@@ -1,0 +1,12 @@
+body.path-local-notificationsagent h5 i.icon{
+    font-size: 1.2rem;
+    line-height: initial;
+}
+
+body.path-local-notificationsagent h5 > i.icon:first-child{
+    margin-left: .5rem;
+}
+
+body.path-local-notificationsagent .mform .form-inline .form-group .custom-select{
+    width: 100%;
+}
