@@ -55,18 +55,4 @@ class local_notificationsagent_observer {
         $courseid = $event->courseid;
 
     }
-
-    /**
-     * @throws dml_exception
-     */
-    public static function course_viewed(\core\event\course_viewed $event) {
-        // Usamos este evento para evitar la consulta a la log_standard_log para el inicio de sesión en un curso.
-        if (!isloggedin() || $event->courseid == 1) {
-            return;
-        }
-        $userid = $event->userid;
-        $courseid = $event->courseid;
-        $timeaccess = $event->timecreated;
-        set_first_course_access($userid, $courseid, $timeaccess);
-    }
 }

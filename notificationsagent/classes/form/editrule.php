@@ -22,9 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+use local_notificationsagent\plugininfo\notificationsbaseinfo;
 
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once("$CFG->libdir/formslib.php");
+require_once ("$CFG->dirroot/local/notificationsagent/lib.php");
 
 class editrule extends \moodleform {
 
@@ -71,23 +74,27 @@ class editrule extends \moodleform {
         ');
             
         $this->add_action_buttons();
-        //Al guardar cambios, borrar todos los $_SESSION referentes al formulario de nueva Regla 
-        // unset($_SESSION['NOTIFICATIONS_CONDITIONS']);
-        // unset($_SESSION['NOTIFICATIONS_EXCEPTIONS']);
-        // unset($_SESSION['NOTIFICATIONS_ACTIONS']);
+        //Al guardar cambios, borrar todos los $SESSION referentes al formulario de nueva Regla 
+        // unset($SESSION->NOTIFICATIONS['CONDITIONS']);
+        // unset($SESSION->NOTIFICATIONS['EXCEPTIONS']);
+        // unset($SESSION->NOTIFICATIONS['ACTIONS']);
     }
 
     private function conditions(&$mform){
+        global $SESSION;
         //Get new Conditions
         require_once('Conditions.php');
         
         $objConditions = new Conditions();
-        echo $objConditions->constructConditions($mform, $_SESSION['NOTIFICATIONS_IDCOURSE']);
-        $listconditions = get_all_conditions($_SESSION['NOTIFICATIONS_IDCOURSE']);
+        echo $objConditions->constructConditions($mform, $SESSION->NOTIFICATIONS['IDCOURSE']);
+
+        //$listconditions = get_conditions_description($SESSION->NOTIFICATIONS['IDCOURSE']);
+        $listconditions = notificationsbaseinfo::get_description('condition');
 
         $listoptionscondition = array();
         foreach ($listconditions as $key => $value) {
-            $listoptionscondition["$key:".json_encode($value['elements'])] = $value['title'];
+            $key = $value['name'] . ':' . json_encode($value['elements']);
+            $listoptionscondition[$key] = $value['title'];   
         }
         $newCondition_group = array();
         $newCondition_group[] =& $mform->createElement('select', 'newCondition_select', '', $listoptionscondition, array('class' => 'col-sm-auto p-0 mr-3'));
@@ -100,17 +107,19 @@ class editrule extends \moodleform {
     }
 
     private function actions(&$mform){
+        global $SESSION;
         //Get new Actions
         require_once('Action.php');
         
         $objAction = new Action();
-        echo $objAction->constructAction($mform, $_SESSION['NOTIFICATIONS_IDCOURSE']);
-        $listaction = get_all_actions($_SESSION['NOTIFICATIONS_IDCOURSE']);
-
+        echo $objAction->constructAction($mform, $SESSION->NOTIFICATIONS['IDCOURSE']);
+        //$listaction = get_all_actions($SESSION->NOTIFICATIONS['IDCOURSE']);
+        $listaction = notificationsbaseinfo::get_description('action');
         $listoptionsaction = array();
         foreach ($listaction as $key => $value) {
-            $listoptionsaction["$key:".json_encode($value['elements'])] = $value['title'];
-        }
+            $key = $value['name'] . ':' . json_encode($value['elements']);
+            $listoptionsaction[$key] = $value['title'];   
+        }     
         $newCondition_group = array();
         $newCondition_group[] =& $mform->createElement('select', 'newAction_select', '', $listoptionsaction, array('class' => 'col-sm-auto p-0 mr-3'));
         $newCondition_group[] =& $mform->createElement('button', 'newAction_button', get_string('add'));

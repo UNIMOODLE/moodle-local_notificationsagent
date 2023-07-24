@@ -180,20 +180,6 @@ function get_all_actions($courseid){
     return $array;
 }*/
 
-/**
- * @throws dml_exception
- */
-function set_first_course_access($userid, $courseid, $timeaccess) {
-    global $DB;
 
-    $exists =$DB->record_exists('notificationsagent_access', array('userid'=> $userid, 'courseid'=> $courseid));
-    if(!$exists){
-        $obj_db = new stdClass();
-        $obj_db->userid = $userid;
-        $obj_db->courseid = $courseid;
-        $obj_db->firstaccess= $timeaccess;
-        $DB->insert_record('notificationsagent_access',$obj_db );
-    }
-}
 
 

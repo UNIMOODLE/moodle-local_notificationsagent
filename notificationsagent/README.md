@@ -1,8 +1,6 @@
 # Notifications Agent #
 
-TODO Describe the plugin shortly here.
-
-TODO Provide more detailed description here.
+Main plug-in in the Notification Agent project
 
 ## Installing via uploaded ZIP file ##
 

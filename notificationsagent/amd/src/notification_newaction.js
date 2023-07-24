@@ -31,23 +31,30 @@
             newActionButton.addEventListener('click', function() {
                 let newActionSelect = document.getElementById('id_newAction_select');
                 let $title = newActionSelect.options[newActionSelect.selectedIndex].text;
-
+                let $formDefault = [];
+                let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
+                Array.from(formNotif.elements).forEach((element) => {
+                    if(element.id){
+                        $formDefault.push("[id]"+element.id+"[/id][value]"+element.value+"[/value]");
+                    }
+                });
                 let $elements = JSON.parse(newActionSelect.value.split(':')[1]);
-                
+                let $name = newActionSelect.options[newActionSelect.selectedIndex].value.substring(0, newActionSelect.options[newActionSelect.selectedIndex].value.indexOf(':['));
                 let data = {
-                    key: 'NOTIFICATIONS_ACTIONS',
+                    key: 'ACTIONS',
                     action: 'new',
                     title: $title,
-                    elements: $elements
+                    elements: $elements,
+                    name : $name,
+                    formDefault: $formDefault
                 };
-
                 $.ajax({
                     type: "POST",
                     url: window.location.pathname.substring(0, '/local/notificationsagent/editrule.php'),
                     data: data,
                     success: function(event) {
                         if(event.state === 'success'){
-                            window.location.reload();
+                            window.location.reload();  
                         }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) { 
@@ -55,7 +62,7 @@
                         console.log(errorThrown); 
                     },
                     dataType: 'json'
-                });   
+                });
             });
         }
     }

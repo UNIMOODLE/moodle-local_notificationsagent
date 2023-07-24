@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/local/notificationsagent/adminlib.php');
+
 if ($hassiteconfig) {
 
     $ADMIN->add('localplugins',
@@ -54,4 +56,27 @@ if ($hassiteconfig) {
     }
 
     $ADMIN->add('localplugins', $settingspage);
+
+    // Add subplugins management in settings view
+
+    $ADMIN->add('localplugins', new admin_category('notificationsactionplugins',
+        get_string('actionplugins', 'local_notificationsagent')));
+    $ADMIN->add('notificationsactionplugins',
+        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationsaction'));
+    $ADMIN->add('localplugins', new admin_category('notificationsconditionplugins',
+        get_string('conditionplugins', 'local_notificationsagent')));
+    $ADMIN->add('notificationsconditionplugins',
+        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationscondition'));
+
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('notificationsaction') as $plugin) {
+        /** @var \local_notificationsagent\plugininfo\notificationsaction $plugin */
+        $plugin->load_settings($ADMIN, 'notificationsactionplugins', $hassiteconfig);
+    }
+
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('notificationscondition') as $plugin) {
+        /** @var \local_notificationsagent\plugininfo\notificationscondition $plugin */
+        $plugin->load_settings($ADMIN, 'notificationsconditionplugins', $hassiteconfig);
+    }
+
 }
+

@@ -32,9 +32,23 @@ $string['disable_user_use_desc'] = 'Deshabilitar el uso del Agente de notificaci
 $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Deshabilitar en sitios en producción';
 
+// Subplugins settings.
+$string['notificationaction_action'] ='Subplugins tipo action ';
+
+$string['managenotificationsactionplugins'] = 'Gestionar plugins tipo action';
+$string['managenotificationsconditionplugins'] = 'Gestionar plugins tipo condition';
+
+$string['actionplugins'] = 'Plugins tipo action';
+$string['conditionplugins'] = 'Plugins tipo condition';
+
+$string['notificationsactionpluginname'] = 'Plugin action';
+$string['notificationsconditionpluginname'] = 'Plugin condition';
+
+$string['hideshow'] = 'Ocultar/Mostrar';
+
 // Task.
 $string['task'] = 'Test Task';
-$string['menu'] = 'Agente de notificaciones';
+$string['menu'] = 'Mi asistente';
 
 // EditRule.
     $string['editrule_newrule'] = 'Nueva regla';

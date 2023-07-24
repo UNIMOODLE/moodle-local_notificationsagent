@@ -39,7 +39,3 @@ $observers[] = [
     'callback' => 'local_notificationsagent_observer::course_module_created',
 ];
 
-$observers[] = [
-    'eventname' => '\core\event\course_viewed',
-    'callback' => 'local_notificationsagent_observer::course_viewed',
-];

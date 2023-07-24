@@ -27,45 +27,133 @@ require_once('renderer.php');
 require_once ("../../lib/modinfolib.php");
 require_once ("lib.php");
 
-global $CFG, $DB, $PAGE;
+global $CFG, $DB, $PAGE, $SESSION;
 require_once($CFG->dirroot . '/local/notificationsagent/classes/form/editrule.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 $typeaction = required_param('action', PARAM_ALPHANUMEXT);
-$_SESSION["NOTIFICATIONS_IDCOURSE"] = $courseid;
+$SESSION->NOTIFICATIONS['IDCOURSE'] = $courseid;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST' && (!isset($_POST['cancel']) && !isset($_POST['submitbutton']))){
+    function get_string_between($string, $start, $end){
+        $string = ' ' . $string;
+        $ini = strpos($string, $start);
+        if ($ini == 0) return '';
+        $ini += strlen($start);
+        $len = strpos($string, $end, $ini) - $ini;
+        return substr($string, $ini, $len);
+    }
+
+    $return = [
+        'state' => 'error'
+    ];
     if(isset($_POST['key'])){
         $keyelement = $_POST['key'];
         switch($_POST['action']){
             case 'new':
                 $listelement = array();
-                foreach($_POST as $key => $value) {
-                    $listelement += array($key => $value);
+                $listelement += array('title' => $_POST['title']);
+                $listelement += array('elements' => $_POST['elements']);
+                $listelement += array('name' => $_POST['name']);
+                $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
+                if(isset($SESSION->NOTIFICATIONS[$keyelement])){
+                    if(isset($_POST['formDefault'])){
+                        unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                        foreach ($_POST['formDefault'] as $key => $action) {
+                            $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($action, "[id]", "[/id]")] = get_string_between($action, "[value]", "[/value]");
+                        }
+                    }
+                    $return = [
+                        'state' => 'success'
+                    ];
                 }
-                $_SESSION[$keyelement][$courseid][] = $listelement;
                 break;
             case 'remove':
                 $keyelementsession = $_POST['keyelementsession'];
-                unset($_SESSION[$keyelement][$courseid][$keyelementsession]);
+                unset($SESSION->NOTIFICATIONS[$keyelement][$keyelementsession]);
+                $SESSION->NOTIFICATIONS[$keyelement] = array_values($SESSION->NOTIFICATIONS[$keyelement]);
+                if(empty($SESSION->NOTIFICATIONS[$keyelement])){
+                    unset($SESSION->NOTIFICATIONS[$keyelement]);
+                }
+                if(isset($_POST['formDefault'])){
+                    unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                    foreach ($_POST['formDefault'] as $key => $action) {
+                        $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($action, "[id]", "[/id]")] = get_string_between($action, "[value]", "[/value]");
+
+                    }
+                }
+                $return = [
+                    'state' => 'success'
+                ];
                 break;
             /* Cambiar orden elemento array */
             /*
             case 'up':
                 $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($_SESSION[$keyelement][$courseid], $keyelementsession, $keyelementsession-1);
-                
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession-1);
+
                 break;
             case 'down':
                 $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($_SESSION[$keyelement][$courseid], $keyelementsession, $keyelementsession+1);
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession+1);
                 break;
             */
         }
-        if(isset($_SESSION[$keyelement][$courseid])){
-            $return = [
-                'state' => 'success'
-            ];
+        echo json_encode($return);
+        die();
+    }
+
+    if(isset($_POST['key'])){
+        $keyelement = $_POST['key'];
+        switch($_POST['condition']){
+            case 'new':
+                $listelement = array();
+                $listelement += array('title' => $_POST['title']);
+                $listelement += array('elements' => $_POST['elements']);
+                $listelement += array('name' => $_POST['name']);
+                $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
+                if(isset($SESSION->NOTIFICATIONS[$keyelement])){
+                    if(isset($_POST['formDefault'])){
+                        unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                        foreach ($_POST['formDefault'] as $key => $condition) {
+                            $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($condition, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
+                        }
+                    }
+                    $return = [
+                        'state' => 'success'
+                    ];
+                }
+                break;
+            case 'remove':
+                $keyelementsession = $_POST['keyelementsession'];
+                unset($SESSION->NOTIFICATIONS[$keyelement][$keyelementsession]);
+                $SESSION->NOTIFICATIONS[$keyelement] = array_values($SESSION->NOTIFICATIONS[$keyelement]);
+                if(empty($SESSION->NOTIFICATIONS[$keyelement])){
+                    unset($SESSION->NOTIFICATIONS[$keyelement]);
+                }
+                if(isset($_POST['formDefault'])){
+                    unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                    foreach ($_POST['formDefault'] as $key => $condition) {
+                        $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($condition, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
+
+                    }
+                }
+                $return = [
+                    'state' => 'success'
+                ];
+                break;
+            /* Cambiar orden elemento array */
+            /*
+            case 'up':
+                $keyelementsession = $_POST['keyelementsession'];
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession-1);
+
+                break;
+            case 'down':
+                $keyelementsession = $_POST['keyelementsession'];
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession+1);
+                break;
+            */
         }
         echo json_encode($return);
         die();

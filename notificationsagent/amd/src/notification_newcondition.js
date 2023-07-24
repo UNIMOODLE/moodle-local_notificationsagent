@@ -31,14 +31,22 @@
             newConditionButton.addEventListener('click', function() {
                 let newConditionSelect = document.getElementById('id_newCondition_select');
                 let $title = newConditionSelect.options[newConditionSelect.selectedIndex].text;
-
+                let $formDefault = [];
+                let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
+                Array.from(formNotif.elements).forEach((element) => {
+                    if(element.id){
+                        $formDefault.push("[id]"+element.id+"[/id][value]"+element.value+"[/value]");
+                    }
+                });
                 let $elements = JSON.parse(newConditionSelect.value.split(':')[1]);
-                
+                let $name = newConditionSelect.options[newConditionSelect.selectedIndex].value.substring(0, newConditionSelect.options[newConditionSelect.selectedIndex].value.indexOf(':['));
                 let data = {
-                    key: 'NOTIFICATIONS_CONDITIONS',
+                    key: 'CONDITIONS',
                     action: 'new',
                     title: $title,
-                    elements: $elements
+                    elements: $elements,
+                    name : $name,
+                    formDefault: $formDefault
                 };
 
                 $.ajax({

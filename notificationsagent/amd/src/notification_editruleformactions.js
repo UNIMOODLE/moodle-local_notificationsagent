@@ -35,10 +35,36 @@
                     let $actionelement = event.target.id.split('_')[1];
                     let $keyelementsession = parseInt(event.target.id.replace($typesection,'').replace('_remove',''));
 
+                    let $formDefault = [];
+                    let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
+                    let idSectionRemove = "";
+                    Array.from(formNotif.elements).forEach((element) => {
+                        if(element.id){
+                            var elementID = element.id;
+                            var keySection = elementID.split('_'+$typesection).pop().split('_')[0];
+                            if(element.id.includes("_"+$typesection)){
+                                //¿Eres la sección eliminada?
+                                if(idSectionRemove && idSectionRemove < keySection){
+                                    //Si lo eres, reduce en 1 el id de la sección (condition, action...)
+                                    elementID = element.id.replace($typesection+keySection, $typesection+(keySection-1));
+                                }
+                            }
+
+                            //Si no perteneces a la sección eliminada, te guardo el valor
+                            if(!element.id.includes($typesection+($keyelementsession+1))){
+                                $formDefault.push("[id]"+elementID+"[/id][value]"+element.value+"[/value]");
+                            }else{
+                                //Si perteneces a la sección eliminada, idSectionRemove de la sección y las secciones posteriores reducir a 1 el id de las secciones posteriores
+                                idSectionRemove = $keyelementsession+1;
+                            }
+                        }
+                    });
+
                     let data = {
-                        key: 'NOTIFICATIONS_'+$typesection.toUpperCase()+'S',
+                        key: $typesection.toUpperCase()+'S',
                         action: $actionelement,
-                        keyelementsession: $keyelementsession
+                        keyelementsession: $keyelementsession,
+                        formDefault: $formDefault
                     };
                     
                     $.ajax({

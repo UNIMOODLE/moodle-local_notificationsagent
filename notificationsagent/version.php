@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     local_notificationsagentt
+ * @package     local_notificationsagent
  * @copyright   2023 ISYC
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_notificationsagent';
 $plugin->release = '0.1.0';
-$plugin->version = 2023022213;
+$plugin->version = 2023022227;
 $plugin->requires = 2022041900;
 $plugin->maturity = MATURITY_ALPHA;

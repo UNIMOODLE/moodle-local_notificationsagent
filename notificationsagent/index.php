@@ -33,11 +33,7 @@ global $CFG, $DB, $PAGE;
 // $PAGE->set_context(context_system::instance()).
 $courseid = required_param('courseid', PARAM_INT);
 // Limpiar session notificaciones.
-foreach($_SESSION as $key => $value){
-    if(substr($key, 0, strlen('NOTIFICATIONS')) === 'NOTIFICATIONS'){
-        unset($_SESSION[$key][$courseid]);
-    }
-}
+unset($SESSION->NOTIFICATIONS);
 
 if (!$courseid) {
     require_login();

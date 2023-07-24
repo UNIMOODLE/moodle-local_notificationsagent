@@ -1,0 +1,6 @@
+{
+  "plugintypes": {
+    "notificationscondition"    : "local/notificationsagent/condition",
+    "notificationsaction"       : "local/notificationsagent/action"
+  }
+}

@@ -33,9 +33,26 @@ $string['disable_user_use_desc'] = 'Disable user use of notifications agent';
 $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Disable on a production site';
 
+// Subplugins settings.
+$string['notificationaction_action'] ='Action subplugins';
+
+$string['managenotificationsactionplugins'] = 'Manage action plugins';
+$string['managenotificationsconditionplugins'] = 'Manage condition plugins';
+
+$string['manageactionplugins'] = 'Manage action plugins';
+$string['manageconditionplugins'] = 'Manage condition plugins';
+
+$string['actionplugins'] = 'Action plugins';
+$string['conditionplugins'] = 'Condition plugins';
+
+$string['notificationsactionpluginname'] = 'Action plugin';
+$string['notificationsconditionpluginname'] = 'Condition plugin';
+
+$string['hideshow'] = 'Hide/Show';
+
 // Task.
 $string['task'] = 'Test Task';
-$string['menu'] = 'Notifications Agent';
+$string['menu'] = 'My assistant';
 $string['heading'] = 'Notifications Agent';
 
 // EditRule.
@@ -69,3 +86,6 @@ $string['heading'] = 'Notifications Agent';
         $string['editrule_action_element_user'] = 'User {$a->typeelement}';
         $string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
         $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
+
+$string['notificationaction_action'] ='Action subplugins';
+$string['subplugintype_notificationsagentaction'] = 'Action subplugins';
