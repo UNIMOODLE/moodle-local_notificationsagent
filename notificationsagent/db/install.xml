@@ -1,72 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notificationsagent/db" VERSION="20230629" COMMENT="XMLDB file for Moodle local/notificationsagent"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+<XMLDB PATH="local/notificationsagent/db" VERSION="20230808" COMMENT="XMLDB file for Moodle local/notificationsagent"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
-    <TABLES>
-        <TABLE NAME="notifications_rule" COMMENT="Instances for notifications rules">
-            <FIELDS>
-                <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="name" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="status" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="visibility" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="ruleid"/>
-            </KEYS>
-        </TABLE>
-        <TABLE NAME="notifications_conditions" COMMENT="Data for conditions subplugins">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="conditionid" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="type" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
-            </KEYS>
-        </TABLE>
-        <TABLE NAME="notifications_actions" COMMENT="Data for action subplugins">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="action_id" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
-            </KEYS>
-        </TABLE>
-        <TABLE NAME="notifications_timetriggers" COMMENT="Data for timetriggers">
-            <FIELDS>
-                <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="user_id" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="day" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="ruleid"/>
-            </KEYS>
-        </TABLE>
-        <TABLE NAME="notifications_timercache" COMMENT="Data for timecache">
-            <FIELDS>
-                <FIELD NAME="conditionid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="user_id" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="from" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="to" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="cache" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="conditionid"/>
-            </KEYS>
-        </TABLE>
-    </TABLES>
+  <TABLES>
+    <TABLE NAME="notifications_rule" COMMENT="Instances for notifications rules">
+      <FIELDS>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="visibility" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="shared" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Shared rule"/>
+        <FIELD NAME="defaultrule" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mark as default rule"/>
+        <FIELD NAME="template" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Rule marked as template"/>
+        <FIELD NAME="assigned" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Rule assigned"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="ruleid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_rule_plugins" COMMENT="Data for subplugins">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Type of subplugin, condtion, action"/>
+        <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="complementary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether a condition is a exception"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_rule_actions" COMMENT="Data for action subplugins">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="action_id" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Type of subplugin, condtion, action"/>
+        <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_timetriggers" COMMENT="Data for timetriggers">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="day" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_timercache" COMMENT="Data for timecache">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeto" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cache" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_events" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="event_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Event type (Moodle cron)"/>
+        <FIELD NAME="decription" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_conditions" COMMENT="Conditions data">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Condition type, timer, cron, condition"/>
+        <FIELD NAME="eventid" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="conditionid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="notifications_actions" COMMENT="Actions data">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="action_id" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="action" TYPE="char" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
 </XMLDB>

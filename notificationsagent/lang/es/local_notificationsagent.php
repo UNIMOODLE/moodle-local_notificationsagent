@@ -33,7 +33,7 @@ $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Deshabilitar en sitios en producción';
 
 // Subplugins settings.
-$string['notificationaction_action'] ='Subplugins tipo action ';
+$string['notificationaction_action'] = 'Subplugins tipo action ';
 
 $string['managenotificationsactionplugins'] = 'Gestionar plugins tipo action';
 $string['managenotificationsconditionplugins'] = 'Gestionar plugins tipo condition';
@@ -49,6 +49,18 @@ $string['hideshow'] = 'Ocultar/Mostrar';
 // Task.
 $string['task'] = 'Test Task';
 $string['menu'] = 'Mi asistente';
+$string['heading'] = 'Agente de Notificaciones';
+
+// Import Template
+$string['import'] = 'Import';
+
+// Export Template
+$string['export'] = 'Exportar';
+
+// Assign Template
+$string['assign'] = 'Asignar';
+$string['type_template'] = 'plantilla';
+$string['type_rule'] = 'regla';
 
 // EditRule.
     $string['editrule_newrule'] = 'Nueva regla';

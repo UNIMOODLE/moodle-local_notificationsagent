@@ -34,7 +34,7 @@ $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Disable on a production site';
 
 // Subplugins settings.
-$string['notificationaction_action'] ='Action subplugins';
+$string['notificationaction_action'] = 'Action subplugins';
 
 $string['managenotificationsactionplugins'] = 'Manage action plugins';
 $string['managenotificationsconditionplugins'] = 'Manage condition plugins';
@@ -54,6 +54,17 @@ $string['hideshow'] = 'Hide/Show';
 $string['task'] = 'Test Task';
 $string['menu'] = 'My assistant';
 $string['heading'] = 'Notifications Agent';
+
+// Import Template
+$string['import'] = 'Import';
+
+// Export Template
+$string['export'] = 'Export';
+
+// Assign Template
+$string['assign'] = 'Assign';
+$string['type_template'] = 'template';
+$string['type_rule'] = 'rule';
 
 // EditRule.
     $string['editrule_newrule'] = 'New rule';
@@ -87,5 +98,5 @@ $string['heading'] = 'Notifications Agent';
         $string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
         $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
 
-$string['notificationaction_action'] ='Action subplugins';
+
 $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
