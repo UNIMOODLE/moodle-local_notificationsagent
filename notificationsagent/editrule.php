@@ -307,7 +307,6 @@ if ($mform->is_cancelled()) {
         $pluginobj = new $pluginclass($rule);
         $dataplugin->parameters = $pluginobj->get_parameters($pluginDatum);
         $DB->insert_record('notifications_rule_plugins', $dataplugin);
-       
     }
   
    
