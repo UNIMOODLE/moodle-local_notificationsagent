@@ -23,6 +23,9 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
+require_admin();
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/local/notificationsagent/adminlib.php');
 
 $subtype = required_param('subtype', PARAM_PLUGIN);

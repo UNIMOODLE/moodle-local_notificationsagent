@@ -45,7 +45,7 @@ class notificationsagent_admin_page_manage_notificationsagent_plugins extends ad
      */
     public function __construct($subtype) {
         $this->subtype = $subtype;
-        $url = new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype'=>$subtype));
+        $url = new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype' => $subtype));
         parent::__construct('manage' . $subtype . 'plugins',
                             get_string('manage' . $subtype . 'plugins', 'local_notificationsagent'),
                             $url);
@@ -104,7 +104,7 @@ class notificationsagent_plugin_manager {
      * @param string $subtype - either assignsubmission or assignfeedback
      */
     public function __construct($subtype) {
-        $this->pageurl = new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype'=>$subtype));
+        $this->pageurl = new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype' => $subtype));
         $this->subtype = $subtype;
     }
 
@@ -125,7 +125,7 @@ class notificationsagent_plugin_manager {
                 $idx = 0;
             }
             while (array_key_exists($idx, $result)) {
-                $idx +=1;
+                $idx += 1;
             }
             $result[$idx] = $name;
         }
@@ -158,7 +158,7 @@ class notificationsagent_plugin_manager {
         }
 
         return $OUTPUT->action_icon(new moodle_url($url,
-                array('action' => $action, 'plugin'=> $plugin, 'sesskey' => sesskey())),
+                array('action' => $action, 'plugin' => $plugin, 'sesskey' => sesskey())),
                 new pix_icon($icon, $alt, 'moodle', array('title' => $alt)),
                 null, array('title' => $alt)) . ' ';
     }
@@ -208,7 +208,7 @@ class notificationsagent_plugin_manager {
             if (!$idx == 0) {
                 $movelinks .= $this->format_icon_link('moveup', $plugin, 't/up', get_string('up'));
             } else {
-                $movelinks .= $OUTPUT->spacer(array('width'=>16));
+                $movelinks .= $OUTPUT->spacer(array('width' => 16));
             }
             if ($idx != count($plugins) - 1) {
                 $movelinks .= $this->format_icon_link('movedown', $plugin, 't/down', get_string('down'));

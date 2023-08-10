@@ -10,3 +10,126 @@ body.path-local-notificationsagent h5 > i.icon:first-child{
 body.path-local-notificationsagent .mform .form-inline .form-group .custom-select{
     width: 100%;
 }
+body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
+    flex: 0 0 100%;
+    margin-bottom: 24px;
+}
+
+@media (min-width: 992px){
+    body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
+        flex: 0 0 32.222222221%;
+        margin-left: 1.666666665%;
+    }
+    body.path-local-notificationsagent [role="main"] > .d-flex > div.card:nth-child(3n+1){
+        margin-left: 0;
+    }
+}
+
+body.path-local-notificationsagent .card{
+    height: 500px;
+}
+
+body.path-local-notificationsagent .card.card-template{
+    background-color: #F3F3F3;
+}
+
+body.path-local-notificationsagent .card .name{
+    font-weight: 600;
+}
+
+body.path-local-notificationsagent .card .card-body{
+    overflow-y: auto;
+}
+
+body.path-local-notificationsagent .card .card-content{
+    flex: 1;
+}
+
+body.path-local-notificationsagent .badge{
+    font-size: 12px;
+    padding: 0.5rem 1rem;
+    background-color: #f3f3f3;
+    border-radius: 1rem;
+    text-transform: capitalize;
+}
+
+body.path-local-notificationsagent .badge.badge-template{
+    background-color: #FFEFBD;
+    color: #8A600D;
+}
+
+body.path-local-notificationsagent .badge.badge-rule{
+    background-color: #ECF3FD;
+    color: #117CDC;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .modal-dialog{
+    max-width: 800px;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .course-category-listing{
+    cursor: default;
+    font-size: 14px;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .header-listing{
+    border: 1px solid #CED4DA;
+    border-radius: 8px 8px 0 0;
+    background-color: #F3F3F3;
+    color: #92989D;
+    font-weight: 700;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .header-listing > div{
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .category-listing{
+    overflow-y: auto;
+    max-height: 50vh;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .list-group-item{
+    padding: 0;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .list-group-item > div{
+    padding: 0.75rem 1.25rem;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed{
+    background-color: #ffffff;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed:hover{
+    background-color: #f8f9fa;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .listitem-category{
+    background-color: #F3F3F3;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item{
+    border-right: 0;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item:last-child{
+    margin-bottom: 1rem;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label{
+    cursor: pointer;
+}
+
+body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label::before{
+    border-radius: 0.25rem;
+}
+
+body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"]{
+    cursor: pointer;
+}
+
+body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"][aria-expanded="true"] i.fa-angle-down:before{
+    content: "\f106";
+}

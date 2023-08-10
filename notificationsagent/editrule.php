@@ -27,7 +27,10 @@ require_once('renderer.php');
 require_once ("../../lib/modinfolib.php");
 require_once ("lib.php");
 
-global $CFG, $DB, $PAGE, $SESSION;
+use local_notificationsagent\Rule;
+use local_notificationsagent\notificationplugin;
+
+global $CFG, $DB, $PAGE, $SESSION , $USER;
 require_once($CFG->dirroot . '/local/notificationsagent/classes/form/editrule.php');
 
 $courseid = required_param('courseid', PARAM_INT);
@@ -158,6 +161,62 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && (!isset($_POST['cancel']) && !isset($
         echo json_encode($return);
         die();
     }
+    if(isset($_POST['key'])){
+        $keyelement = $_POST['key'];
+        switch($_POST['exception']){
+            case 'new':
+                $listelement = array();
+                $listelement += array('title' => $_POST['title']);
+                $listelement += array('elements' => $_POST['elements']);
+                $listelement += array('name' => $_POST['name']);
+                $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
+                if(isset($SESSION->NOTIFICATIONS[$keyelement])){
+                    if(isset($_POST['formDefault'])){
+                        unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                        foreach ($_POST['formDefault'] as $key => $exception) {
+                            $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($exception, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
+                        }
+                    }
+                    $return = [
+                        'state' => 'success'
+                    ];
+                }
+                break;
+            case 'remove':
+                $keyelementsession = $_POST['keyelementsession'];
+                unset($SESSION->NOTIFICATIONS[$keyelement][$keyelementsession]);
+                $SESSION->NOTIFICATIONS[$keyelement] = array_values($SESSION->NOTIFICATIONS[$keyelement]);
+                if(empty($SESSION->NOTIFICATIONS[$keyelement])){
+                    unset($SESSION->NOTIFICATIONS[$keyelement]);
+                }
+                if(isset($_POST['formDefault'])){
+                    unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
+                    foreach ($_POST['formDefault'] as $key => $exception) {
+                        $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($exception, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
+
+                    }
+                }
+                $return = [
+                    'state' => 'success'
+                ];
+                break;
+            /* Cambiar orden elemento array */
+            /*
+            case 'up':
+                $keyelementsession = $_POST['keyelementsession'];
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession-1);
+
+                break;
+            case 'down':
+                $keyelementsession = $_POST['keyelementsession'];
+                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession+1);
+                break;
+            */
+        }
+        echo json_encode($return);
+        die();
+    }
+    
 }
 
 if (!$courseid) {
@@ -184,6 +243,7 @@ $PAGE->set_heading(get_string('heading', 'local_notificationsagent')." - ".get_s
 $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_newaction', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_newcondition', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_newexception', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_editruleformactions', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_placeholders', 'init');
 
@@ -195,13 +255,74 @@ if ($mform->is_cancelled()) {
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
     redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha cancelado');
 } else if ($fromform = $mform->get_data()) {
+    $data = new stdClass;
+    $data->courseid = $courseid;
+    $data->name = $fromform->title;
+    $data->createdat= time();
+    $data->createdby = $USER->id;
+    $ruleid = $DB->insert_record('notifications_rule', $data);
+    // TODO Refactor.
+    $pluginData = array();
+    $processedPlugins = array();
+    $pluginCount = array();
+    $dataplugin = new stdClass();
+    
+    foreach ($fromform as $key => $value) {
+        if (strpos($key, "pluginname") === 0) {
+            $pluginname = $value;
+            
+            if (!isset($pluginCount[$pluginname])) {
+                $pluginCount[$pluginname] = 1;
+            } else {
+                $pluginCount[$pluginname]++;
+            }
+    
+            $currentPluginKey = $pluginname . $pluginCount[$pluginname];
+            $pluginData[$currentPluginKey] = array('type' => '');
+
+        } elseif (strpos($key, "type") === 0 && isset($currentPluginKey)) {
+            $plugintype = $value;
+            $pluginData[$currentPluginKey]['type'] = $plugintype;
+            
+        }elseif (
+            isset($currentPluginKey) &&
+            (strpos($key, 'condition') !== false || strpos($key, 'action') !== false || strpos($key, 'conditionexception') !== false)
+        ) {
+            $subkeyWithoutPluginName = str_replace($pluginname . '_', '', $key);
+            $pluginData[$currentPluginKey][$subkeyWithoutPluginName] = $value;
+        }        
+    }
+
+    foreach ($pluginData as $currentPluginKey => $pluginDatum) {
+        $dataplugin = new \stdClass();
+        $dataplugin->ruleid = $ruleid;
+        $dataplugin->pluginname = preg_replace('/\d+$/', '', $currentPluginKey);
+        $plugintype = preg_replace('/\d+$/', '', $pluginDatum['type']);
+        $dataplugin->type =  $plugintype;
+        // Ruta y creación de objetos de plugin
+        $rule = new \stdClass();
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname  . '/' . $dataplugin->pluginname  . '.php');
+       
+        $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
+        $pluginobj = new $pluginclass($rule);
+        $dataplugin->parameters = $pluginobj->get_parameters($pluginDatum);
+        $DB->insert_record('notifications_rule_plugins', $dataplugin);
+       
+    }
+  
+   
+
+    
+   
+
     //In this case you process validated data. $mform->get_data() returns data posted in form.
-    $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');
+    //$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
+    //redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');
 } else {
     // this branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
     // or on the first display of the form.
 }
+
 
 $output = $PAGE->get_renderer('local_notificationsagent');
 
