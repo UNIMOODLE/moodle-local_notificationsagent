@@ -27,7 +27,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         );
     }
 
-    public function get_ui($mform, $id, $courseid) {
+    public function get_ui($mform, $id, $courseid, $exception) {
 
         $mform->addElement(
             'text', 'action'.$id.'_element'.'3'.'_title',
@@ -61,10 +61,14 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
             );
         }
-        self::placeholders($mform,'action'.$id);
+        asort($listusers);
+        self::placeholders($mform, 'action'.$id);
         $mform->addElement(
             'select', 'action' . $id . '_element' . '3' . '_user',
-            get_string('editrule_action_element_user', 'notificationsaction_usermessageagent', array('typeelement' => '[UUUU]')), $listusers
+            get_string(
+                'editrule_action_element_user', 'notificationsaction_usermessageagent',
+                array('typeelement' => '[UUUU]')
+            ), $listusers
         );
 
         return $mform;
@@ -95,5 +99,15 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
 
     public function check_capability() {
         // TODO: Implement check_capability() method.
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public function get_parameters($params) {
+        // TODO: Implement get_parameters() method.
+        return '{"time:00003 }';
     }
 }

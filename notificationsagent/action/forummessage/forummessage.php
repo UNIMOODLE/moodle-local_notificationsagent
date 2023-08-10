@@ -38,7 +38,7 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         );
     }
 
-    public function get_ui($mform, $id, $courseid) {
+    public function get_ui($mform, $id, $courseid, $exception) {
         global $DB;
         $mform->addElement(
             'text', 'action'.$id.'_element'.'4'.'_title',
@@ -65,9 +65,13 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         $mform->setType('action'.$id.'_message', PARAM_RAW);
 
         $forumname = array();
-        $forumlist =  mod_forum_external::get_forums_by_courses(array($courseid));
+        $forumlist = mod_forum_external::get_forums_by_courses(array($courseid));
         foreach ($forumlist as $forum) {
             $forumname[$forum->id] = $forum->name;
+        }
+        asort($forumname);
+        if (empty($forumname)) {
+            $forumname['0'] = 'FFFF';
         }
         $mform->addElement('select', 'action'.$id.'_element'.'4'.'_forum', get_string('editrule_action_element_forum',
             'notificationsaction_forummessage', array('typeelement' => '[FFFF]')), $forumname);
@@ -87,7 +91,17 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
 
     }
 
-    public  function check_capability() {
+    public function check_capability() {
         // TODO: Implement check_capability() method.
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public function get_parameters($params) {
+        // TODO: Implement get_parameters() method.
+        return '{"time:77777 }';
     }
 }

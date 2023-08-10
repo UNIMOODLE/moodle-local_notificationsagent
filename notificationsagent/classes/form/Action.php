@@ -21,16 +21,16 @@ class Action {
     public function constructAction(&$mform, $idCourse) {
         global $SESSION;
         // get BD actions + ACTIONS.
-
         // Recorremos el array completo de actions y lo construimos en un array de mform.
-        if(isset($SESSION->NOTIFICATIONS['ACTIONS'])){
-            $actionsItems = $SESSION->NOTIFICATIONS['ACTIONS'];
+        if(isset($SESSION->NOTIFICATIONS['actions'])){
+            $actionsItems = $SESSION->NOTIFICATIONS['actions'];
+          
             $idAction = 1;
             foreach ($actionsItems as $key => $action) {
                 $actionRemove = "<i class='btn icon fa fa-trash align-top' id='action".$key."_remove'></i>";
                 $actionButtons = $actionRemove;
                 $titleH = '<h5>'.$idAction.') '.$action['title'].$actionButtons.'</h5>';
-                
+               
                 $mform->addElement('html', $titleH);
                 //$pluginname[$idAction] =  substr($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_newAction_select'], 0, strpos($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_newAction_select'], ':'));
                 $pluginname[$idAction] =  $action['name'];
@@ -46,7 +46,7 @@ class Action {
         global $CFG, $DB, $USER, $COURSE, $SESSION;
         $context = \context_course::instance($idCourse);
         $subtype='action'; // TODO
-            
+
             require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
             $pluginobj = new $pluginclass();

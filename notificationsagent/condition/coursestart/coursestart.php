@@ -64,28 +64,66 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         return false;
     }
 
-    public function get_ui($mform, $id, $courseid) {
-        // TODO $id.
+    public function get_ui($mform, $id, $courseid, $exception) {
+
+        $mform->addElement('hidden', 'pluginname'.$id,$this->get_subtype());
+        $mform->setType('pluginname'.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$id,$this->get_type());
+        $mform->setType('type'.$id, PARAM_RAW );
         $timegroup = array();
-        $timegroup[] =& $mform->createElement('float', 'condition'.$id.'_element'.'2'.'_time_days', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-            placeholder' => 'Horas',
-            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'));
-        $timegroup[] =& $mform->createElement('float', 'condition'.$id.'_element'.'2'.'_time_hours', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => 'Minutos',
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'));
-        $mform->setDefault('condition'.$id.'_element'.'2'.'_time_hours', '2'.'_time_hours');
-        $timegroup[] =& $mform->createElement('float', 'condition'.$id.'_element'.'2'.'_time_minutes', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
-                'placeholder' => 'Segundos',
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'));
+        $timegroup[] =& $mform->createElement(
+            'float', 'condition' . $exception . $id . '_time_days', '',
+            array(
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                'placeholder' => 'Días',
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'
+            )
+        );
+
+        $timegroup[] =& $mform->createElement(
+            'float', 'condition' . $exception . $id . '_time_hours', '',
+            array(
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                ' placeholder' => 'Horas',
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'
+            )
+        );
+        $timegroup[] =& $mform->createElement(
+            'float', 'condition' . $exception . $id . '_time_minutes', '',
+            array(
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
+                 placeholder' => 'Minutos',
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'
+            )
+        );
+        $timegroup[] =& $mform->createElement(
+            'float', 'condition' . $exception . $id  . '_time_seconds', '',
+            array(
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => 'Segudos',
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")'
+            )
+        );
+        $mform->setDefault('condition'.$exception.$id.'_time_hours', '2'.'_time_seconds');
 
         // TODO Strings.
-        $mform->addGroup($timegroup, 'condition'.$id.'_group'.'2'.'time',
+        $mform->addGroup($timegroup, $this->get_subtype().'_'.$this->get_type(). $exception.$id .'time',
             get_string('editrule_condition_element_time', 'notificationscondition_coursestart',
                 array('typeelement' => '[TTTT]')));
+        $mform->setDefault('condition'.$exception.$id.'_time_minutes', '_time_minutes');
+    }
 
+    /** Estimate next time when this condition will be true. */
+    public function estimate_next_time() {
+        // TODO: Implement estimate_next_time() method.
+    }
 
-        $mform->setDefault('condition'.$id.'_element'.'2'.'_time_minutes', '_time_minutes');
+    /**
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public function get_parameters($params) {
+        // TODO: Implement get_parameters() method.
+        return '{"time:99899 }';
     }
 }

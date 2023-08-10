@@ -57,9 +57,6 @@ class Forummessage_action {
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => http_build_query($params, '', '&'),
-                /*CURLOPT_HTTPHEADER => [
-                    "Content-Type: application/json"
-                ],*/
             ));
 
             $response = curl_exec($curl);

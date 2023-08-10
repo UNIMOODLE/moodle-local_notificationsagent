@@ -33,4 +33,7 @@ abstract class notificationconditionplugin extends notificationplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public abstract function evaluate(\EvaluationContext $context): bool;
+
+     /** Estimate next time when this condition will be true. */
+    public abstract function estimate_next_time();
 }

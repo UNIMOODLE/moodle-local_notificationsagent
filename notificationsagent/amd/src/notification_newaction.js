@@ -27,9 +27,9 @@
     return {
 
         init: function() {
-            let newActionButton = document.getElementById('id_newAction_button');
+            let newActionButton = document.getElementById('id_newaction_button');
             newActionButton.addEventListener('click', function() {
-                let newActionSelect = document.getElementById('id_newAction_select');
+                let newActionSelect = document.getElementById('id_newaction_select');
                 let $title = newActionSelect.options[newActionSelect.selectedIndex].text;
                 let $formDefault = [];
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
@@ -41,7 +41,7 @@
                 let $elements = JSON.parse(newActionSelect.value.split(':')[1]);
                 let $name = newActionSelect.options[newActionSelect.selectedIndex].value.substring(0, newActionSelect.options[newActionSelect.selectedIndex].value.indexOf(':['));
                 let data = {
-                    key: 'ACTIONS',
+                    key: 'action',
                     action: 'new',
                     title: $title,
                     elements: $elements,

@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace local_notificationsagent\plugininfo;
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/classes/rule.php');
 
 use core\plugininfo\base;
 use core_plugin_manager, core_component;
+
 
 
 class notificationsbaseinfo extends base {
@@ -58,7 +61,7 @@ class notificationsbaseinfo extends base {
         if (file_exists($path .'/' . $classfile.'.php')) {
             require_once($path . '/' . $classfile.'.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
-            $plugin = new $pluginclass();
+            $plugin = new $pluginclass($rule);
             return $plugin;
         }
     }
@@ -120,10 +123,12 @@ class notificationsbaseinfo extends base {
         global $CFG;
         $listactions = array();
         // TODO enabled.
+        $rule= new \stdClass();
+        $rule->ruleid=null;
         foreach (array_keys(core_component::get_plugin_list('notifications' . $subtype)) as $pluginname) {
             require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
-            $pluginobj = new $pluginclass();
+            $pluginobj = new $pluginclass($rule);
             $listactions[] = $pluginobj->get_description();
         }
 

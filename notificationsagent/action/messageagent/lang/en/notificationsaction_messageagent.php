@@ -28,6 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'User individual notification';
 $string['messageprovider:individual_message'] = 'Message Provider';
 $string['messageagent_action'] = 'Send individual notification with title [TTTT] and message [BBBB]';
-$string['editrule_action_element_title'] = 'Title {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Message {$a->typeelement}';
+$string['editrule_action_title'] = 'Title {$a->typeelement}:';
+$string['editrule_action_message'] = 'Message {$a->typeelement}';
 $string['subtype'] = 'messageagent';

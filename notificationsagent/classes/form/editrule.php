@@ -57,17 +57,20 @@ class editrule extends \moodleform {
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
             ');
-                $this->conditions($mform);
+                //$this->conditions($mform);
+                $this->settabcontent("condition",$mform);
         $mform->addElement('html', '
             </div>
             <div class="tab-pane fade" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
         ');
-                //$this->exceptions($mform);
+                $this->settabcontent("condition", $mform, "exception");
         $mform->addElement('html', '
             </div>
             <div class="tab-pane fade" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
         ');
-                $this->actions($mform);
+                //$this->actions($mform);
+                $this->settabcontent("action",$mform);
+
         $mform->addElement('html', '
             </div>
         </div>
@@ -97,8 +100,8 @@ class editrule extends \moodleform {
             $listoptionscondition[$key] = $value['title'];   
         }
         $newCondition_group = array();
-        $newCondition_group[] =& $mform->createElement('select', 'newCondition_select', '', $listoptionscondition, array('class' => 'col-sm-auto p-0 mr-3'));
-        $newCondition_group[] =& $mform->createElement('button', 'newCondition_button', get_string('add'));
+        $newCondition_group[] =& $mform->createElement('select', 'newcondition_select', '', $listoptionscondition, array('class' => 'col-sm-auto p-0 mr-3'));
+        $newCondition_group[] =& $mform->createElement('button', 'newcondition_button', get_string('add'));
         $mform->addGroup($newCondition_group, 'newCondition_group', get_string('editrule_newcondition', 'local_notificationsagent'), array('class' => 'mt-5'), false);
     }
 
@@ -121,13 +124,38 @@ class editrule extends \moodleform {
             $listoptionsaction[$key] = $value['title'];   
         }     
         $newCondition_group = array();
-        $newCondition_group[] =& $mform->createElement('select', 'newAction_select', '', $listoptionsaction, array('class' => 'col-sm-auto p-0 mr-3'));
-        $newCondition_group[] =& $mform->createElement('button', 'newAction_button', get_string('add'));
+        $newCondition_group[] =& $mform->createElement('select', 'newaction_select', '', $listoptionsaction, array('class' => 'col-sm-auto p-0 mr-3'));
+        $newCondition_group[] =& $mform->createElement('button', 'newaction_button', get_string('add'));
         $mform->addGroup($newCondition_group, 'newAction_group', get_string('editrule_newaction', 'local_notificationsagent'), array('class' => 'mt-5'), false);
     }
 
     //Custom validation should be added here
     function validation($data, $files) {
         return array();
+    }
+
+    private function settabcontent($type, $mform, $exception = null) {
+        global $SESSION;
+        //Get new Conditions
+        require_once('content.php');
+        $obj = new content();
+        //$method = 'construct'.$type;
+        echo $obj->renderform($mform, $SESSION->NOTIFICATIONS['IDCOURSE'], $type, $exception);
+        //$listconditions = get_conditions_description($SESSION->NOTIFICATIONS['IDCOURSE']);
+        $list = notificationsbaseinfo::get_description($type);
+        $listoptions = array();
+        foreach ($list as $key => $value) {
+            $key = $value['name'] . ':' . json_encode($value['elements']);
+            $listoptions[$key] = $value['title'];
+        }
+        $new_group = array();
+        $new_group[] =& $mform->createElement(
+            'select', 'new' . $type . $exception . '_select', '', $listoptions, array('class' => 'col-sm-auto p-0 mr-3')
+        );
+        $new_group[] =& $mform->createElement('button', 'new' . $type . $exception . '_button', get_string('add'));
+        $mform->addGroup(
+            $new_group, 'new' . $type . $exception . '_group', get_string('editrule_new' . $type, 'local_notificationsagent'),
+            array('class' => 'mt-5'), false
+        );
     }
 }

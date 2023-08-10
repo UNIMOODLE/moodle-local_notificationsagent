@@ -13,8 +13,8 @@ class Conditions
         //get BD conditions + CONDITIONS
         
         //Recorremos el array completo de conditions y lo construimos en un array de mform
-        if(isset($SESSION->NOTIFICATIONS['CONDITIONS'])){
-            $conditionsItems = $SESSION->NOTIFICATIONS['CONDITIONS'];
+        if(isset($SESSION->NOTIFICATIONS['conditions'])){
+            $conditionsItems = $SESSION->NOTIFICATIONS['conditions'];
             $idCondition = 1;
             foreach ($conditionsItems as $key => $condition) {
 

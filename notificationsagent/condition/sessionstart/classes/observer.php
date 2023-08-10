@@ -21,8 +21,12 @@
  * @copyright  2023 fernando
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once (__DIR__ . '/../lib.php');
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../lib.php');
+require_once(__DIR__ .'/../sessionstart.php');
 class notificationscondition_sessionstart_observer {
+
+
 
     /**
      * @throws \dml_exception
@@ -32,10 +36,45 @@ class notificationscondition_sessionstart_observer {
         if (!isloggedin() || $event->courseid == 1) {
             return;
         }
+        global $DB;
         $userid = $event->userid;
         $courseid = $event->courseid;
         $timeaccess = $event->timecreated;
-        set_first_course_access($userid, $courseid, $timeaccess);
-    }
+        // TODO
+        //Cuando se reciba un evento de tipo course_viewed se buscará que condiciones tienen
+        // a ese evento como desencadenante.
+        // Sabiendo las condiciones se podrá encontrar las reglas que tengas esa condición y
+        // están asociadas al curso que desencadena el evento.
+        //Se evaluará la condición para el curso y alumno correspondiente calculando la fecha de cumplimiento de la condición.
+        //Si por ejemplo TTTT fuera 10 días y el evento (primer inicio del curso)
+        // ocurre el 12/05/2023 el método de evaluación de tiempo devolverá 22/05/2023.
+        // Este valor se guardaría en la tabla de cache.
+        //En los siguientes eventos course_viewed para ese curso y ese alumno se verificará
+        // si hay algún valor guardado en la cache, de ser asi no se tocaría ya que el primer inicio de sesión no puede cambiar.
+        // parámetros necesarios
+        //condición para saber TTTT
+        // Timeaccess que nos lo da el evento
+        // Insertar en timer cache TTTT + timeacces
+        $rule = new \stdClass();
+        $rule->ruleid = null;
+        $session = new notificationsagent_condition_sessionstart($rule);
+        $pluginname =$session->get_subtype();
 
+        $results = $DB->get_records_sql('
+                select mnrc.parameters, mnrc.pluginname as pluginname
+                from mdl_notifications_rule_plugins mnrc
+                inner join mdl_notifications_rule mnr ON mnr.ruleid=mnrc.ruleid
+                where pluginname=?
+                and courseid=?',
+                [$pluginname,$courseid]
+            );
+
+        foreach ($results as $result){
+            $decode = $result->parameters;
+            $pluginname = $result->pluginname;
+            $param = json_decode($decode, true);
+            $cache = $timeaccess + $param['time'];
+            sessionstart_set_timer_cache($userid, $courseid, $cache, $pluginname);
+        }
+    }
 }

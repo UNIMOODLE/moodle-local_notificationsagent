@@ -61,12 +61,16 @@
                     });
 
                     let data = {
-                        key: $typesection.toUpperCase()+'S',
+                        key: $typesection,
                         action: $actionelement,
                         keyelementsession: $keyelementsession,
                         formDefault: $formDefault
                     };
                     
+                    if (data.key === 'conditionexception') {
+                        data.key = data.key.replace(/condition/, '');
+                    }
+
                     $.ajax({
                         type: "POST",
                         url: window.location.pathname.substring(0, '/local/notificationsagent/editrule.php'),

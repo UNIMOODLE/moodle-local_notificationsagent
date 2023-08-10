@@ -18,21 +18,24 @@
  *  lib.php for sessionstart subplugin.
  *
  * @package
- * @copyright  2023 fernando
+ * @copyright  2023 Isyc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * @throws dml_exception
- */
-function set_first_course_access($userid, $courseid, $timeaccess) {
+// TODO Refactor to plugin instead of subplugin.
+function sessionstart_set_timer_cache($userid, $courseid, $time, $pluginname) {
     global $DB;
-    $exists = $DB->record_exists('notifications_sessionaccess', array('userid' => $userid, 'courseid' => $courseid));
+    $exists = $DB->record_exists('notifications_timercache',
+        array('userid' => $userid,
+            'courseid' => $courseid,
+            'pluginname' => $pluginname));
+    // First course viewed for a user does not change, so no need for update
     if (!$exists) {
         $objdb = new stdClass();
         $objdb->userid = $userid;
         $objdb->courseid = $courseid;
-        $objdb->firstaccess = $timeaccess;
-        $DB->insert_record('notifications_sessionaccess', $objdb);
+        $objdb->timestart = $time;
+        $objdb->pluginname = $pluginname;
+        $DB->insert_record('notifications_timercache', $objdb);
     }
 }

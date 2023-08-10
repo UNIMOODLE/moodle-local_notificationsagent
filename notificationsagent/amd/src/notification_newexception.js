@@ -39,9 +39,10 @@
                     }
                 });
                 let $elements = JSON.parse(newExceptionSelect.value.split(':')[1]);
-                let $name = newExceptionSelect.options[newExceptionSelect.selectedIndex].value.substring(0, newExceptionSelect.options[newExceptionSelect.selectedIndex].value.indexOf(':['));
+                let $name = newExceptionSelect.options[newExceptionSelect.selectedIndex].value.substring(0,
+                  newExceptionSelect.options[newExceptionSelect.selectedIndex].value.indexOf(':['));
                 let data = {
-                    key: 'EXCEPTION',
+                    key: 'exception',
                     action: 'new',
                     title: $title,
                     elements: $elements,
@@ -58,12 +59,12 @@
                             window.location.reload();
                         }
                     },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                        console.log("Status: " + textStatus); 
-                        console.log(errorThrown); 
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.log("Status: " + textStatus);
+                        console.log(errorThrown);
                     },
                     dataType: 'json'
-                });      
+                });
             });
         }
     }

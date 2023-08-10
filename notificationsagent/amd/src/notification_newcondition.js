@@ -27,9 +27,9 @@
     return {
 
         init: function() {
-            let newConditionButton = document.getElementById('id_newCondition_button');
+            let newConditionButton = document.getElementById('id_newcondition_button');
             newConditionButton.addEventListener('click', function() {
-                let newConditionSelect = document.getElementById('id_newCondition_select');
+                let newConditionSelect = document.getElementById('id_newcondition_select');
                 let $title = newConditionSelect.options[newConditionSelect.selectedIndex].text;
                 let $formDefault = [];
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
@@ -41,7 +41,7 @@
                 let $elements = JSON.parse(newConditionSelect.value.split(':')[1]);
                 let $name = newConditionSelect.options[newConditionSelect.selectedIndex].value.substring(0, newConditionSelect.options[newConditionSelect.selectedIndex].value.indexOf(':['));
                 let data = {
-                    key: 'CONDITIONS',
+                    key: 'condition',
                     action: 'new',
                     title: $title,
                     elements: $elements,

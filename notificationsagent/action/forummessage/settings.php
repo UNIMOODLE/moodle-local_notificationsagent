@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,9 +22,9 @@
  * @copyright   2023 ISYC
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 $settings->add(new admin_setting_configtext('notificationsaction_forummessage/token',
             get_string('token', 'notificationsaction_forummessage'),
-            get_string('token_desc', 'notificationsaction_forummessage'),''));
+            get_string('token_desc', 'notificationsaction_forummessage'), ''));
 
 

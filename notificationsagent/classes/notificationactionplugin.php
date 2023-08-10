@@ -23,10 +23,6 @@ abstract class notificationactionplugin extends notificationplugin {
 
     abstract public function get_title();
     abstract public function get_elements();
-    /*
-     * Action description
-     */
-    abstract public function get_description();
 
     /**
      * Returns the main plugin type qualifier.
