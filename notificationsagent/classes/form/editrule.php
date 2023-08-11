@@ -58,18 +58,21 @@ class editrule extends \moodleform {
             <div class="tab-pane fade show active" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
             ');
                 //$this->conditions($mform);
-                $this->settabcontent("condition",$mform);
+        $this->settabcontent("condition",$mform);
+        $mform->addElement('button', 'new' . 'condition' . '_button', get_string('add'));
         $mform->addElement('html', '
             </div>
             <div class="tab-pane fade" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
         ');
-                $this->settabcontent("condition", $mform, "exception");
+        $this->settabcontent("condition", $mform, "exception");
+        $mform->addElement('button', 'new' . 'conditionexception' . '_button', get_string('add'));
         $mform->addElement('html', '
             </div>
             <div class="tab-pane fade" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
         ');
                 //$this->actions($mform);
-                $this->settabcontent("action",$mform);
+        $this->settabcontent("action",$mform);
+        $mform->addElement('button', 'new' . 'action' . '_button', get_string('add'));
 
         $mform->addElement('html', '
             </div>
@@ -152,7 +155,7 @@ class editrule extends \moodleform {
         $new_group[] =& $mform->createElement(
             'select', 'new' . $type . $exception . '_select', '', $listoptions, array('class' => 'col-sm-auto p-0 mr-3')
         );
-        $new_group[] =& $mform->createElement('button', 'new' . $type . $exception . '_button', get_string('add'));
+       
         $mform->addGroup(
             $new_group, 'new' . $type . $exception . '_group', get_string('editrule_new' . $type, 'local_notificationsagent'),
             array('class' => 'mt-5'), false
