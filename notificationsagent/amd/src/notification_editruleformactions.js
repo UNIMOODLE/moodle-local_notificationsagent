@@ -34,7 +34,6 @@
                     let $typesection = event.target.id.split('_')[0].replace(/[0-9]/g, '');
                     let $actionelement = event.target.id.split('_')[1];
                     let $keyelementsession = parseInt(event.target.id.replace($typesection,'').replace('_remove',''));
-
                     let $formDefault = [];
                     let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
                     let idSectionRemove = "";
@@ -46,7 +45,7 @@
                                 //¿Eres la sección eliminada?
                                 if(idSectionRemove && idSectionRemove < keySection){
                                     //Si lo eres, reduce en 1 el id de la sección (condition, action...)
-                                    elementID = element.id.replace($typesection+keySection, $typesection+(keySection-1));
+                                    var elementID = element.id.split($typesection + keySection).join($typesection + (keySection - 1));
                                 }
                             }
 
@@ -66,7 +65,6 @@
                         keyelementsession: $keyelementsession,
                         formDefault: $formDefault
                     };
-                    
                     if (data.key === 'conditionexception') {
                         data.key = data.key.replace(/condition/, '');
                     }

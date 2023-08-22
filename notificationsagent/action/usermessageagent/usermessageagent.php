@@ -28,31 +28,49 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
+        global $SESSION;
+        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
 
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
+        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+
+        //Title.
         $mform->addElement(
-            'text', 'action'.$id.'_element'.'3'.'_title',
+            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
             get_string(
-                'editrule_action_element_title', 'notificationsaction_usermessageagent',
+                'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64')
         );
 
-        $mform->setType('action'.$id.'_element'.'3'.'_title', PARAM_TEXT);
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
+        }
 
         $editoroptions = array(
             'maxfiles' => EDITOR_UNLIMITED_FILES,
             'trusttext' => true
         );
+
+        //Message.
         $mform->addElement(
-            'editor', 'action'.$id.'_element'.'3'.'_message',
+            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
             get_string(
-                'editrule_action_element_message', 'notificationsaction_usermessageagent',
+                'editrule_action_element_message', 'notificationsaction_forummessage',
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
-        );
-        $mform->setType('action'.$id.'_message', PARAM_RAW);
-        // TODO.
+        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']) 
+        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])
+        : null);
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        
+        //Users.
         $context = \context_course::instance($courseid);
         $enrolledusers = get_enrolled_users($context);
         $listusers = array();
@@ -61,15 +79,22 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
             );
         }
+        if(empty($listusers)){
+            $listusers['user-0'] = 'UUUU';
+        }
         asort($listusers);
-        self::placeholders($mform, 'action'.$id);
         $mform->addElement(
-            'select', 'action' . $id . '_element' . '3' . '_user',
+            'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
             get_string(
-                'editrule_action_element_user', 'notificationsaction_usermessageagent',
+                'editrule_action_element_user', 'notificationsaction_addusergroup',
                 array('typeelement' => '[UUUU]')
-            ), $listusers
+            ),
+            $listusers
         );
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user']);
+        }
 
         return $mform;
 
@@ -107,7 +132,21 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
      * @return mixed
      */
     public function get_parameters($params) {
-        // TODO: Implement get_parameters() method.
-        return '{"time:00003 }';
+        $title = "";
+        $user = "";
+        $message = "";
+
+        foreach ($params as $key => $value) {
+            if (strpos($key, "title") !== false){
+                $title = $value;
+
+            } elseif (strpos($key, "message") !== false) {
+                $message = $value;
+            } elseif (strpos($key, "user") !== false) {
+                $user = $value;
+            }
+        }
+    
+        return json_encode(array('title' => $title, 'message' => $message, 'user' => $user));
     }
 }

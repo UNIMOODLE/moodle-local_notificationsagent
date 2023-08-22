@@ -39,31 +39,52 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
-        global $DB;
+        global $SESSION;
+        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
+        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+
+        //Title.
         $mform->addElement(
-            'text', 'action'.$id.'_element'.'4'.'_title',
+            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
             get_string(
-                'editrule_action_element_title', 'notificationsaction_messageagent',
+                'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64')
         );
 
-        $mform->setType('action'.$id.'_element'.'4'.'_title', PARAM_TEXT);
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
+        }
 
         $editoroptions = array(
             'maxfiles' => EDITOR_UNLIMITED_FILES,
             'trusttext' => true
         );
+
+        //Message.
         $mform->addElement(
-            'editor', 'action'.$id.'_element'.'4'.'_message',
+            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
-        $mform->setType('action'.$id.'_message', PARAM_RAW);
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
 
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']);
+        }
+
+        //Forum.
         $forumname = array();
         $forumlist = mod_forum_external::get_forums_by_courses(array($courseid));
         foreach ($forumlist as $forum) {
@@ -73,8 +94,13 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         if (empty($forumname)) {
             $forumname['0'] = 'FFFF';
         }
-        $mform->addElement('select', 'action'.$id.'_element'.'4'.'_forum', get_string('editrule_action_element_forum',
+        $mform->addElement('select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_forum', get_string('editrule_action_element_forum',
             'notificationsaction_forummessage', array('typeelement' => '[FFFF]')), $forumname);
+
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_forum'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_forum',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_forum']);
+        }
 
         return $mform;
     }
@@ -101,7 +127,21 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
      * @return mixed
      */
     public function get_parameters($params) {
-        // TODO: Implement get_parameters() method.
-        return '{"time:77777 }';
+        $title = "";
+        $message = "";
+        $forum = "";
+        
+        foreach ($params as $key => $value) {
+            if (strpos($key, "title") !== false) {
+                $title = $value;
+            } elseif (strpos($key, "message") !== false) {
+                $message = $value;
+            } elseif (strpos($key, "forum") !== false) {
+                $forum = $value;
+            }
+        }
+
+    return json_encode(array('title' => $title, 'message' => $message, 'forum' => $forum));
+
     }
 }

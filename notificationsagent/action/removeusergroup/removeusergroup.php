@@ -28,7 +28,17 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
+        global $SESSION;
+        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
+        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+
         $context = \context_course::instance($courseid);
+
+        //Users.
         $enrolledusers = get_enrolled_users($context);
         $listusers = array();
         foreach ($enrolledusers as $uservalue) {
@@ -41,13 +51,19 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
         }
         asort($listusers);
         $mform->addElement(
-            'select', 'action' . $id . '_element' . '6' . '_user',
+            'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
             get_string(
-                'editrule_action_element_user', 'notificationsaction_removeusergroup',
+                'editrule_action_element_user', 'notificationsaction_addusergroup',
                 array('typeelement' => '[UUUU]')
-            ), $listusers
+            ),
+            $listusers
         );
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user']);
+        }
 
+        //Groups.
         $groups = groups_get_all_groups($courseid, null, null, 'id, name');
         $listgroups = array();
 
@@ -61,12 +77,17 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
         }
         asort($listgroups);
         $mform->addElement(
-            'select', 'action' . $id . '_element' . '6' . '_group',
+            'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_group',
             get_string(
-                'editrule_action_element_group', 'notificationsaction_removeusergroup',
+                'editrule_action_element_group', 'notificationsaction_addusergroup',
                 array('typeelement' => '[GGGG]')
-            ), $listgroups
+            ),
+            $listgroups
         );
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_group'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_group',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_group']);
+        }
 
         return $mform;
 
@@ -104,7 +125,18 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
      * @return mixed
      */
     public function get_parameters($params) {
-        // TODO: Implement get_parameters() method.
-        return '{"time:1111 }';
+        $user = "";
+        $group = "";
+    
+        foreach ($params as $key => $value) {
+            if (strpos($key, "user") !== false){
+                $user = $value;
+
+            } elseif (strpos($key, "group") !== false) {
+                $group = $value;
+            }
+        }
+    
+        return json_encode(array('user' => $user, 'group' => $group));
     }
 }

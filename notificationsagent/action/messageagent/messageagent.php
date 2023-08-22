@@ -28,48 +28,44 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
+        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+        
         $mform->addElement('hidden', 'pluginname'.$this->get_type().$id,$this->get_subtype());
         $mform->setType('pluginname'.$this->get_type().$id,PARAM_RAW );
         $mform->addElement('hidden', 'type'.$this->get_type().$id,$this->get_type().$id);
         $mform->setType('type'.$this->get_type().$id, PARAM_RAW );
         
         $mform->addElement(
-            'text', 'action'.$id.'_title',
+            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
             get_string(
-                'editrule_action_title', 'notificationsaction_messageagent',
+                'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64')
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_action'.$id.'_title'])){
-            $mform->setDefault('action'.$id.'_title', $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_action'.$id.'_title']);
+
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
         }
-        $mform->setType('action'.$id.'_title', PARAM_TEXT);
 
         $editoroptions = array(
             'maxfiles' => EDITOR_UNLIMITED_FILES,
             'trusttext' => true
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_action'.$id.'_message'])){
-            $mform->addElement(
-                'editor', 'action'.$id.'_message',
-                get_string(
-                    'editrule_action_message', 'notificationsaction_messageagent',
-                    array('typeelement' => '[BBBB]')
-                ),
-                ['class' => 'fitem_id_templatevars_editor'], $editoroptions,
-            )->setValue(array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_action'.$id.'_message']));
-        }else{
-            $mform->addElement(
-                'editor', 'action'.$id.'_message',
-                get_string(
-                    'editrule_action_message', 'notificationsaction_messageagent',
-                    array('typeelement' => '[BBBB]')
-                ),
-                ['class' => 'fitem_id_templatevars_editor'], $editoroptions,
-            );
-        }
-        
-        $mform->setType('action'.$id.'_message', PARAM_RAW);
+
+        $mform->addElement(
+            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
+            get_string(
+                'editrule_action_element_message', 'notificationsaction_forummessage',
+                array('typeelement' => '[BBBB]')
+            ),
+            ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']) 
+        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])
+        : null);
+        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
 
         self::placeholders($mform, 'action'.$id);
 
