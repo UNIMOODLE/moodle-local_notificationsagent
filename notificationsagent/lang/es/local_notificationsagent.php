@@ -56,11 +56,18 @@ $string['import'] = 'Import';
 
 // Export Template
 $string['export'] = 'Exportar';
+$string['ruledownload'] = 'Exportar regla como';
 
 // Assign Template
 $string['assign'] = 'Asignar';
 $string['type_template'] = 'plantilla';
 $string['type_rule'] = 'regla';
+
+// Condition plugins
+$string['condition_days'] = 'Días';
+$string['condition_hours'] = 'Horas';
+$string['condition_minutes'] = 'Minutos';
+$string['condition_seconds'] = 'Segundos';
 
 // EditRule.
     $string['editrule_newrule'] = 'Nueva regla';

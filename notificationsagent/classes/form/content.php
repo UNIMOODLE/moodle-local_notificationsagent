@@ -64,13 +64,14 @@ class content {
     }
 
     private function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype, $exception){
-        global  $CFG;
+        global  $CFG, $SESSION;
         $rule = new \stdClass();
         $rule->ruleid = null;
         require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
         $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
         $pluginobj = new $pluginclass($rule);
         $pluginobj->get_ui($mform, $id, $idcourse, $exception);
+        //echo '<pre>' . print_r ($SESSION->NOTIFICATIONS,true) . '</pre>';
     }
 
 }
