@@ -66,11 +66,11 @@ $context = context_course::instance($course->id);
 
 $dataformat = optional_param('dataformat', '', PARAM_ALPHA);
 $columns = array(
-    'ruleid' => 'ruleid',
-    'courseid' => 'courseid'
+    'ruleid' => 'Rule ID',
+    'courseid' => 'Course ID'
 );
 
-$sql = 'SELECT * FROM mdl_notifications_rule';
+$sql = 'SELECT * FROM {notifications_rule}';
 $rs = $DB->get_recordset_sql($sql, $columns);
 \core\dataformat::download_data('exportrule', $dataformat, $columns, $rs);
 $rs->close();

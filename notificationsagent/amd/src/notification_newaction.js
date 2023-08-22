@@ -27,9 +27,9 @@
     return {
 
         init: function() {
-            let newActionButton = document.getElementById('id_newaction_button');
+            let newActionButton = document.querySelector('[id*="newaction_button"]');
             newActionButton.addEventListener('click', function() {
-                let newActionSelect = document.getElementById('id_newaction_select');
+                let newActionSelect = document.querySelector('[id*="newaction_select"]');
                 let $title = newActionSelect.options[newActionSelect.selectedIndex].text;
                 let $formDefault = [];
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');

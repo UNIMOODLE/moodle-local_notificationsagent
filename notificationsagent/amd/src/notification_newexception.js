@@ -27,9 +27,9 @@
     return {
 
         init: function() {
-            let newExceptionButton = document.getElementById('id_newconditionexception_button');
+            let newExceptionButton = document.querySelector('[id*="newconditionexception_button"]');
             newExceptionButton.addEventListener('click', function() {
-                let newExceptionSelect = document.getElementById('id_newconditionexception_select');
+                let newExceptionSelect = document.querySelector('[id*="newconditionexception_select"]');
                 let $title = newExceptionSelect.options[newExceptionSelect.selectedIndex].text;
                 let $formDefault = [];
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');

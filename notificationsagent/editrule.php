@@ -211,8 +211,8 @@ if ($mform->is_cancelled()) {
    
 
     //In this case you process validated data. $mform->get_data() returns data posted in form.
-    //$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    //redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');
+    $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
+    redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');
 } else {
     // this branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
     // or on the first display of the form.

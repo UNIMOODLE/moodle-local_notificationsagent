@@ -27,9 +27,9 @@
     return {
 
         init: function() {
-            let newConditionButton = document.getElementById('id_newcondition_button');
+            let newConditionButton = document.querySelector('[id*="newcondition_button"]');
             newConditionButton.addEventListener('click', function() {
-                let newConditionSelect = document.getElementById('id_newcondition_select');
+                let newConditionSelect = document.querySelector('[id*="newcondition_select"]');
                 let $title = newConditionSelect.options[newConditionSelect.selectedIndex].text;
                 let $formDefault = [];
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');

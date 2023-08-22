@@ -27,8 +27,10 @@ class content {
         global $SESSION, $CFG;
         if ($exception !== null && isset($SESSION->NOTIFICATIONS[$exception])) {
             $this->renderformbyexception($mform, $idcourse, $type, $exception);
+            $mform->addElement('html', '<hr/>');
         } else if ($exception == null && isset($SESSION->NOTIFICATIONS[$type])) {
             $this->renderformbytype($mform, $idcourse, $type);
+            $mform->addElement('html', '<hr/>');
         }
     }
 
