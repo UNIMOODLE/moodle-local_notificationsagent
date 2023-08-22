@@ -48,7 +48,7 @@
                 <div class="card-content">
                 </div>
                 <div class="card-assignment d-flex">
-                    <button type="button" class="btn btn-outline-primary exporttemplate d-block" data-idtemplate="{{{ id }}}">{{#str}}export, local_notificationsagent{{/str}}</button>
+                    <a href="/local/notificationsagent/managerule.php?courseid={{courseid}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a></p>
                     {{#assigntemplatebutton}}
                         <button type="button" class="btn btn-outline-primary d-block ml-auto" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
                     {{/assigntemplatebutton}}

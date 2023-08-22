@@ -105,117 +105,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && (!isset($_POST['cancel']) && !isset($
         echo json_encode($return);
         die();
     }
-
-    if(isset($_POST['key'])){
-        $keyelement = $_POST['key'];
-        switch($_POST['condition']){
-            case 'new':
-                $listelement = array();
-                $listelement += array('title' => $_POST['title']);
-                $listelement += array('elements' => $_POST['elements']);
-                $listelement += array('name' => $_POST['name']);
-                $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
-                if(isset($SESSION->NOTIFICATIONS[$keyelement])){
-                    if(isset($_POST['formDefault'])){
-                        unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
-                        foreach ($_POST['formDefault'] as $key => $condition) {
-                            $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($condition, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
-                        }
-                    }
-                    $return = [
-                        'state' => 'success'
-                    ];
-                }
-                break;
-            case 'remove':
-                $keyelementsession = $_POST['keyelementsession'];
-                unset($SESSION->NOTIFICATIONS[$keyelement][$keyelementsession]);
-                $SESSION->NOTIFICATIONS[$keyelement] = array_values($SESSION->NOTIFICATIONS[$keyelement]);
-                if(empty($SESSION->NOTIFICATIONS[$keyelement])){
-                    unset($SESSION->NOTIFICATIONS[$keyelement]);
-                }
-                if(isset($_POST['formDefault'])){
-                    unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
-                    foreach ($_POST['formDefault'] as $key => $condition) {
-                        $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($condition, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
-
-                    }
-                }
-                $return = [
-                    'state' => 'success'
-                ];
-                break;
-            /* Cambiar orden elemento array */
-            /*
-            case 'up':
-                $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession-1);
-
-                break;
-            case 'down':
-                $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession+1);
-                break;
-            */
-        }
-        echo json_encode($return);
-        die();
-    }
-    if(isset($_POST['key'])){
-        $keyelement = $_POST['key'];
-        switch($_POST['exception']){
-            case 'new':
-                $listelement = array();
-                $listelement += array('title' => $_POST['title']);
-                $listelement += array('elements' => $_POST['elements']);
-                $listelement += array('name' => $_POST['name']);
-                $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
-                if(isset($SESSION->NOTIFICATIONS[$keyelement])){
-                    if(isset($_POST['formDefault'])){
-                        unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
-                        foreach ($_POST['formDefault'] as $key => $exception) {
-                            $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($exception, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
-                        }
-                    }
-                    $return = [
-                        'state' => 'success'
-                    ];
-                }
-                break;
-            case 'remove':
-                $keyelementsession = $_POST['keyelementsession'];
-                unset($SESSION->NOTIFICATIONS[$keyelement][$keyelementsession]);
-                $SESSION->NOTIFICATIONS[$keyelement] = array_values($SESSION->NOTIFICATIONS[$keyelement]);
-                if(empty($SESSION->NOTIFICATIONS[$keyelement])){
-                    unset($SESSION->NOTIFICATIONS[$keyelement]);
-                }
-                if(isset($_POST['formDefault'])){
-                    unset($SESSION->NOTIFICATIONS['FORMDEFAULT']);
-                    foreach ($_POST['formDefault'] as $key => $exception) {
-                        $SESSION->NOTIFICATIONS['FORMDEFAULT'][get_string_between($exception, "[id]", "[/id]")] = get_string_between($condition, "[value]", "[/value]");
-
-                    }
-                }
-                $return = [
-                    'state' => 'success'
-                ];
-                break;
-            /* Cambiar orden elemento array */
-            /*
-            case 'up':
-                $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession-1);
-
-                break;
-            case 'down':
-                $keyelementsession = $_POST['keyelementsession'];
-                moveElementArray($SESSION->NOTIFICATIONS[$keyelement], $keyelementsession, $keyelementsession+1);
-                break;
-            */
-        }
-        echo json_encode($return);
-        die();
-    }
     
 }
 
@@ -279,8 +168,8 @@ if ($mform->is_cancelled()) {
     
             $currentPluginKey = $pluginname . $pluginCount[$pluginname];
             $pluginData[$currentPluginKey] = array('type' => '');
-
-        } elseif (strpos($key, "type") === 0 && isset($currentPluginKey)) {
+            $pluginData[$currentPluginKey]["complementary"] = 0;
+        }elseif (strpos($key, "type") === 0 && isset($currentPluginKey)) {
             $plugintype = $value;
             $pluginData[$currentPluginKey]['type'] = $plugintype;
             
@@ -290,15 +179,21 @@ if ($mform->is_cancelled()) {
         ) {
             $subkeyWithoutPluginName = str_replace($pluginname . '_', '', $key);
             $pluginData[$currentPluginKey][$subkeyWithoutPluginName] = $value;
-        }        
+        } 
+   
+        if (strpos($key, "conditionexception") !== false && isset($currentPluginKey)) {
+            $pluginData[$currentPluginKey]["complementary"] = 1;
+        } 
+       
     }
-
+    
     foreach ($pluginData as $currentPluginKey => $pluginDatum) {
         $dataplugin = new \stdClass();
         $dataplugin->ruleid = $ruleid;
         $dataplugin->pluginname = preg_replace('/\d+$/', '', $currentPluginKey);
         $plugintype = preg_replace('/\d+$/', '', $pluginDatum['type']);
         $dataplugin->type =  $plugintype;
+        $dataplugin->complementary = $pluginDatum['complementary'];
         // Ruta y creación de objetos de plugin
         $rule = new \stdClass();
         require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname  . '/' . $dataplugin->pluginname  . '.php');
@@ -307,6 +202,7 @@ if ($mform->is_cancelled()) {
         $pluginobj = new $pluginclass($rule);
         $dataplugin->parameters = $pluginobj->get_parameters($pluginDatum);
         $DB->insert_record('notifications_rule_plugins', $dataplugin);
+       
     }
   
    
