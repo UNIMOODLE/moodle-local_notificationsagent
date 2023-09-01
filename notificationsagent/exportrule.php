@@ -23,54 +23,35 @@
  */
 
 require_once("../../config.php");
-require_once('renderer.php');
-require_once ("../../lib/modinfolib.php");
-require_once ("lib.php");
-global $CFG, $DB, $PAGE;
+global $DB;
 
-//$courseid = required_param('courseid', PARAM_INT);
-//Limpiar session notificaciones
-foreach($_SESSION as $key => $value){
-    if(substr($key, 0, strlen('NOTIFICATIONS')) === 'NOTIFICATIONS'){
-        unset($_SESSION[$key][$courseid]);
-    }
-}
+$courseid = required_param('courseid', PARAM_INT);
+$ruleid = required_param('ruleid', PARAM_INT);
 
-/*if (!$courseid) {
+if (!$courseid) {
     require_login();
     throw new \moodle_exception('needcourseid');
-}*/
+}
 
-// TODO: Read courseid value instead
-if (!$course = $DB->get_record('course', array('id'=>2))) {
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     throw new \moodle_exception('invalidcourseid');
 }
 require_login($course);
 
-$PAGE->set_course($course);
-$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-$PAGE->set_title($course->shortname);
-$PAGE->set_heading($course->fullname);
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('heading', 'local_notificationsagent'));
-$PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
-$PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
-$output = $PAGE->get_renderer('local_notificationsagent');
-
-$renderer = $PAGE->get_renderer('core');
-$templatecontext = [
-    "courseid" => $course->id
-];
-
 $context = context_course::instance($course->id);
 
-$dataformat = optional_param('dataformat', '', PARAM_ALPHA);
-$columns = array(
-    'ruleid' => 'Rule ID',
-    'courseid' => 'Course ID'
-);
+// TODO: Rewrite query to export conditions / actions.
+/*$sql = 'SELECT *
+        FROM {notifications_rule}
+        WHERE courseid = :courseid
+        AND ruleid = :ruleid';*/
 
-$sql = 'SELECT * FROM {notifications_rule}';
-$rs = $DB->get_recordset_sql($sql, $columns);
-\core\dataformat::download_data('exportrule', $dataformat, $columns, $rs);
-$rs->close();
+$courseparams = array('courseid' => $courseid, 'ruleid' => $ruleid);
+
+$rs = $DB->get_record('notifications_rule', $courseparams);
+
+$rs = json_encode($rs);
+
+header('Content-disposition: attachment; filename=rule_' . $ruleid . '_export.json');
+header('Content-type: application/json');
+echo $rs;

@@ -33,16 +33,21 @@ class editrule extends \moodleform {
 
     //Add elements to form
     public function definition() {
-        global $CFG;
+        global $CFG, $SESSION;
        
         $mform = $this->_form; // Don't forget the underscore! 
 
-        $mform->addElement('text', 'title', get_string('editrule_title', 'local_notificationsagent'), array('size' => '64'));
+        $mform->addElement('text', 'title', get_string('editrule_title', 'local_notificationsagent'), array('size' => '64', 'required' => true ));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('title', PARAM_TEXT);
         } else {
             $mform->setType('title', PARAM_CLEANHTML);
         }
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'])){
+            $mform->setDefault('title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title']);
+        }
+
         $mform->addElement('html', '
         <nav>
             <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
@@ -81,52 +86,6 @@ class editrule extends \moodleform {
         // unset($SESSION->NOTIFICATIONS['CONDITIONS']);
         // unset($SESSION->NOTIFICATIONS['EXCEPTIONS']);
         // unset($SESSION->NOTIFICATIONS['ACTIONS']);
-    }
-
-    private function conditions(&$mform){
-        global $SESSION;
-        //Get new Conditions
-        require_once('Conditions.php');
-        
-        $objConditions = new Conditions();
-        echo $objConditions->constructConditions($mform, $SESSION->NOTIFICATIONS['IDCOURSE']);
-
-        //$listconditions = get_conditions_description($SESSION->NOTIFICATIONS['IDCOURSE']);
-        $listconditions = notificationsbaseinfo::get_description('condition');
-
-        $listoptionscondition = array();
-        foreach ($listconditions as $key => $value) {
-            $key = $value['name'] . ':' . json_encode($value['elements']);
-            $listoptionscondition[$key] = $value['title'];   
-        }
-        $newCondition_group = array();
-        $newCondition_group[] =& $mform->createElement('select', 'newcondition_select', '', $listoptionscondition, array('class' => 'col-sm-auto p-0 mr-3'));
-        $newCondition_group[] =& $mform->createElement('button', 'newcondition_button', get_string('add'));
-        $mform->addGroup($newCondition_group, 'newCondition_group', get_string('editrule_newcondition', 'local_notificationsagent'), array('class' => 'mt-5'), false);
-    }
-
-    private function exceptions(&$mform){
-
-    }
-
-    private function actions(&$mform){
-        global $SESSION;
-        //Get new Actions
-        require_once('Action.php');
-        
-        $objAction = new Action();
-        echo $objAction->constructAction($mform, $SESSION->NOTIFICATIONS['IDCOURSE']);
-        //$listaction = get_all_actions($SESSION->NOTIFICATIONS['IDCOURSE']);
-        $listaction = notificationsbaseinfo::get_description('action');
-        $listoptionsaction = array();
-        foreach ($listaction as $key => $value) {
-            $key = $value['name'] . ':' . json_encode($value['elements']);
-            $listoptionsaction[$key] = $value['title'];   
-        }     
-        $newCondition_group = array();
-        $newCondition_group[] =& $mform->createElement('select', 'newaction_select', '', $listoptionsaction, array('class' => 'col-sm-auto p-0 mr-3'));
-        $newCondition_group[] =& $mform->createElement('button', 'newaction_button', get_string('add'));
-        $mform->addGroup($newCondition_group, 'newAction_group', get_string('editrule_newaction', 'local_notificationsagent'), array('class' => 'mt-5'), false);
     }
 
     //Custom validation should be added here

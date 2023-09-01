@@ -1,7 +1,5 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
-
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -113,7 +111,7 @@ class notificationsaction extends notificationsbaseinfo {
             return;
         }
 
-        if (!$hassiteconfig or !file_exists($this->full_path('settings.php'))) {
+        if (!$hassiteconfig || !file_exists($this->full_path('settings.php'))) {
             return;
         }
 

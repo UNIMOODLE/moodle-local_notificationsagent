@@ -212,14 +212,14 @@ function build_category_array($category, $ruleid) {
         $fullname= $course->fullname;
         $courses_arry[]= array(
             'id' => $courseid,
-            'name' => $fullname,
+            'name' => format_text($fullname),
             'assigned' => $assigned,
         );
     }
 
     $categoryArray = array(
         'id' => $category->id,
-        'name' => $category->name,
+        'name' => format_text($category->name),
         'categories' => array(),
         'courses' => $courses_arry,
         'count' => $count

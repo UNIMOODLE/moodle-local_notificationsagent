@@ -40,8 +40,8 @@ class Rule {
     public function __construct($rule) {
 
             $this->ruleid = $rule->ruleid;
-            $this->name = $rule->name;
-            $this->description = $rule->description;
+            $this->name = format_text($rule->name);
+            $this->description = format_text($rule->description);
             //$this->assigned = $rule->assigned;
             //$this->template = $rule->template;
             //$this->status = $rule->status;

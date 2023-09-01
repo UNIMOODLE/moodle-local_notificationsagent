@@ -57,6 +57,10 @@ $string['heading'] = 'Notifications Agent';
 
 // Import Template
 $string['import'] = 'Import';
+$string['no_file_selected'] = 'No file selected';
+$string['import_success'] = 'Rule imported successfuly';
+$string['import_error'] = 'Cannot import rule, check your JSON file';
+$string['no_json_file'] = 'File is not a JSON';
 
 // Export Template
 $string['export'] = 'Export';

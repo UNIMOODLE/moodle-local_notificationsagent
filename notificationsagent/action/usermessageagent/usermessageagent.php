@@ -42,7 +42,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
-            ), array('size' => '64')
+            ), array('size' => '64', 'required' => true )
         );
 
         $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
@@ -69,6 +69,8 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])
         : null);
         $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
+        null,'required',null,'client');
         
         //Users.
         $context = \context_course::instance($courseid);

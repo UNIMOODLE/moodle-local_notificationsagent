@@ -84,7 +84,7 @@ class notificationscondition extends notificationsbaseinfo {
      * @return moodle_url
      */
     public static function get_manage_url() {
-        return new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype'=>'notificationscondition'));
+        return new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype' => 'notificationscondition'));
     }
 
     public function get_settings_section_name() {
@@ -110,7 +110,7 @@ class notificationscondition extends notificationsbaseinfo {
             return;
         }
 
-        if (!$hassiteconfig or !file_exists($this->full_path('settings.php'))) {
+        if (!$hassiteconfig || !file_exists($this->full_path('settings.php'))) {
             return;
         }
 

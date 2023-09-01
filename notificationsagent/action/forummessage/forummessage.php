@@ -53,7 +53,7 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
-            ), array('size' => '64')
+            ), array('size' => '64', 'required' => true )
         );
 
         $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
@@ -78,6 +78,8 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
         $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
+            null,'required',null,'client');
 
         if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])){
             $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',

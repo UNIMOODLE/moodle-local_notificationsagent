@@ -87,7 +87,7 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
                 'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_days']) 
                 ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_days'] 
-                : null));
+                : null, 'required' => true ));
         //Hours.      
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
@@ -95,14 +95,14 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
                    'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_hours']) 
                    ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_hours'] 
-                   : null));
+                   : null, 'required' => true ));
         //Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
             'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
             'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_minutes']) 
             ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_minutes'] 
-            : null));
+            : null, 'required' => true ));
         //Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
@@ -110,7 +110,7 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
                 'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_seconds']) 
                 ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_seconds'] 
-                : null));
+                : null, 'required' => true ));
         //GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',

@@ -57,7 +57,7 @@ if ($hassiteconfig) {
 
     $ADMIN->add('localplugins', $settingspage);
 
-    // Add subplugins management in settings view
+    // Add subplugins management in settings view.
 
     $ADMIN->add('localplugins', new admin_category('notificationsactionplugins',
         get_string('actionplugins', 'local_notificationsagent')));

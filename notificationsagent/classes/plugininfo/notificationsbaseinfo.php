@@ -123,8 +123,8 @@ class notificationsbaseinfo extends base {
         global $CFG;
         $listactions = array();
         // TODO enabled.
-        $rule= new \stdClass();
-        $rule->ruleid=null;
+        $rule = new \stdClass();
+        $rule->ruleid = null;
         foreach (array_keys(core_component::get_plugin_list('notifications' . $subtype)) as $pluginname) {
             require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;

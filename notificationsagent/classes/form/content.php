@@ -36,7 +36,6 @@ class content {
 
     public function renderformbytype(&$mform, $idcourse, $type) {
         global $SESSION, $CFG;
-        
             $items = $SESSION->NOTIFICATIONS[$type];
             $id = 1;
         foreach ($items as $key => $value) {
@@ -45,9 +44,9 @@ class content {
                 $title = '<h5>' . $id . ') ' . $value['title'] . $buttons . '</h5>';
                 $mform->addElement('html', $title);
                 $pluginname[$id] = $value['name'];
-                $this->get_plugin_ui($mform, $id, $idcourse,$pluginname[$id], $type, $exception =null);
+                $this->get_plugin_ui($mform, $id, $idcourse, $pluginname[$id], $type, $exception = null);
                 $id++;
-            }
+        }
     }
     public function renderformbyexception(&$mform, $idcourse, $type, $exception) {
         global $SESSION, $CFG;
@@ -65,7 +64,7 @@ class content {
         }
     }
 
-    private function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype, $exception){
+    private function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype, $exception) {
         global  $CFG, $SESSION;
         $rule = new \stdClass();
         $rule->ruleid = null;
@@ -73,7 +72,6 @@ class content {
         $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
         $pluginobj = new $pluginclass($rule);
         $pluginobj->get_ui($mform, $id, $idcourse, $exception);
-        //echo '<pre>' . print_r ($SESSION->NOTIFICATIONS,true) . '</pre>';
     }
 
 }

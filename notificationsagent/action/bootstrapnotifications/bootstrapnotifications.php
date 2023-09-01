@@ -28,15 +28,26 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
+        global $SESSION;
+        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$id,$this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$id,PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$id,$this->get_type().$id);
+        $mform->setType('type'.$this->get_type().$id, PARAM_RAW );
+        
         $mform->addElement(
-            'text', 'action' . $id . '_element' . '6' . '_text',
+            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_text',
             get_string(
                 'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
-                array('typeelement' => '[TTTT]')
+                array('typeelement' => '[TTTT]', 'required' => true )
             ));
 
-        $mform->setType('action' . $id . '_element' . '6' . '_text', PARAM_TEXT);
-
+            $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_text', PARAM_TEXT);
+        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_text'])){
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_text',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_text']);
+        }
         return $mform;
     }
 
@@ -72,6 +83,13 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
      * @return mixed
      */
     public function get_parameters($params) {
-        // TODO: Implement get_parameters() method.
+        $text = "";
+        
+        foreach ($params as $key => $value) {
+            if (strpos($key, "text") !== false) {
+                $text = $value;
+            } 
+        }
+    return json_encode(array('text' => $text));
     }
 }
