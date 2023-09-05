@@ -62,8 +62,8 @@ class notificationscondition_sessionstart_observer {
 
         $results = $DB->get_records_sql('
                 select mnrc.parameters, mnrc.pluginname as pluginname
-                from mdl_notifications_rule_plugins mnrc
-                inner join mdl_notifications_rule mnr ON mnr.ruleid=mnrc.ruleid
+                from mdl_notificationsagent_condition mnrc
+                inner join mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
                 where pluginname=?
                 and courseid=?',
                 [$pluginname,$courseid]

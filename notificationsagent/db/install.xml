@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notificationsagent/db" VERSION="20230808" COMMENT="XMLDB file for Moodle local/notificationsagent"
+<XMLDB PATH="local/notificationsagent/db" VERSION="20230905" COMMENT="XMLDB file for Moodle local/notificationsagent"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="notifications_rule" COMMENT="Instances for notifications rules">
+    <TABLE NAME="notificationsagent_rule" COMMENT="Instances for notifications rules">
       <FIELDS>
         <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
@@ -23,7 +23,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="ruleid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="notifications_rule_plugins" COMMENT="Data for subplugins">
+    <TABLE NAME="notificationsagent_condition" COMMENT="Data for subplugins">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
@@ -37,11 +37,10 @@
         <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="notifications_rule_actions" COMMENT="Data for action subplugins">
+    <TABLE NAME="notificationsagent_action" COMMENT="Data for action subplugins">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="action_id" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Type of subplugin, condtion, action"/>
         <FIELD NAME="parameters" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -51,7 +50,7 @@
         <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="ruleid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="notifications_timetriggers" COMMENT="Data for timetriggers">
+    <TABLE NAME="notificationsagent_triggers" COMMENT="Data for timetriggers">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="ruleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
@@ -63,7 +62,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="notifications_timercache" COMMENT="Data for timecache">
+    <TABLE NAME="notificationsagent_cache" COMMENT="Data for timecache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>

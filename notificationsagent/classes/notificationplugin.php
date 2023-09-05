@@ -78,7 +78,7 @@ abstract class notificationplugin {
         global $DB;
         foreach ($records as $record) {
             // TODO SET CACHE
-            $rule =$DB->get_record('notifications_rule', ['ruleid'=>$record->ruleid]);
+            $rule =$DB->get_record('notificationsagent_rule', ['ruleid'=>$record->ruleid]);
             $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
             if (!empty($subplugin)){
                 $subplugin->set_iscomplementary($record->complementary);
@@ -97,7 +97,7 @@ abstract class notificationplugin {
     public static function create_subplugin($id) {
         global $DB;
         // Find type of subplugin.
-        $record = $DB->get_record('notifications_rule_plugins', array('id' => $id));
+        $record = $DB->get_record('notificationsagent_condition', array('id' => $id));
         $subplugins = self::create_subplugins(array($record));
         return $subplugins[0];
     }

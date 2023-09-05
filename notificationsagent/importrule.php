@@ -52,7 +52,7 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         $sqlValue->createdby = $data->createdby;
         $sqlValue->createdat = $data->createdat;
 
-        $id = $DB->insert_record('notifications_rule', $sqlValue);
+        $id = $DB->insert_record('notificationsagent_rule', $sqlValue);
 
         if (is_numeric($id)) {
             $message = get_string('import_success', 'local_notificationsagent');

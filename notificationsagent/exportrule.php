@@ -48,7 +48,7 @@ $context = context_course::instance($course->id);
 
 $courseparams = array('courseid' => $courseid, 'ruleid' => $ruleid);
 
-$rs = $DB->get_record('notifications_rule', $courseparams);
+$rs = $DB->get_record('notificationsagent_rule', $courseparams);
 
 $rs = json_encode($rs);
 

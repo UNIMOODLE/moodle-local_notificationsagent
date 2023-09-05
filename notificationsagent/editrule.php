@@ -149,7 +149,7 @@ if ($mform->is_cancelled()) {
     $data->name = $fromform->title;
     $data->createdat = time();
     $data->createdby = $USER->id;
-    $ruleid = $DB->insert_record('notifications_rule', $data);
+    $ruleid = $DB->insert_record('notificationsagent_rule', $data);
     // TODO Refactor.
     $plugindata = array();
     $plugincount = array();
@@ -201,9 +201,12 @@ if ($mform->is_cancelled()) {
         $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
         $pluginobj = new $pluginclass($rule);
         $dataplugin->parameters = $pluginobj->get_parameters($plugindatum);
-        $DB->insert_record('notifications_rule_plugins', $dataplugin);
+        if($dataplugin->type === \notificationplugin::CAT_ACTION){
+            $DB->insert_record('notificationsagent_action', $dataplugin);
+        }else{
+            $DB->insert_record('notificationsagent_condition', $dataplugin);
+        }
     }
-
     // In this case you process validated data. $mform->get_data() returns data posted in form.
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
     redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');

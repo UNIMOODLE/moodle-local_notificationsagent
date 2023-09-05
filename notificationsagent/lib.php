@@ -205,7 +205,7 @@ function build_category_array($category, $ruleid) {
     $courses_arry=array();
     foreach ($courses as $course){
         $assigned = $DB->get_field(
-            'notifications_rule',
+            'notificationsagent_rule',
             'assigned',
             array('ruleid'=>$ruleid, 'courseid'=>$course->id));
         $courseid= $course->id;
@@ -296,9 +296,9 @@ function build_output_categories($arraycategories, $categoryid = 0) {
                     $output .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "checkboxcategory-".$category["id"]]);
                 $output .= html_writer::end_div();//.custom-checkbox
                 $output .= html_writer::start_div("", ["class" => "d-flex px-0", "data-toggle" => "collapse", "data-target" => "#category-listing-content-".$category["id"], "aria-controls" => "category-listing-content-".$category["id"]]);
-                    $output .= html_writer::start_div("", ["class" => "categoryname"]);
+                    $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
                         $output .= $category["name"];
-                        $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-3"]);
+                        $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
                     $output .= html_writer::end_div();//.categoryname
                 $output .= html_writer::end_div();//.data-toggle
                 $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);

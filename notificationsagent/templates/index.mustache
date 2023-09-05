@@ -47,14 +47,14 @@
             <div class="card-body d-flex flex-column mx-3 px-0">
                 <div class="card-content">
                 </div>
+            </div>
+            <div class="card-footer bg-transparent">
                 <div class="card-assignment d-flex">
                     <a href="/local/notificationsagent/exportrule.php?courseid={{courseid}}&ruleid={{{ id }}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a></p>
                     {{#assigntemplatebutton}}
                         <button type="button" class="btn btn-outline-primary d-block ml-auto" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
                     {{/assigntemplatebutton}}
                 </div>
-            </div>
-            <div class="card-footer bg-transparent">
             </div>
         </div>
     {{/cardscontent}}

@@ -25,7 +25,7 @@
 // TODO Refactor to plugin instead of subplugin.
 function sessionstart_set_timer_cache($userid, $courseid, $time, $pluginname) {
     global $DB;
-    $exists = $DB->record_exists('notifications_timercache',
+    $exists = $DB->record_exists('notificationsagent_cache',
         array('userid' => $userid,
             'courseid' => $courseid,
             'pluginname' => $pluginname));
@@ -36,6 +36,6 @@ function sessionstart_set_timer_cache($userid, $courseid, $time, $pluginname) {
         $objdb->courseid = $courseid;
         $objdb->timestart = $time;
         $objdb->pluginname = $pluginname;
-        $DB->insert_record('notifications_timercache', $objdb);
+        $DB->insert_record('notificationsagent_cache', $objdb);
     }
 }
