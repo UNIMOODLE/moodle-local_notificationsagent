@@ -29,51 +29,51 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
-        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+        $valuesession = 'id_' . $this->get_subtype() . '_' . $this->get_type() . $exception . $id;
 
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
-        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'pluginname' . $this->get_type() . $exception . $id, $this->get_subtype());
+        $mform->setType('pluginname' . $this->get_type() . $exception . $id, PARAM_RAW);
+        $mform->addElement('hidden', 'type' . $this->get_type() . $exception . $id, $this->get_type() . $id);
+        $mform->setType('type' . $this->get_type() . $exception . $id, PARAM_RAW);
 
         $context = \context_course::instance($courseid);
 
-        //Users.
+        // Users.
         $enrolledusers = get_enrolled_users($context);
         $listusers = array();
         foreach ($enrolledusers as $uservalue) {
-            $listusers["user-" . $uservalue->id] = format_string(
+            $listusers[$uservalue->id] = format_string(
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
             );
         }
-        if(empty($listusers)){
-            $listusers['user-0'] = 'UUUU';
+        if (empty($listusers)) {
+            $listusers['0'] = 'UUUU';
         }
         asort($listusers);
         $mform->addElement(
-            'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
+            'select', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
             get_string(
                 'editrule_action_element_user', 'notificationsaction_addusergroup',
                 array('typeelement' => '[UUUU]')
             ),
             $listusers
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_user']);
         }
 
-        //Groups.
+        // Groups.
         $groups = groups_get_all_groups($courseid, null, null, 'id, name');
         $listgroups = array();
 
         foreach ($groups as $item) {
-            $listgroups["group-" . $item->id] = format_string(
+            $listgroups[$item->id] = format_string(
                 $item->name, true
             );
         }
         if (empty($listgroups)) {
-            $listgroups['group-0'] = 'GGGG';
+            $listgroups['0'] = 'GGGG';
         }
         asort($listgroups);
         $mform->addElement(
@@ -84,13 +84,12 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
             ),
             $listgroups
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_group'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_group',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_group']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_group'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_group',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_group']);
         }
 
         return $mform;
-
     }
 
     /**
@@ -124,19 +123,17 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
      *
      * @return mixed
      */
-    public function get_parameters($params) {        
+    public function get_parameters($params) {
         $user = "";
         $group = "";
-    
         foreach ($params as $key => $value) {
-            if (strpos($key, "user") !== false){
+            if (strpos($key, "user") !== false) {
                 $user = $value;
-
-            } elseif (strpos($key, "group") !== false) {
+            } else if (strpos($key, $params["type"] . "_" . "group") !== false) {
                 $group = $value;
             }
         }
-    
+
         return json_encode(array('user' => $user, 'group' => $group));
     }
 }

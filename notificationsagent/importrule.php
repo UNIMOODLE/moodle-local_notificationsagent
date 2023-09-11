@@ -36,25 +36,49 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
     $message = get_string('no_file_selected', 'local_notificationsagent');
     echo \core\notification::error($message);
 } else {
-    // read json file
+    // Read json file.
     $data = file_get_contents($_FILES['userfile']['tmp_name']);
-    $data = json_decode($data);
+    $data = json_decode($data, true);
 
-    // Check if file uploaded is a JSON
-    if ($data === null) {
+    // Check if file uploaded is a JSON.
+    if (!$data) {
         $message = get_string('no_json_file', 'local_notificationsagent');
         echo \core\notification::error($message);
     } else {
-        $sqlValue = new \stdClass();
-        $sqlValue->courseid = $courseid;
-        $sqlValue->name = $data->name;
-        $sqlValue->description = $data->description;
-        $sqlValue->createdby = $data->createdby;
-        $sqlValue->createdat = $data->createdat;
+        $sqlrule = new \stdClass();
+        $sqlrule->courseid = $courseid;
+        $sqlrule->name = $data['rule']['name'];
+        $sqlrule->description = $data['rule']['description'];
+        $sqlrule->createdby = $data['rule']['createdby'];
+        $sqlrule->createdat = $data['rule']['createdat'];
 
-        $id = $DB->insert_record('notificationsagent_rule', $sqlValue);
+        $idrule = $DB->insert_record('notificationsagent_rule', $sqlrule);
 
-        if (is_numeric($id)) {
+        if ($data['actions']) {
+            $sqlactions = new \stdClass();
+
+            for ($i = 1; $i <= count($data['actions']); $i++) {
+                foreach ($data['actions'][$i] as $key => $value) {
+                    $sqlactions->$key = $value;
+                }
+
+                $idactions = $DB->insert_record('notificationsagent_action', $sqlactions);
+            }
+        }
+
+        if ($data['conditions']) {
+            $sqlconditions = new \stdClass();
+
+            for ($i = 1; $i <= count($data['conditions']); $i++) {
+                foreach ($data['conditions'][$i] as $key => $value) {
+                    $sqlconditions->$key = $value;
+                }
+
+                $idconditions = $DB->insert_record('notificationsagent_condition', $sqlconditions);
+            }
+        }
+
+        if ($idrule && (is_null($idactions) || is_null($idconditions))) {
             $message = get_string('import_success', 'local_notificationsagent');
             echo \core\notification::success($message);
         } else {
@@ -62,6 +86,6 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
             echo \core\notification::error($message);
         }
     }
- }
+}
 
 header('Location: index.php?courseid=' . $courseid);

@@ -136,13 +136,13 @@ $PAGE->requires->js_call_amd('local_notificationsagent/notification_newexception
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_editruleformactions', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_placeholders', 'init');
 
-$mform = new editrule('/local/notificationsagent/editrule.php?courseid='.$course->id.'&action='.$typeaction);
+$mform = new editrule(new moodle_url('/local/notificationsagent/editrule.php', array('courseid' => $course->id, 'action' => $typeaction)));
 
 // Form processing and displaying is done here.
 if ($mform->is_cancelled()) {
     // No reenvía bien con cancelar, entra en el $_POST.
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha cancelado');
+    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), 'Se ha cancelado');
 } else if ($fromform = $mform->get_data()) {
     $data = new stdClass;
     $data->courseid = $courseid;
@@ -185,7 +185,7 @@ if ($mform->is_cancelled()) {
             $plugindata[$currentpluginkey]["complementary"] = 1;
         }
     }
-
+    
     foreach ($plugindata as $currentpluginkey => $plugindatum) {
         $dataplugin = new \stdClass();
         $dataplugin->ruleid = $ruleid;
@@ -209,7 +209,7 @@ if ($mform->is_cancelled()) {
     }
     // In this case you process validated data. $mform->get_data() returns data posted in form.
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect($CFG->wwwroot . '/local/notificationsagent/index.php?courseid='.$course->id, 'Se ha guardado');
+    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), 'Se ha guardado');
 } else {
     // This branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
     // or on the first display of the form.

@@ -22,20 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// TODO Refactor to plugin instead of subplugin.
-function sessionstart_set_timer_cache($userid, $courseid, $time, $pluginname) {
+/**
+ * @throws dml_exception
+ */
+function set_first_course_access($userid, $courseid, $timeaccess) {
     global $DB;
-    $exists = $DB->record_exists('notificationsagent_cache',
-        array('userid' => $userid,
-            'courseid' => $courseid,
-            'pluginname' => $pluginname));
-    // First course viewed for a user does not change, so no need for update
+    $exists = $DB->record_exists('notifications_sessionaccess', array('userid' => $userid, 'courseid' => $courseid));
     if (!$exists) {
         $objdb = new stdClass();
         $objdb->userid = $userid;
         $objdb->courseid = $courseid;
-        $objdb->timestart = $time;
-        $objdb->pluginname = $pluginname;
-        $DB->insert_record('notificationsagent_cache', $objdb);
+        $objdb->firstaccess = $timeaccess;
+        $DB->insert_record('notifications_sessionaccess', $objdb);
     }
 }
+

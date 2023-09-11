@@ -55,23 +55,23 @@ $string['task'] = 'Test Task';
 $string['menu'] = 'My assistant';
 $string['heading'] = 'Notifications Agent';
 
-// Import Template
+// Import Template.
 $string['import'] = 'Import';
 $string['no_file_selected'] = 'No file selected';
 $string['import_success'] = 'Rule imported successfuly';
 $string['import_error'] = 'Cannot import rule, check your JSON file';
 $string['no_json_file'] = 'File is not a JSON';
 
-// Export Template
+// Export Template.
 $string['export'] = 'Export';
 $string['ruledownload'] = 'Export rule as';
 
-// Assign Template
+// Assign Template.
 $string['assign'] = 'Assign';
 $string['type_template'] = 'template';
 $string['type_rule'] = 'rule';
 
-// Condition plugins
+// Condition plugins.
 $string['condition_days'] = 'Days';
 $string['condition_hours'] = 'Hours';
 $string['condition_minutes'] = 'Minutes';

@@ -28,29 +28,28 @@ global $DB;
 $courseid = required_param('courseid', PARAM_INT);
 $ruleid = required_param('ruleid', PARAM_INT);
 
+$json = array();
+
 if (!$courseid) {
     require_login();
     throw new \moodle_exception('needcourseid');
 }
 
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    throw new \moodle_exception('invalidcourseid');
-}
-require_login($course);
-
-$context = context_course::instance($course->id);
-
-// TODO: Rewrite query to export conditions / actions.
-/*$sql = 'SELECT *
-        FROM {notifications_rule}
-        WHERE courseid = :courseid
-        AND ruleid = :ruleid';*/
+$sql = 'SELECT *
+ FROM {notificationsagent_rule} r
+ inner join {notificationsagent_action} a on a.ruleid = r.ruleid
+ inner join {notificationsagent_condition} c on c.ruleid = r.ruleid
+ WHERE r.courseid = :courseid
+ AND r.ruleid = :ruleid';
 
 $courseparams = array('courseid' => $courseid, 'ruleid' => $ruleid);
 
-$rs = $DB->get_record('notificationsagent_rule', $courseparams);
+//$rs = $DB->get_record('notificationsagent_rule', $courseparams);
+$json["rule"] = $DB->get_record('notificationsagent_rule', $courseparams);
+$json["actions"] = $DB->get_records('notificationsagent_action', array('ruleid' => $ruleid));
+$json["conditions"] = $DB->get_records('notificationsagent_condition', array('ruleid' => $ruleid));
 
-$rs = json_encode($rs);
+$rs = json_encode($json);
 
 header('Content-disposition: attachment; filename=rule_' . $ruleid . '_export.json');
 header('Content-type: application/json');

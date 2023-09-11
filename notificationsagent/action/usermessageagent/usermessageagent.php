@@ -29,27 +29,27 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
-        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+        $valuesession = 'id_' . $this->get_subtype() . '_' . $this->get_type() . $exception . $id;
 
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
-        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'pluginname' . $this->get_type() . $exception . $id, $this->get_subtype());
+        $mform->setType('pluginname' . $this->get_type() . $exception . $id, PARAM_RAW);
+        $mform->addElement('hidden', 'type' . $this->get_type() . $exception . $id, $this->get_type() . $id);
+        $mform->setType('type' . $this->get_type() . $exception . $id, PARAM_RAW);
 
-        //Title.
+        // Title.
         $mform->addElement(
-            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64', 'required' => true )
         );
 
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
         $editoroptions = array(
@@ -57,49 +57,48 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             'trusttext' => true
         );
 
-        //Message.
+        // Message.
         $mform->addElement(
-            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
+            'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
-        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']) 
-        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])
+        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
         : null);
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
-        null,'required',null,'client');
-        
-        //Users.
+        null, 'required', null, 'client');
+
+        // Users.
         $context = \context_course::instance($courseid);
         $enrolledusers = get_enrolled_users($context);
         $listusers = array();
         foreach ($enrolledusers as $uservalue) {
-            $listusers["user-" . $uservalue->id] = format_string(
+            $listusers[$uservalue->id] = format_string(
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
             );
         }
-        if(empty($listusers)){
-            $listusers['user-0'] = 'UUUU';
+        if (empty($listusers)) {
+            $listusers['0'] = 'UUUU';
         }
         asort($listusers);
         $mform->addElement(
-            'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
+            'select', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
             get_string(
                 'editrule_action_element_user', 'notificationsaction_addusergroup',
                 array('typeelement' => '[UUUU]')
             ),
             $listusers
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_user',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_user']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_user'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_user']);
         }
 
         return $mform;
-
     }
 
     /**
@@ -139,16 +138,15 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         $message = "";
 
         foreach ($params as $key => $value) {
-            if (strpos($key, "title") !== false){
+            if (strpos($key, "title") !== false) {
                 $title = $value;
-
-            } elseif (strpos($key, "message") !== false) {
-                $message = $value;
-            } elseif (strpos($key, "user") !== false) {
+            } else if (strpos($key, "message") !== false) {
+                $message = $value["text"];
+            } else if (strpos($key, "user") !== false) {
                 $user = $value;
             }
         }
-    
+
         return json_encode(array('title' => $title, 'message' => $message, 'user' => $user));
     }
 }

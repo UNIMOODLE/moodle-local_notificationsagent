@@ -24,9 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../lib.php');
 require_once(__DIR__ .'/../sessionstart.php');
+require_once(__DIR__ .'/../../../notificationsagent.php');
+use notificationsagent\notificationsagent;
 class notificationscondition_sessionstart_observer {
-
-
 
     /**
      * @throws \dml_exception
@@ -60,21 +60,16 @@ class notificationscondition_sessionstart_observer {
         $session = new notificationsagent_condition_sessionstart($rule);
         $pluginname =$session->get_subtype();
 
-        $results = $DB->get_records_sql('
-                select mnrc.parameters, mnrc.pluginname as pluginname
-                from mdl_notificationsagent_condition mnrc
-                inner join mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
-                where pluginname=?
-                and courseid=?',
-                [$pluginname,$courseid]
-            );
+        $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
 
-        foreach ($results as $result){
-            $decode = $result->parameters;
-            $pluginname = $result->pluginname;
+        foreach ($conditions as $condition){
+            $decode = $condition->parameters;
+            $pluginname = $condition->pluginname;
             $param = json_decode($decode, true);
             $cache = $timeaccess + $param['time'];
-            sessionstart_set_timer_cache($userid, $courseid, $cache, $pluginname);
+            notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, false);
         }
+        // Log first access to avoid mdl_log_standard_log
+        set_first_course_access($userid,$courseid,$timeaccess);
     }
 }

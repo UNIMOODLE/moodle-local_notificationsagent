@@ -51,23 +51,23 @@ $string['task'] = 'Test Task';
 $string['menu'] = 'Mi asistente';
 $string['heading'] = 'Agente de Notificaciones';
 
-// Import Template
+// Import Template.
 $string['import'] = 'Import';
 $string['no_file_selected'] = 'Ningún archivo seleccionado';
 $string['import_success'] = 'Regla importada correctamente';
 $string['import_error'] = 'No se ha podido importar la regla, revisa el archivo JSON';
 $string['no_json_file'] = 'El archivo no es JSON';
 
-// Export Template
+// Export Template.
 $string['export'] = 'Exportar';
 $string['ruledownload'] = 'Exportar regla como';
 
-// Assign Template
+// Assign Template.
 $string['assign'] = 'Asignar';
 $string['type_template'] = 'plantilla';
 $string['type_rule'] = 'regla';
 
-// Condition plugins
+// Condition plugins.
 $string['condition_days'] = 'Días';
 $string['condition_hours'] = 'Horas';
 $string['condition_minutes'] = 'Minutos';

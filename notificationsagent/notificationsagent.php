@@ -18,5 +18,44 @@ namespace notificationsagent;
 
 class notificationsagent {
 
+    public static function get_conditions_by_course($pluginname, $courseid) {
+        global $DB;
+        $conditions = $DB->get_records_sql('
+                select mnrc.parameters, mnrc.pluginname as pluginname
+                from mdl_notificationsagent_condition mnrc
+                inner join mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
+                where pluginname=?
+                and courseid=?',
+            [$pluginname, $courseid]
+        );
+
+        return $conditions;
+    }
+
+    public static function set_timer_cache($userid, $courseid, $timer, $pluginname, $updaterecord) {
+        // Sessionstart no actualiza si hay registro.
+        // Sessionend actualiza siempre.
+        global $DB;
+        $exists = $DB->record_exists(
+            'notificationsagent_cache',
+            array(
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'pluginname' => $pluginname
+            )
+        );
+
+        if (!$exists) {
+            $objdb = new \stdClass();
+            $objdb->userid = $userid;
+            $objdb->courseid = $courseid;
+            $objdb->timestart = $timer;
+            $objdb->pluginname = $pluginname;
+            $DB->insert_record('notificationsagent_cache', $objdb);
+        }
+
+    }
+
+
 }
 

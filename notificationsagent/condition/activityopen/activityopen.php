@@ -149,7 +149,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             'seconds' => 0
         );
         
-        $cmid = 0;
+        $activity = 0;
     
         foreach ($params as $key => $value) {
             if (is_array($value)) {
@@ -161,12 +161,12 @@ class notificationsagent_condition_activityopen extends notification_activitycon
                     }
                 }
             } elseif (strpos($key, "activity") !== false) {
-                $cmid = $value;
+                $activity = $value;
             }
         }
     
         $timeInSeconds = ($timeValues['days'] * 24 * 60 * 60) + ($timeValues['hours'] * 60 * 60) + ($timeValues['minutes'] * 60) + $timeValues['seconds'];
-        return json_encode(array('time' => $timeInSeconds, 'cmid' => $cmid));
+        return json_encode(array('time' => $timeInSeconds, 'activity' => $activity));
     }
     
 }

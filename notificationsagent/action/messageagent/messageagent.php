@@ -28,26 +28,26 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
-        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
-        
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$id,$this->get_type().$id);
-        $mform->setType('type'.$this->get_type().$id, PARAM_RAW );
-        
+        $valuesession = 'id_' . $this->get_subtype() . '_' . $this->get_type() . $exception . $id;
+
+        $mform->addElement('hidden', 'pluginname' . $this->get_type() . $id, $this->get_subtype());
+        $mform->setType('pluginname' . $this->get_type() . $id, PARAM_RAW);
+        $mform->addElement('hidden', 'type' . $this->get_type() . $id, $this->get_type() . $id);
+        $mform->setType('type' . $this->get_type() . $id, PARAM_RAW);
+
         $mform->addElement(
-            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64', 'required' => true )
         );
 
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
         $editoroptions = array(
@@ -56,21 +56,20 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         );
 
         $mform->addElement(
-            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
+            'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
-        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']) 
-        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])
+        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
         : null);
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
-        null,'required',null,'client');
+        null, 'required', null, 'client');
 
-
-        self::placeholders($mform, 'action'.$id);
+        self::placeholders($mform, 'action' . $id);
 
         return $mform;
     }
@@ -95,7 +94,6 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
 
     public function get_elements() {
         return array('[TTTT]', '[BBBB]');
-
     }
 
     public function check_capability() {
@@ -111,15 +109,15 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
     public function get_parameters($params) {
         $title = "";
         $message = "";
-        
+
         foreach ($params as $key => $value) {
             if (strpos($key, "title") !== false) {
                 $title = $value;
-            } elseif (strpos($key, "message") !== false) {
-                $message = $value;
+            } else if (strpos($key, "message") !== false) {
+                $message = $value["text"];
             }
         }
 
-    return json_encode(array('title' => $title, 'message' => $message));
+        return json_encode(array('title' => $title, 'message' => $message));
     }
 }

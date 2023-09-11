@@ -34,7 +34,7 @@
 
 <div class="d-flex mb-4">
     <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
-    <a href="/local/notificationsagent/editrule.php?courseid={{courseid}}&action=add" class="btn btn-outline-primary">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a></p>
+    <a href="{{{editruleurl}}}" class="btn btn-outline-primary">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a></p>
 </div>
 
 <div class="d-flex flex-wrap">
@@ -50,7 +50,7 @@
             </div>
             <div class="card-footer bg-transparent">
                 <div class="card-assignment d-flex">
-                    <a href="/local/notificationsagent/exportrule.php?courseid={{courseid}}&ruleid={{{ id }}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a></p>
+                    <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a></p>
                     {{#assigntemplatebutton}}
                         <button type="button" class="btn btn-outline-primary d-block ml-auto" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
                     {{/assigntemplatebutton}}
@@ -87,7 +87,7 @@
 <div class="modal fade" id="importTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form enctype="multipart/form-data" action="importrule.php" method="POST">
+            <form enctype="multipart/form-data" action="{{{importruleurl}}}" method="POST">
                 <div class="modal-header">
                     <h3 class="modal-title font-weight-bold">Importar <span></span></h3>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

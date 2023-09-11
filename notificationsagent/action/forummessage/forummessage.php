@@ -22,12 +22,10 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
 
     public function get_title() {
         return get_string('forummessage_action', 'notificationsaction_forummessage');
-
     }
 
     public function get_elements() {
         return array('[FFFF]', '[TTTT]', '[BBBB]');
-
     }
 
     public function get_description() {
@@ -40,27 +38,27 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
-        $valuesession = 'id_'.$this->get_subtype().'_' .$this->get_type() .$exception.$id;
+        $valuesession = 'id_' . $this->get_subtype() . '_' . $this->get_type() . $exception . $id;
 
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
-        $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'pluginname' . $this->get_type() . $exception . $id, $this->get_subtype());
+        $mform->setType('pluginname' . $this->get_type() . $exception . $id, PARAM_RAW);
+        $mform->addElement('hidden', 'type' . $this->get_type() . $exception . $id, $this->get_type() . $id);
+        $mform->setType('type' . $this->get_type() . $exception . $id, PARAM_RAW);
 
-        //Title.
+        // Title.
         $mform->addElement(
-            'text', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
+            'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
             ), array('size' => '64', 'required' => true )
         );
 
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title', PARAM_TEXT);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_title',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
         $editoroptions = array(
@@ -68,25 +66,25 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             'trusttext' => true
         );
 
-        //Message.
+        // Message.
         $mform->addElement(
-            'editor', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
+            'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
-        $mform->setType($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message', PARAM_RAW);
+        $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
-            null,'required',null,'client');
+            null, 'required', null, 'client');
 
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_message',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_message']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message']);
         }
 
-        //Forum.
+        // Forum.
         $forumname = array();
         $forumlist = mod_forum_external::get_forums_by_courses(array($courseid));
         foreach ($forumlist as $forum) {
@@ -96,12 +94,20 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         if (empty($forumname)) {
             $forumname['0'] = 'FFFF';
         }
-        $mform->addElement('select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_forum', get_string('editrule_action_element_forum',
-            'notificationsaction_forummessage', array('typeelement' => '[FFFF]')), $forumname);
+        $mform->addElement(
+            'select',
+            $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_forum',
+            get_string(
+                'editrule_action_element_forum',
+                'notificationsaction_forummessage',
+                array('typeelement' => '[FFFF]')
+            ),
+            $forumname
+        );
 
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_forum'])){
-            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_forum',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_forum']);
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_forum'])) {
+            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_forum',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_forum']);
         }
 
         return $mform;
@@ -116,7 +122,6 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
      */
     public function get_name() {
         return get_string('pluginname', 'notificationsaction_forummessage');
-
     }
 
     public function check_capability() {
@@ -132,18 +137,16 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         $title = "";
         $message = "";
         $forum = "";
-        
         foreach ($params as $key => $value) {
             if (strpos($key, "title") !== false) {
                 $title = $value;
-            } elseif (strpos($key, "message") !== false) {
-                $message = $value;
-            } elseif (strpos($key, "forum") !== false) {
+            } else if (strpos($key, "message") !== false) {
+                $message = $value["text"];
+            } else if (strpos($key, "forum") !== false) {
                 $forum = $value;
             }
         }
 
-    return json_encode(array('title' => $title, 'message' => $message, 'forum' => $forum));
-
+        return json_encode(array('title' => $title, 'message' => $message, 'forum' => $forum));
     }
 }

@@ -68,6 +68,11 @@ $templatecontext = [
     "courseid" => $course->id
 ];
 
+$importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
+$templatecontext['importruleurl'] = $importruleurl;
+$editruleurl = new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'add'));
+$templatecontext['editruleurl'] = $editruleurl;
+
 $rules = Rule::get_rules();
 $cardscontent=array();
 foreach ($rules as $rule){
@@ -78,6 +83,7 @@ foreach ($rules as $rule){
         'type_lang' => $rule->get_template() == 1 ?
             get_string('type_template', 'local_notificationsagent') :
             get_string('type_rule', 'local_notificationsagent'),
+        'exporturl' => new moodle_url("/local/notificationsagent/exportrule.php", array('courseid' => $course->id, 'ruleid' => $rule->get_id()))
     );
 }
 
