@@ -75,7 +75,7 @@ $templatecontext['editruleurl'] = $editruleurl;
 
 $rules = Rule::get_rules();
 $cardscontent=array();
-foreach ($rules as $rule){
+foreach ($rules as $rule) {
     $cardscontent[] = array(
         'id' => $rule->get_id(),
         'name' => $rule->get_name(),
@@ -105,7 +105,7 @@ foreach ($categories_all as $cat) {
     $category_array[] = build_category_array($cat, $ruleid);
 }
 
-if(!empty($category_array)){
+if (!empty($category_array)) {
     $outputcategories = html_writer::start_div("", ["class" => "course-category-listing"]);
         $outputcategories .= html_writer::start_div("", ["class" => "header-listing"]);
             $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);

@@ -123,7 +123,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $user = "";
         $group = "";
         foreach ($params as $key => $value) {

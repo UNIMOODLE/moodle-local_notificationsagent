@@ -133,7 +133,7 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $title = "";
         $message = "";
         $forum = "";

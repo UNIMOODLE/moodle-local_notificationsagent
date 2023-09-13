@@ -106,7 +106,7 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $title = "";
         $message = "";
 

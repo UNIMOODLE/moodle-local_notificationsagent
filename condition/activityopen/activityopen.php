@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
-global $CFG ,$SESSION;
+global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
 use local_notificationsagent\notification_activityconditionplugin;
 class notificationsagent_condition_activityopen extends notification_activityconditionplugin {
@@ -70,54 +70,47 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         global $SESSION;
         $valuesession = 'id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_time_'.$this->get_type().$exception.$id;
 
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id, $this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$exception.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id, $this->get_type().$id);
         $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
 
         $timegroup = array();
-        //Days.
+        // Days.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_days', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_days']) 
-                ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_days'] 
-                : null, 'required' => true ));
-        //Hours.      
+            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null, 'required' => true ));
+        // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_hours', 'local_notificationsagent'),
-                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                   'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_hours']) 
-                   ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_hours'] 
-                   : null, 'required' => true ));
-        //Minutes.
+            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                   'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null, 'required' => true ));
+        // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-            'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_minutes']) 
-            ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_minutes'] 
-            : null, 'required' => true ));
-        //Seconds.
+            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+                'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null, 'required' => true ));
+        // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                'value' => !empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_seconds']) 
-                ? $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_seconds'] 
-                : null, 'required' => true ));
-        //GroupTime.
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null, 'required' => true ));
+        // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
-        //Activity.
+        // Activity.
         $listactivities = array();
         $modinfo = get_fast_modinfo($courseid);
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
         }
-        if(empty($listactivities)){
+        if (empty($listactivities)) {
             $listactivities['0'] = 'AAAA';
         }
         asort($listactivities);
@@ -129,7 +122,8 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             ),
             $listactivities
         );
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_activity'])){
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'
+                   .$this->get_type().$exception.$id.'_activity'])) {
             $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_activity',
             $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_activity']);
         }
@@ -140,33 +134,30 @@ class notificationsagent_condition_activityopen extends notification_activitycon
      *
      * @return mixed
      */
-    public function get_parameters($params) {
-        $timeUnits = array('days', 'hours', 'minutes', 'seconds');
-        $timeValues = array(
+    public function convert_parameters($params) {
+        $timeunits = array('days', 'hours', 'minutes', 'seconds');
+        $timevalues = array(
             'days' => 0,
             'hours' => 0,
             'minutes' => 0,
             'seconds' => 0
         );
-        
         $activity = 0;
-    
         foreach ($params as $key => $value) {
             if (is_array($value)) {
-                foreach ($value as $subKey => $subValue) {
-                    foreach ($timeUnits as $unit) {
-                        if (strpos($subKey, $unit) !== false) {
-                            $timeValues[$unit] = $subValue;
+                foreach ($value as $subkey => $subvalue) {
+                    foreach ($timeunits as $unit) {
+                        if (strpos($subkey, $unit) !== false) {
+                            $timevalues[$unit] = $subvalue;
                         }
                     }
                 }
-            } elseif (strpos($key, "activity") !== false) {
+            } else if (strpos($key, "activity") !== false) {
                 $activity = $value;
             }
         }
-    
-        $timeInSeconds = ($timeValues['days'] * 24 * 60 * 60) + ($timeValues['hours'] * 60 * 60) + ($timeValues['minutes'] * 60) + $timeValues['seconds'];
-        return json_encode(array('time' => $timeInSeconds, 'activity' => $activity));
+        $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
+            + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
+        return json_encode(array('time' => $timeinseconds, 'activity' => $activity));
     }
-    
 }

@@ -200,8 +200,8 @@ if ($mform->is_cancelled()) {
 
         $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
         $pluginobj = new $pluginclass($rule);
-        $dataplugin->parameters = $pluginobj->get_parameters($plugindatum);
-        if($dataplugin->type === \notificationplugin::CAT_ACTION){
+        $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
+        if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
             $DB->insert_record('notificationsagent_action', $dataplugin);
         }else{
             $DB->insert_record('notificationsagent_condition', $dataplugin);

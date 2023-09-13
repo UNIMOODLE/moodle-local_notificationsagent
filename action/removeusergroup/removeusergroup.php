@@ -123,7 +123,7 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $user = "";
         $group = "";
 

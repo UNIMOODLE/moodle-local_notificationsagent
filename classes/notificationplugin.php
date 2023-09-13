@@ -80,7 +80,7 @@ abstract class notificationplugin {
             // TODO SET CACHE
             $rule =$DB->get_record('notificationsagent_rule', ['ruleid'=>$record->ruleid]);
             $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
-            if (!empty($subplugin)){
+            if (!empty($subplugin)) {
                 $subplugin->set_iscomplementary($record->complementary);
                 $subplugin->set_pluginname($record->pluginname);
                 $subplugin->set_id($record->id);
@@ -158,12 +158,18 @@ abstract class notificationplugin {
         $this->pluginname = $pluginname;
     }
 
+
+
+    public function get_parameters() {
+        return $this->parameters;
+    }
+
     /**
      * @param array $params
      *
      * @return mixed
      */
-    abstract public function  get_parameters($params);
+    abstract public function  convert_parameters($params);
     /**
      * @param mixed $parameters
      */
@@ -171,7 +177,7 @@ abstract class notificationplugin {
         $this->parameters = $parameters;
     }
 
-    public function set_type($type){
+    public function set_type($type) {
         $this->type = $type;
     }
 

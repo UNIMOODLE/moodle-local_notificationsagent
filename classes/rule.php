@@ -68,7 +68,7 @@ class Rule {
 
     }
 
-    public static function get_rules(){
+    public static function get_rules() {
         global $DB;
         $instances = array();
         $rules = $DB->get_records('notificationsagent_rule');
@@ -113,21 +113,21 @@ class Rule {
         $this->description = $description;
     }
 
-    public function get_conditions($id){
+    public function get_conditions($id) {
         global $DB;
         $this->conditions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $id, 'type'=>'condition', 'complementary' => 0]));
         return $this->conditions;
     }
 
-    public function get_exceptions($id){
+    public function get_exceptions($id) {
         global $DB;
         $this->exceptions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $id, 'type'=>'condition','complementary' => 1]));
         return $this->exceptions;
     }
 
-    public function get_actions($id){
+    public function get_actions($id) {
         global $DB;
         $this->actions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $id, 'type'=>'action']));

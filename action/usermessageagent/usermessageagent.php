@@ -132,7 +132,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $title = "";
         $user = "";
         $message = "";

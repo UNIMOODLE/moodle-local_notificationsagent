@@ -82,7 +82,7 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
      *
      * @return mixed
      */
-    public function get_parameters($params) {
+    public function convert_parameters($params) {
         $text = "";
 
         foreach ($params as $key => $value) {

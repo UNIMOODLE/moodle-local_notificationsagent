@@ -60,7 +60,7 @@ function get_all_course_modules($courseid) {
 /**
  * @return array[]
  */
-function get_all_conditions($courseid){
+function get_all_conditions($courseid) {
     $listconditions = array();
 
     $hasModules = false;
@@ -99,14 +99,14 @@ function get_all_conditions($courseid){
 /**
  * @return array[]
  */
-function get_all_actions($courseid){
+function get_all_actions($courseid) {
     global $DB, $USER, $COURSE;
     $listactions = array();
 
     $hasUsers = false;
     $context = \context_course::instance($courseid);
     $enrolledusers = get_enrolled_users($context);
-    if(!empty($enrolledusers)){
+    if (!empty($enrolledusers)) {
         $hasUsers = true;
     }
 
@@ -119,13 +119,13 @@ function get_all_actions($courseid){
         LEFT JOIN {forum_digests} d ON d.forum = f.id AND d.userid = ?
         WHERE f.course = ?
     ", array($USER->id, $courseid));
-    if(!empty($modinfo->get_instances_of('forum'))){
+    if (!empty($modinfo->get_instances_of('forum'))) {
         $hasForums = true;
     }
 
     $hasGroups = false;
     $list_groups  = groups_get_all_groups($courseid);
-    if(!empty($list_groups)){
+    if (!empty($list_groups)) {
         $hasGroups = true;
     }
 
@@ -134,14 +134,14 @@ function get_all_actions($courseid){
         'elements' => array('[TTTT]','[BBBB]')
     );
 
-    if($hasUsers){
+    if ($hasUsers) {
         $listactions[] = array(
             'title'=> get_string('editrule_action_title_notificationtouser', 'local_notificationsagent'),
             'elements' => array('[UUUU]','[TTTT]','[BBBB]')
         );
     }
 
-    if($hasForums){
+    if ($hasForums) {
         $listactions[] = array(
             'title'=> get_string('editrule_action_title_postgeneralforum', 'local_notificationsagent'),
             'elements' => array('[FFFF]','[TTTT]','[BBBB]')
@@ -152,7 +152,7 @@ function get_all_actions($courseid){
         );
     }
 
-    if($hasGroups){
+    if ($hasGroups) {
         $listactions[] = array(
             'title'=> get_string('editrule_action_title_addusertogroup', 'local_notificationsagent'),
             'elements' => array('[GGGG]')
@@ -203,7 +203,7 @@ function build_category_array($category, $ruleid) {
     $courses = $category->get_courses();
     $count = $category->coursecount;
     $courses_arry=array();
-    foreach ($courses as $course){
+    foreach ($courses as $course) {
         $assigned = $DB->get_field(
             'notificationsagent_rule',
             'assigned',
@@ -230,7 +230,7 @@ function build_category_array($category, $ruleid) {
     $subcategories = $category->get_children();
     foreach ($subcategories as $subcategory) {
         $hascourses = count_category_courses($subcategory);
-        if($hascourses > 0){
+        if($hascourses > 0) {
             $subcategoryArray = build_category_array($subcategory, $ruleid);
             $categoryArray['categories'][] = $subcategoryArray;
         }
@@ -247,7 +247,7 @@ function build_category_array($category, $ruleid) {
  * @return array
  */
 
-function count_category_courses($category){
+function count_category_courses($category) {
     $countcategorycourses = $category->coursecount;
 
     $subcategories = $category->get_children();
@@ -266,11 +266,11 @@ function count_category_courses($category){
  * @return array
  */
 
-if(!empty($_POST['idRule'])){
+if(!empty($_POST['idRule'])) {
     echo json_encode(getListOfCoursesAssigned($_POST['idRule']));
 }
 
-function getListOfCoursesAssigned($idRule){
+function getListOfCoursesAssigned($idRule) {
     global $DB;
     /* Select tabla de assingados pasándole el idRule y recibiendo un listado de ids de cursos */
     $listofCoursesAssigned = [11, 2, 10, 17, 5];
@@ -309,10 +309,10 @@ function build_output_categories($arraycategories, $categoryid = 0) {
                 $output .= html_writer::end_div();//.col-auto
             $output .= html_writer::end_div();//.d-flex
             $output .= html_writer::start_tag("ul", ["id" => "category-listing-content-".$category["id"], "class" => "collapse", "data-parent" => "#category-listing-content-".$categoryid]);
-                if(!empty($category["categories"])){
+                if (!empty($category["categories"])) {
                     $output .= build_output_categories($category["categories"], $category["id"]);
                 }
-                if(!empty($category["courses"])){
+                if (!empty($category["courses"])) {
                     foreach ($category["courses"] as $key => $course) {
                         $output .= html_writer::start_tag("li", ["id" => "listitem-course-".$course["id"], "class" => "listitem listitem-course list-group-item list-group-item-action"]);
                             $output .= html_writer::start_div("", ["class" => "d-flex"]);

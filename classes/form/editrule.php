@@ -43,7 +43,7 @@ class editrule extends \moodleform {
         } else {
             $mform->setType('title', PARAM_CLEANHTML);
         }
-        if(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'])){
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'])) {
             $mform->setDefault('title',
             $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title']);
         }
