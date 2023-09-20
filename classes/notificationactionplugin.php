@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 require_once('notificationplugin.php');
+require_once('plugininfo/notificationsbaseinfo.php');
+
+use local_notificationsagent\plugininfo\notificationsbaseinfo;
 abstract class notificationactionplugin extends notificationplugin {
 
     const PLACEHOLDERS
@@ -53,6 +56,35 @@ abstract class notificationactionplugin extends notificationplugin {
             $optioncount++;
         }
         $mform->addElement('html', "</div></div></div>");
+    }
+
+    public static function create_subplugins($records) {
+
+        $subplugins = array();
+        global $DB;
+        foreach ($records as $record) {
+            // TODO SET CACHE.
+            $rule = $DB->get_record('notificationsagent_rule', ['ruleid' => $record->ruleid]);
+            $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
+            if (!empty($subplugin)) {
+                $subplugin->set_pluginname($record->pluginname);
+                $subplugin->set_id($record->id);
+                $subplugin->set_parameters($record->parameters);
+                $subplugin->set_type($record->type);
+                $subplugin->set_ruleid($record->ruleid);
+
+                $subplugins[] = $subplugin;
+            }
+        }
+        return $subplugins;
+    }
+
+    public static function create_subplugin($id) {
+        global $DB;
+        // Find type of subplugin.
+        $record = $DB->get_record('notificationsagent_action', array('id' => $id));
+        $subplugins = create_subplugins(array($record));
+        return $subplugins[0];
     }
 
 }

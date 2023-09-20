@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 require_once('notificationplugin.php');
+require_once('plugininfo/notificationsbaseinfo.php');
+
+use local_notificationsagent\plugininfo\notificationsbaseinfo;
 abstract class notificationconditionplugin extends notificationplugin {
 
     public function get_type() {
@@ -32,8 +35,83 @@ abstract class notificationconditionplugin extends notificationplugin {
      *
      * @return bool true if the condition is true, false otherwise.
      */
-    public abstract function evaluate(\EvaluationContext $context): bool;
+    abstract public function evaluate(\EvaluationContext $context): bool;
 
      /** Estimate next time when this condition will be true. */
-    public abstract function estimate_next_time();
+    abstract public function estimate_next_time();
+
+    public static function create_subplugins($records) {
+
+        $subplugins = array();
+        global $DB;
+        foreach ($records as $record) {
+            // TODO SET CACHE.
+            $rule = $DB->get_record('notificationsagent_rule', ['ruleid' => $record->ruleid]);
+            $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
+            if (!empty($subplugin)) {
+                $subplugin->set_iscomplementary($record->complementary);
+                $subplugin->set_pluginname($record->pluginname);
+                $subplugin->set_id($record->id);
+                $subplugin->set_parameters($record->parameters);
+                $subplugin->set_type($record->type);
+                $subplugin->set_ruleid($record->ruleid);
+
+                $subplugins[] = $subplugin;
+            }
+        }
+        return $subplugins;
+    }
+
+    public static function create_subplugin($id) {
+        global $DB;
+        // Find type of subplugin.
+        $record = $DB->get_record('notificationsagent_condition', array('id' => $id));
+        $subplugins = create_subplugins(array($record));
+        return $subplugins[0];
+    }
+
+    /**
+     * Returns date from seconds value
+     *
+     * @param  mixed $inputSeconds
+     * @return void
+     */
+    public function get_human_time($inputSeconds) {
+        $secondsInAMinute = 60;
+        $secondsInAnHour = 60 * $secondsInAMinute;
+        $secondsInADay = 24 * $secondsInAnHour;
+
+        // Extract days.
+        $days = floor($inputSeconds / $secondsInADay);
+
+        // Extract hours.
+        $hourSeconds = $inputSeconds % $secondsInADay;
+        $hours = floor($hourSeconds / $secondsInAnHour);
+
+        // Extract minutes.
+        $minuteSeconds = $hourSeconds % $secondsInAnHour;
+        $minutes = floor($minuteSeconds / $secondsInAMinute);
+
+        // Extract the remaining seconds.
+        $remainingSeconds = $minuteSeconds % $secondsInAMinute;
+        $seconds = ceil($remainingSeconds);
+
+        // Format and return.
+        $timeParts = [];
+        $sections = [
+            get_string('card_day', 'local_notificationsagent')  => (int)$days,
+            get_string('card_hour', 'local_notificationsagent') => (int)$hours,
+            get_string('card_minute', 'local_notificationsagent') => (int)$minutes,
+            get_string('card_second', 'local_notificationsagent') => (int)$seconds,
+        ];
+
+        foreach ($sections as $name => $value) {
+            if ($value > 0) {
+                $timeParts[] = $value . ' ' . $name . ($value == 1 ? '' : 's');
+            }
+        }
+
+        return implode(', ', $timeParts);
+    }
+
 }

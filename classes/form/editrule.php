@@ -27,17 +27,21 @@ use local_notificationsagent\plugininfo\notificationsbaseinfo;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("$CFG->libdir/formslib.php");
-require_once ("$CFG->dirroot/local/notificationsagent/lib.php");
+require_once("$CFG->dirroot/local/notificationsagent/lib.php");
 
 class editrule extends \moodleform {
 
-    //Add elements to form
+    // Add elements to form.
     public function definition() {
         global $CFG, $SESSION;
-       
-        $mform = $this->_form; // Don't forget the underscore! 
 
-        $mform->addElement('text', 'title', get_string('editrule_title', 'local_notificationsagent'), array('size' => '64', 'required' => true ));
+        $mform = $this->_form; // Don't forget the underscore!
+
+        $mform->addElement(
+            'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
+            array('size' => '64')
+        );
+        $mform->addRule('title', null, 'required', null, 'client');
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('title', PARAM_TEXT);
         } else {
@@ -51,19 +55,20 @@ class editrule extends \moodleform {
         $mform->addElement('html', '
         <nav>
             <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link active" id="nav-conditions-tab" data-toggle="tab" href="#nav-conditions" role="tab" aria-controls="nav-conditions" aria-selected="true">Condiciones</a>
-                <a class="nav-item nav-link" id="nav-exceptions-tab" data-toggle="tab" href="#nav-exceptions" role="tab" aria-controls="nav-exceptions" aria-selected="false">Excepciones</a>
-                <a class="nav-item nav-link" id="nav-actions-tab" data-toggle="tab" href="#nav-actions" role="tab" aria-controls="nav-actions" aria-selected="false">Acciones</a>
+                <a class="nav-item nav-link active" id="nav-conditions-tab" data-toggle="tab" href="#nav-conditions"
+                role="tab" aria-controls="nav-conditions" aria-selected="true">Condiciones</a>
+                <a class="nav-item nav-link" id="nav-exceptions-tab" data-toggle="tab" href="#nav-exceptions"
+                role="tab" aria-controls="nav-exceptions" aria-selected="false">Excepciones</a>
+                <a class="nav-item nav-link" id="nav-actions-tab" data-toggle="tab" href="#nav-actions"
+                role="tab" aria-controls="nav-actions" aria-selected="false">Acciones</a>
             </div>
         </nav>
         ');
-        
         $mform->addElement('html', '
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
             ');
-                //$this->conditions($mform);
-        $this->settabcontent("condition",$mform);
+        $this->settabcontent("condition", $mform);
         $mform->addElement('html', '
             </div>
             <div class="tab-pane fade" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
@@ -73,44 +78,45 @@ class editrule extends \moodleform {
             </div>
             <div class="tab-pane fade" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
         ');
-                //$this->actions($mform);
-        $this->settabcontent("action",$mform);
+        $this->settabcontent("action", $mform);
 
         $mform->addElement('html', '
             </div>
         </div>
         ');
-            
+
         $this->add_action_buttons();
-        //Al guardar cambios, borrar todos los $SESSION referentes al formulario de nueva Regla 
-        // unset($SESSION->NOTIFICATIONS['CONDITIONS']);
-        // unset($SESSION->NOTIFICATIONS['EXCEPTIONS']);
-        // unset($SESSION->NOTIFICATIONS['ACTIONS']);
+        // ... Al guardar cambios, borrar todos los SESSION referentes al formulario de nueva Regla.
+        // ... unset($SESSION->NOTIFICATIONS['CONDITIONS']);.
+        // ... unset($SESSION->NOTIFICATIONS['EXCEPTIONS']);.
+        // ... unset($SESSION->NOTIFICATIONS['ACTIONS']);.
     }
 
-    //Custom validation should be added here
-    function validation($data, $files) {
+    // Custom validation should be added here.
+    public function validation($data, $files) {
         return array();
     }
 
     private function settabcontent($type, $mform, $exception = null) {
         global $SESSION;
-        //Get new Conditions
+
         require_once('content.php');
         $obj = new content();
-        //$method = 'construct'.$type;
+
         echo $obj->renderform($mform, $SESSION->NOTIFICATIONS['IDCOURSE'], $type, $exception);
-        //$listconditions = get_conditions_description($SESSION->NOTIFICATIONS['IDCOURSE']);
+
         $list = notificationsbaseinfo::get_description($type);
         $listoptions = array();
         foreach ($list as $key => $value) {
             $key = $value['name'] . ':' . json_encode($value['elements']);
             $listoptions[$key] = $value['title'];
         }
-        $new_group = array();
-        $new_group[] =& $mform->createElement('select', 'new' . $type . $exception . '_select', '', $listoptions, array('class' => 'col-sm-auto p-0 mr-3'));
-        $new_group[] =& $mform->createElement('button', 'new' . $type . $exception . '_button', get_string('add'));
+        $newgroup = array();
+        $newgroup[] =& $mform->createElement('select', 'new' . $type . $exception . '_select', '',
+            $listoptions, array('class' => 'col-sm-auto p-0 mr-3'));
+        $newgroup[] =& $mform->createElement('button', 'new' . $type . $exception . '_button', get_string('add'));
 
-        $mform->addElement('group', 'new' . $type . $exception . '_group', get_string('editrule_new' . $type, 'local_notificationsagent'), $new_group);
+        $mform->addElement('group', 'new' . $type . $exception . '_group', get_string('editrule_new' . $type,
+            'local_notificationsagent'), $newgroup);
     }
 }

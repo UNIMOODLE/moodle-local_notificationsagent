@@ -40,9 +40,9 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
-            ), array('size' => '64', 'required' => true )
+            ), array('size' => '64')
         );
-
+        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
@@ -119,5 +119,16 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         }
 
         return json_encode(array('title' => $title, 'message' => $message));
+    }
+
+    public function process_markups($params, $courseid) {
+        // TODO: Send only text, as it is
+        /*$jsonParams = json_decode($params);
+
+        $paramsToReplace = [$jsonParams->title, $jsonParams->message];
+
+        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());*/
+
+        return $this->get_title();
     }
 }

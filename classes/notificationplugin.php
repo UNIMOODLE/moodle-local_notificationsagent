@@ -68,39 +68,22 @@ abstract class notificationplugin {
     abstract public function get_description();
 
     /**
+     * Returns a human-readable string from database records
+     *
+     * @param  mixed $params
+     * @param  mixed $courseid
+     * @return string
+     */
+    abstract public function process_markups($params, $courseid);
+
+    /**
      * Factory for loading subplugins from database records
      * @param array $records
      * @return array of subplugins
      */
-    public static function create_subplugins($records) {
+    public abstract static function create_subplugins($records);
 
-        $subplugins=array();
-        global $DB;
-        foreach ($records as $record) {
-            // TODO SET CACHE
-            $rule =$DB->get_record('notificationsagent_rule', ['ruleid'=>$record->ruleid]);
-            $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
-            if (!empty($subplugin)) {
-                $subplugin->set_iscomplementary($record->complementary);
-                $subplugin->set_pluginname($record->pluginname);
-                $subplugin->set_id($record->id);
-                $subplugin->set_parameters($record->parameters);
-                $subplugin->set_type($record->type);
-                $subplugin->set_ruleid($record->ruleid);
-
-                $subplugins[] = $subplugin;
-            }
-        }
-        return $subplugins;
-    }
-
-    public static function create_subplugin($id) {
-        global $DB;
-        // Find type of subplugin.
-        $record = $DB->get_record('notificationsagent_condition', array('id' => $id));
-        $subplugins = self::create_subplugins(array($record));
-        return $subplugins[0];
-    }
+    public abstract static function create_subplugin($id) ;
 
     /**
      * @param $ruleid
@@ -159,7 +142,6 @@ abstract class notificationplugin {
     }
 
 
-
     public function get_parameters() {
         return $this->parameters;
     }
@@ -169,7 +151,9 @@ abstract class notificationplugin {
      *
      * @return mixed
      */
+
     abstract public function  convert_parameters($params);
+
     /**
      * @param mixed $parameters
      */
@@ -180,7 +164,5 @@ abstract class notificationplugin {
     public function set_type($type) {
         $this->type = $type;
     }
-
-
 
 }

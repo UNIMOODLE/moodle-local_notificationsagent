@@ -81,29 +81,31 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                 'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null, 'required' => true ));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null));
+
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                    'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null, 'required' => true ));
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null));
         // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
             'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null, 'required' => true ));
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null));
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null, 'required' => true ));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null));
         // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
+        $mform->addGroupRule($this->get_subtype().'_condition'.$exception.$id.'_time', '- You must supply a value here.','required');
         // Activity.
         $listactivities = array();
         $modinfo = get_fast_modinfo($courseid);
@@ -160,4 +162,25 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
         return json_encode(array('time' => $timeinseconds, 'activity' => $activity));
     }
+
+    public function process_markups($params, $courseid) {
+        $jsonParams = json_decode($params);
+
+        $modinfo = get_fast_modinfo($courseid);
+        $types = $modinfo->get_cms();
+
+        foreach ($types as $type) {
+            if ($type->id == $jsonParams->activity) {
+                $activityname = $type->name;
+            }
+        }
+
+        $paramsToReplace = [$this->get_human_time($jsonParams->time), $activityname];
+
+        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
+
+        return $humanValue;
+    }
+
+    
 }

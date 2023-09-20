@@ -142,14 +142,13 @@ $mform = new editrule(new moodle_url('/local/notificationsagent/editrule.php', a
 if ($mform->is_cancelled()) {
     // No reenvía bien con cancelar, entra en el $_POST.
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), 'Se ha cancelado');
+    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), get_string('rulecancelled', 'local_notificationsagent'));
 } else if ($fromform = $mform->get_data()) {
     $data = new stdClass;
     $data->courseid = $courseid;
     $data->name = $fromform->title;
     $data->createdat = time();
     $data->createdby = $USER->id;
-    $ruleid = $DB->insert_record('notificationsagent_rule', $data);
     // TODO Refactor.
     $plugindata = array();
     $plugincount = array();
@@ -179,42 +178,60 @@ if ($mform->is_cancelled()) {
         ) {
             $subkeywithoutpluginame = str_replace($pluginname . '_', '', $key);
             $plugindata[$currentpluginkey][$subkeywithoutpluginame] = $value;
+            
         }
 
         if (preg_match("/conditionexception\d+$/", $key) && isset($currentpluginkey)) {
             $plugindata[$currentpluginkey]["complementary"] = 1;
         }
     }
-    
-    foreach ($plugindata as $currentpluginkey => $plugindatum) {
-        $dataplugin = new \stdClass();
-        $dataplugin->ruleid = $ruleid;
-        $dataplugin->pluginname = preg_replace('/\d+$/', '', $currentpluginkey);
-        $plugintype = preg_replace('/\d+$/', '', $plugindatum['type']);
-        $dataplugin->type = $plugintype;
-        $dataplugin->complementary = $plugindatum['complementary'];
-        // Ruta y creación de objetos de plugin.
-        $rule = new \stdClass();
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname . '/'
-            . $dataplugin->pluginname . '.php');
 
-        $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
-        $pluginobj = new $pluginclass($rule);
-        $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
-        if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
-            $DB->insert_record('notificationsagent_action', $dataplugin);
-        }else{
-            $DB->insert_record('notificationsagent_condition', $dataplugin);
+    $countCondition = 0;
+    $countAction = 0;
+
+    foreach ($plugindata as $item) {
+        $type = $item["type"];
+        if (strpos($type, "condition") !== false) {
+            $countCondition++;
+        } elseif (strpos($type, "action") !== false) {
+            $countAction++;
         }
     }
-    // In this case you process validated data. $mform->get_data() returns data posted in form.
-    $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), 'Se ha guardado');
+
+    if($countCondition >= 1 && $countAction >=1){
+        $ruleid = $DB->insert_record('notificationsagent_rule', $data);
+        foreach ($plugindata as $currentpluginkey => $plugindatum) {
+            $dataplugin = new \stdClass();
+            $dataplugin->ruleid = $ruleid;
+            $dataplugin->pluginname = preg_replace('/\d+$/', '', $currentpluginkey);
+            $plugintype = preg_replace('/\d+$/', '', $plugindatum['type']);
+            $dataplugin->type = $plugintype;
+            $dataplugin->complementary = $plugindatum['complementary'];
+            // Ruta y creación de objetos de plugin.
+            $rule = new \stdClass();
+            require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname . '/'
+                . $dataplugin->pluginname . '.php');
+
+            $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
+            $pluginobj = new $pluginclass($rule);
+            $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
+            if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
+                $DB->insert_record('notificationsagent_action', $dataplugin);
+            }else{
+                $DB->insert_record('notificationsagent_condition', $dataplugin);
+            }
+        }
+        // In this case you process validated data. $mform->get_data() returns data posted in form.
+        $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
+        redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)),  get_string('rulesaved', 'local_notificationsagent'));
+    }else{
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'] = $fromform->title;
+        redirect(new moodle_url('/local/notificationsagent/editrule.php', array('courseid' => $course->id, 'action' => $typeaction)),"You must add at least one condition and one action");
+    }
 } else {
     // This branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
     // or on the first display of the form.
 }
-
 
 $output = $PAGE->get_renderer('local_notificationsagent');
 

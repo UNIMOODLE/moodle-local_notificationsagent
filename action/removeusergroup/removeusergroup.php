@@ -107,7 +107,7 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
     }
 
     public function get_title() {
-        // TODO: Implement get_title() method.
+        return get_string('removeusergroup_action', 'notificationsaction_removeusergroup');
     }
 
     public function get_elements() {
@@ -136,5 +136,9 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
         }
 
         return json_encode(array('user' => $user, 'group' => $group));
+    }
+
+    public function process_markups($params, $courseid) {
+        return $this->get_title();
     }
 }

@@ -107,7 +107,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
     }
 
     public function get_title() {
-        // TODO: Implement get_title() method.
+        return get_string('addusergroup_action', 'notificationsaction_addusergroup');
     }
 
     public function get_elements() {
@@ -135,5 +135,9 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
         }
 
         return json_encode(array('user' => $user, 'group' => $group));
+    }
+
+    public function process_markups($params, $courseid) {
+        return $this->get_title();
     }
 }

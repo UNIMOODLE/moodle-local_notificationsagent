@@ -78,29 +78,30 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
                    placeholder' => get_string('condition_days', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null, 'required' => true ));
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null));
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
                    placeholder' => get_string('condition_hours', 'local_notificationsagent'),
-                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null, 'required' => true ));
+                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null));
         // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null, 'required' => true ));
+            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null));
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")', 
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null, 'required' => true ));
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null));
         //GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
+                $mform->addGroupRule($this->get_subtype().'_condition'.$exception.$id.'_time', '- You must supply a value here.','required');
     }
 
     /** Estimate next time when this condition will be true. */
@@ -137,10 +138,21 @@ class notificationsagent_condition_coursestart extends notification_activitycond
                     }
                 }
             }
+
         }
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
 
         return json_encode(array('time' => $timeinseconds));
+    }
+
+    public function process_markups($params, $courseid) {
+        $jsonParams = json_decode($params);
+
+        $paramsToReplace = [$this->get_human_time($jsonParams->time)];
+
+        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
+
+        return $humanValue;
     }
 }

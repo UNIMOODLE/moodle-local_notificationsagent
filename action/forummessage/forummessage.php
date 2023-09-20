@@ -51,8 +51,9 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
-            ), array('size' => '64', 'required' => true )
+            ), array('size' => '64' )
         );
+        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
 
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
@@ -148,5 +149,9 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         }
 
         return json_encode(array('title' => $title, 'message' => $message, 'forum' => $forum));
+    }
+
+    public function process_markups($params, $courseid) {
+        return $this->get_title();
     }
 }

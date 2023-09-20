@@ -75,6 +75,8 @@ $string['condition_seconds'] = 'Segundos';
 
 // EditRule.
     $string['editrule_newrule'] = 'Nueva regla';
+    $string['editrule_editrule'] = 'Editar';
+    $string['editrule_deleterule'] = 'Borrar';
     $string['editrule_title'] = 'Título';
     // Condition.
     $string['editrule_newcondition'] = 'Nueva condición:';
@@ -104,3 +106,23 @@ $string['condition_seconds'] = 'Segundos';
         $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
         $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
         $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+
+// Rule.
+$string['rulecancelled'] = 'Regla cancelada';
+$string['rulesaved'] = 'Regla guardada';
+
+// Card content
+$string['cardif'] = 'Si:';
+$string['cardunless'] = 'Excepto si:';
+$string['cardthen'] = 'Entonces:';
+
+// Card Condition time.
+$string['card_day'] = 'día';
+$string['card_hour'] = 'hora';
+$string['card_minute'] = 'minuto';
+$string['card_second'] = 'segundo';
+
+// Assign modal
+$string['assigncancel'] = 'Cancelar';
+$string['assignsave'] = 'Guardar cambios';
+$string['assignassign'] = 'Assignar: ';

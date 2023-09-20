@@ -40,8 +40,9 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
             'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_text',
             get_string(
                 'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
-                array('typeelement' => '[TTTT]', 'required' => true )
+                array('typeelement' => '[TTTT]')
             ));
+        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_text', null, 'required', null, 'client');
 
             $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text', PARAM_TEXT);
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_text'])) {
@@ -66,7 +67,7 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
     }
 
     public function get_title() {
-        // TODO: Implement get_title() method.
+        return get_string('bootstrapnotifications_action', 'notificationsaction_bootstrapnotifications');
     }
 
     public function get_elements() {
@@ -92,5 +93,9 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
         }
 
         return json_encode(array('text' => $text));
+    }
+
+    public function process_markups($params, $courseid) {
+        return $this->get_title();
     }
 }

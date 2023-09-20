@@ -15,7 +15,7 @@ body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
     margin-bottom: 24px;
 }
 
-@media (min-width: 992px){
+@media (min-width: 1320px){
     body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
         flex: 0 0 32.222222221%;
         margin-left: 1.666666665%;
@@ -43,6 +43,12 @@ body.path-local-notificationsagent .card .card-body{
 
 body.path-local-notificationsagent .card .card-content{
     flex: 1;
+}
+
+body.path-local-notificationsagent .card .conditions-content > span,
+body.path-local-notificationsagent .card .exceptions-content > span,
+body.path-local-notificationsagent .card .actions-content > span{
+    font-size: 18px;
 }
 
 body.path-local-notificationsagent .badge{

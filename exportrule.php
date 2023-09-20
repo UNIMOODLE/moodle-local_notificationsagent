@@ -44,7 +44,6 @@ $sql = 'SELECT *
 
 $courseparams = array('courseid' => $courseid, 'ruleid' => $ruleid);
 
-//$rs = $DB->get_record('notificationsagent_rule', $courseparams);
 $json["rule"] = $DB->get_record('notificationsagent_rule', $courseparams);
 $json["actions"] = $DB->get_records('notificationsagent_action', array('ruleid' => $ruleid));
 $json["conditions"] = $DB->get_records('notificationsagent_condition', array('ruleid' => $ruleid));

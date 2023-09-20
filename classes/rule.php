@@ -15,7 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace local_notificationsagent;
 require_once('notificationplugin.php');
+require_once('notificationactionplugin.php');
+require_once('notificationconditionplugin.php');
 
+use notificationactionplugin;
+use notificationconditionplugin;
 use notificationplugin;
 
 class Rule {
@@ -30,6 +34,7 @@ class Rule {
     private $assigned;
     private $template;
     private $status;
+    private $courseid;
     /********************************
      * Life-cycle functions
      ********************************/
@@ -42,6 +47,7 @@ class Rule {
             $this->ruleid = $rule->ruleid;
             $this->name = format_text($rule->name);
             $this->description = format_text($rule->description);
+            $this->courseid = $rule->courseid;
             //$this->assigned = $rule->assigned;
             //$this->template = $rule->template;
             //$this->status = $rule->status;
@@ -115,21 +121,21 @@ class Rule {
 
     public function get_conditions($id) {
         global $DB;
-        $this->conditions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
+        $this->conditions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $id, 'type'=>'condition', 'complementary' => 0]));
         return $this->conditions;
     }
 
     public function get_exceptions($id) {
         global $DB;
-        $this->exceptions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
+        $this->exceptions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $id, 'type'=>'condition','complementary' => 1]));
         return $this->exceptions;
     }
 
     public function get_actions($id) {
         global $DB;
-        $this->actions = notificationplugin::create_subplugins($DB->get_records('notificationsagent_condition',
+        $this->actions = notificationactionplugin::create_subplugins($DB->get_records('notificationsagent_action',
             ['ruleid' => $id, 'type'=>'action']));
         return $this->actions;
     }
@@ -209,6 +215,20 @@ class Rule {
      */
     public function set_ruleid($ruleid): void {
         $this->ruleid = $ruleid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_courseid() {
+        return $this->courseid;
+    }
+
+    /**
+     * @param mixed $courseid
+     */
+    public function set_courseid($courseid): void {
+        $this->courseid = $courseid;
     }
 
 

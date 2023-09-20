@@ -44,7 +44,7 @@ if (!$courseid) {
 }
 
 
-if (!$course = $DB->get_record('course', array('id'=>$courseid))) {
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     throw new \moodle_exception('invalidcourseid');
 }
 require_login($course);
@@ -70,24 +70,82 @@ $templatecontext = [
 
 $importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
 $templatecontext['importruleurl'] = $importruleurl;
-$editruleurl = new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'add'));
-$templatecontext['editruleurl'] = $editruleurl;
+$addruleurl = new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'add'));
+$templatecontext['addruleurl'] = $addruleurl;
 
 $rules = Rule::get_rules();
-$cardscontent=array();
+$rulecontent = array();
+
+$conditionsarray = array();
+$exceptionsarray = array();
+$actionsarray = array();
+
 foreach ($rules as $rule) {
-    $cardscontent[] = array(
+    $conditions = $rule->get_conditions($rule->get_id());
+    $exceptions = $rule->get_exceptions($rule->get_id());
+    $actions = $rule->get_actions($rule->get_id());
+    $conditionscontent = array();
+    $exceptionscontent = array();
+    $actionscontent = array();
+
+    // Conditions.
+    foreach ($conditions as $key => $value) {
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
+        $pluginobj = new $pluginclass($rule);
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
+            array_push($conditionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        }
+    }
+    $conditionsarray = array(
+        'hascontent' => !empty($conditionscontent),
+        'content' => $conditionscontent
+    );
+
+    // Exceptions.
+    foreach ($exceptions as $key => $value) {
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
+        $pluginobj = new $pluginclass($rule);
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
+            array_push($exceptionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        }
+    }
+    $exceptionsarray = array(
+        'hascontent' => !empty($exceptionscontent),
+        'content' => $exceptionscontent
+    );
+
+    // Actions.
+    foreach ($actions as $key => $value) {
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
+        $pluginobj = new $pluginclass($rule);
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
+            array_push($actionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        }
+    }
+    $actionsarray = array(
+        'hascontent' => !empty($actionscontent),
+        'content' => $actionscontent
+    );
+
+    $rulecontent[] = array(
         'id' => $rule->get_id(),
         'name' => $rule->get_name(),
+        'conditions' => $conditionsarray,
+        'exceptions' => $exceptionsarray,
+        'actions' => $actionsarray,
         'type' => $rule->get_template() == 1 ? 'template' : 'rule',
         'type_lang' => $rule->get_template() == 1 ?
             get_string('type_template', 'local_notificationsagent') :
             get_string('type_rule', 'local_notificationsagent'),
+        'editurl' => new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id())),
         'exporturl' => new moodle_url("/local/notificationsagent/exportrule.php", array('courseid' => $course->id, 'ruleid' => $rule->get_id()))
     );
 }
 
-$templatecontext['cardscontent'] = $cardscontent;
+$templatecontext['rulecontent'] = $rulecontent;
 
 /* Assign Templates */
 $assigntemplatebutton = [
@@ -100,7 +158,7 @@ $category_array = [];
 //TODO check $ruleid.
 $ruleid = "";
 foreach ($categories_all as $cat) {
-    /* $ruleid de build_category_array acabará desapareciendo 
+    /* $ruleid de build_category_array acabará desapareciendo
     ya que el listado de cursos se obtendrá desde AJAX y la función getListOfCoursesAssigned en lib.php*/
     $category_array[] = build_category_array($cat, $ruleid);
 }

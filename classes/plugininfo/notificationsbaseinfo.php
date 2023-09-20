@@ -89,14 +89,14 @@ class notificationsbaseinfo extends base {
             if ($subtype == null) {
                 return self::get_system_enabled_plugins_all_types($rule);
             } else {
-                $plugins = core_plugin_manager::instance()->get_installed_plugins('notificationsagent' . $subtype);
+                $plugins = core_plugin_manager::instance()->get_installed_plugins('notifications' . $subtype);
             }
             if (!$plugins) {
                 return array();
             }
             $installed = array();
             foreach ($plugins as $pluginname => $version) {
-                $installed[] = 'notificationsagent' . $subtype . '_' . $pluginname;
+                $installed[] = 'notifications' . $subtype . '_' . $pluginname;
             }
 
             list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
@@ -125,7 +125,7 @@ class notificationsbaseinfo extends base {
         // TODO enabled.
         $rule = new \stdClass();
         $rule->ruleid = null;
-        foreach (array_keys(core_component::get_plugin_list('notifications' . $subtype)) as $pluginname) {
+        foreach (array_keys(self::get_system_enabled_plugins(null, $subtype)) as $pluginname) {
             require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
             $pluginobj = new $pluginclass($rule);

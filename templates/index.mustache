@@ -34,36 +34,77 @@
 
 <div class="d-flex mb-4">
     <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
-    <a href="{{{editruleurl}}}" class="btn btn-outline-primary">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a></p>
+    <a href="{{{addruleurl}}}" class="btn btn-outline-primary">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
 </div>
 
 <div class="d-flex flex-wrap">
-    {{#cardscontent}}
+    {{#rulecontent}}
         <div id="card-{{{ id }}}" class="card card-{{{ type }}}">
             <div class="card-header bg-transparent mx-3 px-0">
                 <span class="badge badge-{{{ type }}}">{{{ type_lang }}}</span>
                 <h5 class="name mt-4">{{{ name }}}</h5>
             </div>
-            <div class="card-body d-flex flex-column mx-3 px-0">
+            <div class="card-body d-flex flex-column mx-3 my-2 p-0">
                 <div class="card-content">
+                    {{#conditions}}
+                        {{#hascontent}}
+                            <div class="conditions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardif, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-clock-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/conditions}}
+                    {{#exceptions}}
+                        {{#hascontent}}
+                            <div class="exceptions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardunless, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-check-square-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/exceptions}}
+                    {{#actions}}
+                        {{#hascontent}}
+                            <div class="actions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardthen, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-bell-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/actions}}
                 </div>
             </div>
             <div class="card-footer bg-transparent">
-                <div class="card-assignment d-flex">
-                    <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a></p>
+                <div class="card-assignment d-flex justify-content-between align-items-center">
+                    <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
+                    <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
                     {{#assigntemplatebutton}}
-                        <button type="button" class="btn btn-outline-primary d-block ml-auto" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
                     {{/assigntemplatebutton}}
+                    <a href="#"><i class="fa fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}</a>
                 </div>
             </div>
         </div>
-    {{/cardscontent}}
+    {{/rulecontent}}
 </div>
 <div class="modal fade" id="assignTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title font-weight-bold">Asignar <span></span></h3>
+                <h3 class="modal-title font-weight-bold">{{#str}}assignassign, local_notificationsagent{{/str}}<span></span></h3>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -77,8 +118,8 @@
                 {{{ output_categoriescourses }}}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="saveassignTemplateModal" class="btn btn-primary mb-1">Guardar cambios</button>
+                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}assigncancel, local_notificationsagent{{/str}}</button>
+                <button type="button" id="saveassignTemplateModal" class="btn btn-primary mb-1">{{#str}}assignsave, local_notificationsagent{{/str}}</button>
             </div>
         </div>
     </div>

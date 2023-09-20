@@ -42,9 +42,9 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
                 array('typeelement' => '[TTTT]')
-            ), array('size' => '64', 'required' => true )
+            ), array('size' => '64')
         );
-
+        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
@@ -116,7 +116,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
     }
 
     public function get_title() {
-        // TODO: Implement get_title() method.
+        return get_string('usermessageagent_action', 'notificationsaction_usermessageagent');
     }
 
     public function get_elements() {
@@ -148,5 +148,9 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         }
 
         return json_encode(array('title' => $title, 'message' => $message, 'user' => $user));
+    }
+
+    public function process_markups($params, $courseid) {
+        return $this->get_title();
     }
 }

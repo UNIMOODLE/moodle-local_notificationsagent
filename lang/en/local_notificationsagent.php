@@ -79,6 +79,8 @@ $string['condition_seconds'] = 'Seconds';
 
 // EditRule.
     $string['editrule_newrule'] = 'New rule';
+    $string['editrule_editrule'] = 'Edit';
+    $string['editrule_deleterule'] = 'Delete';
     $string['editrule_title'] = 'Title';
     // Condition.
     $string['editrule_newcondition'] = 'New condition:';
@@ -111,3 +113,25 @@ $string['condition_seconds'] = 'Seconds';
 
 
 $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
+
+// Rule.
+$string['rulecancelled'] = 'Rule cancelled';
+$string['rulesaved'] = 'Rule saved';
+
+// Card content
+$string['cardif'] = 'If:';
+$string['cardunless'] = 'Unless:';
+$string['cardthen'] = 'Then:';
+
+// Card Condition time.
+$string['card_day'] = 'day';
+$string['card_hour'] = 'hour';
+$string['card_minute'] = 'minute';
+$string['card_second'] = 'second';
+
+// Assign modal
+$string['assigncancel'] = 'Cancel';
+$string['assignsave'] = 'Save changes';
+$string['assignassign'] = 'Assign: ';
+
+

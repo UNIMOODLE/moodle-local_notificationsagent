@@ -21,7 +21,7 @@ class notificationsagent {
     public static function get_conditions_by_course($pluginname, $courseid) {
         global $DB;
         $conditions = $DB->get_records_sql('
-                select mnrc.parameters, mnrc.pluginname as pluginname
+                select mnrc.ruleid, mnrc.parameters, mnrc.pluginname as pluginname
                 from mdl_notificationsagent_condition mnrc
                 inner join mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
                 where pluginname=?
