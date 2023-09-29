@@ -18,7 +18,7 @@ require_once('forummessage_action.php');
 
 class notificationsaction_forummessage_observer {
 
-    public static function general_post_forum(\notificationsaction_forummessage\event\forum_post_event $event) {
+    public static function general_post_forum(\notificationsaction_forummessage\event\notificationsagent_forummessage_event $event) {
         // Post a message on a forum.
         // Forumid to be sent in event.
         $forumid = 1; // TODO.

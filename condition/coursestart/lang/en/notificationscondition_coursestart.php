@@ -19,4 +19,5 @@ $string['conditiontext'] = '[TTTT] has passed since the beginning of the course.
 $string['subtype'] = 'coursestart';
 $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['coursestart_crontask'] = 'course start cron task';
 

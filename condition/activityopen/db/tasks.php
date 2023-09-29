@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,16 +12,26 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ *  tasks.php .
+ *
+ * @package
+ * @copyright  2023
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
-require_once('addusergroup_action.php');
-class notificationsaction_addusergroup_observer {
 
-    public static function add_user_group(\notificationsaction_addusergroup\event\notificationsagent_addusergroup_event $event) {
-        // Add user to a specified group.
 
-        $message = new Addusergroup_action($event->courseid, $event->relateduserid);
-        $message->add_user_group();
-
-    }
-}
+$tasks = array(
+    array(
+        'classname' => 'notificationscondition_activityopen\task\activityopen_crontask',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);

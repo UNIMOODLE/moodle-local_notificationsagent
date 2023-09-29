@@ -17,6 +17,7 @@ require_once('notificationplugin.php');
 require_once('plugininfo/notificationsbaseinfo.php');
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
+use local_notificationsagent\EvaluationContext;
 abstract class notificationconditionplugin extends notificationplugin {
 
     public function get_type() {
@@ -30,12 +31,12 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param \EvaluationContext $context |null collection of variables to evaluate the condition.
+     * @param EvaluationContext $context  |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
      */
-    abstract public function evaluate(\EvaluationContext $context): bool;
+    abstract public function evaluate(EvaluationContext $context): bool;
 
      /** Estimate next time when this condition will be true. */
     abstract public function estimate_next_time();
@@ -66,7 +67,7 @@ abstract class notificationconditionplugin extends notificationplugin {
         global $DB;
         // Find type of subplugin.
         $record = $DB->get_record('notificationsagent_condition', array('id' => $id));
-        $subplugins = create_subplugins(array($record));
+        $subplugins = self::create_subplugins(array($record));
         return $subplugins[0];
     }
 

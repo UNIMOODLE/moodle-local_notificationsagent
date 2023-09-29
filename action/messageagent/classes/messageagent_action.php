@@ -16,14 +16,16 @@
 class Messageagent_action {
     private int $courseid;
     private array $users;
-    private $coursecontext;
 
-    public function __construct ($courseid) {
+
+    public function __construct ($courseid, $relateduserid) {
         $this->courseid = $courseid;
-        $coursecontext = context_course::instance($courseid);
-        $this->coursecontext = $coursecontext;
-        $this->users = $this->get_usersbycourse($coursecontext);
-
+        if(empty($relateduserid)){
+            $coursecontext = context_course::instance($courseid);
+            $this->users = $this->get_usersbycourse($coursecontext);
+        }else{
+            $this->users = [$relateduserid];
+        }
     }
 
     public function send_notification() {
@@ -38,9 +40,9 @@ class Messageagent_action {
             $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
             $message->userto = $user;
             $message->subject = 'Recordatorio usuarios curso ' . date('H:i:s', time()); // Será nuestro TTTT.
-            $message->fullmessage = 'Hola {user_name}'; // Será nuestro BBBB.
+            $message->fullmessage = 'Hola {user_name} ' . $user; // Será nuestro BBBB.
             $message->fullmessageformat = FORMAT_MARKDOWN;
-            $message->fullmessagehtml = '<p>Hola {user_name}</p>';
+            $message->fullmessagehtml = '<p>Hola {user_name}  </p>' . $user;
             $message->smallmessage = 'small message'; // TODO.
             $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
             $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification. // TODO.

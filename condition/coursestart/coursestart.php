@@ -17,6 +17,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
 use local_notificationsagent\notification_activityconditionplugin;
+use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_coursestart extends notification_activityconditionplugin {
 
     public function get_description() {
@@ -53,15 +54,30 @@ class notificationsagent_condition_coursestart extends notification_activitycond
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param \EvaluationContext $context |null collection of variables to evaluate the condition.
+     * @param EvaluationContext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(EvaluationContext $context): bool {
-        // TODO: Implement evaluate() method.
-        // Needed courseid and date to evaluate condition.
-        return false;
+        global $DB;
+
+        $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
+        $pluginname = $this->get_subtype();
+        $params = json_decode($context->get_params());
+        $meetcondition = false;
+ 
+        $course = get_course($courseid);
+        $timestart= $course->startdate;
+
+        $timenow =  time();
+
+        if (!empty($timestart)) {
+            ($timenow  > $timestart + $params->time) ? $meetcondition = true : $meetcondition = false;
+        } 
+
+        return $meetcondition;
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -147,9 +163,9 @@ class notificationsagent_condition_coursestart extends notification_activitycond
     }
 
     public function process_markups($params, $courseid) {
-        $jsonParams = json_decode($params);
+        $jsonparams = json_decode($params);
 
-        $paramsToReplace = [$this->get_human_time($jsonParams->time)];
+        $paramsToReplace = [$this->get_human_time($jsonparams->time)];
 
         $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
 

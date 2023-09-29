@@ -17,6 +17,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
 use local_notificationsagent\notification_activityconditionplugin;
+use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_activityopen extends notification_activityconditionplugin {
 
     public function get_description() {
@@ -45,12 +46,37 @@ class notificationsagent_condition_activityopen extends notification_activitycon
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param \EvaluationContext $context |null collection of variables to evaluate the condition.
+     * @param EvaluationContext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(EvaluationContext $context): bool {
+        // Params being like "time": "activity":"" .
+        global $DB;
+        $meetcondition = false;
+        $courseid = $context->get_courseid();
+        $params = json_decode($context->get_params());
+        $coursecontext = context_course::instance($courseid);
+        $pluginname = $this->get_subtype();
+        $timeaccess = $context->get_timeaccess();
+        // We need to check every user in the course.
+        $users = get_enrolled_users($coursecontext);
+        $conditionid = $this->get_id();
+        foreach ($users as $userid) {
+            $timestart = $DB->get_field(
+                'notificationsagent_cache',
+                'timestart',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid->id, 'pluginname' => $pluginname],
+            );
+            if (!empty($timestart)) {
+                ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
+            } else {
+                // WIP Pick datatstart by activity type.
+                $meetcondition = false;
+            }
+        }
+        return $meetcondition;
     }
 
     /** Estimate next time when this condition will be true. */
@@ -105,7 +131,9 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
-        $mform->addGroupRule($this->get_subtype().'_condition'.$exception.$id.'_time', '- You must supply a value here.','required');
+        $mform->addGroupRule(
+            $this->get_subtype() . '_condition' . $exception . $id . '_time', '- You must supply a value here.', 'required'
+        );
         // Activity.
         $listactivities = array();
         $modinfo = get_fast_modinfo($courseid);
@@ -164,23 +192,19 @@ class notificationsagent_condition_activityopen extends notification_activitycon
     }
 
     public function process_markups($params, $courseid) {
-        $jsonParams = json_decode($params);
+        $jsonparams = json_decode($params);
 
         $modinfo = get_fast_modinfo($courseid);
         $types = $modinfo->get_cms();
 
         foreach ($types as $type) {
-            if ($type->id == $jsonParams->activity) {
+            if ($type->id == $jsonparams->activity) {
                 $activityname = $type->name;
             }
         }
+        $paramstoreplace = [$this->get_human_time($jsonparams->time), $activityname];
+        $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
-        $paramsToReplace = [$this->get_human_time($jsonParams->time), $activityname];
-
-        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
-
-        return $humanValue;
+        return $humanvalue;
     }
-
-    
 }

@@ -31,3 +31,4 @@ $string['messageagent_action'] = 'Send individual notification with title [TTTT]
 $string['editrule_action_title'] = 'Title {$a->typeelement}:';
 $string['editrule_action_message'] = 'Message {$a->typeelement}';
 $string['subtype'] = 'messageagent';
+$string['messageagent_event'] = 'Message agent';

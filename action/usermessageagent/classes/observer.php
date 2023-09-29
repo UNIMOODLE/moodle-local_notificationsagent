@@ -13,13 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-use notificationsaction_usermessageagent\event\particular_notification_event;
+use notificationsaction_usermessageagent\event\notificationsagent_usermessageagent_event;
 
 defined('MOODLE_INTERNAL') || die();
 require_once('usermessage_action.php');
 class notificationsaction_usermessageagent_observer {
 
-    public static function particular_notification(particular_notification_event $event) {
+    public static function particular_notification(notificationsagent_usermessageagent_event $event) {
         // Send notification to a particular user enrolled on the received course in the event.
 
         $message = new Usermessageagent_action($event->courseid, $event->relateduserid);

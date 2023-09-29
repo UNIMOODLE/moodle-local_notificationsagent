@@ -17,9 +17,10 @@ defined('MOODLE_INTERNAL') || die();
 require_once('removeusergroup_action.php');
 class notificationsaction_removeusergroup_observer {
 
-    public static function remove_user_group(\notificationsaction_removeusergroup\event\remove_user_group_event $event) {
+    public static function remove_user_group(
+        \notificationsaction_removeusergroup\event\notificationsagent_removeusergroup_event $event
+    ) {
         // Add user to a specified group.
-
         $message = new Removeusergroup_action($event->courseid, $event->relateduserid);
         $message->remove_user_group();
 

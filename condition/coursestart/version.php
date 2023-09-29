@@ -22,6 +22,6 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023051102;
+$plugin->version = 2023051103;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationscondition_coursestart';

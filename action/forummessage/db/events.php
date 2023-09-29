@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_forummessage\event\forum_post_event',
+    'eventname' => '\notificationsaction_forummessage\event\notificationsagent_forummessage_event',
     'callback' => 'notificationsaction_forummessage_observer::general_post_forum',
 ];

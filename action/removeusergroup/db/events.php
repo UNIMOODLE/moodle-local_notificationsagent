@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_removeusergroup\event\remove_user_group_event',
+    'eventname' => '\notificationsaction_removeusergroup\event\notificationsagent_removeusergroup_event',
     'callback' => 'notificationsaction_removeusergroup_observer::remove_user_group',
 ];

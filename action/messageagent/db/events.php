@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_messageagent\event\individual_notification_event',
+    'eventname' => '\notificationsaction_messageagent\event\notificationsagent_messageagent_event',
     'callback' => 'notificationsaction_messageagent_observer::individual_notification',
 ];

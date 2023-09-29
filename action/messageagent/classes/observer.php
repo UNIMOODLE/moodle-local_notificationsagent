@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 require_once('messageagent_action.php');
+
 class notificationsaction_messageagent_observer {
 
-    public static function individual_notification(\notificationsaction_messageagent\event\individual_notification_event $event) {
-        // Send notification to all users enrolled on the received course in the event.
-
-        $message = new Messageagent_action($event->courseid);
+    public static function individual_notification(
+        \notificationsaction_messageagent\event\notificationsagent_messageagent_event $event
+    ) {
+        $message = new Messageagent_action($event->courseid, $event->relateduserid);
         $message->send_notification();
-
     }
 }

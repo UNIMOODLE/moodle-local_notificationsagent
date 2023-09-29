@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
 use local_notificationsagent\notification_activityconditionplugin;
+use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_sessionstart extends notification_activityconditionplugin {
 
     public function get_description() {
@@ -53,31 +54,46 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param \EvaluationContext $context |null collection of variables to evaluate the condition.
+     * @param EvaluationContext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(EvaluationContext $context): bool {
-        $meetcondition = false;
-        // TODO: Implement evaluate() method.
-        // NEED: pluginname, userid, courseid, time
-        // Check table cache for a result: pluginname, userid, courseid
-            // if cache date is lesser than now return false other wise is true
-        // If there is not a result on table cache we need to evaluate notifications_sessionaccess,
-        // userid, courseid, time (from condition)
-            //
-// Received
-//Array
-//(
-//[ruleid] => 1
-//[pluginname] => sessionstart
-//[parameters] => {"time":0}
-//[type] => condition
-//)
 
-        // Miramos mdl_notificationsagent_cache si hay registro, comprobar.
-        // si no hay registro comprobar en la tabla del plugin.
+        // Miramos mdl_notificationsagent_cache si hay registro, comprobar
+        // si no hay registro comprobar en la tabla del plugin
+        global $DB;
+        $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
+        $pluginname = $this->get_subtype();
+        $conditionid = $this->get_id();
+        $timeaccess = $context->get_timeaccess();
+        $params = json_decode($context->get_params());
+        $meetcondition = false;
+
+        // Timestart es el tiempo de primer acceso más time
+        $timestart = $DB->get_field('notificationsagent_cache',
+            'timestart', ['conditionid' => $conditionid,'courseid'=> $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+        );
+
+
+        if (!empty($timestart)) {
+            ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
+            // La regla se hizo después de que el usuario entrara en el curso.
+        } else {
+            // Check own plugin table
+            $firstacces = $DB->get_field('notifications_sessionaccess',
+                'firstaccess', ['courseid'=> $courseid, 'userid' => $userid],
+            );
+            // El usuario no ha desencadenado nunca un course_view
+            if (empty($firstacces)) {
+                return $meetcondition;
+            }
+
+            ($timeaccess  > $firstacces + $params->time) ? $meetcondition = true : $meetcondition = false;
+
+        }
 
         return $meetcondition;
 
@@ -174,9 +190,9 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
     }
 
     public function process_markups($params, $courseid) {
-        $jsonParams = json_decode($params);
+        $jsonparams = json_decode($params);
 
-        $paramsToReplace = [$this->get_human_time($jsonParams->time)];
+        $paramsToReplace = [$this->get_human_time($jsonparams->time)];
 
         $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
 

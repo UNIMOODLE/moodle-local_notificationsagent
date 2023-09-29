@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../lib.php');
 require_once(__DIR__ .'/../sessionstart.php');
 require_once(__DIR__ .'/../../../notificationsagent.php');
+require_once(__DIR__ .'/../../../classes/engine/notificationsagent_engine.php');
 use notificationsagent\notificationsagent;
 class notificationscondition_sessionstart_observer {
 
@@ -32,14 +33,16 @@ class notificationscondition_sessionstart_observer {
      * @throws \dml_exception
      */
     public static function course_viewed(\core\event\course_viewed $event) {
-        // We use this event to avoid querying the log_standard_log for a course firstaccess.
+
         if (!isloggedin() || $event->courseid == 1) {
             return;
         }
-        global $DB;
+
         $userid = $event->userid;
         $courseid = $event->courseid;
         $timeaccess = $event->timecreated;
+
+
         // TODO
         //Cuando se reciba un evento de tipo course_viewed se buscará que condiciones tienen
         // a ese evento como desencadenante.
@@ -51,6 +54,7 @@ class notificationscondition_sessionstart_observer {
         // Este valor se guardaría en la tabla de cache.
         //En los siguientes eventos course_viewed para ese curso y ese alumno se verificará
         // si hay algún valor guardado en la cache, de ser asi no se tocaría ya que el primer inicio de sesión no puede cambiar.
+
         // parámetros necesarios
         //condición para saber TTTT
         // Timeaccess que nos lo da el evento
@@ -58,18 +62,24 @@ class notificationscondition_sessionstart_observer {
         $rule = new \stdClass();
         $rule->ruleid = null;
         $session = new notificationsagent_condition_sessionstart($rule);
-        $pluginname =$session->get_subtype();
+        $pluginname = $session->get_subtype();
 
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-
+        $ruleids = [];
         foreach ($conditions as $condition){
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
+            $ruleids[] = $condition->ruleid;
+            $condtionid = $condition->id;
             $param = json_decode($decode, true);
             $cache = $timeaccess + $param['time'];
-            notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, false);
+            notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, false);
         }
-        // Log first access to avoid mdl_log_standard_log
+        // We use this event to avoid querying the log_standard_log for a course firstaccess.
         set_first_course_access($userid,$courseid,$timeaccess);
+
+        // Search for conditions with sessionstart and courseid
+        // Call engine with userid, courseid, timecreated
+        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid);
     }
 }

@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Notifications Agent';
-$string['pluginname1'] = 'notificationsagent';
 // Settings.
+$string['settings'] = 'Settings';
 $string['disable_user_use'] = 'Disable user use';
 $string['disable_user_use_desc'] = 'Disable user use of notifications agent';
 $string['tracelog'] = 'Trace log';

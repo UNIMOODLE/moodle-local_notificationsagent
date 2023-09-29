@@ -23,8 +23,70 @@
  */
 
 namespace local_notificationsagent;
+
 use local_notificationsagent\Rule;
+
 class EvaluationContext {
 
+    private $userid; // Evento.
+    private $courseid; // Evento o regla.
+    private $timeaccess; // Evento.
+    private $params; // Los que vienen del plugin.
+
+    /**
+     * @return mixed
+     */
+    public function get_userid() {
+        return $this->userid;
+    }
+
+    /**
+     * @param mixed $userid
+     */
+    public function set_userid($userid): void {
+        $this->userid = $userid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_courseid() {
+        return $this->courseid;
+    }
+
+    /**
+     * @param mixed $courseid
+     */
+    public function set_courseid($courseid): void {
+        $this->courseid = $courseid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_timeaccess() {
+        return $this->timeaccess;
+    }
+
+    /**
+     * @param mixed $timeaccess
+     */
+    public function set_timeaccess($timeaccess): void {
+        $this->timeaccess = $timeaccess;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_params() {
+        return $this->params;
+    }
+
+    /**
+     * @param mixed $params
+     */
+    public function set_params($params): void {
+        $this->params = $params;
+    }
 
 }

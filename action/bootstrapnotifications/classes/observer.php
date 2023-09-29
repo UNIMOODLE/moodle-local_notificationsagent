@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
-require_once('addusergroup_action.php');
+require_once('bootstrapnotifications_action.php');
 class notificationsaction_bootstrapnotifications_observer {
 
-    public static function bootstrap_notifications(\notificationsaction_bootstrapnotifications\event\bootstrap_notifications_event $event) {
+    public static function bootstrap_notifications(
+        \notificationsaction_bootstrapnotifications\event\notificationsagent_bootstrapnotifications_event $event
+    ) {
         // Create a bootstrap notification.
 
         $message = new Bootstrapnotifications_action($event->text);

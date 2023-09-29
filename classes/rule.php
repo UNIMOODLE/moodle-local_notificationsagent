@@ -21,6 +21,7 @@ require_once('notificationconditionplugin.php');
 use notificationactionplugin;
 use notificationconditionplugin;
 use notificationplugin;
+use local_notificationsagent\EvaluationContext;
 
 class Rule {
 
@@ -70,7 +71,7 @@ class Rule {
         return $rule;
     }
 
-    public function save() {
+    public function save($rule) {
 
     }
 
@@ -229,6 +230,26 @@ class Rule {
      */
     public function set_courseid($courseid): void {
         $this->courseid = $courseid;
+    }
+
+    public function evaluate(EvaluationContext $context): bool {
+        // Evaluate conditions.
+        foreach ($this->conditions as $condition) {
+            $context->set_params($condition->get_parameters());
+            $result = $condition->evaluate($context);
+            if ($result === false) {
+                return false;
+            }
+        }
+        // Evaluate exceptions.
+        foreach ($this->exceptions as $exception) {
+            $context->set_params($exception->get_parameters());
+            $result = $exception->evaluate($context);
+            if ($result === true) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

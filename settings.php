@@ -29,10 +29,9 @@ require_once($CFG->dirroot . '/local/notificationsagent/adminlib.php');
 
 if ($hassiteconfig) {
 
-    $ADMIN->add('localplugins',
-        new admin_category('local_notificationsagent_settings', get_string('pluginname',
-                'local_notificationsagent')));
-    $settingspage = new admin_settingpage('manage_notificationsagent', get_string('pluginname',
+    $ADMIN->add('modules', new admin_category('notificationscategory', get_string('pluginname','local_notificationsagent')));
+
+    $settingspage = new admin_settingpage('manage_notificationsagent', get_string('settings',
         'local_notificationsagent'));
 
     if ($ADMIN->fulltree) {
@@ -55,7 +54,8 @@ if ($hassiteconfig) {
         $settingspage->add($settingstracelog);
     }
 
-    $ADMIN->add('localplugins', $settingspage);
+    $ADMIN->add('notificationscategory', $settingspage);
+    //$ADMIN->add('notificationscategory', new admin_externalpage('notificationsexternalpage', get_string('menu', 'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/index.php'));
 
     // Add subplugins management in settings view.
 

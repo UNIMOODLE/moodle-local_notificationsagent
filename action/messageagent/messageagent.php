@@ -123,9 +123,9 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
 
     public function process_markups($params, $courseid) {
         // TODO: Send only text, as it is
-        /*$jsonParams = json_decode($params);
+        /*$jsonparams = json_decode($params);
 
-        $paramsToReplace = [$jsonParams->title, $jsonParams->message];
+        $paramsToReplace = [$jsonparams->title, $jsonparams->message];
 
         $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());*/
 

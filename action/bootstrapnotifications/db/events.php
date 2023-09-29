@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_bootstrapnotifications\event\bootstrap_notifications_event',
+    'eventname' => '\notificationsaction_bootstrapnotifications\event\notificationsagent_bootstrapnotifications_event',
     'callback' => 'notificationsaction_bootstrapnotifications_observer::bootstrap_notifications',
 ];

@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Agente de notificaciones';
 // Settings.
+$string['settings'] = 'Ajustes';
 $string['disable_user_use'] = 'Deshabilitar para el usuario';
 $string['disable_user_use_desc'] = 'Deshabilitar el uso del Agente de notificaciones para el usuario';
 $string['tracelog'] = 'Trace log';

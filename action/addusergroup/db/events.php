@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_addusergroup\event\add_user_group_event',
+    'eventname' => '\notificationsaction_addusergroup\event\notificationsagent_addusergroup_event',
     'callback' => 'notificationsaction_addusergroup_observer::add_user_group',
 ];
