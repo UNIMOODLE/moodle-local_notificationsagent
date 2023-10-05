@@ -122,7 +122,7 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
     }
 
     public function process_markups($params, $courseid) {
-        // TODO: Send only text, as it is
+        // TODO: Send only text, as it is.
         /*$jsonparams = json_decode($params);
 
         $paramsToReplace = [$jsonparams->title, $jsonparams->message];

@@ -22,6 +22,7 @@ use notificationactionplugin;
 use notificationconditionplugin;
 use notificationplugin;
 use local_notificationsagent\EvaluationContext;
+use moodle_url;
 
 class Rule {
 
@@ -36,6 +37,12 @@ class Rule {
     private $template;
     private $status;
     private $courseid;
+
+    private const PLACEHOLDERS
+    = array(
+        '{User_FirstName}', '{User_LastName_s}', '{User_Email}', '{User_Username}', '{User_Address}', '{Course_FullName}', '{Course_Url}'
+    );
+    
     /********************************
      * Life-cycle functions
      ********************************/
@@ -252,5 +259,80 @@ class Rule {
         return true;
     }
 
+    /**
+     * Return list of placeholders.
+     *
+     * @return array
+     */
+    public static function get_placeholders(): array {
+        return self::PLACEHOLDERS;
+    }
 
+    /**
+     * Replace place holders in the template with respective content.
+     *
+     * @param string $template Message template.
+     * @param subscription $subscription subscription instance
+     * @param \stdclass $eventobj Event data
+     * @param \context $context context object
+     *
+     * @return mixed final template string.
+     */
+    public function replace_placeholders($parameters, $courseid = null, $userid = null) {
+        $paramstoreplace = [];
+        $placeholderstoreplace = [];
+        $placeholders = self::get_placeholders();
+
+        if (!empty($userid)) {
+            $user = \core_user::get_user($userid, '*', MUST_EXIST);
+        }
+
+        if (!empty($courseid)) {
+            $course = get_course($courseid);
+        }
+
+        $jsonparams = json_decode($parameters);
+
+        foreach ($jsonparams as $item) {
+            foreach ($placeholders as $placeholder) {
+                if (strpos($item, $placeholder) !== false) {
+                    switch ($placeholder) {
+                        case '{User_FirstName}':
+                            $paramstoreplace[] = $user->firstname;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{User_LastName_s}':
+                            $paramstoreplace[] = $user->lastname;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{User_Email}':
+                            $paramstoreplace[] = $user->email;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{User_Username}':
+                            $paramstoreplace[] = $user->username;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{User_Address}':
+                            $paramstoreplace[] = $user->address;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{Course_FullName}':
+                            $paramstoreplace[] = $course->fullname;
+                            $placeholderstoreplace[] = $placeholder;
+
+                        case '{Course_Url}':
+                            $paramstoreplace[] = new moodle_url('/course/view.php', [
+                                'id' => $courseid,
+                            ]);
+                            $placeholderstoreplace[] = $placeholder;
+                    }
+                }
+            }
+        }
+
+        $humanvalue = str_replace($placeholderstoreplace, $paramstoreplace, $parameters);
+
+        return $humanvalue;
+    }
 }

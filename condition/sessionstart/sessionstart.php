@@ -77,7 +77,6 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
             'timestart', ['conditionid' => $conditionid,'courseid'=> $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
-
         if (!empty($timestart)) {
             ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
             // La regla se hizo después de que el usuario entrara en el curso.
@@ -151,6 +150,7 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
     /** Estimate next time when this condition will be true. */
     public function estimate_next_time() {
         // TODO: Implement estimate_next_time() method.
+        // Devolvemos la fecha en la que la condición será verdad. fecha firstaccess + param['time'] si time()< firstaccess + param['time']
     }
 
     /**

@@ -79,6 +79,8 @@ $string['condition_seconds'] = 'Seconds';
 
 // EditRule.
     $string['editrule_newrule'] = 'New rule';
+    $string['editrule_activaterule'] = 'Activate';
+    $string['editrule_pauserule'] = 'Pause';
     $string['editrule_editrule'] = 'Edit';
     $string['editrule_deleterule'] = 'Delete';
     $string['editrule_title'] = 'Title';
@@ -129,9 +131,17 @@ $string['card_hour'] = 'hour';
 $string['card_minute'] = 'minute';
 $string['card_second'] = 'second';
 
+// Status modal
+$string['statustitle'] = '{$a->textstatus} rule {$a->title}';
+$string['statuscontent'] = 'You are going to {$a->textstatus} rule {$a->title}, do you want to continue?';
+$string['statuscancel'] = 'Cancel';
+$string['statusaccept'] = 'Accept';
+$string['statusacceptactivated'] = 'Rule activated';
+$string['statusacceptpaused'] = 'Rule paused';
+
 // Assign modal
+$string['assignassign'] = 'Assign: ';
 $string['assigncancel'] = 'Cancel';
 $string['assignsave'] = 'Save changes';
-$string['assignassign'] = 'Assign: ';
 
 

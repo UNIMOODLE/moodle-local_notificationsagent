@@ -22,7 +22,7 @@ class notificationsaction_usermessageagent_observer {
     public static function particular_notification(notificationsagent_usermessageagent_event $event) {
         // Send notification to a particular user enrolled on the received course in the event.
 
-        $message = new Usermessageagent_action($event->courseid, $event->relateduserid);
+        $message = new Usermessageagent_action($event->courseid, $event->relateduserid, $event->other);
         $message->send_notification();
 
     }

@@ -22,7 +22,7 @@ class notificationsaction_bootstrapnotifications_observer {
     ) {
         // Create a bootstrap notification.
 
-        $message = new Bootstrapnotifications_action($event->text);
+        $message = new Bootstrapnotifications_action($event->other);
         $message->add_bootstrap_notifications();
 
     }

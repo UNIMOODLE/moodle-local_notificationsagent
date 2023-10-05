@@ -59,6 +59,7 @@ $PAGE->set_title(get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
@@ -133,6 +134,7 @@ foreach ($rules as $rule) {
     $rulecontent[] = array(
         'id' => $rule->get_id(),
         'name' => $rule->get_name(),
+        'status' => 1,
         'conditions' => $conditionsarray,
         'exceptions' => $exceptionsarray,
         'actions' => $actionsarray,
@@ -146,12 +148,6 @@ foreach ($rules as $rule) {
 }
 
 $templatecontext['rulecontent'] = $rulecontent;
-
-/* Assign Templates */
-$assigntemplatebutton = [
-    'action' => get_string('assign', 'local_notificationsagent')
-];
-$templatecontext['assigntemplatebutton'] = $assigntemplatebutton;
 
 $categories_all = core_course_category::top()->get_children();
 $category_array = [];

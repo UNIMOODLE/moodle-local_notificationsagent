@@ -42,6 +42,9 @@ class notificationscondition_sessionstart_observer {
         $courseid = $event->courseid;
         $timeaccess = $event->timecreated;
 
+        // We use this event to avoid querying the log_standard_log for a course firstaccess.
+        set_first_course_access($userid,$courseid,$timeaccess);
+
 
         // TODO
         //Cuando se reciba un evento de tipo course_viewed se buscará que condiciones tienen
@@ -75,8 +78,6 @@ class notificationscondition_sessionstart_observer {
             $cache = $timeaccess + $param['time'];
             notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, false);
         }
-        // We use this event to avoid querying the log_standard_log for a course firstaccess.
-        set_first_course_access($userid,$courseid,$timeaccess);
 
         // Search for conditions with sessionstart and courseid
         // Call engine with userid, courseid, timecreated

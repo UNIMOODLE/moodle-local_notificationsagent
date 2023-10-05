@@ -22,7 +22,7 @@ class notificationsaction_forummessage_observer {
         // Post a message on a forum.
         // Forumid to be sent in event.
         $forumid = 1; // TODO.
-        $post = new Forummessage_action($event->courseid, $forumid);
+        $post = new Forummessage_action($event->courseid, $forumid, $event->other);
         $post->post_forum($forumid);
 
     }

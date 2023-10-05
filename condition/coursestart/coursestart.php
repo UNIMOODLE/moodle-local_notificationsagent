@@ -71,7 +71,7 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         $course = get_course($courseid);
         $timestart= $course->startdate;
 
-        $timenow =  time();
+        $timenow =  time(); 
 
         if (!empty($timestart)) {
             ($timenow  > $timestart + $params->time) ? $meetcondition = true : $meetcondition = false;

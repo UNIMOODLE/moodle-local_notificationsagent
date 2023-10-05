@@ -26,7 +26,7 @@ class notificationsagent_bootstrapnotifications_event extends \core\event\base {
     protected function init() {
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['crud'] = 'r';
-        $this->data['text'] = $this->text;
+        $this->data['other'] = $this->other;
         $this->data['relateduserid'] = $this->relateduserid;
     }
 
@@ -46,7 +46,7 @@ class notificationsagent_bootstrapnotifications_event extends \core\event\base {
      */
     public function get_description() {
         // TODO.
-        return "Text: '$this->text' ";
+        return "Text: '$this->other' ";
     }
 
 }

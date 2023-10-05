@@ -101,11 +101,11 @@ class notificationsagent {
     }
 
     // TODO WIP.
-    public static function set_timer_trigger($ruleid, $userid, $courseid, $timer) {
+    public static function set_time_trigger($ruleid, $userid, $courseid, $timer) {
 
         global $DB;
         $objdb = new \stdClass();
-        $objdb->userid = $userid;
+        $objdb->userid = $userid; // TODO is case is NULL. DB forces to not null.
         $objdb->courseid = $courseid;
         $objdb->ruleid = $ruleid;
         $objdb->day = $timer;

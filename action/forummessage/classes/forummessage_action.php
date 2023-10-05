@@ -17,22 +17,24 @@ class Forummessage_action {
 
     private int $forumid;
     private int $courseid;
+    private string $placeholders;
 
-    public function __construct($courseid, $forumid) {
+    public function __construct($courseid, $forumid, $other) {
         $this->courseid = $courseid;
         $this->forumid = $forumid;
+        $this->placeholders = $other;
     }
 
     public function post_forum($forumid) {
 
         global $CFG;
-        // TODO Get parameters.
-        $postsubject = "Post general";
-        $postmessage = "Mensaje del post";
+        $placeholdershuman = json_decode($this->placeholders);
+        $postsubject = $placeholdershuman->title;
+        $postmessage = $placeholdershuman->message;
 
         try {
             // Set up the Moodle Web Services client.
-            $token = get_config('notificationsaction_forummessage', 'token_name');
+            $token = get_config('notificationsaction_forummessage', 'token');
             $domain = $CFG->wwwroot;
             $restformat = 'json';
 

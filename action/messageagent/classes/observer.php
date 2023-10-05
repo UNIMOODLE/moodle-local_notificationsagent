@@ -21,7 +21,7 @@ class notificationsaction_messageagent_observer {
     public static function individual_notification(
         \notificationsaction_messageagent\event\notificationsagent_messageagent_event $event
     ) {
-        $message = new Messageagent_action($event->courseid, $event->relateduserid);
+        $message = new Messageagent_action($event->courseid, $event->relateduserid, $event->other);
         $message->send_notification();
     }
 }

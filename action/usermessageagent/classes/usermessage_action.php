@@ -16,23 +16,27 @@
 class Usermessageagent_action {
     private int $courseid, $user;
     private array $users;
+    private string $placeholders;
 
-    public function __construct ($courseid, $user) {
+    public function __construct ($courseid, $user, $other) {
         $this->courseid = $courseid;
         $this->user = $user;
+        $this->placeholders = $other;
     }
 
     public function send_notification() {
+
+        $placeholdershuman = json_decode($this->placeholders);
 
         $message = new \core\message\message();
         $message->component = 'notificationsaction_usermessageagent'; // Your plugin's name.
         $message->name = 'particular_message'; // Your notification name from message.php.
         $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
-        $message->userto = $this->user;
-        $message->subject = 'Recordatorio individual ' . date('H:i:s', time()); // Será nuestro TTTT.
-        $message->fullmessage = 'Hola {user_name}'; // Será nuestro BBBB.
+        $message->userto = $placeholdershuman->user;
+        $message->subject = $placeholdershuman->title; // Será nuestro TTTT.
+        $message->fullmessage = $placeholdershuman->message; // Será nuestro BBBB.
         $message->fullmessageformat = FORMAT_MARKDOWN;
-        $message->fullmessagehtml = '<p>Hola {user_name}</p>';
+        $message->fullmessagehtml = '<p>' . $placeholdershuman->message . '</p>';
         $message->smallmessage = 'small message'; // TODO.
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
         $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification //TODO.

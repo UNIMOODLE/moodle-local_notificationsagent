@@ -89,17 +89,43 @@
             </div>
             <div class="card-footer bg-transparent">
                 <div class="card-assignment d-flex justify-content-between align-items-center">
+                    <a data-toggle="modal"{{^ status }} class="d-none" {{/ status }}data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="0" data-textstatus="{{#str}}editrule_pauserule, local_notificationsagent{{/str}}" href="#">
+                        <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
+                    </a>
+                    <a data-toggle="modal"{{# status }} class="d-none" {{/ status }}data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="1" data-textstatus="{{#str}}editrule_activaterule, local_notificationsagent{{/str}}" href="#">
+                        <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
+                    </a>
                     <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
                     <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
-                    {{#assigntemplatebutton}}
-                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{{ action }}}</button>
-                    {{/assigntemplatebutton}}
+                    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{#str}}assign, local_notificationsagent{{/str}}</button>
                     <a href="#"><i class="fa fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}</a>
                 </div>
             </div>
         </div>
     {{/rulecontent}}
 </div>
+<div class="modal fade" id="statusRuleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title font-weight-bold"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}statuscancel, local_notificationsagent{{/str}}</button>
+                <button type="button" id="acceptStatusRule" class="btn btn-primary mb-1">{{#str}}statusaccept, local_notificationsagent{{/str}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="assignTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

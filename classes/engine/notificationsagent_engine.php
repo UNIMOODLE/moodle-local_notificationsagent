@@ -69,8 +69,7 @@ class Notificationsagent_engine {
                     foreach($actions as $action){
                         $course_context = context_course::instance($courseid);
                         $pluginname = $action->get_subtype();
-                        $parameters = $action->get_parameters();
-
+                        $parameters = $rule->replace_placeholders($action->get_parameters(), $courseid, $userid);
                         global $CFG;
                         require_once($CFG->dirroot . '/local/notificationsagent/action/'
                             . $action->get_subtype() . '/classes/event/' . $action->get_subtype().'_event.php');
@@ -80,7 +79,7 @@ class Notificationsagent_engine {
                             'courseid'=>$courseid,
                             'context'=>$course_context,
                             'relateduserid' => $userid,
-                            // In 'other' fiels we send parameters.
+                            'other' => $parameters,
                             ));
                         $event->trigger();
                     }

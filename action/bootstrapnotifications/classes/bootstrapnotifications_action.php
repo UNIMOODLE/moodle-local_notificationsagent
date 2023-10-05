@@ -14,15 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 class Bootstrapnotifications_action {
-    private int $text;
+    private string $placeholders;
 
-    public function __construct ($text) {
-        $this->text = $text;
+    public function __construct ($other) {
+        $this->placeholders = $other;
     }
 
     public function add_bootstrap_notifications() {
-        $message = $this->text;
-        echo \core\notification::success($message);
+        $placeholdershuman = json_decode($this->placeholders);
+
+        echo \core\notification::success($placeholdershuman->text);
     }
 
 }
