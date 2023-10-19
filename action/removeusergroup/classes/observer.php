@@ -21,7 +21,7 @@ class notificationsaction_removeusergroup_observer {
         \notificationsaction_removeusergroup\event\notificationsagent_removeusergroup_event $event
     ) {
         // Add user to a specified group.
-        $message = new Removeusergroup_action($event->courseid, $event->relateduserid);
+        $message = new Removeusergroup_action($event->other);
         $message->remove_user_group();
 
     }

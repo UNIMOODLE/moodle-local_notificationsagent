@@ -75,15 +75,12 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
                 array('typeelement' => '[BBBB]')
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
-        );
+        )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        : null);
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
-            null, 'required', null, 'client');
-
-        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])) {
-            $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
-            $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message']);
-        }
+        null, 'required', null, 'client');
 
         // Forum.
         $forumname = array();
@@ -125,8 +122,15 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         return get_string('pluginname', 'notificationsaction_forummessage');
     }
 
-    public function check_capability() {
-        // TODO: Implement check_capability() method.
+    public function check_capability($context) {
+        if (has_capability('local/notificationsagent:forummessage', $context) &&
+            has_capability('mod/forum:addnews', $context) &&
+            has_capability('mod/forum:addquestion', $context) &&
+            has_capability('mod/forum:startdiscussion', $context)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

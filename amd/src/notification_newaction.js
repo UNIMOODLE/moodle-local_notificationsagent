@@ -32,6 +32,15 @@
                 let newActionSelect = document.querySelector('[id*="newaction_select"]');
                 let $title = newActionSelect.options[newActionSelect.selectedIndex].text;
                 let $formDefault = [];
+
+                if (window.location.href.includes('action=edit')) {
+                    let url = new URL(window.location.href);
+                    var ruleid = url.searchParams.get('ruleid');
+                    if (ruleid) {
+                        $formDefault.push("[id]ruleid[/id][value]"+ruleid+"[/value]");
+                    }
+                }
+
                 let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
                 Array.from(formNotif.elements).forEach((element) => {
                     if(element.id){

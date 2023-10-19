@@ -123,8 +123,13 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         return array('[TTTT]', '[BBBB]', '[UUUU]');
     }
 
-    public function check_capability() {
-        // TODO: Implement check_capability() method.
+    public function check_capability($context) {
+        if (has_capability('local/notificationsagent:usermessageagent', $context) &&
+            has_capability('moodle/site:sendmessage', $context)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

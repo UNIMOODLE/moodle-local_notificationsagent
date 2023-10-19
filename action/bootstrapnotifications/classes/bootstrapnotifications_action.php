@@ -23,7 +23,7 @@ class Bootstrapnotifications_action {
     public function add_bootstrap_notifications() {
         $placeholdershuman = json_decode($this->placeholders);
 
-        echo \core\notification::success($placeholdershuman->text);
+        echo \core\notification::success(format_text($placeholdershuman->text));
     }
 
 }

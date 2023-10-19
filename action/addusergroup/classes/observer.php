@@ -20,7 +20,7 @@ class notificationsaction_addusergroup_observer {
     public static function add_user_group(\notificationsaction_addusergroup\event\notificationsagent_addusergroup_event $event) {
         // Add user to a specified group.
 
-        $message = new Addusergroup_action($event->courseid, $event->relateduserid);
+        $message = new Addusergroup_action($event->other);
         $message->add_user_group();
 
     }

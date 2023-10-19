@@ -37,12 +37,12 @@ if (!$courseid) {
 
 $sql = 'SELECT *
  FROM {notificationsagent_rule} r
- inner join {notificationsagent_action} a on a.ruleid = r.ruleid
- inner join {notificationsagent_condition} c on c.ruleid = r.ruleid
+ inner join {notificationsagent_action} a on a.ruleid = r.id
+ inner join {notificationsagent_condition} c on c.ruleid = r.id
  WHERE r.courseid = :courseid
- AND r.ruleid = :ruleid';
+ AND r.id = :ruleid';
 
-$courseparams = array('courseid' => $courseid, 'ruleid' => $ruleid);
+$courseparams = array('courseid' => $courseid, 'id' => $ruleid);
 
 $json["rule"] = $DB->get_record('notificationsagent_rule', $courseparams);
 $json["actions"] = $DB->get_records('notificationsagent_action', array('ruleid' => $ruleid));

@@ -29,6 +29,11 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     abstract public function get_subtype();
 
+    /*
+     * Check whether a user has capabilty to use a condition.
+     */
+    abstract public function check_capability($context);
+
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param EvaluationContext $context  |null collection of variables to evaluate the condition.
@@ -39,7 +44,7 @@ abstract class notificationconditionplugin extends notificationplugin {
     abstract public function evaluate(EvaluationContext $context): bool;
 
      /** Estimate next time when this condition will be true. */
-    abstract public function estimate_next_time();
+    abstract public function estimate_next_time(EvaluationContext $context);
 
     public static function create_subplugins($records) {
 
@@ -47,7 +52,7 @@ abstract class notificationconditionplugin extends notificationplugin {
         global $DB;
         foreach ($records as $record) {
             // TODO SET CACHE.
-            $rule = $DB->get_record('notificationsagent_rule', ['ruleid' => $record->ruleid]);
+            $rule = $DB->get_record('notificationsagent_rule', ['id' => $record->ruleid]);
             $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
             if (!empty($subplugin)) {
                 $subplugin->set_iscomplementary($record->complementary);

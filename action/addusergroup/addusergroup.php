@@ -114,8 +114,8 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
         return array('[GGGG]', '[UUUU]');
     }
 
-    public function check_capability() {
-        // TODO: Implement check_capability() method.
+    public function check_capability($context) {
+        return has_capability('local/notificationsagent:addusergroup', $context);
     }
 
     /**

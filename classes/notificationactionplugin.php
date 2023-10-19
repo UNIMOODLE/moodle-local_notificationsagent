@@ -17,12 +17,8 @@ require_once('notificationplugin.php');
 require_once('plugininfo/notificationsbaseinfo.php');
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
+use local_notificationsagent\Rule;
 abstract class notificationactionplugin extends notificationplugin {
-
-    const PLACEHOLDERS
-        = array(
-            'User_FirstName', 'User_LastName_s', 'User_Email', 'User_Username', 'User_Address', 'Course_FullName', 'Course_Url'
-        );
 
     abstract public function get_title();
     abstract public function get_elements();
@@ -41,17 +37,17 @@ abstract class notificationactionplugin extends notificationplugin {
     /*
      * Check whether a user has capabilty to use an action.
      */
-    abstract public function check_capability();
+    abstract public function check_capability($context);
 
     /*
      * Show placeholder where needed
      */
-    public function placeholders(&$mform, $idaction) {
+    public function placeholders(&$mform, $idaction, $typeitem) {
 
         $mform->addElement('html', "<div class='form-group row fitem'> <div class='col-md-3'></div>
-        <div class='col-md-9'><div class='notificationvars' id='notificationvars_".$idaction."'>");
+        <div class='col-md-9'><div class='notificationvars' id='notificationvars_".$idaction."_".$typeitem."'>");
         $optioncount = 0;
-        foreach (self::PLACEHOLDERS as $option) {
+        foreach (Rule::get_placeholders() as $option) {
             $mform->addElement('html', "<a href='#' data-text='$option' class='clickforword'><span>$option</span></a> ");
             $optioncount++;
         }
@@ -64,7 +60,7 @@ abstract class notificationactionplugin extends notificationplugin {
         global $DB;
         foreach ($records as $record) {
             // TODO SET CACHE.
-            $rule = $DB->get_record('notificationsagent_rule', ['ruleid' => $record->ruleid]);
+            $rule = $DB->get_record('notificationsagent_rule', ['id' => $record->ruleid]);
             $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
             if (!empty($subplugin)) {
                 $subplugin->set_pluginname($record->pluginname);

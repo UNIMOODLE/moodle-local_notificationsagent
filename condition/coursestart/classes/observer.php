@@ -23,11 +23,14 @@ class notificationscondition_coursestart_observer {
     public static function course_updated(core\event\course_updated $event) {
         global $DB;
 
-        //Cuando se reciba un evento de tipo course_updated se buscará que condiciones tienen a ese evento como desencadenante. 
-        //Sabiendo las condiciones se podrá encontrar las reglas que tengas esa condición y están asociadas al curso que desencadena el evento.
-        //Se evaluará la condición para el curso y alumno correspondiente calculando la fecha de cumplimiento de la condición.
-        //Si por ejemplo TTTT fuera 10 días y el evento ocurre el 12/05/2023 el método de evaluación buscará en la tabla mdl_course.startdate
-        //la fecha de inicio del curso. Hará el cálculo y devolverá 22/05/2023. Este valor se guardaría en la tabla de caché.
+        /*Cuando se reciba un evento de tipo course_updated se buscará que condiciones tienen a ese evento como desencadenante.
+        Sabiendo las condiciones se podrá encontrar las reglas que tengas esa condición y
+        están asociadas al curso que desencadena el evento.
+        Se evaluará la condición para el curso y alumno correspondiente calculando la fecha de cumplimiento
+        de la condición.
+        Si por ejemplo TTTT fuera 10 días y el evento ocurre el 12/05/2023 el método de evaluación buscará en la
+        tabla mdl_course.startdate
+        la fecha de inicio del curso. Hará el cálculo y devolverá 22/05/2023. Este valor se guardaría en la tabla de caché.*/
 
         if (!isloggedin() || $event->courseid == 1) {
             return;
@@ -38,30 +41,34 @@ class notificationscondition_coursestart_observer {
         $timeaccess = $event->timecreated;
         $other = $event->other;
 
-        $startdate = $DB->get_field('course','startdate', ['id'=> $courseid],);
+        $startdate = $DB->get_field('course', 'startdate', ['id' => $courseid]);
 
-        if(isset($other["updatedfields"]["startdate"])){
+        if (isset($other["updatedfields"]["startdate"])) {
             $startdate = $other["updatedfields"]["startdate"];
         }
 
-        $rule = new \stdClass();
-        $rule->ruleid = null;
-        $session = new notificationsagent_condition_coursestart($rule);
-        $pluginname = $session->get_subtype();
+        $pluginname = get_string('subtype', 'notificationscondition_coursestart');
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         $ruleids = [];
-        foreach ($conditions as $condition){
+        foreach ($conditions as $condition) {
+            $context = \context_course::instance($courseid);
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
+            $enrolledusers = notificationsagent::get_usersbycourse($context);
             $ruleids[] = $condition->ruleid;
             $param = json_decode($decode, true);
             $cache = $startdate + $param['time'];
-            notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, true);
+            foreach ($enrolledusers as $enrolleduser) {
+                notificationsagent::set_timer_cache($enrolleduser, $courseid, $cache, $pluginname, $condtionid, true);
+            }
         }
         
         // Call engine with userid, courseid, timecreated
-        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid);
+        foreach ($enrolledusers as $enrolleduser) {
+            Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $enrolleduser);
+        }
+    
 
     }
 

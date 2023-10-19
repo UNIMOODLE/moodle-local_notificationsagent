@@ -48,7 +48,7 @@ $string['notificationsconditionpluginname'] = 'Plugin condition';
 $string['hideshow'] = 'Ocultar/Mostrar';
 
 // Task.
-$string['task'] = 'Test Task';
+$string['tatasktriggerssk'] = 'Tarea de desencadenadores de notificaciones';
 $string['menu'] = 'Mi asistente';
 $string['heading'] = 'Agente de Notificaciones';
 
@@ -79,6 +79,7 @@ $string['condition_seconds'] = 'Segundos';
     $string['editrule_activaterule'] = 'Activar';
     $string['editrule_pauserule'] = 'Pausar';
     $string['editrule_editrule'] = 'Editar';
+    $string['editrule_unlinkrule'] = 'Desenlazar';
     $string['editrule_deleterule'] = 'Borrar';
     $string['editrule_title'] = 'Título';
     // Condition.
@@ -133,7 +134,35 @@ $string['statusaccept'] = 'Aceptar';
 $string['statusacceptactivated'] = 'Regla activada';
 $string['statusacceptpaused'] = 'Regla pausada';
 
+// Delete modal
+$string['unlinktitle'] = 'Borrar la regla {$a->title}';
+$string['unlinkcontent'] = 'Se va a desvincular la regla {$a->title} del curso, ¿desea continuar?';
+$string['deletetitle'] = 'Borrar la plantilla {$a->title}';
+$string['deletecontent'] = 'Se va a borrar la plantilla {$a->title}, ¿desea continuar?';
+$string['unlinkaccept'] = 'Regla borrada';
+$string['deleteaccept'] = 'Plantilla borrada';
+
 // Assign modal
 $string['assignassign'] = 'Assignar: ';
 $string['assigncancel'] = 'Cancelar';
 $string['assignsave'] = 'Guardar cambios';
+
+// Capabilities.
+$string['notificationsagent:updaterulestatus'] = 'Actualizar el estado de una regla';
+$string['notificationsagent:unlinkrule'] = 'Desvincular una regla';
+$string['notificationsagent:deleterule'] = 'Borrar una regla';
+
+$string['notificationsagent:activitycompleted'] = 'Capacidad para usar la condición activitycompleted';
+$string['notificationsagent:activityopen'] = 'Capacidad para usar la condición activityopen';
+$string['notificationsagent:coursestart'] = 'Capacidad para usar la condición coursestart';
+$string['notificationsagent:sessionstart'] = 'Capacidad para usar la condición sessionstart';
+
+$string['notificationsagent:addusergroup'] = 'Capacidad para usar la acción addusergroup';
+$string['notificationsagent:bootstrapnotifications'] = 'Capacidad para usar la acción bootstrapnotifications';
+$string['notificationsagent:forummessage'] = 'Capacidad para usar la acción forummessage';
+$string['notificationsagent:messageagent'] = 'Capacidad para usar la acción messageagent';
+$string['notificationsagent:removeusergroup'] = 'Capacidad para usar la acción removeusergroup';
+$string['notificationsagent:usermessageagent'] = 'Capacidad para usar la acción usermessageagent';
+
+// Webservices
+$string['nosuchinstance'] = 'Dicha instancia no ha sido encontrada.';

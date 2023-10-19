@@ -67,7 +67,7 @@ class content {
     private function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype, $exception) {
         global  $CFG, $SESSION;
         $rule = new \stdClass();
-        $rule->ruleid = null;
+        $rule->id = null;
         require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
         $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
         $pluginobj = new $pluginclass($rule);

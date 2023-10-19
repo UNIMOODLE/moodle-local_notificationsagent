@@ -26,9 +26,10 @@ define([], function() {
 
         init: function() {
             var module = this;
+            var idtemplate;
             $('#assignTemplateModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
-                var idtemplate = button.data('idtemplate');
+                idtemplate = button.data('idtemplate');
     
                 var modal = $(this);
                 modal.find('.modal-title > span').text($('#card-'+idtemplate+' .badge').text());
@@ -40,7 +41,7 @@ define([], function() {
                 /* Rellenar cursos asignados */
                 $.ajax({
                     type: "POST",
-                    url: '/local/notificationsagent/lib.php',
+                    url: '/local/notificationsagent/assignrule.php',
                     data: {
                         idRule: idtemplate
                     },
@@ -106,16 +107,34 @@ define([], function() {
             });
 
             $('#assignTemplateModal #saveassignTemplateModal').on('click', function(){
-                var arrayCourses = [];
+                var $arrayCourses = [];
                 
                 var checkassign = $('#assignTemplateModal .category-listing input[id^="checkboxcourse-"]');
                 checkassign.each(function(){
                     if($(this).prop('checked') == true){
-                        arrayCourses.push($(this).attr('id').replace('checkboxcourse-', ''));
+                        $arrayCourses.push($(this).attr('id').replace('checkboxcourse-', ''));
                     }
                 });
-                console.log(arrayCourses);
+                let data = {
+                    arrayCourses: $arrayCourses,
+                    idRule : idtemplate,
+                };
                 //Se necesitará hacer AJAX para guardar en BD y al guardar sacar un alert de que se ha guardado correctamente después de cerrar el modal
+                $.ajax({
+                    type: "POST",
+                    url: '/local/notificationsagent/assignrule.php',
+                    data: data,
+                    success: function(addlistofcoursesassigned) {
+                        window.location.reload();  
+
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                        console.log("Status: " + textStatus); 
+                        console.log(errorThrown); 
+                    },
+                    dataType: 'json'
+                });
+                   
             });
         },
         checkhascategoryparent: function(idparent) {

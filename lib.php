@@ -65,7 +65,7 @@ function build_category_array($category, $ruleid) {
         $assigned = $DB->get_field(
             'notificationsagent_rule',
             'assigned',
-            array('ruleid' => $ruleid, 'courseid' => $course->id));
+            array('id' => $ruleid, 'courseid' => $course->id));
         $courseid = $course->id;
         $fullname = $course->fullname;
         $coursesarry[] = array(
@@ -115,18 +115,7 @@ function count_category_courses($category) {
     }
     return $countcategorycourses;
 }
-// TODO New file. Fix ASAP.
-if (!empty($_POST['idRule'])) {
-    echo json_encode(get_list_courses_assigned($_POST['idRule']));
-}
-// TODO Funcionality.
-function get_list_courses_assigned($idRule) {
-    global $DB;
-    /* Select tabla de assingados pasándole el idRule y recibiendo un listado de ids de cursos */
-    $listofcoursesassigned = [11, 2, 10, 17, 5];
 
-    return $listofcoursesassigned;
-}
 
 /**
  * Retrieve output for modal window
@@ -194,6 +183,25 @@ function build_output_categories($arraycategories, $categoryid = 0) {
         $output .= html_writer::end_tag("li");// ... .listitem.listitem-category.list-group-item
     }
     return $output;
+}
+
+function get_rulesbytimeinterval($timestarted,$tasklastrunttime) {
+    global $DB;
+    $rulesid_query = "
+                    SELECT id,ruleid, courseid, userid
+                      FROM {notificationsagent_triggers}
+                     WHERE startdate 
+                   BETWEEN :tasklastrunttime AND :timestarted
+                     " ;
+
+    $rulesid = $DB->get_records_sql(
+        $rulesid_query,
+        [
+            'tasklastrunttime' => $tasklastrunttime,
+            'timestarted' => $timestarted
+        ]
+    );
+    return $rulesid;
 }
 
 

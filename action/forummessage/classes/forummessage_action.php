@@ -29,8 +29,8 @@ class Forummessage_action {
 
         global $CFG;
         $placeholdershuman = json_decode($this->placeholders);
-        $postsubject = $placeholdershuman->title;
-        $postmessage = $placeholdershuman->message;
+        $postsubject = format_text($placeholdershuman->title);
+        $postmessage = format_text($placeholdershuman->message);
 
         try {
             // Set up the Moodle Web Services client.

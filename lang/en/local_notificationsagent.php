@@ -51,7 +51,7 @@ $string['notificationsconditionpluginname'] = 'Condition plugin';
 $string['hideshow'] = 'Hide/Show';
 
 // Task.
-$string['task'] = 'Test Task';
+$string['tasktriggers'] = 'Notifications triggers task';
 $string['menu'] = 'My assistant';
 $string['heading'] = 'Notifications Agent';
 
@@ -82,6 +82,7 @@ $string['condition_seconds'] = 'Seconds';
     $string['editrule_activaterule'] = 'Activate';
     $string['editrule_pauserule'] = 'Pause';
     $string['editrule_editrule'] = 'Edit';
+    $string['editrule_unlinkrule'] = 'Delete';
     $string['editrule_deleterule'] = 'Delete';
     $string['editrule_title'] = 'Title';
     // Condition.
@@ -139,9 +140,35 @@ $string['statusaccept'] = 'Accept';
 $string['statusacceptactivated'] = 'Rule activated';
 $string['statusacceptpaused'] = 'Rule paused';
 
+// Delete modal
+$string['unlinktitle'] = 'Delete rule {$a->title}';
+$string['unlinkcontent'] = 'You are going to unlink the rule {$a->title} from the course, do you want to continue?';
+$string['deletetitle'] = 'Delete template {$a->title}';
+$string['deletecontent'] = 'You are going to delete the template {$a->title}, do you want to continue?';
+$string['unlinkaccept'] = 'Rule deleted';
+$string['deleteaccept'] = 'Template deleted';
+
 // Assign modal
 $string['assignassign'] = 'Assign: ';
 $string['assigncancel'] = 'Cancel';
 $string['assignsave'] = 'Save changes';
 
+// Capabilities.
+$string['notificationsagent:updaterulestatus'] = 'Update a rule\'s status';
+$string['notificationsagent:unlinkrule'] = 'Unlink a rule';
+$string['notificationsagent:deleterule'] = 'Delete a rule';
 
+$string['notificationsagent:activitycompleted'] = 'Capability needed in order to use activitycompleted condition';
+$string['notificationsagent:activityopen'] = 'Capability needed in order to use activityopen condition';
+$string['notificationsagent:coursestart'] = 'Capability needed in order to use coursestart condition';
+$string['notificationsagent:sessionstart'] = 'Capability needed in order to use sessionstart condition';
+
+$string['notificationsagent:addusergroup'] = 'Capability needed in order to use addusergroup action';
+$string['notificationsagent:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
+$string['notificationsagent:forummessage'] = 'Capability needed in order to use forummessage action';
+$string['notificationsagent:messageagent'] = 'Capability needed in order to use messageagent action';
+$string['notificationsagent:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
+$string['notificationsagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
+
+// Webservices
+$string['notificationsagent:nosuchinstance'] = 'No such instance was found.';

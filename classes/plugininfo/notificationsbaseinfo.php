@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace local_notificationsagent\plugininfo;
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/notificationsagent/classes/rule.php');
 
@@ -25,30 +26,6 @@ use core_plugin_manager, core_component;
 class notificationsbaseinfo extends base {
 
     private static $plugins = [];
-
-    public static function get_installed_plugins($rule = null, $subtype = null) {
-        global $DB;
-        $installed = array();
-        $subtypes = array();
-        $result = array();
-
-        if ($subtype == null) {
-            $subtypes = ['condition', 'action'];
-        } else {
-            $subtypes = [$subtype];
-        }
-
-        foreach ($subtypes as $subtype) {
-            $plugins = core_plugin_manager::instance()->get_installed_plugins('notifications'.$subtype);
-            foreach ($plugins as $pluginname => $version) {
-                $installed[] = $subtype . '_' . $pluginname;
-                // TODO .
-                // $result[$pluginname] = self::instance($rule, $subtype, $pluginname);.
-            }
-        }
-        return $installed;
-    }
-
 
     /**
      * @param \stdClass $rule record of the instance for initializing plugins
@@ -121,6 +98,7 @@ class notificationsbaseinfo extends base {
 
     public static function get_description($subtype) {
         global $CFG;
+        $courseid = required_param('courseid', PARAM_INT);
         $listactions = array();
         // TODO enabled.
         $rule = new \stdClass();
@@ -129,7 +107,11 @@ class notificationsbaseinfo extends base {
             require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
             $pluginobj = new $pluginclass($rule);
-            $listactions[] = $pluginobj->get_description();
+            $context = \context_course::instance($courseid);
+            // Check subplugin capability for current user in course.
+            if ($pluginobj->check_capability($context)) {
+                $listactions[] = $pluginobj->get_description();
+            }
         }
 
         return $listactions;

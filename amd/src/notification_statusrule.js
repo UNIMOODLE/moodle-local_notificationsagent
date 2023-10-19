@@ -14,78 +14,112 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @module   local_notificationsagent/statusrule
- * @copyright 2023, ISYC
+ * @module    local_notificationsagent/statusrule
+ * @copyright 2023 ISYC <soporte@isyc.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- define(['core/str','core/notification'], function(str, notification) {
+import {get_strings as getStrings} from 'core/str';
+import Notification from 'core/notification';
+import {updateRuleStatus} from 'local_notificationsagent/rule/repository';
 
-    return {
+/**
+ * Types of rule states
+ * 
+ * @type {{RULE_STATUS: boolean}}
+ */
+const RULE_STATUS = {
+    RESUMED: 0,
+    PAUSED: 1,
+};
 
-        init: function() {
-            $('#statusRuleModal').on('show.bs.modal', function (event) {
-                $button = $(event.relatedTarget);
-                var idrule = $button.data('idrule');
-                var textstatus = $button.data('textstatus');
+/**
+ * Text to be displayed when pausing, or resuming a rule.
+ * 
+ * @type {{RULE_STATUS_STRING: string}}
+ */
+const RULE_STATUS_STRING = [
+    {
+        key: 'statusacceptpaused', component: 'local_notificationsagent',
+    },
+    {
+        key: 'statusacceptactivated', component: 'local_notificationsagent',
+    }
+];
 
-                var modal = $(this);
-                var strings = [
-                    {
-                        key: 'statustitle',
-                        component: 'local_notificationsagent',
-                        param: {
-                            textstatus: textstatus,
-                            title: $('#card-'+idrule+' .name').text()
-                        },
-                    },
-                    {
-                        key: 'statuscontent',
-                        component: 'local_notificationsagent',
-                        param: {
-                            textstatus: textstatus.toLowerCase(),
-                            title: $('#card-'+idrule+' .name').text()
-                        },
-                    }
-                ];
-                str.get_strings(strings).then(function (results) {
-                    modal.find('.modal-title').text(results[0]);
-                    modal.find('.modal-body > div').text(results[1]);
-                });
+/**
+ * Registers the click event listener for the status button of a rule.
+ */
+export const init = () => {
+    $('#statusRuleModal').on('show.bs.modal', function (e) {
+        ruleButton = $(e.relatedTarget);
+        let id = ruleButton.data('idrule');
+        let statusText = ruleButton.data('textstatus');
+
+        const modal = $(this);
+
+        const requiredStrings = [
+            {key: 'statustitle', component: 'local_notificationsagent', param: {
+                textstatus: statusText,
+                title: $('#card-' + id + ' .name').text()
+            }},
+            {key: 'statuscontent', component: 'local_notificationsagent', param: {
+                textstatus: statusText.toLowerCase(),
+                title: $('#card-' + id + ' .name').text()
+            }},
+        ];
+
+        getStrings(requiredStrings).then(([ruleTitle, ruleContent]) => {
+            modal.find('.modal-title').text(ruleTitle);
+            modal.find('.modal-body > div').text(ruleContent);
+        });
+    });
+
+    $('#statusRuleModal #acceptStatusRule').on('click', (e) => {
+        e.preventDefault();
+        setRuleStatus(ruleButton);
+    });
+};
+
+/**
+ * Changes the status for a given rule.
+ * @param {HTMLElement} ruleButton
+ * @returns {Promise<void>}
+ */
+const setRuleStatus = async(ruleButton) => {
+    let ruleid = ruleButton.data('idrule');
+    let status = ruleButton.data('valuestatus');
+
+    if (!status) {
+        status = RULE_STATUS.RESUMED;
+    } else {
+        status = RULE_STATUS.PAUSED;
+    }
+
+    $('#statusRuleModal').modal('hide');
+
+    getStrings(RULE_STATUS_STRING).then(([rulePaused, ruleResumed]) => {
+        ruleButton.addClass('d-none');
+        if (status) {
+            $('a[data-idrule="' + ruleid + '"][data-target="#statusRuleModal"][data-valuestatus="0"]').removeClass('d-none');
+            Notification.addNotification({
+                message: rulePaused,
+                type: "info"
             });
-
-            $('#statusRuleModal #acceptStatusRule').on('click', function(){
-                $('#statusRuleModal').modal('hide');
-
-                //Cuando se haga update del estado en BD correctamente de la regla
-                var strings = [
-                    {
-                        key: 'statusacceptactivated',
-                        component: 'local_notificationsagent',
-                    },
-                    {
-                        key: 'statusacceptpaused',
-                        component: 'local_notificationsagent',
-                    }
-                ];
-                str.get_strings(strings).then(function (results) {
-                    $button.addClass('d-none');
-                    if($button.data('valuestatus')){
-                        $('a[data-idrule="'+$button.data('idrule')+'"][data-target="#statusRuleModal"][data-valuestatus="0"]').removeClass('d-none');
-                        notification.addNotification({
-                            message: results[0],
-                            type: "info"
-                        });
-                    }else{
-                        $('a[data-idrule="'+$button.data('idrule')+'"][data-target="#statusRuleModal"][data-valuestatus="1"]').removeClass('d-none');
-                        notification.addNotification({
-                            message: results[1],
-                            type: "info"
-                        });
-                    }
-                });
+        } else {
+            $('a[data-idrule="' + ruleid + '"][data-target="#statusRuleModal"][data-valuestatus="1"]').removeClass('d-none');
+            Notification.addNotification({
+                message: ruleResumed,
+                type: "info"
             });
-        },
-    };
-});
+        }
+    });
+
+    try {
+        // TODO Display warnings as Notification exception 
+        response = await updateRuleStatus(ruleid, status);
+        console.log(response);
+    } catch (exception) {
+        Notification.exception(exception);
+    }
+};

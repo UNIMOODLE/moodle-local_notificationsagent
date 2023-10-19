@@ -23,13 +23,14 @@ use notificationconditionplugin;
 use notificationplugin;
 use local_notificationsagent\EvaluationContext;
 use moodle_url;
+use notificationsagent\notificationsagent;
 
 class Rule {
 
-    private $ruleid;
+    private $id;
     private $name;
     private $description;
-    private $conditions; //= array();
+    private $conditions;
     private $exceptions;
     private $actions;
     private $record;
@@ -37,29 +38,30 @@ class Rule {
     private $template;
     private $status;
     private $courseid;
+    private $createdby;
 
     private const PLACEHOLDERS
     = array(
-        '{User_FirstName}', '{User_LastName_s}', '{User_Email}', '{User_Username}', '{User_Address}', '{Course_FullName}', '{Course_Url}'
+        'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address', 'Course_FullName', 'Course_Url',
+        'Teacher_FirstName', 'Teacher_LastName', 'Teacher_Email', 'Teacher_Username', 'Teacher_Address', 'Current_time'
     );
-    
-    /********************************
-     * Life-cycle functions
-     ********************************/
+
+    /** @var int Status of a rule that is enabled */
+    public const RESUME_RULE = 0;
+    /** @var int The status of a rule that is disabled */
+    public const PAUSE_RULE = 1;
+
     /** Construct an empty Rule.
      *
      * @param $rule
      */
     public function __construct($rule) {
-
-            $this->ruleid = $rule->ruleid;
-            $this->name = format_text($rule->name);
-            $this->description = format_text($rule->description);
+            $this->id = $rule->id;
+            $this->name = $rule->name;
+            $this->description = $rule->description;
             $this->courseid = $rule->courseid;
-            //$this->assigned = $rule->assigned;
-            //$this->template = $rule->template;
-            //$this->status = $rule->status;
-
+            $this->createdby = $rule->createdby;
+            $this->status = $rule->status;
     }
 
     /**
@@ -67,13 +69,13 @@ class Rule {
      */
     public static function create_instance($id) {
         global $DB;
-        $rule = $DB->get_record('notificationsagent_rule', ['ruleid' => $id]);
+        $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
         if ($rule) {
             $rule = new Rule($rule);
             // TODO.
-            $rule->conditions = $rule->get_conditions($id);
-            $rule->exceptions = $rule->get_exceptions($id);
-            $rule->actions =  $rule->get_actions($id);
+            $rule->conditions = $rule->get_conditions();
+            $rule->exceptions = $rule->get_exceptions();
+            $rule->actions = $rule->get_actions();
         }
         return $rule;
     }
@@ -87,7 +89,7 @@ class Rule {
         $instances = array();
         $rules = $DB->get_records('notificationsagent_rule');
         foreach ($rules as $rule) {
-            $instances[] = Rule::create_instance($rule->ruleid);
+            $instances[] = self::create_instance($rule->id);
         }
         return $instances;
     }
@@ -96,7 +98,7 @@ class Rule {
      * @return mixed
      */
     public function get_id() {
-        return $this->ruleid;
+        return $this->id;
     }
 
     /**
@@ -127,25 +129,37 @@ class Rule {
         $this->description = $description;
     }
 
-    public function get_conditions($id) {
+    public function get_conditions() {
         global $DB;
         $this->conditions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
-            ['ruleid' => $id, 'type'=>'condition', 'complementary' => 0]));
+            ['ruleid' => $this->id, 'type' => 'condition', 'complementary' => 0]));
         return $this->conditions;
     }
 
-    public function get_exceptions($id) {
+    public function get_exceptions() {
         global $DB;
         $this->exceptions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
-            ['ruleid' => $id, 'type'=>'condition','complementary' => 1]));
+            ['ruleid' => $this->id, 'type' => 'condition', 'complementary' => 1]));
         return $this->exceptions;
     }
 
-    public function get_actions($id) {
+    public function get_actions() {
         global $DB;
         $this->actions = notificationactionplugin::create_subplugins($DB->get_records('notificationsagent_action',
-            ['ruleid' => $id, 'type'=>'action']));
+            ['ruleid' => $this->id, 'type' => 'action']));
         return $this->actions;
+    }
+
+    public function delete_conditions($id) {
+        global $DB;
+        $this->conditions = $DB->delete_records('notificationsagent_condition', ['ruleid' => $id]);
+            return $this->conditions;
+    }
+
+    public function delete_actions($id) {
+        global $DB;
+        $this->actions = $DB->delete_records('notificationsagent_action', ['ruleid' => $id]);
+            return $this->actions;
     }
 
     /**
@@ -212,17 +226,10 @@ class Rule {
     }
 
     /**
-     * @return mixed
+     * @param mixed $id
      */
-    public function get_ruleid() {
-        return $this->ruleid;
-    }
-
-    /**
-     * @param mixed $ruleid
-     */
-    public function set_ruleid($ruleid): void {
-        $this->ruleid = $ruleid;
+    public function set_id($id): void {
+        $this->id = $id;
     }
 
     /**
@@ -239,12 +246,41 @@ class Rule {
         $this->courseid = $courseid;
     }
 
+    /**
+     * @return mixed
+     */
+    public function get_createdby() {
+        return $this->createdby;
+    }
+
+    /**
+     * @param mixed $createdby
+     */
+    public function set_createdby($createdby): void {
+        $this->createdby = $createdby;
+    }
+
     public function evaluate(EvaluationContext $context): bool {
         // Evaluate conditions.
         foreach ($this->conditions as $condition) {
             $context->set_params($condition->get_parameters());
             $result = $condition->evaluate($context);
             if ($result === false) {
+                /* Las condiciones temporales poseen un método adicional que permite calcular y devolver
+                la próxima fecha en la que se cumplirán estas condiciones. Esta fecha se almacena en la
+                tabla de triggers para que pueda ser consultada en cualquier momento sin tener
+                que recalcularla repetidamente, lo que mejora la eficiencia y rendimiento del
+                sistema de notificaciones.
+                */
+                $timetrigger = $condition->estimate_next_time($context);
+                // Keep record in trigger.
+                // Event driven conditions return a null timetrigger.
+                if (!empty($timetrigger)) {
+                    notificationsagent::set_time_trigger($this->get_id(),
+                        $context->get_userid(),
+                        $context->get_courseid(),
+                        $timetrigger);
+                }
                 return false;
             }
         }
@@ -278,10 +314,11 @@ class Rule {
      *
      * @return mixed final template string.
      */
-    public function replace_placeholders($parameters, $courseid = null, $userid = null) {
+    public function replace_placeholders($parameters, $courseid = null, $userid = null, $rule = null) {
         $paramstoreplace = [];
         $placeholderstoreplace = [];
         $placeholders = self::get_placeholders();
+        $idcreatedby = $rule->get_createdby();
 
         if (!empty($userid)) {
             $user = \core_user::get_user($userid, '*', MUST_EXIST);
@@ -291,41 +328,69 @@ class Rule {
             $course = get_course($courseid);
         }
 
+        if (!empty($idcreatedby)) {
+            $createdbyuser = \core_user::get_user($idcreatedby, '*', MUST_EXIST);
+        }
+
         $jsonparams = json_decode($parameters);
 
         foreach ($jsonparams as $item) {
             foreach ($placeholders as $placeholder) {
                 if (strpos($item, $placeholder) !== false) {
                     switch ($placeholder) {
-                        case '{User_FirstName}':
+                        case 'User_FirstName':
                             $paramstoreplace[] = $user->firstname;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{User_LastName_s}':
+                        case 'User_LastName':
                             $paramstoreplace[] = $user->lastname;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{User_Email}':
+                        case 'User_Email':
                             $paramstoreplace[] = $user->email;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{User_Username}':
+                        case 'User_Username':
                             $paramstoreplace[] = $user->username;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{User_Address}':
+                        case 'User_Address':
                             $paramstoreplace[] = $user->address;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{Course_FullName}':
+                        case 'Course_FullName':
                             $paramstoreplace[] = $course->fullname;
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
 
-                        case '{Course_Url}':
+                        case 'Course_Url':
                             $paramstoreplace[] = new moodle_url('/course/view.php', [
                                 'id' => $courseid,
                             ]);
-                            $placeholderstoreplace[] = $placeholder;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Teacher_FirstName':
+                            $paramstoreplace[] = $createdbyuser->firstname;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Teacher_LastName':
+                            $paramstoreplace[] = $createdbyuser->lastname;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Teacher_Email':
+                            $paramstoreplace[] = $createdbyuser->email;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Teacher_Username':
+                            $paramstoreplace[] = $createdbyuser->username;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Teacher_Address':
+                            $paramstoreplace[] = $createdbyuser->address;
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
+
+                        case 'Current_time':
+                            $paramstoreplace[] = date('d-m-Y h:i:s', time());
+                            $placeholderstoreplace[] = '{' . $placeholder . '}';
                     }
                 }
             }
@@ -334,5 +399,28 @@ class Rule {
         $humanvalue = str_replace($placeholderstoreplace, $paramstoreplace, $parameters);
 
         return $humanvalue;
+    }
+
+    /**
+     * Hook to execute before deleting a rule
+     *
+     * @return void
+     */
+    protected function before_delete() {
+        $this->delete_conditions($this->get_id());
+        $this->delete_actions($this->get_id());
+    }
+
+    /**
+     * Delete rule entry from the database
+     *
+     * @return void
+     */
+    public function delete() {
+        global $DB;
+
+        self::before_delete($this->get_id());
+
+        $DB->delete_records('notificationsagent_rule', ['id' => $this->get_id()]);
     }
 }

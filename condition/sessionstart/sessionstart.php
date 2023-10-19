@@ -61,8 +61,8 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
      */
     public function evaluate(EvaluationContext $context): bool {
 
-        // Miramos mdl_notificationsagent_cache si hay registro, comprobar
-        // si no hay registro comprobar en la tabla del plugin
+        // Miramos mdl_notificationsagent_cache si hay registro, comprobar.
+        // si no hay registro comprobar en la tabla del plugin.
         global $DB;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
@@ -72,25 +72,25 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
         $params = json_decode($context->get_params());
         $meetcondition = false;
 
-        // Timestart es el tiempo de primer acceso más time
+        // Timestart es el tiempo de primer acceso más time.
         $timestart = $DB->get_field('notificationsagent_cache',
-            'timestart', ['conditionid' => $conditionid,'courseid'=> $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (!empty($timestart)) {
             ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
             // La regla se hizo después de que el usuario entrara en el curso.
         } else {
-            // Check own plugin table
+            // Check own plugin table.
             $firstacces = $DB->get_field('notifications_sessionaccess',
-                'firstaccess', ['courseid'=> $courseid, 'userid' => $userid],
+                'firstaccess', ['courseid' => $courseid, 'userid' => $userid],
             );
-            // El usuario no ha desencadenado nunca un course_view
+            // El usuario no ha desencadenado nunca un course_view ¿Comprobar log_standard_log?.
             if (empty($firstacces)) {
                 return $meetcondition;
             }
 
-            ($timeaccess  > $firstacces + $params->time) ? $meetcondition = true : $meetcondition = false;
+            ($timeaccess > $firstacces + $params->time) ? $meetcondition = true : $meetcondition = false;
 
         }
 
@@ -144,13 +144,19 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
-        $mform->addGroupRule($this->get_subtype().'_condition'.$exception.$id.'_time', '- You must supply a value here.','required');
+        $mform->addGroupRule(
+            $this->get_subtype() . '_condition' . $exception . $id . '_time', '- You must supply a value here.', 'required'
+        );
     }
 
     /** Estimate next time when this condition will be true. */
-    public function estimate_next_time() {
-        // TODO: Implement estimate_next_time() method.
-        // Devolvemos la fecha en la que la condición será verdad. fecha firstaccess + param['time'] si time()< firstaccess + param['time']
+    public function estimate_next_time(EvaluationContext $context) {
+        // No devolvemos fecha en los subplugins que responden a un evento core de moodle.
+        return null;
+    }
+
+    public function check_capability($context) {
+        return has_capability('local/notificationsagent:sessionstart', $context);
     }
 
     /**
@@ -192,10 +198,10 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
     public function process_markups($params, $courseid) {
         $jsonparams = json_decode($params);
 
-        $paramsToReplace = [$this->get_human_time($jsonparams->time)];
+        $paramstoteplace = [$this->get_human_time($jsonparams->time)];
 
-        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        return $humanValue;
+        return $humanvalue;
     }
 }

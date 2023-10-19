@@ -69,7 +69,7 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
 
-        self::placeholders($mform, 'action' . $id);
+        self::placeholders($mform, 'action' . $id, 'message');
 
         return $mform;
     }
@@ -96,9 +96,13 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         return array('[TTTT]', '[BBBB]');
     }
 
-    public function check_capability() {
-        // TODO: Implement check_capability() method.
-        return false;
+    public function check_capability($context) {
+        if (has_capability('local/notificationsagent:messageagent', $context) &&
+            has_capability('moodle/site:sendmessage', $context)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

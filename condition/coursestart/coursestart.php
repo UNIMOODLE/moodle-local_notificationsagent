@@ -67,26 +67,37 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         $pluginname = $this->get_subtype();
         $params = json_decode($context->get_params());
         $meetcondition = false;
- 
         $course = get_course($courseid);
-        $timestart= $course->startdate;
+        $timestart = $course->startdate;
 
-        $timenow =  time(); 
+        $timenow = time();
 
         if (!empty($timestart)) {
-            ($timenow  > $timestart + $params->time) ? $meetcondition = true : $meetcondition = false;
-        } 
+            ($timenow > $timestart + $params->time) ? $meetcondition = true : $meetcondition = false;
+        }
 
         return $meetcondition;
+    }
+
+
+    /** Estimate next time when this condition will be true. */
+    public function estimate_next_time(EvaluationContext $context) {
+        global $DB;
+        $params = json_decode($context->get_params());
+        $courseid = $context->get_courseid();
+        $course = get_course($courseid);
+        $timestart = $course->startdate;
+
+        return $timestart + $params->time;
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
         global $SESSION;
         $valuesession = 'id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_time_'.$this->get_type().$exception.$id;
 
-        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id,$this->get_subtype());
-        $mform->setType('pluginname'.$this->get_type().$exception.$id,PARAM_RAW );
-        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id,$this->get_type().$id);
+        $mform->addElement('hidden', 'pluginname'.$this->get_type().$exception.$id, $this->get_subtype());
+        $mform->setType('pluginname'.$this->get_type().$exception.$id, PARAM_RAW );
+        $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id, $this->get_type().$id);
         $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
 
         $timegroup = array();
@@ -104,25 +115,30 @@ class notificationsagent_condition_coursestart extends notification_activitycond
                    'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null));
         // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2', 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null));
+            array(
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+                'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null
+            )
+        );
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
             array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
                 'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null));
-        //GroupTime.
+        // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
                 array('typeelement' => '[TTTT]')));
-                $mform->addGroupRule($this->get_subtype().'_condition'.$exception.$id.'_time', '- You must supply a value here.','required');
+        $mform->addGroupRule(
+            $this->get_subtype() . '_condition' . $exception . $id . '_time', '- You must supply a value here.', 'required'
+        );
     }
 
-    /** Estimate next time when this condition will be true. */
-    public function estimate_next_time() {
-        // TODO: Implement estimate_next_time() method.
+    public function check_capability($context) {
+        return has_capability('local/notificationsagent:coursestart', $context);
     }
 
     /**
@@ -165,10 +181,10 @@ class notificationsagent_condition_coursestart extends notification_activitycond
     public function process_markups($params, $courseid) {
         $jsonparams = json_decode($params);
 
-        $paramsToReplace = [$this->get_human_time($jsonparams->time)];
+        $paramstoteplace = [$this->get_human_time($jsonparams->time)];
 
-        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        return $humanValue;
+        return $humanvalue;
     }
 }

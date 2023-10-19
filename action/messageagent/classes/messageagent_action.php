@@ -42,10 +42,10 @@ class Messageagent_action {
             $message->name = 'individual_message'; // Your notification name from message.php.
             $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
             $message->userto = $user;
-            $message->subject = $placeholdershuman->title; // Será nuestro TTTT.
-            $message->fullmessage = $placeholdershuman->message; // Será nuestro BBBB.
+            $message->subject = format_text($placeholdershuman->title); // Será nuestro TTTT.
+            $message->fullmessage = format_text($placeholdershuman->message); // Será nuestro BBBB.
             $message->fullmessageformat = FORMAT_MARKDOWN;
-            $message->fullmessagehtml = '<p>' . $placeholdershuman->message . '</p>';
+            $message->fullmessagehtml = '<p>' . format_text($placeholdershuman->message) . '</p>';
             $message->smallmessage = 'small message'; // TODO.
             $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
             $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification. // TODO.

@@ -16,6 +16,7 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
+require_once(__DIR__ .'/lib.php');
 use local_notificationsagent\notification_activityconditionplugin;
 use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_activityopen extends notification_activityconditionplugin {
@@ -56,32 +57,36 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         global $DB;
         $meetcondition = false;
         $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
         $params = json_decode($context->get_params());
+        $cmid = $params->activity;
         $coursecontext = context_course::instance($courseid);
         $pluginname = $this->get_subtype();
         $timeaccess = $context->get_timeaccess();
-        // We need to check every user in the course.
-        $users = get_enrolled_users($coursecontext);
         $conditionid = $this->get_id();
-        foreach ($users as $userid) {
-            $timestart = $DB->get_field(
-                'notificationsagent_cache',
-                'timestart',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid->id, 'pluginname' => $pluginname],
-            );
-            if (!empty($timestart)) {
-                ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
-            } else {
-                // WIP Pick datatstart by activity type.
-                $meetcondition = false;
-            }
+
+        $timestart = $DB->get_field(
+            'notificationsagent_cache',
+            'timestart',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+        );
+
+        if (empty($timestart)) {
+            $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
         }
+        ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
+
         return $meetcondition;
     }
 
     /** Estimate next time when this condition will be true. */
-    public function estimate_next_time() {
-        // TODO: Implement estimate_next_time() method.
+    public function estimate_next_time(EvaluationContext $context) {
+        // Get activity from context.
+        $params = json_decode($context->get_params());
+        $cmid = $params->activity;
+        $time = $params->time;
+        $starttime = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
+        return $starttime + $time;
     }
 
     /** Returns the name of the plugin
@@ -159,6 +164,10 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         }
     }
 
+    public function check_capability($context) {
+        return has_capability('local/notificationsagent:activityopen', $context);
+    }
+
     /**
      * @param array $params
      *
@@ -188,10 +197,11 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         }
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
-        return json_encode(array('time' => $timeinseconds, 'activity' => $activity));
+        return json_encode(array('time' => $timeinseconds, 'activity' => (int) $activity));
     }
 
     public function process_markups($params, $courseid) {
+        $activityincourse = false;
         $jsonparams = json_decode($params);
 
         $modinfo = get_fast_modinfo($courseid);
@@ -200,8 +210,15 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         foreach ($types as $type) {
             if ($type->id == $jsonparams->activity) {
                 $activityname = $type->name;
+                $activityincourse = true;
             }
         }
+
+        // Check if activity is found in course, if is not, return [AAAA].
+        if (!$activityincourse) {
+            $activityname = '[AAAA]';
+        }
+
         $paramstoreplace = [$this->get_human_time($jsonparams->time), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 

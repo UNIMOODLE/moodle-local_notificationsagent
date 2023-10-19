@@ -17,10 +17,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
     array(
-        'classname' => 'local_notificationsagent\task\cron_task_local_notificationsagent',
+        'classname' => 'local_notificationsagent\task\notificationsagent_trigger_cron',
         'blocking' => 0,
-        'minute' => '5',
-        'hour' => '*',
+        'minute' => '0',
+        'hour' => '*/1',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

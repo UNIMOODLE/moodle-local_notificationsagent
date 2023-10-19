@@ -60,6 +60,7 @@ $PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/delete', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
@@ -82,9 +83,9 @@ $exceptionsarray = array();
 $actionsarray = array();
 
 foreach ($rules as $rule) {
-    $conditions = $rule->get_conditions($rule->get_id());
-    $exceptions = $rule->get_exceptions($rule->get_id());
-    $actions = $rule->get_actions($rule->get_id());
+    $conditions = $rule->get_conditions();
+    $exceptions = $rule->get_exceptions();
+    $actions = $rule->get_actions();
     $conditionscontent = array();
     $exceptionscontent = array();
     $actionscontent = array();
@@ -133,13 +134,14 @@ foreach ($rules as $rule) {
 
     $rulecontent[] = array(
         'id' => $rule->get_id(),
-        'name' => $rule->get_name(),
-        'status' => 1,
+        'name' => format_text($rule->get_name()),
+        'status' => $rule->get_status(),
         'conditions' => $conditionsarray,
         'exceptions' => $exceptionsarray,
         'actions' => $actionsarray,
-        'type' => $rule->get_template() == 1 ? 'template' : 'rule',
-        'type_lang' => $rule->get_template() == 1 ?
+        'type' => $rule->get_courseid() == SITEID ? 'template' : 'rule',
+        'isrule' => $rule->get_courseid() == SITEID ? false : true,
+        'type_lang' => $rule->get_courseid() == SITEID ?
             get_string('type_template', 'local_notificationsagent') :
             get_string('type_rule', 'local_notificationsagent'),
         'editurl' => new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id())),

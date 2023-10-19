@@ -26,8 +26,7 @@ class notificationsagent_removeusergroup_event extends \core\event\base {
     protected function init() {
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['crud'] = 'r';
-        $this->data['groupid'] = $this->groupid;
-        $this->data['relateduserid'] = $this->relateduserid;
+        $this->data['other'] = $this->other;
     }
 
     /**

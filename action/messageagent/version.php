@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023051102;
+$plugin->version = 2023101802;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationsaction_messageagent';
 

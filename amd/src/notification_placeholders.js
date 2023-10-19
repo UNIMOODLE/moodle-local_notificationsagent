@@ -36,8 +36,9 @@ define([], function() {
             for (var i = 0; i < clickforword.length; i++) {
                 clickforword[i].addEventListener('click', function(e) {
                     e.preventDefault(); // To prevent the default behaviour of a tag.
-                    var idAction = e.target.closest("div.notificationvars").getAttribute("id").replace("notificationvars","");
-                    module.insertAtCaret("{" + this.getAttribute('data-text') + "}", idAction);
+                    var idAction = e.target.closest("div.notificationvars").getAttribute("id").replace("notificationvars_","").split('_')[0];
+                    var typeitem = e.target.closest("div.notificationvars").getAttribute("id").replace("notificationvars_","").split('_')[1];
+                    module.insertAtCaret(e.target.closest(".fitem").previousElementSibling.getAttribute("id"), "{" + this.getAttribute('data-text') + "}", idAction, typeitem);
                 });
             }
         },
@@ -47,25 +48,30 @@ define([], function() {
          * @param  {string} myValue
          * @param  {int} idAction
          */
-        insertAtCaret: function(myValue, idAction) {
+        insertAtCaret: function(idContainerReplace, myValue, idAction, typeitem) {
             var sel, range;
-            
-            if(window.getSelection().type !== 'None' && 
-                ($(window.getSelection().baseNode).closest("[id^='id_'][id*='"+idAction+"'][id$='editable']").attr("id") !== undefined || 
-                $(window.getSelection().focusNode).closest("[id^='id_'][id*='"+idAction+"'][id$='editable']").attr("id") !== undefined)){
-                sel = window.getSelection();
-                if (sel.getRangeAt && sel.rangeCount) {
-                    range = sel.getRangeAt(0);
-                    range.deleteContents();
-                    range.insertNode(document.createTextNode(myValue));
 
-                    for (let position = 0; position != (myValue.length + 1); position++) {
-                        sel.modify("move", "right", "character");
+            if(typeitem == 'message'){
+                if(window.getSelection().type !== 'None' && 
+                    ($(window.getSelection().baseNode).closest("[id^='id_'][id*='_"+idAction+"'][id$='editable']").attr("id") !== undefined || 
+                    $(window.getSelection().focusNode).closest("[id^='id_'][id*='_"+idAction+"'][id$='editable']").attr("id") !== undefined)){
+                    sel = window.getSelection();
+                    if (sel.getRangeAt && sel.rangeCount) {
+                        range = sel.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(myValue));
+
+                        for (let position = 0; position != (myValue.length + 1); position++) {
+                            sel.modify("move", "right", "character");
+                        }
                     }
+                }else{
+                    var thiselem = document.querySelectorAll("#"+idContainerReplace+" [id^='id_'][id*='_"+idAction+"'][id$='editable']");
+                    thiselem[0].appendChild(document.createTextNode(myValue));
                 }
-            }else{
-                var thiselem = document.querySelectorAll("[id^='id_'][id*='"+idAction+"'][id$='editable']");
-                thiselem[0].appendChild(document.createTextNode(myValue));
+            }else if(typeitem == 'text'){
+                var thiselem = document.querySelectorAll("#"+idContainerReplace+" [type='"+typeitem+"'][id^='id_'][id*='_"+idAction+"']");
+                thiselem[0].value = thiselem[0].value + myValue;
             }
         },
     };

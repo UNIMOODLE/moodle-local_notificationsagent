@@ -20,9 +20,11 @@ class notificationsagent {
 
     public static function get_conditions_by_course($pluginname, $courseid) {
         global $DB;
-        $conditios_sql = "SELECT mnr.ruleid, mnrc.id,mnrc.parameters, mnrc.pluginname
-                            FROM mdl_notificationsagent_condition mnrc
-                            JOIN mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
+        $conditios_sql = "SELECT mnr.id, mnrc.ruleid,mnrc.parameters, mnrc.pluginname
+                            FROM {notificationsagent_condition} mnrc
+                            JOIN {notificationsagent_rule} mnr 
+                              ON mnr.id = mnrc.ruleid
+                             AND mnr.status = 0
                            WHERE pluginname = :pluginname
                              AND courseid = :courseid";
 
@@ -39,10 +41,11 @@ class notificationsagent {
 
     public static function get_conditions_by_cm($pluginname, $courseid, $cmid) {
         global $DB;
-        $conditios_sql = "SELECT mnr.ruleid, mnrc.id, mnrc.parameters, mnrc.pluginname,
+        $conditios_sql = "SELECT mnr.id, mnrc.ruleid, mnrc.parameters, mnrc.pluginname,
                                  JSON_VALUE(parameters, '$.activity') AS cmid
-                            FROM mdl_notificationsagent_condition mnrc
-                            JOIN mdl_notificationsagent_rule mnr ON mnr.ruleid=mnrc.ruleid
+                            FROM {notificationsagent_condition} mnrc
+                            JOIN {notificationsagent_rule} mnr ON mnr.id = mnrc.ruleid
+                             AND mnr.status = 0
                            WHERE pluginname = :pluginname
                              AND courseid = :courseid
                              AND JSON_VALUE(parameters, '$.activity') = :cmid";
@@ -52,11 +55,46 @@ class notificationsagent {
             [
                 'pluginname' => $pluginname,
                 'courseid' => $courseid,
-                'cmid'=> $cmid
+                'cmid' => $cmid
             ]
         );
 
         return $conditions;
+    }
+
+
+    public static function get_conditions_by_plugin($pluginname) {
+        global $DB;
+        $conditions_sql = "SELECT mnrc.id, mnr.id, mnrc.ruleid,mnrc.parameters, mnrc.pluginname, mnr.courseid
+                            FROM {notificationsagent_condition} mnrc
+                            JOIN {notificationsagent_rule} mnr 
+                              ON mnr.id = mnrc.ruleid
+                             AND mnr.status = 0
+                           WHERE pluginname = :pluginname";
+
+        $conditions = $DB->get_records_sql(
+            $conditions_sql,
+            [
+                'pluginname' => $pluginname,
+            ]
+        );
+
+        return $conditions;
+    }
+
+
+    /**
+     * @param $context
+     *
+     * @return array
+     */
+    public static function get_usersbycourse($context): array {
+        $enrolledusers = get_enrolled_users($context);
+        $users = [];
+        foreach ($enrolledusers as $user) {
+            $users[] = $user->id;
+        }
+        return $users;
     }
 
 
@@ -67,50 +105,90 @@ class notificationsagent {
         // activityopen actualiza siempre.
         // coursestart actualiza siempre.
         global $DB;
-            $exists = $DB->get_field(
-                'notificationsagent_cache', 'id',
-                array(
-                    'userid' => $userid,
-                    'courseid' => $courseid,
-                    'pluginname' => $pluginname,
-                    'conditionid' => $conditionid
-                )
-            );
-
+        $exists = $DB->get_field(
+            'notificationsagent_cache', 'id',
+            array(
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'pluginname' => $pluginname,
+                'conditionid' => $conditionid
+            )
+        );
+        $objdb = new \stdClass();
+        $objdb->userid = $userid;
+        $objdb->courseid = $courseid;
+        $objdb->timestart = $timer;
+        $objdb->pluginname = $pluginname;
+        $objdb->conditionid = $conditionid;
         // Insert.
         if (!$exists) {
-            $objdb = new \stdClass();
-            $objdb->userid = $userid;
-            $objdb->courseid = $courseid;
-            $objdb->timestart = $timer;
-            $objdb->pluginname = $pluginname;
-            $objdb->conditionid = $conditionid;
             $DB->insert_record('notificationsagent_cache', $objdb);
         }
         // Update.
         if ($exists && $updatecacheifexist) {
-            $objdb = new \stdClass();
             $objdb->id = $exists;
-            $objdb->userid = $userid;
-            $objdb->courseid = $courseid;
-            $objdb->timestart = $timer;
-            $objdb->pluginname = $pluginname;
-            $objdb->conditionid = $conditionid;
             $DB->update_record('notificationsagent_cache', $objdb);
         }
     }
 
     // TODO WIP.
     public static function set_time_trigger($ruleid, $userid, $courseid, $timer) {
-
         global $DB;
+        $exists = $DB->get_field(
+            'notificationsagent_triggers', 'id',
+            array(
+                'ruleid' => $ruleid,
+                'userid' => $userid,
+                'courseid' => $courseid,
+            )
+        );
+
         $objdb = new \stdClass();
-        $objdb->userid = $userid; // TODO is case is NULL. DB forces to not null.
+        $objdb->userid = $userid;
         $objdb->courseid = $courseid;
         $objdb->ruleid = $ruleid;
-        $objdb->day = $timer;
-        $DB->insert_record('notificationsagent_triggers', $objdb);
+        $objdb->startdate = $timer;
+
+        if (!$exists) {
+            $DB->insert_record('notificationsagent_triggers', $objdb);
+        } else {
+            $objdb->id = $exists;
+            $DB->update_record('notificationsagent_triggers', $objdb);
+        }
 
     }
+
+    /**
+     * Delete all cache records by rule ID
+     * 
+     * @param int $id rule ID
+     * 
+     * @return void
+    */
+    public static function delete_cache_by_ruleid($id)
+    {
+        global $DB;
+
+        $conditions = $DB->get_records('notificationsagent_condition', ['ruleid' => $id], 'id');
+        if (!empty($conditions)) {
+            $conditionsid = array_keys($conditions);
+            list($insql, $inparams) = $DB->get_in_or_equal($conditionsid);
+            $DB->delete_records_select('notificationsagent_cache', "conditionid $insql", $inparams);
+        }
+    }
+
+    /**
+     * Delete all trigger records by rule ID
+     * 
+     * @param int $id rule ID
+     * 
+     * @return void
+     */
+    public static function delete_triggers_by_ruleid($id) {
+        global $DB;
+
+        $DB->delete_records('notificationsagent_triggers', ['ruleid' => $id]);
+    }
 }
+
 

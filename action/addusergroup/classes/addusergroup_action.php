@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 class Addusergroup_action {
-    private int $groupid, $user;
+    private string $placeholders;
 
-    public function __construct ($groupid, $user) {
-        $this->groupid = $groupid;
-        $this->user = $user;
+    public function __construct ($other) {
+        $this->placeholders = $other;
     }
 
     public function add_user_group() {
-        $groupadd = groups_add_member($this->groupid, $this->user);
+        $placeholdershuman = json_decode($this->placeholders);
+        $groupadd = groups_add_member($placeholdershuman->group, $placeholdershuman->user);
     }
 
 }

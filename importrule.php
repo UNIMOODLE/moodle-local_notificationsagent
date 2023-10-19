@@ -57,9 +57,13 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         if ($data['actions']) {
             $sqlactions = new \stdClass();
 
-            for ($i = 1; $i <= count($data['actions']); $i++) {
-                foreach ($data['actions'][$i] as $key => $value) {
-                    $sqlactions->$key = $value;
+            for ($i = 0; $i < count($data['actions']); $i++) {
+                foreach ($data['actions'][array_key_first($data['actions']) + $i] as $key => $value) {
+                    if ($key == 'ruleid') {
+                        $sqlactions->ruleid = $idrule;
+                    } else {
+                        $sqlactions->$key = $value;
+                    }
                 }
 
                 $idactions = $DB->insert_record('notificationsagent_action', $sqlactions);
@@ -69,16 +73,20 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         if ($data['conditions']) {
             $sqlconditions = new \stdClass();
 
-            for ($i = 1; $i <= count($data['conditions']); $i++) {
-                foreach ($data['conditions'][$i] as $key => $value) {
-                    $sqlconditions->$key = $value;
+            for ($i = 0; $i < count($data['conditions']); $i++) {
+                foreach ($data['conditions'][array_key_first($data['conditions']) + $i] as $key => $value) {
+                    if ($key == 'ruleid') {
+                        $sqlconditions->ruleid = $idrule;
+                    } else {
+                        $sqlconditions->$key = $value;
+                    }
                 }
 
                 $idconditions = $DB->insert_record('notificationsagent_condition', $sqlconditions);
             }
         }
 
-        if ($idrule && (is_null($idactions) || is_null($idconditions))) {
+        if ($idrule && (!is_null($idactions) && !is_null($idconditions))) {
             $message = get_string('import_success', 'local_notificationsagent');
             echo \core\notification::success($message);
         } else {

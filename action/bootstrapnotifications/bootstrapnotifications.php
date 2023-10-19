@@ -41,7 +41,8 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
             get_string(
                 'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
                 array('typeelement' => '[TTTT]')
-            ));
+            ), array('size' => '64')
+        );
         $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_text', null, 'required', null, 'client');
 
             $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text', PARAM_TEXT);
@@ -49,6 +50,9 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
             $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text',
             $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_text']);
         }
+
+        self::placeholders($mform, 'action' . $id, 'text');
+
         return $mform;
     }
 
@@ -74,8 +78,8 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
         return array('[TTTT]');
     }
 
-    public function check_capability() {
-        // TODO: Implement check_capability() method.
+    public function check_capability($context) {
+        return has_capability('local/notificationsagent:bootstrapnotifications', $context);
     }
 
     /**

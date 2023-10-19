@@ -43,33 +43,25 @@ class notificationscondition_sessionstart_observer {
         $timeaccess = $event->timecreated;
 
         // We use this event to avoid querying the log_standard_log for a course firstaccess.
-        set_first_course_access($userid,$courseid,$timeaccess);
+        set_first_course_access($userid, $courseid, $timeaccess);
 
+        /*Cuando se reciba un evento de tipo course_viewed se buscará que condiciones tienen
+         a ese evento como desencadenante.
+         Sabiendo las condiciones se podrá encontrar las reglas que tengas esa condición y
+         están asociadas al curso que desencadena el evento.
+        Se evaluará la condición para el curso y alumno correspondiente calculando la fecha de cumplimiento de la condición.
+        Si por ejemplo TTTT fuera 10 días y el evento (primer inicio del curso)
+         ocurre el 12/05/2023 el método de evaluación de tiempo devolverá 22/05/2023.
+         Este valor se guardaría en la tabla de cache.
+        En los siguientes eventos course_viewed para ese curso y ese alumno se verificará
+         si hay algún valor guardado en la cache, de ser asi no se tocaría ya que el primer inicio de sesión no puede cambiar.
+        */
 
-        // TODO
-        //Cuando se reciba un evento de tipo course_viewed se buscará que condiciones tienen
-        // a ese evento como desencadenante.
-        // Sabiendo las condiciones se podrá encontrar las reglas que tengas esa condición y
-        // están asociadas al curso que desencadena el evento.
-        //Se evaluará la condición para el curso y alumno correspondiente calculando la fecha de cumplimiento de la condición.
-        //Si por ejemplo TTTT fuera 10 días y el evento (primer inicio del curso)
-        // ocurre el 12/05/2023 el método de evaluación de tiempo devolverá 22/05/2023.
-        // Este valor se guardaría en la tabla de cache.
-        //En los siguientes eventos course_viewed para ese curso y ese alumno se verificará
-        // si hay algún valor guardado en la cache, de ser asi no se tocaría ya que el primer inicio de sesión no puede cambiar.
-
-        // parámetros necesarios
-        //condición para saber TTTT
-        // Timeaccess que nos lo da el evento
-        // Insertar en timer cache TTTT + timeacces
-        $rule = new \stdClass();
-        $rule->ruleid = null;
-        $session = new notificationsagent_condition_sessionstart($rule);
-        $pluginname = $session->get_subtype();
+        $pluginname = get_string('subtype', 'notificationscondition_sessionstart');
 
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         $ruleids = [];
-        foreach ($conditions as $condition){
+        foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $ruleids[] = $condition->ruleid;
@@ -78,9 +70,8 @@ class notificationscondition_sessionstart_observer {
             $cache = $timeaccess + $param['time'];
             notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, false);
         }
-
-        // Search for conditions with sessionstart and courseid
-        // Call engine with userid, courseid, timecreated
+        // Search for conditions with sessionstart and courseid,
+        // Call engine with userid, courseid, timecreated.
         Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid);
     }
 }

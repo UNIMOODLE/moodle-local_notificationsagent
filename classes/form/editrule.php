@@ -86,10 +86,6 @@ class editrule extends \moodleform {
         ');
 
         $this->add_action_buttons();
-        // ... Al guardar cambios, borrar todos los SESSION referentes al formulario de nueva Regla.
-        // ... unset($SESSION->NOTIFICATIONS['CONDITIONS']);.
-        // ... unset($SESSION->NOTIFICATIONS['EXCEPTIONS']);.
-        // ... unset($SESSION->NOTIFICATIONS['ACTIONS']);.
     }
 
     // Custom validation should be added here.
