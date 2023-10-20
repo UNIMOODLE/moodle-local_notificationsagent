@@ -85,11 +85,21 @@ class Rule {
     }
 
     public static function get_rules() {
-        global $DB;
-        $instances = array();
-        $rules = $DB->get_records('notificationsagent_rule');
+        global $DB,$USER, $COURSE;
+        $instances=array();
+        // Teacher view. Course rules. User rules (in other courses). Templates.
+        $paramsuser= array('createdby' => $USER->id);
+        $rulesuser = $DB->get_records('notificationsagent_rule', $paramsuser);
+
+        $paramscourse= array('courseid' => $COURSE->id);
+        $rulescourse = $DB->get_records('notificationsagent_rule', $paramscourse);
+
+        $paramstemplate= array('courseid' => SITEID );
+        $rulestemplate = $DB->get_records('notificationsagent_rule', $paramstemplate);
+
+        $rules = array_unique(array_merge($rulescourse, $rulesuser, $rulestemplate),SORT_REGULAR);
         foreach ($rules as $rule) {
-            $instances[] = self::create_instance($rule->id);
+            $instances[] = Rule::create_instance($rule->id);
         }
         return $instances;
     }
