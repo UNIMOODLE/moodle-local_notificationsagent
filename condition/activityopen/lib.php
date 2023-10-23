@@ -30,7 +30,8 @@ function notificationsagent_condition_activityopen_get_cm_starttime($cmid) {
                     SELECT mcm.id,instance,module,mm.name, mcm.course
                       FROM {course_modules} mcm
                       JOIN {modules} mm ON mm.id = mcm.module
-                    WHERE mcm.id = :cmid";
+                     WHERE mcm.id = :cmid";
+
 
     $modtype = $DB->get_record_sql(
         $starttimequery,

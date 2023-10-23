@@ -67,15 +67,22 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         $pluginname = $this->get_subtype();
         $params = json_decode($context->get_params());
         $meetcondition = false;
-        $course = get_course($courseid);
-        $timestart = $course->startdate;
+        $conditionid = $this->get_id();
 
-        $timenow = time();
+        $timeaccess = $context->get_timeaccess();
 
-        if (!empty($timestart)) {
-            ($timenow > $timestart + $params->time) ? $meetcondition = true : $meetcondition = false;
+        $timestart = $DB->get_field(
+            'notificationsagent_cache',
+            'timestart',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+        );
+
+        if (empty($timestart)) {
+            $course = get_course($courseid);
+            $timestart = $course->startdate + $params->time;
         }
 
+        ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
         return $meetcondition;
     }
 

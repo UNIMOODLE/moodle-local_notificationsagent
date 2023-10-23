@@ -72,7 +72,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         );
 
         if (empty($timestart)) {
-            $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
+            $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid) + $params->time;
         }
         ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
 
