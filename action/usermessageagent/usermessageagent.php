@@ -72,6 +72,8 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
 
+        self::placeholders($mform, 'action' . $id, 'message');
+
         // Users.
         $context = \context_course::instance($courseid);
         $enrolledusers = get_enrolled_users($context);

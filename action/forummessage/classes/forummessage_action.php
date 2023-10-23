@@ -29,7 +29,7 @@ class Forummessage_action {
 
         global $CFG;
         $placeholdershuman = json_decode($this->placeholders);
-        $postsubject = format_text($placeholdershuman->title);
+        $postsubject = format_text($placeholdershuman->title, FORMAT_PLAIN);
         $postmessage = format_text($placeholdershuman->message);
 
         try {

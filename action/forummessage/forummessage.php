@@ -82,6 +82,8 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
 
+        self::placeholders($mform, 'action' . $id, 'message');
+
         // Forum.
         $forumname = array();
         $forumlist = mod_forum_external::get_forums_by_courses(array($courseid));
