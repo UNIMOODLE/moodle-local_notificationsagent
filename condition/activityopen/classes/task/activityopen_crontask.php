@@ -47,7 +47,7 @@ class activityopen_crontask extends scheduled_task {
         * reducir la carga en el sistema.
         * */
 
-        $pluginname = get_string('subtype', 'notificationscondition_activityopen');
+        $pluginname = 'activityopen';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {

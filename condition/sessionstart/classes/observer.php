@@ -57,7 +57,7 @@ class notificationscondition_sessionstart_observer {
          si hay algún valor guardado en la cache, de ser asi no se tocaría ya que el primer inicio de sesión no puede cambiar.
         */
 
-        $pluginname = get_string('subtype', 'notificationscondition_sessionstart');
+        $pluginname = 'sessionstart';
 
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         $ruleids = [];

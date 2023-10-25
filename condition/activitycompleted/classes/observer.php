@@ -44,7 +44,7 @@ class notificationscondition_activitycompleted_observer {
         $cmstate = $event->other['completionstate'];
         $time = $event->timecreated;
 
-        $pluginname = get_string('subtype', 'notificationscondition_activitycompleted');
+        $pluginname = 'activitycompleted';
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
 
         $ruleids = [];

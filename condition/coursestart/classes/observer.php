@@ -45,7 +45,7 @@ class notificationscondition_coursestart_observer {
             return;
         }
 
-        $pluginname = get_string('subtype', 'notificationscondition_coursestart');
+        $pluginname = 'coursestart';
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         $context = \context_course::instance($courseid);
         $enrolledusers = notificationsagent::get_usersbycourse($context);

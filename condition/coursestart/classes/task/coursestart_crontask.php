@@ -40,7 +40,7 @@ class coursestart_crontask extends scheduled_task {
         global $DB;
         custom_mtrace("Coursestart start");
 
-        $pluginname = get_string('subtype', 'notificationscondition_coursestart');
+        $pluginname = 'coursestart';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
