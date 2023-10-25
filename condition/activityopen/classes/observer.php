@@ -40,7 +40,7 @@ class notificationscondition_activityopen_observer {
 
         $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
 
-        $pluginname = '_activityopen';
+        $pluginname = 'activityopen';
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         $context = context_course::instance($courseid);
