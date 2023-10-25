@@ -36,7 +36,6 @@ class notificationscondition_activityopen_observer {
     public static function course_module_updated(\core\event\course_module_updated $event) {
 
         $courseid = $event->courseid;
-        $timeaccess = $event->timecreated;
         $cmid = $event->objectid;
 
         $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
@@ -46,24 +45,18 @@ class notificationscondition_activityopen_observer {
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         $context = context_course::instance($courseid);
         $enrolledusers = notificationsagent::get_usersbycourse($context);
-        $ruleids = [];
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
-            $ruleids[] = $condition->ruleid;
             $param = json_decode($decode, true);
-
             $cache = $timestart + $param['time'];
             foreach ($enrolledusers as $enrolleduser) {
                 // Update every time a module is updated.
-                notificationsagent::set_timer_cache($enrolleduser, $courseid, $cache, $pluginname, $condtionid, true);
+                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
+                notificationsagent::set_time_trigger($condition->ruleid,$enrolleduser->id, $courseid, $cache);
             }
-        }
-        // Call engine with userid, courseid, timecreated.
-        foreach ($enrolledusers as $enrolleduser) {
-            Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $enrolleduser);
         }
     }
 }

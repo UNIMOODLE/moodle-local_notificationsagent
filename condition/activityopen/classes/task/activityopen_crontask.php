@@ -61,7 +61,7 @@ class activityopen_crontask extends scheduled_task {
             $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
             $cache = $timestart + $param['time'];
             foreach ($enrolledusers as $enrolleduser) {
-                notificationsagent::set_timer_cache($enrolleduser, $courseid, $cache, $pluginname, $condtionid, false);
+                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, false);
             }
         }
 

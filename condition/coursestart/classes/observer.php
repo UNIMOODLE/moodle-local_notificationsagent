@@ -36,40 +36,30 @@ class notificationscondition_coursestart_observer {
             return;
         }
 
-        $userid = $event->userid;
         $courseid = $event->courseid;
-        $timeaccess = $event->timecreated;
         $other = $event->other;
-
-        $startdate = $DB->get_field('course', 'startdate', ['id' => $courseid]);
-
+        // If stardate is not set in other array then the startdate setting has not been modified.
         if (isset($other["updatedfields"]["startdate"])) {
             $startdate = $other["updatedfields"]["startdate"];
+        } else {
+            return;
         }
 
         $pluginname = get_string('subtype', 'notificationscondition_coursestart');
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-        $ruleids = [];
+        $context = \context_course::instance($courseid);
+        $enrolledusers = notificationsagent::get_usersbycourse($context);
+
         foreach ($conditions as $condition) {
-            $context = \context_course::instance($courseid);
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
-            $enrolledusers = notificationsagent::get_usersbycourse($context);
-            $ruleids[] = $condition->ruleid;
             $param = json_decode($decode, true);
             $cache = $startdate + $param['time'];
             foreach ($enrolledusers as $enrolleduser) {
-                notificationsagent::set_timer_cache($enrolleduser, $courseid, $cache, $pluginname, $condtionid, true);
+                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
+                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid,$cache);
             }
         }
-        
-        // Call engine with userid, courseid, timecreated
-        foreach ($enrolledusers as $enrolleduser) {
-            Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $enrolleduser);
-        }
-    
-
     }
-
 }

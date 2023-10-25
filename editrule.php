@@ -335,6 +335,7 @@ if ($mform->is_cancelled()) {
     $timer = 0;
     // Edit Rule.
     if($countCondition >= 1 && $countAction >=1){
+        $students = notificationsagent::get_usersbycourse($context);
         if (isset($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid'])){
             $ruleid = intval($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid']);
             $title = $fromform->title;
@@ -352,7 +353,7 @@ if ($mform->is_cancelled()) {
             $ruleinstance->delete_conditions($ruleid);
             $ruleinstance->delete_actions($ruleid);
 
-            
+
             foreach ($plugindata as $currentpluginkey => $plugindatum) {
                 $dataplugin = new \stdClass();
                 $dataplugin->ruleid = $ruleid;
@@ -370,7 +371,7 @@ if ($mform->is_cancelled()) {
                 $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
                 if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
                     $DB->insert_record('notificationsagent_action', $dataplugin);
-                }else{
+                } else {
                     $condtionid = $DB->insert_record('notificationsagent_condition', $dataplugin);
                     $obj = \notificationconditionplugin::create_subplugin($condtionid);
                     $pluginname = $obj->get_subtype();
@@ -380,24 +381,18 @@ if ($mform->is_cancelled()) {
                     $contextevaluation->set_params($params);
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
-                    
-
-                    $students = notificationsagent::get_usersbycourse($context);
                     // Recorre la lista de participantes
                     foreach ($students as $student) {
-                        notificationsagent::set_timer_cache($student, $courseid, $cache, $pluginname, $condtionid, true);
+                        notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
                         if($timer <= $cache){
                             $timer = $cache;
-                            notificationsagent::set_time_trigger($ruleid, $student, $courseid, $timer);
+                            notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
                         }
                     }
-                        
-                    
-
                 }
             }
         // New Rule.   
-        }else{
+        } else {
             $ruleid = $DB->insert_record('notificationsagent_rule', $data);
 
             foreach ($plugindata as $currentpluginkey => $plugindatum) {
@@ -417,7 +412,7 @@ if ($mform->is_cancelled()) {
                 $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
                 if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
                     $DB->insert_record('notificationsagent_action', $dataplugin);
-                }else{
+                } else {
                     $condtionid = $DB->insert_record('notificationsagent_condition', $dataplugin);
                     $obj = \notificationconditionplugin::create_subplugin($condtionid);
                     $pluginname = $obj->get_subtype();
@@ -427,25 +422,19 @@ if ($mform->is_cancelled()) {
                     $contextevaluation->set_params($params);
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
-                    if (!empty($cache)){
-
-                        $students = notificationsagent::get_usersbycourse($context);
+                    if (!empty($cache)) {
                         // Recorre la lista de participantes
                         foreach ($students as $student) {
-                            notificationsagent::set_timer_cache($student, $courseid, $cache, $pluginname, $condtionid, true);
+                            notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
                             if($timer <= $cache){
                                 $timer = $cache;
-                                notificationsagent::set_time_trigger($ruleid, $student, $courseid, $timer);
+                                notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
                             }
-
                         }
                     }
-
-
                 }
             }
         }
-        
 
         // In this case you process validated data. $mform->get_data() returns data posted in form.
         $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));

@@ -41,7 +41,7 @@ class notificationsagent {
 
     public static function get_conditions_by_cm($pluginname, $courseid, $cmid) {
         global $DB;
-        $conditios_sql = "SELECT mnr.id, mnrc.ruleid, mnrc.parameters, mnrc.pluginname,
+        $conditios_sql = "SELECT mnrc.id, mnrc.ruleid, mnrc.parameters, mnrc.pluginname,
                                  JSON_VALUE(parameters, '$.activity') AS cmid
                             FROM {notificationsagent_condition} mnrc
                             JOIN {notificationsagent_rule} mnr ON mnr.id = mnrc.ruleid
@@ -89,12 +89,8 @@ class notificationsagent {
      * @return array
      */
     public static function get_usersbycourse($context): array {
-        $enrolledusers = get_enrolled_users($context);
-        $users = [];
-        foreach ($enrolledusers as $user) {
-            $users[] = $user->id;
-        }
-        return $users;
+        return get_role_users(5, $context,false, 'u.*',
+            '', true, '','','' ,'u.suspended = 0','');
     }
 
 
@@ -134,13 +130,14 @@ class notificationsagent {
     // TODO WIP.
     public static function set_time_trigger($ruleid, $userid, $courseid, $timer) {
         global $DB;
-        $exists = $DB->get_field(
-            'notificationsagent_triggers', 'id',
+        $exists = $DB->get_record(
+            'notificationsagent_triggers',
             array(
                 'ruleid' => $ruleid,
                 'userid' => $userid,
                 'courseid' => $courseid,
-            )
+            ),
+            'id, startdate'
         );
 
         $objdb = new \stdClass();
@@ -152,10 +149,12 @@ class notificationsagent {
         if (!$exists) {
             $DB->insert_record('notificationsagent_triggers', $objdb);
         } else {
-            $objdb->id = $exists;
-            $DB->update_record('notificationsagent_triggers', $objdb);
+            $objdb->id = $exists->id;
+            // Don't update if record startdate is lesser than $timer.
+            if ($timer > $exists->startdate) {
+                $DB->update_record('notificationsagent_triggers', $objdb);
+            }
         }
-
     }
 
     /**
