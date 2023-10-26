@@ -15,17 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 class Forummessage_action {
 
-    private int $forumid;
     private int $courseid;
     private string $placeholders;
 
-    public function __construct($courseid, $forumid, $other) {
+    public function __construct($courseid, $other) {
         $this->courseid = $courseid;
-        $this->forumid = $forumid;
         $this->placeholders = $other;
     }
 
-    public function post_forum($forumid) {
+    public function post_forum() {
 
         global $CFG;
         $placeholdershuman = json_decode($this->placeholders);
@@ -40,7 +38,7 @@ class Forummessage_action {
 
             // Call the Moodle Web Services API to post the message.
             $params = array(
-                'forumid' => $forumid,
+                'forumid' => $placeholdershuman->forum,
                 'subject' => $postsubject,
                 'message' => $postmessage,
                 'moodlewsrestformat' => $restformat

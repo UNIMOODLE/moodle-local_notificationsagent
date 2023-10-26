@@ -20,10 +20,8 @@ class notificationsaction_forummessage_observer {
 
     public static function general_post_forum(\notificationsaction_forummessage\event\notificationsagent_forummessage_event $event) {
         // Post a message on a forum.
-        // Forumid to be sent in event.
-        $forumid = 1; // TODO.
-        $post = new Forummessage_action($event->courseid, $forumid, $event->other);
-        $post->post_forum($forumid);
+        $post = new Forummessage_action($event->courseid, $event->other);
+        $post->post_forum();
 
     }
 }
