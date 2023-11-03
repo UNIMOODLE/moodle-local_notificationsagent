@@ -13,6 +13,23 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_notificationsagent;
 require_once('notificationplugin.php');
 require_once('notificationactionplugin.php');
@@ -90,7 +107,7 @@ class Rule {
         // Teacher view. Course rules. User rules (in other courses). Templates.
         $paramsuser= array('createdby' => $USER->id);
         $rulesuser = $DB->get_records('notificationsagent_rule', $paramsuser);
-
+        // TODO REFACTOR
         $paramscourse= array('courseid' => $COURSE->id);
         $rulescourse = $DB->get_records('notificationsagent_rule', $paramscourse);
 
@@ -433,4 +450,24 @@ class Rule {
 
         $DB->delete_records('notificationsagent_rule', ['id' => $this->get_id()]);
     }
+
+    public function get_assignedcontext() {
+        global $DB;
+
+        $data = ['category' => [], 'course' => []];
+        $data['course'][] = $this->courseid;
+
+        $results = $DB->get_records('notificationsagent_context',  array('ruleid' => $this->id));
+        foreach ($results as $result){
+            if($result->contextid == CONTEXT_COURSE) {
+                $data['course'][] = $result->objectid;
+            }
+            if($result->contextid == CONTEXT_COURSECAT) {
+                $data['category'][] = $result->objectid;
+            }
+        }
+
+        return $data;
+    }
 }
+

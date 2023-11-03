@@ -13,67 +13,73 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
 
 /**
- * Assign rule
+ * Version details
  *
  * @package    local_notificationsagent
- * @copyright  2023 UNIMOODLE
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once("../../config.php");
+require_once("classes/rule.php");
 
- require_once("../../config.php");
+use local_notificationsagent\Rule;
 
- $idrule = optional_param('idRule', null, PARAM_INT);
- $arraycourses = optional_param_array('arrayCourses', null, PARAM_RAW);
+$idrule = optional_param('ruleid', null, PARAM_INT);
+$arraycategories = optional_param_array('category', null, PARAM_RAW);
+$arraycourses = optional_param_array('course', null, PARAM_RAW);
  
+if (!empty($idrule)) {
+    echo json_encode(get_list_assigned_context($idrule));
+} 
 
- if (isset($idrule) && !isset($arraycourses)) {
-     echo json_encode(get_list_courses_assigned($idrule));
- } 
- if (isset($arraycourses)) {
-    echo json_encode(add_list_courses_assigned($idrule, $arraycourses));
+if (!empty($idrule) && (isset($arraycourses) || isset($arraycategories))) {
+    add_list_courses_assigned($idrule, $arraycategories, $arraycourses);
+} 
 
- } 
-
-
- function get_list_courses_assigned($idrule) {
-    global $DB;
-    $courseid = $DB->get_field('notificationsagent_rule', 'courseid', array('id' => $idrule));
-    $listofcoursesassigned = [$courseid];
+ function get_list_assigned_context($idrule) {
+    $rule = Rule::create_instance($idrule);
+    $listofcoursesassigned = $rule->get_assignedcontext();
     return $listofcoursesassigned;
 }
 
+function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
+    global $DB;
 
+    $DB->delete_records('notificationsagent_context', ['ruleid' => $idrule]);
 
-function add_list_courses_assigned($idrule, $arraycourses) {
-   global $DB, $USER;
-    $rule = $DB->get_record('notificationsagent_rule', array('id' => $idrule));
-    $conditions = $DB->get_records('notificationsagent_condition', array('id' => $idrule));
-    $actions = $DB->get_records('notificationsagent_action', array('id' => $idrule));
-
-    foreach($arraycourses as $array){
-        if($array !== $rule->courseid){
-            $data = new stdClass;
-            $data->courseid = $array;
-            $data->name = $rule->name;
-            $data->createdat = time();
-            $data->createdby = $USER->id;
-            $id = $DB->insert_record('notificationsagent_rule', $data);
-
-            foreach($conditions as $condition){
-                $condition->ruleid = $id;
-                $DB->insert_record('notificationsagent_condition', $condition);
-            }
-            foreach($actions as $action){
-                $action->ruleid = $id;
-                $DB->insert_record('notificationsagent_action', $action);
-            }
+    if (!empty($categories)) {
+        foreach ($categories as $category) {
+            $paramscat = array (
+                'ruleid' => $idrule,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => $category
+            );
+            $DB->insert_record('notificationsagent_context', $paramscat);
         }
     }
 
-   $addlistofcoursesassigned = $id; 
-   return $addlistofcoursesassigned;
-
-
+    if (!empty($courses)) {
+        $rule = Rule::create_instance($idrule);
+        foreach ($courses as $course) { 
+            if ($course != $rule->get_courseid()) {
+                $paramscourse = array (
+                    'ruleid' => $idrule,
+                    'contextid' => CONTEXT_COURSE,
+                    'objectid' => $course
+                );
+                $DB->insert_record('notificationsagent_context', $paramscourse);
+            }
+        }
+    }
 }
