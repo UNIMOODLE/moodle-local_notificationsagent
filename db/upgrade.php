@@ -42,10 +42,43 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // For further information please read {@link https://docs.moodle.org/dev/Upgrade_API}.
-    //
-    // You will also have to create the db/install.xml file by using the XMLDB Editor.
-    // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
+    if ($oldversion < 2023112100) {
+
+        // Define table notificationsagent_context to be created.
+        $table = new xmldb_table('notificationsagent_context');
+
+        // Adding fields to table notificationsagent_context.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('ruleid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('objectid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table notificationsagent_context.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for notificationsagent_context.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
+    }
+
+    if ($oldversion < 2023112100) {
+
+        // Define field cmid to be added to notificationsagent_condition.
+        $table = new xmldb_table('notificationsagent_condition');
+        $field = new xmldb_field('cmid', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'parameters');
+
+        // Conditionally launch add field cmid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
+    }
 
     return true;
 }
