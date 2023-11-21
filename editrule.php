@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -35,6 +35,7 @@ require_once("../../config.php");
 require_once('renderer.php');
 require_once("../../lib/modinfolib.php");
 require_once("lib.php");
+require_once("classes/rule.php");
 require_once($CFG->dirroot . "/local/notificationsagent/classes/evaluationcontext.php");
 
 use local_notificationsagent\Rule;
@@ -45,8 +46,17 @@ use local_notificationsagent\EvaluationContext;
 global $CFG, $DB, $PAGE, $SESSION , $USER;
 require_once($CFG->dirroot . '/local/notificationsagent/classes/form/editrule.php');
 
+$isroleadmin = false;
+if (is_siteadmin() || !empty($PAGE->settingsnav)) {
+    if (is_siteadmin() || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
+        || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))) {
+            $isroleadmin = true;
+    }
+}
+
 $courseid = required_param('courseid', PARAM_INT);
 $typeaction = required_param('action', PARAM_ALPHANUMEXT);
+$ruletype = !is_null(optional_param('type', null, PARAM_INT)) ? optional_param('type', null, PARAM_INT) : Rule::RULE_TYPE;
 $SESSION->NOTIFICATIONS['IDCOURSE'] = $courseid;
 
 $cancel = optional_param('cancel', null, PARAM_TEXT);
@@ -66,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$cancel && !$submitbutton) {
     }
 
     $return = [
-        'state' => 'error'
+        'state' => 'error',
     ];
     if (isset($keypost)) {
         $keyelement = $keypost;
@@ -74,10 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$cancel && !$submitbutton) {
         $formdefault = optional_param_array('formDefault', null, PARAM_RAW);
         switch($action) {
             case 'new':
-                $listelement = array();
-                $listelement += array('title' => optional_param('title', null, PARAM_TEXT));
-                $listelement += array('elements' => optional_param_array('elements', null, PARAM_RAW));
-                $listelement += array('name' => optional_param('name', null, PARAM_TEXT));
+                $listelement = [];
+                $listelement += ['title' => optional_param('title', null, PARAM_TEXT)];
+                $listelement += ['elements' => optional_param_array('elements', null, PARAM_RAW)];
+                $listelement += ['name' => optional_param('name', null, PARAM_TEXT)];
                 $SESSION->NOTIFICATIONS[$keyelement][] = $listelement;
                 if (isset($SESSION->NOTIFICATIONS[$keyelement])) {
                     if (isset($formdefault)) {
@@ -88,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$cancel && !$submitbutton) {
                         }
                     }
                     $return = [
-                        'state' => 'success'
+                        'state' => 'success',
                     ];
                 }
                 break;
@@ -107,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$cancel && !$submitbutton) {
                     }
                 }
                 $return = [
-                    'state' => 'success'
+                    'state' => 'success',
                 ];
                 break;
         }
@@ -122,7 +132,7 @@ if (!$courseid) {
 }
 
 
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+if ((!$isroleadmin && $courseid == 1) || (!$course = $DB->get_record('course', ['id' => $courseid]))) {
     throw new \moodle_exception('invalidcourseid');
 }
 require_login($course);
@@ -131,75 +141,87 @@ $context = context_course::instance($course->id);
 $info = get_fast_modinfo($course);
 
 $PAGE->set_course($course);
-$PAGE->set_url(new moodle_url('/local/notificationsagent/editrule.php', array('courseid' => $course->id, 'action' => $typeaction)));
-$PAGE->set_title($course->shortname);
-$PAGE->set_heading($course->fullname);
+$PAGE->set_url(new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $course->id, 'action' => $typeaction]));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(
-    get_string('editrule_newrule', 'local_notificationsagent') . " - " . get_string('heading', 'local_notificationsagent')
-);
+    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
+    get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(
-    get_string('heading', 'local_notificationsagent') . " - " . get_string('editrule_newrule', 'local_notificationsagent')
+    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
+    get_string('heading', 'local_notificationsagent'));
+$PAGE->navbar->add(
+    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
+    get_string('heading', 'local_notificationsagent')
 );
-$PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_newaction', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_newcondition', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_newexception', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_editruleformactions', 'init');
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_placeholders', 'init');
 
-if(empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])){
+if (empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])) {
     if (isset($_GET['ruleid'])) {
         $ruleid = $_GET['ruleid'];
-        $rule = $DB->get_record('notificationsagent_rule', array('id' => $ruleid));
-        $ruleaction = $DB->get_records('notificationsagent_action', array('ruleid' => $ruleid));
-        $rulecondition = $DB->get_records('notificationsagent_condition', array('ruleid' => $ruleid, 'complementary' => 0));
-        $ruleexception = $DB->get_records('notificationsagent_condition', array('ruleid' => $ruleid,'complementary' => 1));
-        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'] = $rule->name;
+        $rule = Rule::create_instance($ruleid);
+        $ruleaction = $DB->get_records('notificationsagent_action', ['ruleid' => $ruleid]);
+        $rulecondition = $DB->get_records('notificationsagent_condition', ['ruleid' => $ruleid, 'complementary' => 0]);
+        $ruleexception = $DB->get_records('notificationsagent_condition', ['ruleid' => $ruleid, 'complementary' => 1]);
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'] = $rule->get_name();
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_timesfired'] = $rule->get_timesfired();
+        $runtime = $rule->get_runtime_format();
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_days'] = $runtime['days'];
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_hours'] = $runtime['hours'];
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_minutes'] = $runtime['minutes'];
         $SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid'] = $ruleid;
 
-       // Condition.
+        // Condition.
         $index = 1;
         foreach ($rulecondition as $condition) {
-                $type = $condition->type;
-                $pluginname = $condition->pluginname; 
-                $parameters = json_decode($condition->parameters);
-                require_once($CFG->dirroot . '/local/notificationsagent/'.$type. '/'. $pluginname . '/' . $pluginname . '.php');
-                $pluginclass = 'notificationsagent_'. $type. '_' . $pluginname;
-                $pluginobj = new $pluginclass($ruleid);
-              
-                // Set description.
-                
-                $description = $pluginobj->get_description();
-                if (isset($SESSION->NOTIFICATIONS[$type])) {
-                    $SESSION->NOTIFICATIONS[$type][] = $description;
-                } else {
-                    $SESSION->NOTIFICATIONS[$type] = array($description);
-                }
+            $type = $condition->type;
+            $pluginname = $condition->pluginname;
+            $parameters = json_decode($condition->parameters);
+            require_once($CFG->dirroot . '/local/notificationsagent/' . $type . '/' . $pluginname . '/' . $pluginname . '.php');
+            $pluginclass = 'notificationsagent_' . $type . '_' . $pluginname;
+            $pluginobj = new $pluginclass($ruleid);
 
-                // Set time.
-                if(isset($parameters->time)){
-                    $days = floor($parameters->time / (60 * 60 * 24));
-                    // Calculate remaining hours
-                    $remainingHours = $parameters->time % (60 * 60 * 24);
-                    $hours = floor($remainingHours / (60 * 60));
-                    // Calculate remaining minutes
-                    $remainingMinutes = $remainingHours % (60 * 60);
-                    $minutes = floor($remainingMinutes / 60);
-                    // Calculate remaining seconds
-                    $seconds = $remainingMinutes % 60;
-                    $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . 'time_' . $type.$index. '_days'] = $days;
-                    $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . 'time_' . $type.$index. '_hours'] = $hours;
-                    $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . 'time_' . $type.$index. '_minutes'] = $minutes;
-                    $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . 'time_' . $type.$index. '_seconds'] = $seconds;
-    
-                }
-    
-                // Set extra parameters.
-                foreach ($parameters as $key => $value){
-                    $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . $key] = $value; 
-                }
-                $index ++;
+            // Set description.
+            $description = $pluginobj->get_description();
+            if (isset($SESSION->NOTIFICATIONS[$type])) {
+                $SESSION->NOTIFICATIONS[$type][] = $description;
+            } else {
+                $SESSION->NOTIFICATIONS[$type] = [$description];
+            }
+
+            // Set time.
+            if (isset($parameters->time)) {
+                $days = floor($parameters->time / (60 * 60 * 24));
+                // Calculate remaining hours.
+                $remaininghours = $parameters->time % (60 * 60 * 24);
+                $hours = floor($remaininghours / (60 * 60));
+                // Calculate remaining minutes.
+                $remainingminutes = $remaininghours % (60 * 60);
+                $minutes = floor($remainingminutes / 60);
+                // Calculate remaining seconds.
+                $seconds = $remainingminutes % 60;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . 'time_' . $type . $index
+                . '_days']
+                    = $days;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . 'time_' . $type . $index
+                . '_hours']
+                    = $hours;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . 'time_' . $type . $index
+                . '_minutes']
+                    = $minutes;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . 'time_' . $type . $index
+                . '_seconds']
+                    = $seconds;
+
+            }
+
+            // Set extra parameters.
+            foreach ($parameters as $key => $value) {
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . $key] = $value;
+            }
+            $index++;
         }
 
 
@@ -207,46 +229,53 @@ if(empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])){
         $index = 1;
         foreach ($ruleexception as $condition) {
             $type = $condition->type;
-            $pluginname = $condition->pluginname; 
+            $pluginname = $condition->pluginname;
             $parameters = json_decode($condition->parameters);
-            
+
             $exception = "exception";
-            require_once($CFG->dirroot . '/local/notificationsagent/'.$type. '/'. $pluginname . '/' . $pluginname . '.php');
-            $pluginclass = 'notificationsagent_'. $type. '_' . $pluginname;
+            require_once($CFG->dirroot . '/local/notificationsagent/' . $type . '/' . $pluginname . '/' . $pluginname . '.php');
+            $pluginclass = 'notificationsagent_' . $type . '_' . $pluginname;
             $pluginobj = new $pluginclass($ruleid);
-        
-            
-                $description = $pluginobj->get_description();
-                if (isset($SESSION->NOTIFICATIONS[$exception])) {
-                    $SESSION->NOTIFICATIONS[$exception][] = $description;
-                } else {
-                    $SESSION->NOTIFICATIONS[$exception] = array($description);
-                }
+
+            $description = $pluginobj->get_description();
+            if (isset($SESSION->NOTIFICATIONS[$exception])) {
+                $SESSION->NOTIFICATIONS[$exception][] = $description;
+            } else {
+                $SESSION->NOTIFICATIONS[$exception] = [$description];
+            }
 
             // Set time.
-            if(isset($parameters->time)){
+            if (isset($parameters->time)) {
                 $days = floor($parameters->time / (60 * 60 * 24));
-                // Calculate remaining hours
-                $remainingHours = $parameters->time % (60 * 60 * 24);
-                $hours = floor($remainingHours / (60 * 60));
-                // Calculate remaining minutes
-                $remainingMinutes = $remainingHours % (60 * 60);
-                $minutes = floor($remainingMinutes / 60);
-                // Calculate remaining seconds
-                $seconds = $remainingMinutes % 60;
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$exception.$index. '_' . 'time_' . $type.$exception.$index. '_days'] = $days;
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$exception.$index. '_' . 'time_' . $type.$exception.$index. '_hours'] = $hours;
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$exception.$index. '_' . 'time_' . $type.$exception.$index. '_minutes'] = $minutes;
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$exception.$index. '_' . 'time_' . $type.$exception.$index. '_seconds'] = $seconds;
+                // Calculate remaining hours.
+                $remaininghours = $parameters->time % (60 * 60 * 24);
+                $hours = floor($remaininghours / (60 * 60));
+                // Calculate remaining minutes.
+                $remainingminutes = $remaininghours % (60 * 60);
+                $minutes = floor($remainingminutes / 60);
+                // Calculate remaining seconds.
+                $seconds = $remainingminutes % 60;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $exception . $index . '_' . 'time_'
+                . $type . $exception . $index . '_days']
+                    = $days;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $exception . $index . '_' . 'time_'
+                . $type . $exception . $index . '_hours']
+                    = $hours;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $exception . $index . '_' . 'time_'
+                . $type . $exception . $index . '_minutes']
+                    = $minutes;
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $exception . $index . '_' . 'time_'
+                . $type . $exception . $index . '_seconds']
+                    = $seconds;
 
             }
 
             // Set extra parameters.
-            foreach ($parameters as $key => $value){
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$exception.$index. '_' . $key] = $value; 
+            foreach ($parameters as $key => $value) {
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $exception . $index . '_' . $key]
+                    = $value;
             }
-            $index ++;
-            
+            $index++;
         }
 
 
@@ -254,47 +283,46 @@ if(empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])){
         $index = 1;
         foreach ($ruleaction as $action) {
             $type = $action->type;
-            $pluginname = $action->pluginname; 
+            $pluginname = $action->pluginname;
             $parameters = json_decode($action->parameters);
-            require_once($CFG->dirroot . '/local/notificationsagent/'.$type. '/'. $pluginname . '/' . $pluginname . '.php');
-            $pluginclass = 'notificationsagent_'. $type. '_' . $pluginname;
+            require_once($CFG->dirroot . '/local/notificationsagent/' . $type . '/' . $pluginname . '/' . $pluginname . '.php');
+            $pluginclass = 'notificationsagent_' . $type . '_' . $pluginname;
             $pluginobj = new $pluginclass($ruleid);
-    
+
             // Set description.
             $description = $pluginobj->get_description();
             if (isset($SESSION->NOTIFICATIONS[$type])) {
                 $SESSION->NOTIFICATIONS[$type][] = $description;
             } else {
-                $SESSION->NOTIFICATIONS[$type] = array($description);
+                $SESSION->NOTIFICATIONS[$type] = [$description];
             }
             // Set extra parameters.
-            foreach ($parameters as $key => $value){
-                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'. $pluginname. '_'. $type.$index. '_' . $key] = $value; 
+            foreach ($parameters as $key => $value) {
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_' . $pluginname . '_' . $type . $index . '_' . $key] = $value;
             }
-    
-            $index ++;
-        }  
-    } 
+
+            $index++;
+        }
+    }
 }
 
-
-
-$mform = new editrule(new moodle_url('/local/notificationsagent/editrule.php', array('courseid' => $course->id, 'action' => $typeaction)));
+$mform = new editrule(
+    new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $course->id, 'action' => $typeaction]),
+    ['type' => $ruletype, 'timesfired' => Rule::MINIMUM_EXECUTION]
+);
 
 // Form processing and displaying is done here.
 if ($mform->is_cancelled()) {
     // No reenvía bien con cancelar, entra en el $_POST.
-    $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-    redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)), get_string('rulecancelled', 'local_notificationsagent'));
+    $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]));
+    redirect(
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]),
+        get_string('rulecancelled', 'local_notificationsagent')
+    );
 } else if ($fromform = $mform->get_data()) {
-    $data = new stdClass;
-    $data->courseid = $courseid;
-    $data->name = $fromform->title;
-    $data->createdat = time();
-    $data->createdby = $USER->id;
     // TODO Refactor.
-    $plugindata = array();
-    $plugincount = array();
+    $plugindata = [];
+    $plugincount = [];
     $dataplugin = new stdClass();
 
     foreach ($fromform as $key => $value) {
@@ -308,7 +336,7 @@ if ($mform->is_cancelled()) {
             }
 
             $currentpluginkey = $pluginname . $plugincount[$pluginname];
-            $plugindata[$currentpluginkey] = array('type' => '');
+            $plugindata[$currentpluginkey] = ['type' => ''];
             $plugindata[$currentpluginkey]["complementary"] = 0;
         } else if (strpos($key, "type") === 0 && isset($currentpluginkey)) {
             $plugintype = $value;
@@ -321,7 +349,7 @@ if ($mform->is_cancelled()) {
         ) {
             $subkeywithoutpluginame = str_replace($pluginname . '_', '', $key);
             $plugindata[$currentpluginkey][$subkeywithoutpluginame] = $value;
-            
+
         }
 
         if (preg_match("/conditionexception\d+$/", $key) && isset($currentpluginkey)) {
@@ -329,39 +357,40 @@ if ($mform->is_cancelled()) {
         }
     }
 
-    $countCondition = 0;
-    $countAction = 0;
+    $countcondition = 0;
+    $countaction = 0;
 
     foreach ($plugindata as $item) {
         $type = $item["type"];
         if (strpos($type, "condition") !== false) {
-            $countCondition++;
-        } elseif (strpos($type, "action") !== false) {
-            $countAction++;
+            $countcondition++;
+        } else if (strpos($type, "action") !== false) {
+            $countaction++;
         }
     }
 
     $timer = 0;
     // Edit Rule.
-    if($countCondition >= 1 && $countAction >=1){
+    if ($countcondition >= 1 && $countaction >= 1) {
         $students = notificationsagent::get_usersbycourse($context);
-        if (isset($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid'])){
+        if (isset($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid'])) {
             $ruleid = intval($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid']);
-            $title = $fromform->title;
-            $sql = "UPDATE {notificationsagent_rule} SET name = :name WHERE id = :id";
-            $params = array('name' => $title, 'id' => $ruleid);
-            $DB->execute($sql, $params);
-
             $ruleinstance = \local_notificationsagent\Rule::create_instance($ruleid);
+            if ($ruleinstance->is_use_template($courseid, $context)) {
+                $instance = Rule::create_instance();
+                $ruleid = $instance->create($fromform);
+            } else {
+                $instance = Rule::create_instance($ruleid);
+                $instance->update($fromform);
 
-            $conditions = $ruleinstance->get_conditions();
-            foreach ($conditions as $condition) {
-                $DB->delete_records('notificationsagent_cache',['conditionid' => $condition->id]);
+                $conditions = $ruleinstance->get_conditions();
+                foreach ($conditions as $condition) {
+                    $DB->delete_records('notificationsagent_cache', ['conditionid' => $condition->id]);
+                }
+                $DB->delete_records('notificationsagent_triggers', ['ruleid' => $ruleid]);
+                $ruleinstance->delete_conditions($ruleid);
+                $ruleinstance->delete_actions($ruleid);
             }
-            $DB->delete_records('notificationsagent_triggers',['ruleid' => $ruleid]);
-            $ruleinstance->delete_conditions($ruleid);
-            $ruleinstance->delete_actions($ruleid);
-
 
             foreach ($plugindata as $currentpluginkey => $plugindatum) {
                 $dataplugin = new \stdClass();
@@ -374,13 +403,14 @@ if ($mform->is_cancelled()) {
                 $rule = new \stdClass();
                 require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname . '/'
                     . $dataplugin->pluginname . '.php');
-    
+
                 $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
                 $pluginobj = new $pluginclass($rule);
                 $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
                 if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
                     $DB->insert_record('notificationsagent_action', $dataplugin);
                 } else {
+                    $dataplugin->cmid = $pluginobj->get_cmid(json_decode($dataplugin->parameters));
                     $condtionid = $DB->insert_record('notificationsagent_condition', $dataplugin);
                     $obj = \notificationconditionplugin::create_subplugin($condtionid);
                     $pluginname = $obj->get_subtype();
@@ -390,19 +420,20 @@ if ($mform->is_cancelled()) {
                     $contextevaluation->set_params($params);
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
-                    // Recorre la lista de participantes
+                    // Recorre la lista de participantes.
                     foreach ($students as $student) {
                         notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
-                        if($timer <= $cache){
+                        if ($timer <= $cache) {
                             $timer = $cache;
                             notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
                         }
                     }
                 }
             }
-        // New Rule.   
+            // New Rule.
         } else {
-            $ruleid = $DB->insert_record('notificationsagent_rule', $data);
+            $rule = Rule::create_instance();
+            $ruleid = $rule->create($fromform);
 
             foreach ($plugindata as $currentpluginkey => $plugindatum) {
                 $dataplugin = new \stdClass();
@@ -415,13 +446,14 @@ if ($mform->is_cancelled()) {
                 $rule = new \stdClass();
                 require_once($CFG->dirroot . '/local/notificationsagent/' . $plugintype . '/' . $dataplugin->pluginname . '/'
                     . $dataplugin->pluginname . '.php');
-    
+
                 $pluginclass = 'notificationsagent_' . $plugintype . '_' . $dataplugin->pluginname;
                 $pluginobj = new $pluginclass($rule);
                 $dataplugin->parameters = $pluginobj->convert_parameters($plugindatum);
                 if ($dataplugin->type === \notificationplugin::CAT_ACTION) {
                     $DB->insert_record('notificationsagent_action', $dataplugin);
                 } else {
+                    $dataplugin->cmid = $pluginobj->get_cmid(json_decode($dataplugin->parameters));
                     $condtionid = $DB->insert_record('notificationsagent_condition', $dataplugin);
                     $obj = \notificationconditionplugin::create_subplugin($condtionid);
                     $pluginname = $obj->get_subtype();
@@ -429,13 +461,14 @@ if ($mform->is_cancelled()) {
                     $contextevaluation = new EvaluationContext();
                     $contextevaluation->set_courseid($courseid);
                     $contextevaluation->set_params($params);
+                    $contextevaluation->set_complementary(EvaluationContext::COMPLEMENTARY[$dataplugin->complementary]);
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
                     if (!empty($cache)) {
-                        // Recorre la lista de participantes
+                        // Recorre la lista de participantes.
                         foreach ($students as $student) {
                             notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
-                            if($timer <= $cache){
+                            if ($timer <= $cache) {
                                 $timer = $cache;
                                 notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
                             }
@@ -446,15 +479,38 @@ if ($mform->is_cancelled()) {
         }
 
         // In this case you process validated data. $mform->get_data() returns data posted in form.
-        $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-        redirect(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)),  get_string('rulesaved', 'local_notificationsagent'));
-    }else{
+        $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]));
+        redirect(
+            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]),
+            get_string('rulesaved', 'local_notificationsagent')
+        );
+    } else {
         $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'] = $fromform->title;
-        redirect(new moodle_url('/local/notificationsagent/editrule.php', array('courseid' => $course->id, 'action' => $typeaction)),"You must add at least one condition and one action");
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_timesfired'] = $fromform->timesfired;
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_days'] = $fromform->runtime_group['runtime_days'];
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_hours'] = $fromform->runtime_group['runtime_hours'];
+        $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_minutes'] = $fromform->runtime_group['runtime_minutes'];
+
+        foreach ($fromform as $key => $value) {
+            if (!strpos($key, "time")) {
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']["id_" . $key] = $value;
+            }
+
+            if (strpos($key, "time")) {
+                foreach ($value as $subkey => $subvalue) {
+                    $SESSION->NOTIFICATIONS['FORMDEFAULT']["id_" . $key . "_" . $subkey] = $subvalue;
+                }
+            }
+            if (isset($value['text'])) {
+                $SESSION->NOTIFICATIONS['FORMDEFAULT']["id_" . $key] = $value['text'];
+            }
+        }
+
+        redirect(
+            new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $course->id, 'action' => $typeaction]),
+            "You must add at least one condition and one action"
+        );
     }
-} else {
-    // This branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
-    // or on the first display of the form.
 }
 
 $output = $PAGE->get_renderer('local_notificationsagent');

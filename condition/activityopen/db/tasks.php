@@ -24,14 +24,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => 'notificationscondition_activityopen\task\activityopen_crontask',
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
-    )
-);
+        'month' => '*',
+    ],
+];

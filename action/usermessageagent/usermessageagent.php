@@ -17,14 +17,15 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
 
+
 class notificationsagent_action_usermessageagent extends notificationactionplugin {
 
     public function get_description() {
-        return array(
-            'title' => get_string('usermessageagent_action', 'notificationsaction_usermessageagent'),
+        return [
+            'title' => $this->get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -36,15 +37,19 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         $mform->addElement('hidden', 'type' . $this->get_type() . $exception . $id, $this->get_type() . $id);
         $mform->setType('type' . $this->get_type() . $exception . $id, PARAM_RAW);
 
+        self::placeholders($mform, 'action' . $id, 'message');
+
         // Title.
         $mform->addElement(
             'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
-                array('typeelement' => '[TTTT]')
-            ), array('size' => '64')
+                ['typeelement' => '[TTTT]']
+            ), ['size' => '64']
         );
-        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
+        $mform->addRule(
+            $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', null, 'required', null, 'client'
+        );
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
@@ -52,32 +57,30 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
-        $editoroptions = array(
+        $editoroptions = [
             'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true
-        );
+            'trusttext' => true,
+        ];
 
         // Message.
         $mform->addElement(
             'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
-                array('typeelement' => '[BBBB]')
+                ['typeelement' => '[BBBB]']
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
-        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? ['text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message']]
         : null);
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
 
-        self::placeholders($mform, 'action' . $id, 'message');
-
         // Users.
         $context = \context_course::instance($courseid);
         $enrolledusers = get_enrolled_users($context);
-        $listusers = array();
+        $listusers = [];
         foreach ($enrolledusers as $uservalue) {
             $listusers[$uservalue->id] = format_string(
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
@@ -91,7 +94,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             'select', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
             get_string(
                 'editrule_action_element_user', 'notificationsaction_addusergroup',
-                array('typeelement' => '[UUUU]')
+                ['typeelement' => '[UUUU]']
             ),
             $listusers
         );
@@ -122,7 +125,7 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
     }
 
     public function get_elements() {
-        return array('[TTTT]', '[BBBB]', '[UUUU]');
+        return ['[TTTT]', '[BBBB]', '[UUUU]'];
     }
 
     public function check_capability($context) {
@@ -154,10 +157,37 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
             }
         }
 
-        return json_encode(array('title' => $title, 'message' => $message, 'user' => $user));
+        return json_encode(['title' => $title, 'message' => $message, 'user' => $user]);
     }
 
     public function process_markups($params, $courseid) {
         return $this->get_title();
+    }
+
+    public function execute_action($context, $params) {
+        // Send notification to a particular user enrolled on the received course in the event.
+        $placeholdershuman = json_decode($params);
+        $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
+
+        $message = new \core\message\message();
+        $message->component = 'notificationsaction_usermessageagent'; // Your plugin's name.
+        $message->name = 'particular_message'; // Your notification name from message.php.
+        $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
+        $message->userto = $placeholdershuman->user;
+        $message->subject = format_text($placeholdershuman->title); // Será nuestro TTTT.
+        $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml = format_text('<p>' . $sendmessage . '</p>');
+        $message->smallmessage = 'small message'; // TODO.
+        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
+        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification //TODO.
+        $message->contexturlname = 'Course list'; // Link title explaining where users get to for the contexturl.
+        // The integer ID of the new message or false if there was a problem (with submitted data or sending the message to
+        // the message processor).
+        message_send($message);
+    }
+
+    public function is_generic() {
+        return false;
     }
 }

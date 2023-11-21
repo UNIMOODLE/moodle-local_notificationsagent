@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notificationsagent/condition/sessionstart/db" VERSION="20230629" COMMENT="XMLDB file for Moodle notificationsagent sessionstart"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+<XMLDB PATH="local/notificationsagent/condition/sessionstart/db" VERSION="20231109" COMMENT="XMLDB file for Moodle notificationsagent sessionstart"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
-<TABLES>
-    <TABLE NAME="notifications_sessionaccess" COMMENT="Keeping course firstaccess by user; avoiding log_standard_log querys.">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            <FIELD NAME="firstaccess" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        </KEYS>
+  <TABLES>
+    <TABLE NAME="notificationsagent_crseview" COMMENT="Keeping course firstaccess by user; avoiding log_standard_log querys.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="firstaccess" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
     </TABLE>
-</TABLES>
+  </TABLES>
 </XMLDB>

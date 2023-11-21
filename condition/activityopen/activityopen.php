@@ -16,17 +16,18 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
-require_once(__DIR__ .'/lib.php');
+
 use local_notificationsagent\notification_activityconditionplugin;
 use local_notificationsagent\EvaluationContext;
+use notificationsagent\notificationsagent;
 class notificationsagent_condition_activityopen extends notification_activityconditionplugin {
 
     public function get_description() {
-        return array(
+        return [
             'title' => self::get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     protected function get_mod_name() {
@@ -38,7 +39,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
     }
 
     public function get_elements() {
-        return array('[TTTT]', '[AAAA]');
+        return ['[TTTT]', '[AAAA]'];
     }
 
     public function get_subtype() {
@@ -72,7 +73,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         );
 
         if (empty($timestart)) {
-            $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid) + $params->time;
+            $timestart = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart + $params->time;
         }
         ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
 
@@ -85,7 +86,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         $params = json_decode($context->get_params());
         $cmid = $params->activity;
         $time = $params->time;
-        $starttime = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
+        $starttime = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
         return $starttime + $time;
     }
 
@@ -106,41 +107,54 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id, $this->get_type().$id);
         $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
 
-        $timegroup = array();
+        $timegroup = [];
         // Days.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                 'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+            ]
+        );
 
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                    'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null));
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
+            ]
+        );
         // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
             'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null));
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            ]
+        );
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
+            ]
+        );
         // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
-                array('typeelement' => '[TTTT]')));
+                ['typeelement' => '[TTTT]']
+            ));
         $mform->addGroupRule(
             $this->get_subtype() . '_condition' . $exception . $id . '_time', '- You must supply a value here.', 'required'
         );
         // Activity.
-        $listactivities = array();
+        $listactivities = [];
         $modinfo = get_fast_modinfo($courseid);
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
@@ -153,7 +167,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_activity',
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activityopen',
-                array('typeelement' => '[AAAA]')
+                ['typeelement' => '[AAAA]']
             ),
             $listactivities
         );
@@ -174,13 +188,13 @@ class notificationsagent_condition_activityopen extends notification_activitycon
      * @return mixed
      */
     public function convert_parameters($params) {
-        $timeunits = array('days', 'hours', 'minutes', 'seconds');
-        $timevalues = array(
+        $timeunits = ['days', 'hours', 'minutes', 'seconds'];
+        $timevalues = [
             'days' => 0,
             'hours' => 0,
             'minutes' => 0,
-            'seconds' => 0
-        );
+            'seconds' => 0,
+        ];
         $activity = 0;
         foreach ($params as $key => $value) {
             if (is_array($value)) {
@@ -197,7 +211,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         }
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
-        return json_encode(array('time' => $timeinseconds, 'activity' => (int) $activity));
+        return json_encode(['time' => $timeinseconds, 'activity' => (int) $activity]);
     }
 
     public function process_markups($params, $courseid) {
@@ -223,5 +237,19 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         return $humanvalue;
+    }
+
+    public function is_generic() {
+        return true;
+    }
+
+    /**
+     * Return the module identifier specified in the condition
+     * @param object $parameters Plugin parameters
+     *
+     * @return int|null $cmid Course module id or null
+     */
+    public function get_cmid($parameters) {
+        return $parameters->activity;
     }
 }

@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -50,9 +50,9 @@ class notificationsaction extends notificationsbaseinfo {
 
         $plugins = core_plugin_manager::instance()->get_installed_plugins('notificationsaction');
         if (!$plugins) {
-            return array();
+            return [];
         }
-        $installed = array();
+        $installed = [];
         foreach ($plugins as $plugin => $version) {
             $installed[] = 'notificationsaction_'.$plugin;
         }
@@ -67,7 +67,7 @@ class notificationsaction extends notificationsbaseinfo {
             unset($plugins[$name]);
         }
 
-        $enabled = array();
+        $enabled = [];
         foreach ($plugins as $plugin => $version) {
             $enabled[$plugin] = $plugin;
         }
@@ -98,7 +98,7 @@ class notificationsaction extends notificationsbaseinfo {
      * @return moodle_url
      */
     public static function get_manage_url() {
-        return new moodle_url('/local/notificationsagent/adminmanageplugins.php', array('subtype' => 'notificationsaction'));
+        return new moodle_url('/local/notificationsagent/adminmanageplugins.php', ['subtype' => 'notificationsaction']);
     }
 
     public function get_settings_section_name() {

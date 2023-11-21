@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -55,13 +55,20 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         echo \core\notification::error($message);
     } else {
         $sqlrule = new \stdClass();
-        $sqlrule->courseid = $courseid;
         $sqlrule->name = $data['rule']['name'];
         $sqlrule->description = $data['rule']['description'];
         $sqlrule->createdby = $data['rule']['createdby'];
         $sqlrule->createdat = $data['rule']['createdat'];
+        $sqlrule->template = $data['rule']['template'];
 
-        $idrule = $DB->insert_record('notificationsagent_rule', $sqlrule);
+        if ($idrule = $DB->insert_record('notificationsagent_rule', $sqlrule)) {
+            $sqlcontext = new \stdClass();
+            $sqlcontext->ruleid = $idrule;
+            $sqlcontext->contextid = CONTEXT_COURSE;
+            $sqlcontext->objectid = $courseid;
+
+            $idcontext = $DB->insert_record('notificationsagent_context', $sqlcontext);
+        }
 
         if ($data['actions']) {
             $sqlactions = new \stdClass();
@@ -95,7 +102,7 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
             }
         }
 
-        if ($idrule && (!is_null($idactions) && !is_null($idconditions))) {
+        if ($idcontext && $idrule && (!is_null($idactions) && !is_null($idconditions))) {
             $message = get_string('import_success', 'local_notificationsagent');
             echo \core\notification::success($message);
         } else {

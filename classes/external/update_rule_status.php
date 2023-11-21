@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -83,7 +83,7 @@ class update_rule_status extends \external_api {
         if (empty($instance)) {
             throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
         }
-        $context = \context_course::instance($instance->get_courseid());
+        $context = \context_course::instance($instance->get_default_context());
 
         try {
             if (has_capability('local/notificationsagent:updaterulestatus', $context)) {

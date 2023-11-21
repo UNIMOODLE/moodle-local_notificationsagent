@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -35,6 +35,7 @@ namespace local_notificationsagent\task;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/engine/notificationsagent_engine.php");
+require_once($CFG->dirroot . '/local/notificationsagent/notificationsagent.php');
 
 use core\task\scheduled_task;
 use Notificationsagent_engine;
@@ -59,7 +60,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $lastruntime = $DB->get_records('task_log',
             [
                 'classname' => $classname,
-                'component' => $component
+                'component' => $component,
             ],
             'id DESC',
             'timestart',
@@ -73,7 +74,9 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $triggers = get_rulesbytimeinterval($timestarted, $tasklastrunttime);
         // Evalutate rules.
         foreach ($triggers as $trigger) {
-            Notificationsagent_engine::notificationsagent_engine_evaluate_rule([$trigger->ruleid], $timestarted, $trigger->userid);
+            Notificationsagent_engine::notificationsagent_engine_evaluate_rule(
+                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid
+            );
         }
         custom_mtrace("Task finished-> " . time() );
     }

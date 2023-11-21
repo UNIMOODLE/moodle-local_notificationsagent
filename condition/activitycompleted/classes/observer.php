@@ -66,6 +66,6 @@ class notificationscondition_activitycompleted_observer {
             }
         }
 
-        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, null, $userid);
+        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $time, $userid, $courseid);
     }
 }

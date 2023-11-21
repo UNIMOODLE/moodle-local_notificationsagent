@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -33,29 +33,15 @@
 
 require_once("../../config.php");
 global $DB;
-
-$courseid = required_param('courseid', PARAM_INT);
+require_login();
 $ruleid = required_param('ruleid', PARAM_INT);
+$json = [];
 
-$json = array();
+$ruleparams = ['id' => $ruleid];
 
-if (!$courseid) {
-    require_login();
-    throw new \moodle_exception('needcourseid');
-}
-
-$sql = 'SELECT *
- FROM {notificationsagent_rule} r
- inner join {notificationsagent_action} a on a.ruleid = r.id
- inner join {notificationsagent_condition} c on c.ruleid = r.id
- WHERE r.courseid = :courseid
- AND r.id = :ruleid';
-
-$courseparams = array('courseid' => $courseid, 'id' => $ruleid);
-
-$json["rule"] = $DB->get_record('notificationsagent_rule', $courseparams);
-$json["actions"] = $DB->get_records('notificationsagent_action', array('ruleid' => $ruleid));
-$json["conditions"] = $DB->get_records('notificationsagent_condition', array('ruleid' => $ruleid));
+$json["rule"] = $DB->get_record('notificationsagent_rule', $ruleparams);
+$json["actions"] = $DB->get_records('notificationsagent_action', ['ruleid' => $ruleid]);
+$json["conditions"] = $DB->get_records('notificationsagent_condition', ['ruleid' => $ruleid]);
 
 $rs = json_encode($json);
 

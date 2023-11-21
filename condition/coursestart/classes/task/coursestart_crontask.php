@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 namespace notificationscondition_coursestart\task;
-
+defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../notificationsagent.php');
 require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
@@ -57,7 +57,7 @@ class coursestart_crontask extends scheduled_task {
             }
         }
 
-        custom_mtrace("Coursestart end " . print_r($conditions,true));
+        custom_mtrace("Coursestart end ");
 
     }
 }

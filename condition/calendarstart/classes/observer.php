@@ -17,43 +17,40 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ .'/../calendarstart.php');
 require_once(__DIR__ .'/../../../notificationsagent.php');
 require_once(__DIR__ .'/../../../classes/engine/notificationsagent_engine.php');
+require_once(__DIR__ . '/../../../../../calendar/lib.php');
 use notificationsagent\notificationsagent;
 class notificationscondition_calendarstart_observer {
 
-    public static function calendar_updated(core\event\calendar_event_updated $event) {
+    public static function calendar_updated(\core\event\calendar_event_updated $event) {
         global $DB;
-        if (!isloggedin() || $event->courseid == 1) {
-            return;
-        }
 
-        $other = $event->other;
         $courseid = $event->courseid;
         $ruleids = [];
-
-        // If stardate is not set in other array then the startdate setting has not been modified.
-        if (isset($other["timestart"])) {
-            $startdate = $other["timestart"];
-        } else {
-            return;
-        }
 
         $pluginname = get_string('subtype', 'notificationscondition_calendarstart');
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         $context = \context_course::instance($courseid);
         $enrolledusers = notificationsagent::get_usersbycourse($context);
-     
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
             $ruleids[] = $condition->ruleid;
-            $param = json_decode($decode, true);
-            $cache = $startdate + $param['time'];
+            $param = json_decode($decode);
+            $radio = $param->radio;
 
+            $calendarevent = calendar_get_events_by_id([$param->calendar]);
+
+            if ($radio == 1) {
+                $cache = $calendarevent[$param->calendar]->timestart + $param->time;
+            } else {
+                $cache = $calendarevent[$param->calendar]->timestart +
+                $calendarevent[$param->calendar]->timeduration + $param->time;
+            }
             foreach ($enrolledusers as $enrolleduser) {
                 notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid,$cache);
+                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid, $cache);
             }
         }
     }

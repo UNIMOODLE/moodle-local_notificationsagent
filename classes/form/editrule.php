@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -42,24 +42,62 @@ class editrule extends \moodleform {
 
     // Add elements to form.
     public function definition() {
-        global $CFG, $SESSION;
+        global $CFG, $SESSION, $COURSE;
 
         $mform = $this->_form; // Don't forget the underscore!
 
         $mform->addElement(
             'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
-            array('size' => '64')
+            ['size' => '64']
         );
         $mform->addRule('title', null, 'required', null, 'client');
+        $mform->addElement(
+            'text', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
+            ['size' => '5']
+        );
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('title', PARAM_TEXT);
+            $mform->setType('timesfired', PARAM_TEXT);
         } else {
             $mform->setType('title', PARAM_CLEANHTML);
+            $mform->setType('timesfired', PARAM_CLEANHTML);
         }
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title'])) {
             $mform->setDefault('title',
             $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_title']);
         }
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_timesfired'])) {
+            $mform->setDefault('timesfired',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_timesfired']);
+        } else {
+            $mform->setDefault('timesfired', $this->_customdata['timesfired']);
+        }
+
+        $runtimegroup[] = $mform->createElement('float', 'runtime_days', '', [
+            'class' => 'mr-2', 'size' => 7, 'maxlength' => '3',
+            'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_days'] ?? 1,
+        ]);
+
+        $runtimegroup[] = $mform->createElement('float', 'runtime_hours', '', [
+            'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
+            'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_hours'] ?? 0,
+        ]);
+        $runtimegroup[] = $mform->createElement('float', 'runtime_minutes', '', [
+            'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
+            'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_runtime_group_runtime_minutes'] ?? 0,
+        ]);
+
+        $mform->addGroup($runtimegroup, 'runtime_group', get_string('editrule_runtime', 'local_notificationsagent'));
+
+        $mform->addElement('hidden', 'courseid', $COURSE->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $mform->addElement('hidden', 'type', get_string('editrule_type', 'local_notificationsagent'));
+        $mform->setType('type', PARAM_INT);
+        $mform->setDefault('type', $this->_customdata['type']);
 
         $mform->addElement('html', '
         <nav>
@@ -99,7 +137,7 @@ class editrule extends \moodleform {
 
     // Custom validation should be added here.
     public function validation($data, $files) {
-        return array();
+        return [];
     }
 
     private function settabcontent($type, $mform, $exception = null) {
@@ -111,14 +149,15 @@ class editrule extends \moodleform {
         echo $obj->renderform($mform, $SESSION->NOTIFICATIONS['IDCOURSE'], $type, $exception);
 
         $list = notificationsbaseinfo::get_description($type);
-        $listoptions = array();
+        $listoptions = [];
         foreach ($list as $key => $value) {
             $key = $value['name'] . ':' . json_encode($value['elements']);
             $listoptions[$key] = $value['title'];
         }
-        $newgroup = array();
+        $newgroup = [];
         $newgroup[] =& $mform->createElement('select', 'new' . $type . $exception . '_select', '',
-            $listoptions, array('class' => 'col-sm-auto p-0 mr-3'));
+            $listoptions, ['class' => 'col-sm-auto p-0 mr-3']
+        );
         $newgroup[] =& $mform->createElement('button', 'new' . $type . $exception . '_button', get_string('add'));
 
         $mform->addElement('group', 'new' . $type . $exception . '_group', get_string('editrule_new' . $type,

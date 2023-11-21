@@ -17,6 +17,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname'   => 'core\event\calendar_event_updated',
+    'eventname'   => '\core\event\calendar_event_updated',
     'callback' => 'notificationscondition_calendarstart_observer::calendar_updated',
 ];

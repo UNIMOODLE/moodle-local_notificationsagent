@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -30,6 +30,8 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 require_once('notificationplugin.php');
 require_once('plugininfo/notificationsbaseinfo.php');
 
@@ -45,6 +47,14 @@ abstract class notificationconditionplugin extends notificationplugin {
     abstract public function get_elements();
 
     abstract public function get_subtype();
+
+    /**
+     * Return the module identifier specified in the condition
+     * @param object $parameters Plugin parameters
+     *
+     * @return int|null $cmid Course module id or null
+     */
+    abstract protected function get_cmid($parameters);
 
     /*
      * Check whether a user has capabilty to use a condition.
@@ -65,7 +75,7 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     public static function create_subplugins($records) {
 
-        $subplugins = array();
+        $subplugins = [];
         global $DB;
         foreach ($records as $record) {
             // TODO SET CACHE.
@@ -88,39 +98,39 @@ abstract class notificationconditionplugin extends notificationplugin {
     public static function create_subplugin($id) {
         global $DB;
         // Find type of subplugin.
-        $record = $DB->get_record('notificationsagent_condition', array('id' => $id));
-        $subplugins = self::create_subplugins(array($record));
+        $record = $DB->get_record('notificationsagent_condition', ['id' => $id]);
+        $subplugins = self::create_subplugins([$record]);
         return $subplugins[0];
     }
 
     /**
      * Returns date from seconds value
      *
-     * @param  mixed $inputSeconds
+     * @param  mixed $inputseconds
      * @return void
      */
-    public function get_human_time($inputSeconds) {
-        $secondsInAMinute = 60;
-        $secondsInAnHour = 60 * $secondsInAMinute;
-        $secondsInADay = 24 * $secondsInAnHour;
+    public function get_human_time($inputseconds) {
+        $secondsinaminute = 60;
+        $secondsinhour = 60 * $secondsinaminute;
+        $secondsinday = 24 * $secondsinhour;
 
         // Extract days.
-        $days = floor($inputSeconds / $secondsInADay);
+        $days = floor($inputseconds / $secondsinday);
 
         // Extract hours.
-        $hourSeconds = $inputSeconds % $secondsInADay;
-        $hours = floor($hourSeconds / $secondsInAnHour);
+        $hourseconds = $inputseconds % $secondsinday;
+        $hours = floor($hourseconds / $secondsinhour);
 
         // Extract minutes.
-        $minuteSeconds = $hourSeconds % $secondsInAnHour;
-        $minutes = floor($minuteSeconds / $secondsInAMinute);
+        $minuteseconds = $hourseconds % $secondsinhour;
+        $minutes = floor($minuteseconds / $secondsinaminute);
 
         // Extract the remaining seconds.
-        $remainingSeconds = $minuteSeconds % $secondsInAMinute;
-        $seconds = ceil($remainingSeconds);
+        $remainingseconds = $minuteseconds % $secondsinaminute;
+        $seconds = ceil($remainingseconds);
 
         // Format and return.
-        $timeParts = [];
+        $timeparts = [];
         $sections = [
             get_string('card_day', 'local_notificationsagent')  => (int)$days,
             get_string('card_hour', 'local_notificationsagent') => (int)$hours,
@@ -130,11 +140,15 @@ abstract class notificationconditionplugin extends notificationplugin {
 
         foreach ($sections as $name => $value) {
             if ($value > 0) {
-                $timeParts[] = $value . ' ' . $name . ($value == 1 ? '' : 's');
+                $timeparts[] = $value . ' ' . $name . ($value == 1 ? '' : 's');
             }
         }
 
-        return implode(', ', $timeParts);
+        if (empty($timeparts)) {
+            $timeparts[] = 0 . ' ' . get_string('card_second', 'local_notificationsagent') . 's';
+        }
+
+        return implode(', ', $timeparts);
     }
 
 }

@@ -21,122 +21,89 @@
 
 import {get_string as getString, get_strings as getStrings} from 'core/str';
 import Notification from 'core/notification';
-import {unlinkRule, deleteRule} from 'local_notificationsagent/rule/repository';
+import {checkRuleContext, deleteRule} from 'local_notificationsagent/rule/repository';
 
 /**
- * Types of rule deletion
- * 
- * @type {{RULE_DELETE_TYPE: boolean}}
- */
-const RULE_DELETE_TYPE = {
-    UNLINKED: 0,
-    DELETED: 1,
-};
-
-const RULE_UNLINK_STRING = [
-    {
-        key: 'unlinkaccept', component: 'local_notificationsagent',
-    },
-    {
-        key: 'type_template', component: 'local_notificationsagent',
-    }
-];
-
-/**
- * Registers the click event listener for the unlink, or delete button of a rule
+ * Registers the click event listener for the delete button of a rule
  */
 export const init = () => {
     $('#deleteRuleModal').on('show.bs.modal', function (e) {
         ruleButton = $(e.relatedTarget);
         let id = ruleButton.data('ruleid');
-        value = ruleButton.data('value');
-
-        if (!value) {
-            value = RULE_DELETE_TYPE.UNLINKED;
-        } else {
-            value = RULE_DELETE_TYPE.DELETED;
-        }
+        let ruleType = ruleButton.data('type');
 
         const modal = $(this);
 
-        const requiredStrings = [
-            [
-                {key: 'unlinktitle', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-                {key: 'unlinkcontent', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-            ],
-            [
-                {key: 'deletetitle', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-                {key: 'deletecontent', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-            ]
-        ]
-
-        getStrings(requiredStrings[value]).then(([ruleTitle, ruleContent]) => {
-            modal.find('.modal-title').text(ruleTitle);
-            modal.find('.modal-body > div').text(ruleContent);
+        hasRuleContext(ruleButton).then(hasContext => {
+            if (hasContext) {
+                requiredStrings = [
+                    {key: 'deletetitle', component: 'local_notificationsagent', param: {
+                        title: $('#card-' + id + ' .name').text(),
+                        type: ruleType,
+                    }},
+                    {key: 'deletecontent_hascontext', component: 'local_notificationsagent', param: {
+                        title: $('#card-' + id + ' .name').text(),
+                        type: ruleType,
+                    }},
+                ];
+            } else {
+                requiredStrings = [
+                    {key: 'deletetitle', component: 'local_notificationsagent', param: {
+                        title: $('#card-' + id + ' .name').text(),
+                        type: ruleType,
+                    }},
+                    {key: 'deletecontent_nocontext', component: 'local_notificationsagent', param: {
+                        title: $('#card-' + id + ' .name').text(),
+                        type: ruleType,
+                    }},
+                ];
+            }
+    
+            getStrings(requiredStrings).then(([ruleTitle, ruleContent]) => {
+                modal.find('.modal-title').text(ruleTitle);
+                modal.find('.modal-body > div').text(ruleContent);
+            });
         });
     });
 
     $('#deleteRuleModal #acceptDeleteRule').on('click', (e) => {
         e.preventDefault();
 
-        if (value == RULE_DELETE_TYPE.UNLINKED) {
-            setUnlinkRule(ruleButton);
-        } else {
-            setDeleteRule(ruleButton);
-        }
+        setDeleteRule(ruleButton);
     });
 };
 
 /**
- * Unlinks a given rule from the course
+ * Check if the rule has any other context before deleting
  * 
  * @param {HTMLElement} ruleButton
- * @returns {Promise<void>}
+ * @returns {boolean} Has it context?
  */
-const setUnlinkRule = async(ruleButton) => {
+const hasRuleContext = async(ruleButton) => {
     let id = ruleButton.data('ruleid');
-
-    $('#deleteRuleModal').modal('hide');
+    let hasContext = false;
 
     try {
-        response = await unlinkRule(id);
+        response = await checkRuleContext(id);
         
         if ($.isEmptyObject(response['warnings'])) {
-            ruleButton.addClass('d-none');
-    
-            getStrings(RULE_UNLINK_STRING).then(([ruleUnlinked, ruleTemplateType]) => {
-                $('div[id="card-' + id + '"]').find('#card-type').text(ruleTemplateType);
-                $('div[id="card-' + id + '"]').removeClass('card card-rule').addClass('card card-template');
-                $('div[id="card-' + id + '"]').find('#card-type').removeClass('badge badge-rule').addClass('badge badge-template');
-        
-                $('a[data-ruleid="' + id + '"][data-target="#deleteRuleModal"][data-value="1"]').removeClass('d-none');
-                Notification.addNotification({
-                    message: ruleUnlinked,
-                    type: 'info'
-                }); 
-            });
+            hasContext = response['hascontext'];
         } else {
             Notification.addNotification({
                 message: response['warnings'][0].message,
                 type: 'error'
             });
         }
-
     } catch (exception) {
         Notification.exception(exception);
     }
+
+    return hasContext;
 };
 
+
 /**
- * Deletes a given rule from the course
+ * Deletes a given rule
  * 
  * @param {HTMLElement} ruleButton
  * @returns {Promise<void>}
@@ -168,7 +135,6 @@ const setDeleteRule = async(ruleButton) => {
                 type: 'error'
             });
         }
-
     } catch (exception) {
         Notification.exception(exception);
     }

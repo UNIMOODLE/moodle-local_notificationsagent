@@ -21,3 +21,5 @@ $string['modname'] = 'calendarstart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['calendarstart_crontask'] = 'Calendar start cron task';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
+$string['afterend'] = 'After the end of "event"';
+$string['afterstart'] = 'After the start of "event"';

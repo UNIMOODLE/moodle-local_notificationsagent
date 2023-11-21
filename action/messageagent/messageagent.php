@@ -13,17 +13,20 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+use notificationsagent\notificationsagent;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
 
 class notificationsagent_action_messageagent extends notificationactionplugin {
     public function get_description() {
-        return array(
+        return [
             'title' => self::get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -35,14 +38,18 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         $mform->addElement('hidden', 'type' . $this->get_type() . $id, $this->get_type() . $id);
         $mform->setType('type' . $this->get_type() . $id, PARAM_RAW);
 
+        self::placeholders($mform, 'action' . $id, 'message');
+
         $mform->addElement(
             'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
-                array('typeelement' => '[TTTT]')
-            ), array('size' => '64')
+                ['typeelement' => '[TTTT]']
+            ), ['size' => '64']
         );
-        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
+        $mform->addRule(
+            $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', null, 'required', null, 'client'
+        );
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession.'_title'])) {
@@ -50,26 +57,24 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
             $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
-        $editoroptions = array(
+        $editoroptions = [
             'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true
-        );
+            'trusttext' => true,
+        ];
 
         $mform->addElement(
             'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
-                array('typeelement' => '[BBBB]')
+                ['typeelement' => '[BBBB]']
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
-        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? ['text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message']]
         : null);
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
-
-        self::placeholders($mform, 'action' . $id, 'message');
 
         return $mform;
     }
@@ -93,7 +98,7 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
     }
 
     public function get_elements() {
-        return array('[TTTT]', '[BBBB]');
+        return ['[TTTT]', '[BBBB]'];
     }
 
     public function check_capability($context) {
@@ -122,17 +127,57 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
             }
         }
 
-        return json_encode(array('title' => $title, 'message' => $message));
+        return json_encode(['title' => $title, 'message' => $message]);
     }
 
     public function process_markups($params, $courseid) {
-        // TODO: Send only text, as it is.
-        /*$jsonparams = json_decode($params);
-
-        $paramsToReplace = [$jsonparams->title, $jsonparams->message];
-
-        $humanValue = str_replace($this->get_elements(), $paramsToReplace, $this->get_title());*/
-
         return $this->get_title();
+    }
+
+    public function execute_action($context, $params) {
+
+        $users = [];
+
+        if (empty($context->get_userid())) {
+            $users = notificationsagent::get_usersbycourse($context);
+        } else {
+            $users = [$context->get_userid()];
+        }
+
+        $placeholdershuman = json_decode($params);
+
+        $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
+
+        $message = new \core\message\message();
+        $message->name = 'individual_message'; // Your notification name from message.php.
+        $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
+        $message->component = 'notificationsaction_messageagent'; // Your plugin's name.
+        $message->subject = format_text($placeholdershuman->title); // Será nuestro TTTT.
+        $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
+        $message->smallmessage = 'small message'; // TODO.
+        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
+        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification. // TODO.
+        $message->contexturlname = 'Course list'; // Link title explaining where users get to for the contexturl.
+
+        // TODO: Check userid -1.
+        //if ($users == -1) {
+            foreach ($users as $user) {
+                $message->userto = $user;
+                // The integer ID of the new message or false if there was a problem
+                // ... (with submitted data or sending the message to the message processor).
+                message_send($message);
+            }
+        /*} else {
+            $message->userto = $context->get_userid();
+            // The integer ID of the new message or false if there was a problem
+            // ... (with submitted data or sending the message to the message processor).
+            message_send($message);
+        }*/
+    }
+
+    public function is_generic() {
+        return true;
     }
 }

@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -42,6 +42,12 @@ function custom_mtrace($message) {
  * @throws moodle_exception
  */
 function local_notificationsagent_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $context) {
+    if (get_config('local_notificationsagent', 'disable_user_use')) {
+        if (!has_capability('local/notificationsagent:managecourserule', $context)) {
+            return;
+        }
+    }
+
     $menuentrytext = get_string('menu', 'local_notificationsagent');
     $courseid = $course->id;
     $url = '/local/notificationsagent/index.php?courseid='.$courseid;
@@ -53,16 +59,6 @@ function local_notificationsagent_extend_navigation_course(navigation_node $pare
         "notificationsagent"
     );
 }
-
-
-/**
- * Cambiar orden elemento array
- */
-/*function moveElementArray(&$array, $from, $to) {
-    $out = array_splice($array, $from, 1);
-    array_splice($array, $to, 0, $out);
-    return $array;
-}*/
 
 /**
  * Retrieve data for modal window
@@ -77,28 +73,21 @@ function build_category_array($category, $ruleid) {
     global $DB;
     $courses = $category->get_courses();
     $count = $category->coursecount;
-    $coursesarry = array();
+    $coursesarry = [];
     foreach ($courses as $course) {
-        $assigned = $DB->get_field(
-            'notificationsagent_rule',
-            'assigned',
-            array('id' => $ruleid, 'courseid' => $course->id));
-        $courseid = $course->id;
-        $fullname = $course->fullname;
-        $coursesarry[] = array(
-            'id' => $courseid,
-            'name' => format_text($fullname),
-            'assigned' => $assigned,
-        );
+        $coursesarry[] = [
+            'id' => $course->id,
+            'name' => format_text($course->fullname),
+        ];
     }
 
-    $categoryarray = array(
+    $categoryarray = [
         'id' => $category->id,
         'name' => format_text($category->name),
-        'categories' => array(),
+        'categories' => [],
         'courses' => $coursesarry,
-        'count' => $count
-    );
+        'count' => $count,
+    ];
 
     $categoryarray['countsubcategoriescourses'] = count_category_courses($category);
 
@@ -145,54 +134,72 @@ function count_category_courses($category) {
 function build_output_categories($arraycategories, $categoryid = 0) {
     $output = "";
     foreach ($arraycategories as $key => $category) {
-        $output .= html_writer::start_tag("li", ["id" => "listitem-category-".$category["id"],
-            "class" => "listitem listitem-category list-group-item list-group-item-action collapsed"]);
-            $output .= html_writer::start_div("", ["class" => "category-listing-header d-flex"]);
-                $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-                    $output .= html_writer::tag("input", "", ["id" => "checkboxcategory-".$category["id"],
-                        "type" => "checkbox", "class" => "custom-control-input",
-                        "data-parent" => "#category-listing-content-".$categoryid]);
-                    $output .= html_writer::tag("label", "",
-                        ["class" => "custom-control-label", "for" => "checkboxcategory-".$category["id"]]);
-                $output .= html_writer::end_div();// ... .custom-checkbox
-                $output .= html_writer::start_div("", ["class" => "d-flex px-0", "data-toggle" => "collapse",
-                    "data-target" => "#category-listing-content-".$category["id"],
-                    "aria-controls" => "category-listing-content-".$category["id"]]);
-                    $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
-                        $output .= $category["name"];
-                        $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
-                    $output .= html_writer::end_div();// ....categoryname
-                $output .= html_writer::end_div();// ... .data-toggle
-                $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);
-                    $output .= html_writer::start_tag("span", ["class" => "course-count text-muted"]);
-                        $output .= $category["countsubcategoriescourses"];
-                        $output .= html_writer::tag("i", "", ["class" => "fa fa-graduation-cap fa-fw ml-2"]);
-                    $output .= html_writer::end_tag("span");// ... .course-count
-                $output .= html_writer::end_div();// ... .col-auto
-            $output .= html_writer::end_div();// ... .d-flex
-            $output .= html_writer::start_tag("ul", ["id" => "category-listing-content-".$category["id"],
-                "class" => "collapse", "data-parent" => "#category-listing-content-".$categoryid]);
+        $output .= html_writer::start_tag("li", [
+            "id" => "listitem-category-" . $category["id"],
+            "class" => "listitem listitem-category list-group-item list-group-item-action collapsed",
+        ]);
+        $output .= html_writer::start_div("", ["class" => "category-listing-header d-flex"]);
+        $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
+        $output .= html_writer::tag("input", "", [
+            "id" => "checkboxcategory-" . $category["id"],
+            "type" => "checkbox", "class" => "custom-control-input",
+            "data-parent" => "#category-listing-content-" . $categoryid,
+        ]);
+        $output .= html_writer::tag(
+            "label", "",
+            ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
+        );
+        $output .= html_writer::end_div();// ... .custom-checkbox
+        $output .= html_writer::start_div("", [
+            "class" => "d-flex px-0", "data-toggle" => "collapse",
+            "data-target" => "#category-listing-content-" . $category["id"],
+            "aria-controls" => "category-listing-content-" . $category["id"],
+        ]);
+        $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
+        $output .= $category["name"];
+        $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
+        $output .= html_writer::end_div();// ....categoryname
+        $output .= html_writer::end_div();// ... .data-toggle
+        $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);
+        $output .= html_writer::start_tag("span", ["class" => "course-count text-muted"]);
+        $output .= $category["countsubcategoriescourses"];
+        $output .= html_writer::tag("i", "", ["class" => "fa fa-graduation-cap fa-fw ml-2"]);
+        $output .= html_writer::end_tag("span");// ... .course-count
+        $output .= html_writer::end_div();// ... .col-auto
+        $output .= html_writer::end_div();// ... .d-flex
+        $output .= html_writer::start_tag("ul", [
+            "id" => "category-listing-content-" . $category["id"],
+            "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
+        ]);
         if (!empty($category["categories"])) {
                     $output .= build_output_categories($category["categories"], $category["id"]);
         }
         if (!empty($category["courses"])) {
             foreach ($category["courses"] as $key => $course) {
-                        $output .= html_writer::start_tag("li", ["id" => "listitem-course-".$course["id"],
-                            "class" => "listitem listitem-course list-group-item list-group-item-action"]);
-                            $output .= html_writer::start_div("", ["class" => "d-flex"]);
-                                $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-                                    $output .= html_writer::tag("input", "",
-                                        ["id" => "checkboxcourse-".$course["id"],
-                                            "type" => "checkbox", "class" => "custom-control-input",
-                                            "data-parent" => "#category-listing-content-".$category["id"]]);
-                                    $output .= html_writer::tag("label", "",
-                                        ["class" => "custom-control-label", "for" => "checkboxcourse-".$course["id"]]);
-                                $output .= html_writer::end_div();// ... .custom-checkbox
-                                $output .= html_writer::start_div("", ["class" => "coursename"]);
-                                    $output .= $course["name"];
-                                $output .= html_writer::end_div();// ... .coursename
-                            $output .= html_writer::end_div();// ... .d-flex
-                        $output .= html_writer::end_tag("li");
+                $output .= html_writer::start_tag("li", [
+                    "id" => "listitem-course-" . $course["id"],
+                    "class" => "listitem listitem-course list-group-item list-group-item-action",
+                ]);
+                $output .= html_writer::start_div("", ["class" => "d-flex"]);
+                $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
+                $output .= html_writer::tag(
+                    "input", "",
+                    [
+                        "id" => "checkboxcourse-" . $course["id"],
+                        "type" => "checkbox", "class" => "custom-control-input",
+                        "data-parent" => "#category-listing-content-" . $category["id"],
+                    ]
+                );
+                $output .= html_writer::tag(
+                    "label", "",
+                    ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
+                );
+                $output .= html_writer::end_div();// ... .custom-checkbox
+                $output .= html_writer::start_div("", ["class" => "coursename"]);
+                $output .= $course["name"];
+                $output .= html_writer::end_div();// ... .coursename
+                $output .= html_writer::end_div();// ... .d-flex
+                $output .= html_writer::end_tag("li");
                         // ... .listitem.listitem-course.list-group-item.list-group-item-action
             }
         }
@@ -202,23 +209,78 @@ function build_output_categories($arraycategories, $categoryid = 0) {
     return $output;
 }
 
-function get_rulesbytimeinterval($timestarted,$tasklastrunttime) {
+function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
     global $DB;
-    $rulesid_query = "
-                    SELECT id,ruleid, courseid, userid
+    $rulesidquery = "
+                    SELECT id, ruleid, courseid, userid
                       FROM {notificationsagent_triggers}
-                     WHERE startdate 
+                     WHERE startdate
                    BETWEEN :tasklastrunttime AND :timestarted
-                     " ;
+                     ";
 
     $rulesid = $DB->get_records_sql(
-        $rulesid_query,
+        $rulesidquery,
         [
             'tasklastrunttime' => $tasklastrunttime,
-            'timestarted' => $timestarted
+            'timestarted' => $timestarted,
         ]
     );
     return $rulesid;
+}
+
+/**
+ * Returns seconds in human format
+ *
+ * @param integer $seconds Seconds
+ * @return array $data Time in days, hours, minutes and seconds
+ */
+function to_human_format($seconds) {
+    $secondsinaminute = 60;
+    $secondsinhour = 60 * $secondsinaminute;
+    $secondsinday = 24 * $secondsinhour;
+
+    $days = floor($seconds / $secondsinday);
+
+    $hourseconds = $seconds % $secondsinday;
+    $hours = floor($hourseconds / $secondsinhour);
+
+    $minuteseconds = $hourseconds % $secondsinhour;
+    $minutes = floor($minuteseconds / $secondsinaminute);
+
+    $remainingseconds = $minuteseconds % $secondsinaminute;
+    $seconds = ceil($remainingseconds);
+
+    return [
+        'days' => $days,
+        'hours' => $hours,
+        'minutes' => $minutes,
+        'seconds' => $seconds,
+    ];
+}
+
+/**
+ * Returns human format in seconds
+ * @param array $time Time in days, hours, minutes and seconds
+ *
+ * @return integer $seconds Seconds
+ */
+function to_seconds_format($time) {
+    $seconds = 0;
+
+    if (isset($time['days']) && $time['days'] != "") {
+        $seconds = $time['days'] * 24 * 60 * 60;
+    }
+    if (isset($time['hours']) && $time['hours'] != "") {
+        $seconds += $time['hours'] * 60 * 60;
+    }
+    if (isset($time['minutes']) && $time['minutes'] != "") {
+        $seconds += $time['minutes'] * 60;
+    }
+    if (isset($time['seconds']) && $time['seconds'] != "") {
+        $seconds += $time['seconds'];
+    }
+
+    return $seconds;
 }
 
 

@@ -17,14 +17,15 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
 
+
 class notificationsagent_action_bootstrapnotifications extends notificationactionplugin {
 
     public function get_description() {
-        return array(
-            'title' => get_string('bootstrapnotifications_action', 'notificationsaction_bootstrapnotifications'),
+        return [
+            'title' => $this->get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -36,22 +37,24 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
         $mform->addElement('hidden', 'type' . $this->get_type() . $id, $this->get_type() . $id);
         $mform->setType('type' . $this->get_type() . $id, PARAM_RAW);
 
+        self::placeholders($mform, 'action' . $id, 'text');
+
         $mform->addElement(
             'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_text',
             get_string(
                 'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
-                array('typeelement' => '[TTTT]')
-            ), array('size' => '64')
+                ['typeelement' => '[TTTT]']
+            ), ['size' => '64']
         );
-        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_text', null, 'required', null, 'client');
+        $mform->addRule(
+            $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text', null, 'required', null, 'client'
+        );
 
             $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text', PARAM_TEXT);
         if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_text'])) {
             $mform->setDefault($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_text',
             $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_text']);
         }
-
-        self::placeholders($mform, 'action' . $id, 'text');
 
         return $mform;
     }
@@ -75,7 +78,7 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
     }
 
     public function get_elements() {
-        return array('[TTTT]');
+        return ['[TTTT]'];
     }
 
     public function check_capability($context) {
@@ -96,10 +99,24 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
             }
         }
 
-        return json_encode(array('text' => $text));
+        return json_encode(['text' => $text]);
     }
 
     public function process_markups($params, $courseid) {
         return $this->get_title();
+    }
+
+    public function execute_action($context, $params) {
+        // Create a bootstrap notification.
+        global $USER;
+        $placeholdershuman = json_decode($params);
+
+        if ($USER->id == $context->get_userid()) {
+            echo \core\notification::success(format_text($placeholdershuman->text));
+        }
+    }
+
+    public function is_generic() {
+        return true;
     }
 }

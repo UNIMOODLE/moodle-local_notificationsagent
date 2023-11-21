@@ -27,13 +27,13 @@
  */
 function set_first_course_access($userid, $courseid, $timeaccess) {
     global $DB;
-    $exists = $DB->record_exists('notifications_sessionaccess', array('userid' => $userid, 'courseid' => $courseid));
+    $exists = $DB->record_exists('notificationsagent_crseview', ['userid' => $userid, 'courseid' => $courseid]);
     if (!$exists) {
         $objdb = new stdClass();
         $objdb->userid = $userid;
         $objdb->courseid = $courseid;
         $objdb->firstaccess = $timeaccess;
-        $DB->insert_record('notifications_sessionaccess', $objdb);
+        $DB->insert_record('notificationsagent_crseview', $objdb);
     }
 }
 

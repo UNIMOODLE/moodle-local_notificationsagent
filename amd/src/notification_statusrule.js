@@ -40,6 +40,12 @@ const RULE_STATUS = {
  */
 const RULE_STATUS_STRING = [
     {
+        key: 'status_paused', component: 'local_notificationsagent',
+    },
+    {
+        key: 'status_active', component: 'local_notificationsagent',
+    },
+    {
         key: 'statusacceptpaused', component: 'local_notificationsagent',
     },
     {
@@ -98,7 +104,18 @@ const setRuleStatus = async(ruleButton) => {
 
     $('#statusRuleModal').modal('hide');
 
-    getStrings(RULE_STATUS_STRING).then(([rulePaused, ruleResumed]) => {
+    getStrings(RULE_STATUS_STRING).then(([ruleBadgePaused, ruleBadgeActive, rulePaused, ruleResumed]) => {
+        let badgestatus = $('#card-'+ruleid+' .badge-status');
+        if (status) {
+            badgestatus.removeClass('badge-active');
+            badgestatus.addClass('badge-paused');
+            badgestatus.find('span').text(ruleBadgePaused);
+        } else {
+            badgestatus.removeClass('badge-paused');
+            badgestatus.addClass('badge-active');
+            badgestatus.find('span').text(ruleBadgeActive);
+        }
+
         ruleButton.addClass('d-none');
         if (status) {
             $('a[data-idrule="' + ruleid + '"][data-target="#statusRuleModal"][data-valuestatus="0"]').removeClass('d-none');
@@ -118,7 +135,6 @@ const setRuleStatus = async(ruleButton) => {
     try {
         // TODO Display warnings as Notification exception 
         response = await updateRuleStatus(ruleid, status);
-        console.log(response);
     } catch (exception) {
         Notification.exception(exception);
     }

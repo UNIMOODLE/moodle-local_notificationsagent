@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -30,6 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 require_once('notificationplugin.php');
 require_once('plugininfo/notificationsbaseinfo.php');
 
@@ -61,19 +62,21 @@ abstract class notificationactionplugin extends notificationplugin {
      */
     public function placeholders(&$mform, $idaction, $typeitem) {
 
-        $mform->addElement('html', "<div class='form-group row fitem'> <div class='col-md-3'></div>
-        <div class='col-md-9'><div class='notificationvars' id='notificationvars_".$idaction."_".$typeitem."'>");
-        $optioncount = 0;
+        $mform->addElement('html', "<div class='form-group row fitem'>
+        <div class='col-md-12'><div class='notificationvars' id='notificationvars_".$idaction."_".$typeitem."'>");
         foreach (Rule::get_placeholders() as $option) {
-            $mform->addElement('html', "<a href='#' data-text='$option' class='clickforword'><span>$option</span></a> ");
-            $optioncount++;
+            $clipboardtarget = "#notificationvars_" . $idaction . "_" . $typeitem . "_" . $option;
+            $mform->addElement('html', "<a href='#' id='notificationvars_" . $idaction . "_" . $typeitem . "_" . $option
+                . "' data-text='$option' data-action='copytoclipboard' data-clipboard-target='$clipboardtarget'
+                class='clickforword'><span>{" . $option . "}</span></a> "
+            );
         }
         $mform->addElement('html', "</div></div></div>");
     }
 
     public static function create_subplugins($records) {
 
-        $subplugins = array();
+        $subplugins = [];
         global $DB;
         foreach ($records as $record) {
             // TODO SET CACHE.
@@ -95,11 +98,32 @@ abstract class notificationactionplugin extends notificationplugin {
     public static function create_subplugin($id) {
         global $DB;
         // Find type of subplugin.
-        $record = $DB->get_record('notificationsagent_action', array('id' => $id));
-        $subplugins = create_subplugins(array($record));
+        $record = $DB->get_record('notificationsagent_action', ['id' => $id]);
+        $subplugins = create_subplugins([$record]);
         return $subplugins[0];
     }
 
+    abstract public function execute_action($context, $params);
+
+    /**
+     * Gets the message to send depending on the timesfired of the rule and the user
+     * @param object $context Evaluation Context
+     * @param string $message Message
+     *
+     * @return string $result Message to sent
+     */
+    public static function get_message_by_timesfired($context, $message) {
+        $delimiter = '/{' . Rule::SEPARATOR . '}|&lt;!-- pagebreak --&gt;/';
+
+        $messagesplit = preg_split($delimiter, $message);
+
+        if ($context->get_ruletimesfired() == Rule::MINIMUM_EXECUTION) {
+            $messageindex = rand(0, count($messagesplit) - 1);
+        } else {
+            $messageindex = min($context->get_usertimesfired(), count($messagesplit)) - 1;
+        }
+        $result = $messagesplit[$messageindex];
+
+        return $result;
+    }
 }
-
-

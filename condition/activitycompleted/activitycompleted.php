@@ -24,11 +24,11 @@ use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_activitycompleted extends notification_activityconditionplugin {
 
     public function get_description() {
-        return array(
+        return [
             'title' => self::get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     protected function get_mod_name() {
@@ -40,7 +40,7 @@ class notificationsagent_condition_activitycompleted extends notification_activi
     }
 
     public function get_elements() {
-        return array('[AAAA]');
+        return ['[AAAA]'];
     }
 
     public function get_subtype() {
@@ -67,7 +67,7 @@ class notificationsagent_condition_activitycompleted extends notification_activi
 
         $cacheexists = $DB->record_exists('notificationsagent_cache', [
             'pluginname' => $pluginname, 'conditionid' => $conditionid,
-            'courseid' => $courseid, 'userid' => $userid
+            'courseid' => $courseid, 'userid' => $userid,
         ]);
 
         if (!$cacheexists) {
@@ -109,7 +109,7 @@ class notificationsagent_condition_activitycompleted extends notification_activi
         $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id, $this->get_type().$id);
         $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
 
-        $listactivities = array();
+        $listactivities = [];
         $modinfo = get_fast_modinfo($courseid);
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
@@ -122,7 +122,7 @@ class notificationsagent_condition_activitycompleted extends notification_activi
             'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_activity',
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activitycompleted',
-                array('typeelement' => '[AAAA]')
+                ['typeelement' => '[AAAA]']
             ),
             $listactivities
         );
@@ -150,7 +150,7 @@ class notificationsagent_condition_activitycompleted extends notification_activi
             }
         }
 
-        return json_encode(array('activity' => $activity));
+        return json_encode(['activity' => $activity]);
     }
 
     public function process_markups($params, $courseid) {
@@ -176,5 +176,19 @@ class notificationsagent_condition_activitycompleted extends notification_activi
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         return $humanvalue;
+    }
+
+    public function is_generic() {
+        return false;
+    }
+
+    /**
+     * Return the module identifier specified in the condition
+     * @param object $parameters Plugin parameters
+     *
+     * @return int $cmid Course module id
+     */
+    public function get_cmid($parameters) {
+        return $parameters->activity;
     }
 }

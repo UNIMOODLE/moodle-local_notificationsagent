@@ -7,6 +7,20 @@ body.path-local-notificationsagent h5 > i.icon:first-child{
     margin-left: .5rem;
 }
 
+body.path-local-notificationsagent .notificationvars{
+    font-size: 15px;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+body.path-local-notificationsagent .notificationvars > a{
+    text-decoration: underline;
+}
+
+body.path-local-notificationsagent .notificationvars > a:not(:last-child){
+    margin-right: .5rem;
+}
+
 body.path-local-notificationsagent .mform .form-inline .form-group .custom-select{
     width: 100%;
 }
@@ -29,7 +43,8 @@ body.path-local-notificationsagent .card{
     height: 500px;
 }
 
-body.path-local-notificationsagent .card.card-template{
+body.path-local-notificationsagent .card.card-template,
+body.path-local-notificationsagent .card.card-required{
     background-color: #F3F3F3;
 }
 
@@ -67,6 +82,41 @@ body.path-local-notificationsagent .badge.badge-template{
 body.path-local-notificationsagent .badge.badge-rule{
     background-color: #ECF3FD;
     color: #117CDC;
+}
+
+body.path-local-notificationsagent .badge.badge-status,
+body.path-local-notificationsagent .badge.badge-shared{
+    display: flex;
+    align-items: center;
+}
+
+body.path-local-notificationsagent .badge.badge-status > i{
+    font-size: 8px;
+}
+
+body.path-local-notificationsagent .badge.badge-shared > i{
+    font-size: 11px;
+}
+
+body.path-local-notificationsagent .badge.badge-status.badge-active{
+    background-color: #d5ffbc;
+    color: #089400;
+}
+
+body.path-local-notificationsagent .badge.badge-status.badge-paused{
+    background-color: #fff1f0;
+    color: #d72112;
+}
+
+body.path-local-notificationsagent .badge.badge-status.badge-required{
+    background-color: #bcc3ff;
+    color: #0009e4;
+}
+
+body.path-local-notificationsagent .badge.badge-shared{
+    background-color: #ffff93;
+    color: #7d7d01;
+    margin-right: 0.5rem;
 }
 
 body.path-local-notificationsagent #assignTemplateModal .modal-dialog{

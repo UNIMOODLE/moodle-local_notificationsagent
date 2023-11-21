@@ -25,15 +25,15 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
     }
 
     public function get_elements() {
-        return array('[FFFF]', '[TTTT]', '[BBBB]');
+        return ['[FFFF]', '[TTTT]', '[BBBB]'];
     }
 
     public function get_description() {
-        return array(
+        return [
             'title' => self::get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -45,15 +45,19 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         $mform->addElement('hidden', 'type' . $this->get_type() . $exception . $id, $this->get_type() . $id);
         $mform->setType('type' . $this->get_type() . $exception . $id, PARAM_RAW);
 
+        self::placeholders($mform, 'action' . $id, 'message');
+
         // Title.
         $mform->addElement(
             'text', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title',
             get_string(
                 'editrule_action_element_title', 'notificationsaction_forummessage',
-                array('typeelement' => '[TTTT]')
-            ), array('size' => '64' )
+                ['typeelement' => '[TTTT]']
+            ), ['size' => '64']
         );
-        $mform->addRule( $this->get_subtype() . '_' . $this->get_type() . $exception . $id .'_title', null, 'required', null, 'client');
+        $mform->addRule(
+            $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', null, 'required', null, 'client'
+        );
 
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_title', PARAM_TEXT);
 
@@ -62,31 +66,29 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_title']);
         }
 
-        $editoroptions = array(
+        $editoroptions = [
             'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true
-        );
+            'trusttext' => true,
+        ];
 
         // Message.
         $mform->addElement(
             'editor', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
             get_string(
                 'editrule_action_element_message', 'notificationsaction_forummessage',
-                array('typeelement' => '[BBBB]')
+                ['typeelement' => '[BBBB]']
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         )->setValue(!empty($SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
-        ? array('text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message'])
+        ? ['text' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_message']]
         : null);
         $mform->setType($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message', PARAM_RAW);
         $mform->addRule($this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_message',
         null, 'required', null, 'client');
 
-        self::placeholders($mform, 'action' . $id, 'message');
-
         // Forum.
-        $forumname = array();
-        $forumlist = mod_forum_external::get_forums_by_courses(array($courseid));
+        $forumname = [];
+        $forumlist = mod_forum_external::get_forums_by_courses([$courseid]);
         foreach ($forumlist as $forum) {
             $forumname[$forum->id] = $forum->name;
         }
@@ -100,7 +102,7 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             get_string(
                 'editrule_action_element_forum',
                 'notificationsaction_forummessage',
-                array('typeelement' => '[FFFF]')
+                ['typeelement' => '[FFFF]']
             ),
             $forumname
         );
@@ -154,10 +156,58 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
             }
         }
 
-        return json_encode(array('title' => $title, 'message' => $message, 'forum' => $forum));
+        return json_encode(['title' => $title, 'message' => $message, 'forum' => $forum]);
     }
 
     public function process_markups($params, $courseid) {
         return $this->get_title();
+    }
+
+    public function execute_action($context, $params) {
+        // Post a message on a forum.
+
+        $placeholdershuman = json_decode($params);
+        $postsubject = format_text($placeholdershuman->title, FORMAT_PLAIN);
+        $postmessage = format_text($placeholdershuman->message);
+
+        $discussion = new stdClass();
+        $discussion->forum = $placeholdershuman->forum;
+        $discussion->course = $context->get_courseid();
+        $discussion->name = $postsubject;
+        $discussion->message = $postmessage;
+        $discussion->messageformat = FORMAT_HTML;
+        $discussion->messagetrust = 0;
+        $discussion->attatchment = null;
+        $discussion->timelocked = 0;
+        $discussion->pinned = FORUM_DISCUSSION_PINNED;
+        $discussion->mailnow = true;
+        $discussion->groupid = -1;
+        $discussion->timestart = 0;
+        $discussion->timeend = 0;
+
+        if ($discussion->id = forum_add_discussion($discussion, null, null, $context->get_userid())) {
+            $cm = get_coursemodule_from_instance('forum', $placeholdershuman->forum);
+            $context = context_module::instance($cm->id);
+            $forumparams = [
+                'userid' => get_admin()->id,
+                'context' => $context,
+                'objectid' => $discussion->id,
+                'other' => [
+                    'forumid' => $placeholdershuman->forum,
+                ],
+            ];
+
+            $event = \mod_forum\event\discussion_created::create($forumparams);
+            $event->add_record_snapshot('forum_discussions', $discussion);
+            $event->trigger();
+        } else {
+            throw new \moodle_exception('couldnotadd', 'forum', '', $discussion->name);
+        }
+
+        return true;
+    }
+
+    public function is_generic() {
+        return true;
     }
 }

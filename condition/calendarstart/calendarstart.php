@@ -16,16 +16,17 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
+require_once(__DIR__ . '/../../../../calendar/lib.php');
 use local_notificationsagent\notification_activityconditionplugin;
 use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_calendarstart extends notification_activityconditionplugin {
 
     public function get_description() {
-        return array(
+        return [
             'title' => self::get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_mod_name() {
@@ -45,7 +46,7 @@ class notificationsagent_condition_calendarstart extends notification_activityco
     }
 
     public function get_elements() {
-        return array('[TTTT]', '[CCCC]');
+        return ['[TTTT]', '[CCCC]'];
     }
 
     public function get_subtype() {
@@ -65,6 +66,7 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         $userid = $context->get_userid();
         $pluginname = $this->get_subtype();
         $params = json_decode($context->get_params());
+        $radio = $params->radio;
         $meetcondition = false;
         $conditionid = $this->get_id();
 
@@ -77,11 +79,17 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         );
 
         if (empty($timestart)) {
-            $event = calendar_get_events_by_id(array($params->calendar));
-            $timestart = $event[$params->calendar]->timestart; + $params->time;
+            $event = calendar_get_events_by_id([$params->calendar]);
+            if ($radio == 1) {
+                $timestart = $event[$params->calendar]->timestart + $params->time;
+            } else {
+                $timestart = $event[$params->calendar]->timestart + $event[$params->calendar]->timeduration + $params->time;
+            }
+
         }
 
         ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
+
         return $meetcondition;
     }
 
@@ -90,9 +98,14 @@ class notificationsagent_condition_calendarstart extends notification_activityco
     public function estimate_next_time(EvaluationContext $context) {
         global $DB;
         $params = json_decode($context->get_params());
-        $event = calendar_get_events_by_id(array($params->calendar));
-        $timestart = $event[$params->calendar]->timestart;
-        return $timestart + $params->time;
+        $radio = $params->radio;
+        $event = calendar_get_events_by_id([$params->calendar]);
+        if ($radio == 1) {
+            $timestart = $event[$params->calendar]->timestart + $params->time;
+        } else {
+            $timestart = $event[$params->calendar]->timestart + $event[$params->calendar]->timeduration + $params->time;
+        }
+        return $timestart;
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -104,54 +117,56 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         $mform->addElement('hidden', 'type'.$this->get_type().$exception.$id, $this->get_type().$id);
         $mform->setType('type'.$this->get_type().$exception.$id, PARAM_RAW );
 
-        $timegroup = array();
+        $timegroup = [];
         // Days.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
+            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
                    placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null, ]);
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
+            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
                    placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null));
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null, ]);
         // Minutes.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
-            array(
+            [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null
-            )
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            ]
         );
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
-            array('class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null));
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null, ]);
         // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',
-                array('typeelement' => '[TTTT]')));
+                ['typeelement' => '[TTTT]']));
         $mform->addGroupRule(
             $this->get_subtype() . '_condition' . $exception . $id . '_time', '- You must supply a value here.', 'required'
         );
 
+        // Calendar.
         $listevents = $DB->get_records_sql("SELECT * FROM {event} WHERE eventtype IN ('course')");
 
-        $events = array();
+        $events = [];
         foreach ($listevents as $event) {
-            $events[$event->id] = $event->name;
+            $events[$event->id] = format_text($event->name) . " - " . userdate($event->timestart) .
+            " - " . userdate($event->timestart + $event->timeduration);
         }
 
         $mform->addElement(
             'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_calendar',
             get_string(
                 'editrule_condition_calendar', 'notificationscondition_calendarstart',
-                array('typeelement' => '[CCCC]')
+                ['typeelement' => '[CCCC]']
             ),
             $events
         );
@@ -159,6 +174,23 @@ class notificationsagent_condition_calendarstart extends notification_activityco
                    .$this->get_type().$exception.$id.'_calendar'])) {
             $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_calendar',
             $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_calendar']);
+        }
+        // Radio.
+        $radioarray = [];
+        $radioarray[] = $mform->createElement('radio', $this->get_subtype().'_' .$this->get_type() . $exception.$id.'_radio',
+        '', get_string('afterstart', 'notificationscondition_calendarstart'), 1);
+        $radioarray[] = $mform->createElement('radio', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_radio',
+        '', get_string('afterend', 'notificationscondition_calendarstart'), 2);
+
+        $mform->addGroup($radioarray, $this->get_subtype().'_condition'.$exception.$id.'_radio', '', [' '], false);
+        $mform->addGroupRule(
+            $this->get_subtype() . '_condition' . $exception . $id . '_radio', '- You must supply a value here.', 'required'
+        );
+
+        if (!empty($SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'
+                   .$this->get_type().$exception.$id.'_radio'])) {
+            $mform->setDefault($this->get_subtype().'_' .$this->get_type() .$exception.$id.'_radio',
+            $SESSION->NOTIFICATIONS['FORMDEFAULT']['id_'.$this->get_subtype().'_'.$this->get_type().$exception.$id.'_radio']);
         }
 
     }
@@ -173,14 +205,15 @@ class notificationsagent_condition_calendarstart extends notification_activityco
      * @return mixed
      */
     public function convert_parameters($params) {
-        $timeunits = array('days', 'hours', 'minutes', 'seconds');
-        $timevalues = array(
+        $timeunits = ['days', 'hours', 'minutes', 'seconds'];
+        $timevalues = [
             'days' => 0,
             'hours' => 0,
             'minutes' => 0,
-            'seconds' => 0
-        );
+            'seconds' => 0,
+        ];
         $calendar = 0;
+        $radio = 0;
         foreach ($params as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $subkey => $value) {
@@ -190,15 +223,17 @@ class notificationsagent_condition_calendarstart extends notification_activityco
                         }
                     }
                 }
-            }else if (strpos($key, "calendar") !== false) {
+            } else if (strpos($key, "calendar") !== false) {
                 $calendar = $value;
+            } else if (strpos($key, "radio") !== false) {
+                $radio = $value;
             }
 
         }
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
 
-        return json_encode(array('time' => $timeinseconds, 'calendar' => (int) $calendar));
+        return json_encode(['time' => $timeinseconds, 'calendar' => (int) $calendar, 'radio' => $radio]);
     }
 
     public function process_markups($params, $courseid) {
@@ -209,5 +244,19 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
         return $humanvalue;
+    }
+
+    public function is_generic() {
+        return true;
+    }
+
+    /**
+     * Return the module identifier specified in the condition
+     * @param object $parameters Plugin parameters
+     *
+     * @return int|null $cmid Course module id or null
+     */
+    public function get_cmid($parameters) {
+        return null;
     }
 }

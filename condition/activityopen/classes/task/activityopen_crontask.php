@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace notificationscondition_activityopen\task;
-
+defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../notificationsagent.php');
 require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
-require_once(__DIR__ . '/../../lib.php');
 
 use core\task\scheduled_task;
 use core_reportbuilder\local\helpers\custom_fields;
@@ -58,14 +57,14 @@ class activityopen_crontask extends scheduled_task {
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
             $cmid = $param['activity'];
-            $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
+            $timestart = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
             $cache = $timestart + $param['time'];
             foreach ($enrolledusers as $enrolleduser) {
                 notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, false);
             }
         }
 
-        custom_mtrace("Activity open end " . print_r($conditions, true));
+        custom_mtrace("Activity open end ");
 
     }
 }

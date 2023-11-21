@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -41,6 +41,8 @@ $string['disable_user_use'] = 'Disable user use';
 $string['disable_user_use_desc'] = 'Disable user use of notifications agent';
 $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Disable on a production site';
+$string['startdate'] = 'Activity dates config';
+$string['startdate_desc'] = 'Use a line for each activity with the pattern: pluginname|tablename|startdate|startend';
 
 // Subplugins settings.
 $string['notificationaction_action'] = 'Action subplugins';
@@ -64,6 +66,11 @@ $string['tasktriggers'] = 'Notifications triggers task';
 $string['menu'] = 'My assistant';
 $string['heading'] = 'Notifications Agent';
 
+// Status Template.
+$string['status_active'] = 'Active';
+$string['status_paused'] = 'Paused';
+$string['status_required'] = 'Required';
+
 // Import Template.
 $string['import'] = 'Import';
 $string['no_file_selected'] = 'No file selected';
@@ -80,6 +87,18 @@ $string['assign'] = 'Assign';
 $string['type_template'] = 'template';
 $string['type_rule'] = 'rule';
 
+// Share modal.
+$string['sharetitle'] = 'Share rule {$a->title}';
+$string['sharecontent'] = 'You are going to share the rule {$a->title} with the administrator, do you want to continue?';
+$string['unsharetitle'] = 'Unshare rule {$a->title}';
+$string['unsharecontent'] = 'You are going to stop sharing the rule {$a->title} with the administrator, do you want to continue?';
+$string['shareaccept'] = 'Rule shared';
+$string['unshareaccept'] = 'Rule unshared';
+
+// Share all modal.
+$string['sharealltitle'] = 'Approve the shared rule {$a->title}';
+$string['shareallcontent'] = 'You are going to approve the shared rule {$a->title}, do you want to continue?';
+
 // Condition plugins.
 $string['condition_days'] = 'Days';
 $string['condition_hours'] = 'Hours';
@@ -87,13 +106,22 @@ $string['condition_minutes'] = 'Minutes';
 $string['condition_seconds'] = 'Seconds';
 
 // EditRule.
-    $string['editrule_newrule'] = 'New rule';
-    $string['editrule_activaterule'] = 'Activate';
-    $string['editrule_pauserule'] = 'Pause';
-    $string['editrule_editrule'] = 'Edit';
-    $string['editrule_unlinkrule'] = 'Delete';
-    $string['editrule_deleterule'] = 'Delete';
-    $string['editrule_title'] = 'Title';
+$string['editrule_newrule'] = 'New rule';
+$string['editrule_activaterule'] = 'Activate';
+$string['editrule_pauserule'] = 'Pause';
+$string['editrule_editrule'] = 'Edit';
+$string['editrule_deleterule'] = 'Delete';
+$string['editrule_newtemplate'] = 'New template';
+$string['editrule_title'] = 'Title';
+$string['editrule_type'] = 'Rule type';
+$string['editrule_usetemplate'] = 'Select';
+$string['editrule_sharerule'] = 'Share';
+$string['editrule_unsharerule'] = 'Unshare';
+$string['editrule_shareallrule'] = 'Share All';
+$string['editrule_sharedallrule'] = 'Shared';
+$string['editrule_timesfired'] = 'No. of executions';
+$string['editrule_runtime'] = 'Interval';
+
     // Condition.
     $string['editrule_newcondition'] = 'New condition:';
     $string['editrule_condition_title_tocloseactivity'] = 'There is less than [TTTT] left for the closing of the activity [AAAA]';
@@ -130,7 +158,7 @@ $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
 $string['rulecancelled'] = 'Rule cancelled';
 $string['rulesaved'] = 'Rule saved';
 
-// Card content
+// Card content.
 $string['cardif'] = 'If:';
 $string['cardunless'] = 'Unless:';
 $string['cardthen'] = 'Then:';
@@ -141,7 +169,7 @@ $string['card_hour'] = 'hour';
 $string['card_minute'] = 'minute';
 $string['card_second'] = 'second';
 
-// Status modal
+// Status modal.
 $string['statustitle'] = '{$a->textstatus} rule {$a->title}';
 $string['statuscontent'] = 'You are going to {$a->textstatus} rule {$a->title}, do you want to continue?';
 $string['statuscancel'] = 'Cancel';
@@ -149,26 +177,37 @@ $string['statusaccept'] = 'Accept';
 $string['statusacceptactivated'] = 'Rule activated';
 $string['statusacceptpaused'] = 'Rule paused';
 
-// Delete modal
-$string['unlinktitle'] = 'Delete rule {$a->title}';
-$string['unlinkcontent'] = 'You are going to unlink the rule {$a->title} from the course, do you want to continue?';
-$string['deletetitle'] = 'Delete template {$a->title}';
-$string['deletecontent'] = 'You are going to delete the template {$a->title}, do you want to continue?';
-$string['unlinkaccept'] = 'Rule deleted';
-$string['deleteaccept'] = 'Template deleted';
+// Delete modal.
+$string['deletetitle'] = 'Delete {$a->type} {$a->title}';
+$string['deletecontent_nocontext'] = 'You are going to delete the {$a->type} {$a->title}, do you want to continue?';
+$string['deletecontent_hascontext'] = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
+$string['deleteaccept'] = 'Rule deleted';
 
-// Assign modal
+// Assign modal.
 $string['assignassign'] = 'Assign: ';
 $string['assigncancel'] = 'Cancel';
 $string['assignsave'] = 'Save changes';
+$string['assignforced'] = 'Assign rule as forced';
 
 // Capabilities.
-$string['notificationsagent:updaterulestatus'] = 'Update a rule\'s status';
-$string['notificationsagent:unlinkrule'] = 'Unlink a rule';
+$string['notificationsagent:createrule'] = 'Create a rule';
+$string['notificationsagent:editrule'] = 'Edit a rule';
+$string['notificationsagent:checkrulecontext'] = 'Check the context of a rule';
 $string['notificationsagent:deleterule'] = 'Delete a rule';
+$string['notificationsagent:updaterulestatus'] = 'Update a rule\'s status';
+$string['notificationsagent:exportrule'] = 'Export a rule';
+$string['notificationsagent:importrule'] = 'Import a rule';
+$string['notificationsagent:assignrule'] = 'Assign a rule';
+$string['notificationsagent:forcerule'] = 'Force a rule';
+$string['notificationsagent:updateruleshare'] = 'Update the sharing state of a rule';
+$string['notificationsagent:shareruleall'] = 'Approve the sharing of a rule';
+$string['notificationsagent:managesiterule'] = 'Manage rules at site level';
+$string['notificationsagent:managecourserule'] = 'Manage rules at course level';
+$string['notificationsagent:manageownrule'] = 'Manage your own course rules';
 
 $string['notificationsagent:activitycompleted'] = 'Capability needed in order to use activitycompleted condition';
 $string['notificationsagent:activityopen'] = 'Capability needed in order to use activityopen condition';
+$string['notificationsagent:calendarstart'] = 'Capability needed in order to use calendarstart condition';
 $string['notificationsagent:coursestart'] = 'Capability needed in order to use coursestart condition';
 $string['notificationsagent:sessionstart'] = 'Capability needed in order to use sessionstart condition';
 
@@ -179,5 +218,6 @@ $string['notificationsagent:messageagent'] = 'Capability needed in order to use 
 $string['notificationsagent:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
 $string['notificationsagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
 
-// Webservices
+// Webservices.
 $string['notificationsagent:nosuchinstance'] = 'No such instance was found.';
+$string['isnotrule'] = 'The given rule id is not a rule.';

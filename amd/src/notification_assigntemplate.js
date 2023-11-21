@@ -20,7 +20,26 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([], function() {
+define(['core/str'], function(str) {
+    /**
+     * Types of rule type
+     * 
+     * @type {{RULE_TYPE: boolean}}
+     */
+    const RULE_TYPE = [
+        'rule',
+        'template'
+    ];
+
+    const ACTION = [
+        'SHOW_CONTEXT',
+        'SET_CONTEXT',
+    ];
+
+    const RULE_FORCED_TYPE = {
+        FORCED: 0,
+        NONFORCED: 1, 
+    } 
 
     return {
 
@@ -30,11 +49,29 @@ define([], function() {
             $('#assignTemplateModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 idtemplate = button.data('idtemplate');
+                var isRuleForced;
+                var htmlRuleForced;
+
+                let ruleCard = $('div[id="card-' + idtemplate + '"]');
+                $('#assignTemplateModal #forced-content').empty();
+                if (ruleCard.data('type') === RULE_TYPE[0]) {
+                    isRuleForced = ruleCard.data('forced');
+                    str.get_string('assignforced', 'local_notificationsagent').then(forcedRule => {
+                        htmlRuleForced = '<div class="custom-control custom-checkbox mr-1">';
+                            htmlRuleForced += '<input id="forced" type="checkbox" class="custom-control-input">';
+                            htmlRuleForced += '<label class="custom-control-label" for="forced">'+forcedRule+'</label>';
+                        htmlRuleForced += '</div>';
+                        $('#assignTemplateModal #forced-content').append(htmlRuleForced);
+                        if (!isRuleForced) {
+                            $('#assignTemplateModal #forced-content #forced').prop('checked', true);
+                        }
+                    });
+                }
     
                 var modal = $(this);
-                modal.find('.modal-title > span').text($('#card-'+idtemplate+' .badge').text());
-                modal.find('.badge').text($('#card-'+idtemplate+' .badge').text());
-                modal.find('.badge').attr('class', 'mr-2 '+$('#card-'+idtemplate+' .badge').attr('class'));
+                modal.find('.modal-title > span').text($('#card-'+idtemplate+' .badge-type').text());
+                modal.find('.badge').text($('#card-'+idtemplate+' .badge-type').text());
+                modal.find('.badge').attr('class', 'mr-2 '+$('#card-'+idtemplate+' .badge-type').attr('class'));
                 
                 modal.find('.modal-body .name').text($('#card-'+idtemplate+' .name').text());
 
@@ -43,7 +80,8 @@ define([], function() {
                     type: "POST",
                     url: '/local/notificationsagent/assignrule.php',
                     data: {
-                        ruleid: idtemplate
+                        ruleid: idtemplate,
+                        action: ACTION[0]
                     },
                     success: function(data) {
                         data['category'].forEach((categoryid) => {
@@ -94,6 +132,11 @@ define([], function() {
                 data['category'] = [];
                 data['course'] = [];
                 var allCategories = [];
+
+                forced = RULE_FORCED_TYPE.NONFORCED;
+                if ($('#assignTemplateModal #forced').prop('checked')) {
+                    forced = RULE_FORCED_TYPE.FORCED;
+                }
 
                 let mainCategories = $('#assignTemplateModal #category-listing-content-0 > li[id^="listitem-category-"]').has('input[id^="checkboxcategory-"]:checked');
 
@@ -146,6 +189,8 @@ define([], function() {
                         ruleid: idtemplate,
                         category: data['category'],
                         course: data['course'],
+                        forced: forced,
+                        action: ACTION[1]
                     },
                     success: function() {
                         window.location.reload();  

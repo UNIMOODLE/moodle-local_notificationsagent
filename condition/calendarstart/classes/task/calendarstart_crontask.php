@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 namespace notificationscondition_calendarstart\task;
-
+defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../notificationsagent.php');
 require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
+require_once(__DIR__ . '/../../../../../../calendar/lib.php');
 
 use core\task\scheduled_task;
 use notificationsagent\notificationsagent;
@@ -44,20 +45,27 @@ class calendarstart_crontask extends scheduled_task {
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $startdate = $DB->get_field('event', 'timestart', ['id' => $courseid]);
+            $decode = $condition->parameters;
+            $param = json_decode($decode);
+
             $context = \context_course::instance($courseid);
             $enrolledusers = notificationsagent::get_usersbycourse($context);
             $condtionid = $condition->id;
-            $decode = $condition->parameters;
-            $param = json_decode($decode, true);
-            $cache = $startdate + $param['time'];
+            $radio = $param->radio;
+
+            $calendarevent = calendar_get_events_by_id([$param->calendar]);
+            if ($radio == 1) {
+                $cache = $calendarevent[$param->calendar]->timestart + $param->time;
+            } else {
+                $cache = $calendarevent[$param->calendar]->timestart +
+                $calendarevent[$param->calendar]->timeduration + $param->time;
+            }
 
             foreach ($enrolledusers as $enrolleduser) {
                 notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
             }
         }
-
-        custom_mtrace("calendarstart end " . print_r($conditions,true));
+        custom_mtrace("calendarstart end ");
 
     }
 }

@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -85,9 +85,9 @@ class notificationsbaseinfo extends base {
                 $plugins = core_plugin_manager::instance()->get_installed_plugins('notifications' . $subtype);
             }
             if (!$plugins) {
-                return array();
+                return [];
             }
-            $installed = array();
+            $installed = [];
             foreach ($plugins as $pluginname => $version) {
                 $installed[] = 'notifications' . $subtype . '_' . $pluginname;
             }
@@ -105,7 +105,7 @@ class notificationsbaseinfo extends base {
         } else {
             $plugins = self::$plugins[$subtype];
         }
-        $enabled = array();
+        $enabled = [];
         foreach ($plugins as $pluginname => $version) {
             $enabled[$pluginname] = self::instance($rule, $subtype, $pluginname);
         }
@@ -115,7 +115,7 @@ class notificationsbaseinfo extends base {
     public static function get_description($subtype) {
         global $CFG;
         $courseid = required_param('courseid', PARAM_INT);
-        $listactions = array();
+        $listactions = [];
         // TODO enabled.
         $rule = new \stdClass();
         $rule->ruleid = null;

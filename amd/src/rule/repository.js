@@ -42,14 +42,14 @@ const updateRuleStatus = (ruleid, status) => {
 };
 
 /**
- * Unlink the rule from the course
+ * Check if a rule has any other context
  *
  * @param {Number} ruleid The rule ID.
  * @returns {object} jQuery promise
  */
-const unlinkRule = (ruleid) => {
+const checkRuleContext = (ruleid) => {
     const request = {
-        methodname: 'local_notificationsagent_unlink_rule',
+        methodname: 'local_notificationsagent_check_rule_context',
         args: {
             ruleid,
         }
@@ -73,6 +73,40 @@ const deleteRule = (ruleid) => {
     return Ajax.call([request])[0];
 };
 
+/**
+ * Update the sharing status of a rule
+ *
+ * @param {Number} ruleid The rule ID.
+ * @param {Boolean} status Whether to set as shared or unshared rule.
+ * @returns {object} jQuery promise
+ */
+const updateRuleShare = (ruleid, status) => {
+    const request = {
+        methodname: 'local_notificationsagent_update_rule_share',
+        args: {
+            ruleid,
+            status,
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
+/**
+ * Approve the sharing of a rule
+ *
+ * @param {Number} ruleid The rule ID.
+ * @returns {object} jQuery promise
+ */
+const shareAllRule = (ruleid) => {
+    const request = {
+        methodname: 'local_notificationsagent_share_rule_all',
+        args: {
+            ruleid,
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
 export default {
-    updateRuleStatus, unlinkRule, deleteRule
+    updateRuleStatus, deleteRule, updateRuleShare, shareAllRule, checkRuleContext
 }

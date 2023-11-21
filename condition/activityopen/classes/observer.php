@@ -38,7 +38,7 @@ class notificationscondition_activityopen_observer {
         $courseid = $event->courseid;
         $cmid = $event->objectid;
 
-        $timestart = notificationsagent_condition_activityopen_get_cm_starttime($cmid);
+        $timestart = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
 
         $pluginname = 'activityopen';
 
@@ -55,7 +55,7 @@ class notificationscondition_activityopen_observer {
             foreach ($enrolledusers as $enrolleduser) {
                 // Update every time a module is updated.
                 notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid,$enrolleduser->id, $courseid, $cache);
+                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid, $cache);
             }
         }
     }

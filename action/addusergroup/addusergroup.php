@@ -20,11 +20,11 @@ require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationacti
 class notificationsagent_action_addusergroup extends notificationactionplugin {
 
     public function get_description() {
-        return array(
-            'title' => get_string('addusergroup_action', 'notificationsaction_addusergroup'),
+        return [
+            'title' => $this->get_title(),
             'elements' => self::get_elements(),
-            'name' => self::get_subtype()
-        );
+            'name' => self::get_subtype(),
+        ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -40,7 +40,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
 
         // Users.
         $enrolledusers = get_enrolled_users($context);
-        $listusers = array();
+        $listusers = [];
         foreach ($enrolledusers as $uservalue) {
             $listusers[$uservalue->id] = format_string(
                 $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
@@ -54,7 +54,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
             'select', $this->get_subtype() . '_' . $this->get_type() . $exception . $id . '_user',
             get_string(
                 'editrule_action_element_user', 'notificationsaction_addusergroup',
-                array('typeelement' => '[UUUU]')
+                ['typeelement' => '[UUUU]']
             ),
             $listusers
         );
@@ -65,7 +65,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
 
         // Groups.
         $groups = groups_get_all_groups($courseid, null, null, 'id, name');
-        $listgroups = array();
+        $listgroups = [];
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
@@ -80,7 +80,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
             'select', $this->get_subtype().'_' .$this->get_type() .$exception.$id.'_group',
             get_string(
                 'editrule_action_element_group', 'notificationsaction_addusergroup',
-                array('typeelement' => '[GGGG]')
+                ['typeelement' => '[GGGG]']
             ),
             $listgroups
         );
@@ -111,7 +111,7 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
     }
 
     public function get_elements() {
-        return array('[GGGG]', '[UUUU]');
+        return ['[GGGG]', '[UUUU]'];
     }
 
     public function check_capability($context) {
@@ -134,10 +134,20 @@ class notificationsagent_action_addusergroup extends notificationactionplugin {
             }
         }
 
-        return json_encode(array('user' => $user, 'group' => $group));
+        return json_encode(['user' => $user, 'group' => $group]);
     }
 
     public function process_markups($params, $courseid) {
         return $this->get_title();
+    }
+
+    public function execute_action($context, $params) {
+         // Add user to a specified group.
+         $placeholdershuman = json_decode($params);
+         groups_add_member($placeholdershuman->group, $placeholdershuman->user);
+    }
+
+    public function is_generic() {
+        return false;
     }
 }

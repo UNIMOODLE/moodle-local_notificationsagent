@@ -20,7 +20,7 @@ require_once(__DIR__ .'/../../../classes/engine/notificationsagent_engine.php');
 use notificationsagent\notificationsagent;
 class notificationscondition_coursestart_observer {
 
-    public static function course_updated(core\event\course_updated $event) {
+    public static function course_updated(\core\event\course_updated $event) {
         global $DB;
 
         /*Cuando se reciba un evento de tipo course_updated se buscará que condiciones tienen a ese evento como desencadenante.
@@ -58,7 +58,7 @@ class notificationscondition_coursestart_observer {
             $cache = $startdate + $param['time'];
             foreach ($enrolledusers as $enrolleduser) {
                 notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid,$cache);
+                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid, $cache);
             }
         }
     }

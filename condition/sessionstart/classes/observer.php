@@ -72,6 +72,6 @@ class notificationscondition_sessionstart_observer {
         }
         // Search for conditions with sessionstart and courseid,
         // Call engine with userid, courseid, timecreated.
-        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid);
+        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid);
     }
 }

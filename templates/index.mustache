@@ -19,7 +19,7 @@
     Produced by the UNIMOODLE University Group: Universities of
     Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
     Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
     Version details
 
@@ -49,15 +49,34 @@
 }}
 
 <div class="d-flex mb-4">
-    <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
-    <a href="{{{addruleurl}}}" class="btn btn-outline-primary">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
+    {{#capabilities.import}}
+        <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
+    {{/capabilities.import}}
+    {{#capabilities.create}}
+        <a href="{{{url.addrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
+        {{# iscontextsite}}
+            <a href="{{{url.addtemplate}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newtemplate, local_notificationsagent{{/str}}</a>
+        {{/ iscontextsite}}
+    {{/capabilities.create}}
 </div>
 
 <div class="d-flex flex-wrap">
     {{#rulecontent}}
-        <div id="card-{{{ id }}}" class="card card-{{{ type }}}">
+        <div id="card-{{{ id }}}" class="card card-{{{ type }}}{{^ forced}} card-required{{/ forced}}" data-type="{{{ type }}}" data-forced="{{{ forced }}}">
             <div class="card-header bg-transparent mx-3 px-0">
-                <span id="card-type" class="badge badge-{{{ type }}}">{{{ type_lang }}}</span>
+                <div class="d-flex justify-content-between">
+                    <span class="badge badge-type badge-{{{ type }}}">{{{ type_lang }}}</span>
+                    {{#isrule}}
+                        <div class="d-flex">
+                            {{# canshare}}
+                                {{^ isallshared}}
+                                    <span class="badge badge-shared"><i class="fa fa-star mr-2"></i><span>{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</span></span>
+                                {{/ isallshared}}
+                            {{/ canshare}}
+                            <span class="badge badge-status{{^ forced }} badge-required{{/ forced}}{{# forced }} badge-{{# status }}paused{{/ status }}{{^ status }}active{{/ status }}{{/forced}}"><i class="fa fa-circle mr-2"></i><span>{{{ status_lang }}}</span></span>
+                        </div>
+                    {{/isrule}}
+                </div>
                 <h5 class="name mt-4">{{{ name }}}</h5>
             </div>
             <div class="card-body d-flex flex-column mx-3 my-2 p-0">
@@ -105,21 +124,99 @@
             </div>
             <div class="card-footer bg-transparent">
                 <div class="card-assignment d-flex justify-content-between align-items-center">
-                    <a data-toggle="modal"{{^ status }} class="d-none" {{/ status }}data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="0" data-textstatus="{{#str}}editrule_activaterule, local_notificationsagent{{/str}}" href="#">
-                        <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
-                    </a>
-                    <a data-toggle="modal"{{# status }} class="d-none" {{/ status }}data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="1" data-textstatus="{{#str}}editrule_pauserule, local_notificationsagent{{/str}}" href="#">
-                        <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
-                    </a>
-                    <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
-                    <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
-                    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{#str}}assign, local_notificationsagent{{/str}}</button>
-                    <a data-toggle="modal"{{^ isrule }} class="d-none" {{/ isrule }}data-target="#deleteRuleModal" data-ruleid="{{{ id }}}" data-value="0" href="#">
-                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
-                    </a>
-                    <a data-toggle="modal"{{# isrule }} class="d-none" {{/ isrule }}data-target="#deleteRuleModal" data-ruleid="{{{ id }}}" data-value="1" href="#">
-                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
-                    </a>
+                    {{#capabilities.resume}}
+                        {{# iscontextsite}}
+                            {{#isrule}}
+                                <a data-toggle="modal"{{^ status }} class="d-none"{{/ status }} data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="0" data-textstatus="{{#str}}editrule_activaterule, local_notificationsagent{{/str}}" href="#">
+                                    <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
+                                </a>
+                                <a data-toggle="modal"{{# status }} class="d-none"{{/ status }} data-target="#statusRuleModal" data-idrule="{{{ id }}}" data-valuestatus="1" data-textstatus="{{#str}}editrule_pauserule, local_notificationsagent{{/str}}" href="#">
+                                    <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
+                                </a>
+                            {{/isrule}}
+                        {{/ iscontextsite}}
+                        {{^ iscontextsite}}
+                            {{#isrule}}
+                                <a data-toggle="modal"{{^ status }} class="d-none"{{/ status }}{{# forced}} data-target="#statusRuleModal"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}} data-idrule="{{{ id }}}" data-valuestatus="0" data-textstatus="{{#str}}editrule_activaterule, local_notificationsagent{{/str}}" href="#">
+                                    <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
+                                </a>
+                                <a data-toggle="modal"{{# status }} class="d-none"{{/ status }}{{# forced}} data-target="#statusRuleModal"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}} data-idrule="{{{ id }}}" data-valuestatus="1" data-textstatus="{{#str}}editrule_pauserule, local_notificationsagent{{/str}}" href="#">
+                                    <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
+                                </a>
+                            {{/isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.resume}}
+                    {{#capabilities.edit}}
+                        {{# iscontextsite}}
+                            <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
+                        {{/ iscontextsite}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                <a{{# forced}} href="{{{editurl}}}"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}}><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_editrule, local_notificationsagent{{/str}}</a>
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.edit}}
+                    {{#capabilities.export}}
+                        {{# iscontextsite}}
+                            <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
+                        {{/ iscontextsite}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.export}}
+                    {{#capabilities.assign}}
+                        {{# iscontextsite}}
+                            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#assignTemplateModal" data-idtemplate="{{{ id }}}">{{#str}}assign, local_notificationsagent{{/str}}</button>
+                        {{/ iscontextsite}}
+                    {{/capabilities.assign}}
+                    {{#capabilities.share}}
+                        {{^ iscontextsite}}
+                            {{# isrule}}
+                                {{# canshare}}
+                                    {{# isallshared}}
+                                        <a data-toggle="modal"{{^ shared }} class="d-none"{{/ shared }}{{# forced}} data-target="#shareRuleModal"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}} data-ruleid="{{{ id }}}" data-value="0" href="#">
+                                            <i class="fa fa-link mr-2"></i>{{#str}}editrule_sharerule, local_notificationsagent{{/str}}
+                                        </a>
+                                        <a data-toggle="modal"{{# shared }} class="d-none"{{/ shared }}{{# forced}} data-target="#shareRuleModal"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}} data-ruleid="{{{ id }}}" data-value="1" href="#">
+                                            <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unsharerule, local_notificationsagent{{/str}}
+                                        </a>
+                                    {{/ isallshared}}
+                                {{/ canshare}}
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                        {{# iscontextsite}}
+                            {{# isrule}}
+                                {{^ shared}}
+                                    <a data-toggle="modal" data-target="#shareAllRuleModal" data-ruleid="{{{ id }}}" href="#">
+                                        <i class="fa fa-share-alt mr-2"></i>{{#str}}editrule_shareallrule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ shared}}
+                            {{/ isrule}}
+                        {{/ iscontextsite}}
+                    {{/capabilities.share}}
+                    {{#capabilities.delete}}
+                        {{# candelete}}
+                            {{# iscontextsite}}
+                                <a data-toggle="modal" data-target="#deleteRuleModal" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                    <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                </a>
+                            {{/ iscontextsite}}
+                            {{^ iscontextsite}}
+                                {{# isrule}}
+                                    <a data-toggle="modal"{{# forced}} data-target="#deleteRuleModal"{{/ forced}}{{^ forced }} class="disabled"{{/ forced}} data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ isrule}}
+                            {{/ iscontextsite}}
+                        {{/ candelete}}
+                    {{/capabilities.delete}}
+                    {{^ iscontextsite}}
+                        {{^ isrule}}
+                            <a href="{{{editurl}}}" class="btn btn-outline-primary">{{#str}}editrule_usetemplate, local_notificationsagent{{/str}}</a>
+                        {{/ isrule}}
+                    {{/ iscontextsite}}
                 </div>
             </div>
         </div>
@@ -163,6 +260,10 @@
                 </div>
                 <hr/>
                 {{{ output_categoriescourses }}}
+                {{{ capabilities.force }}}
+                    <div id="forced-content" class="mt-3">
+                    </div>
+                {{{ capabilities.force }}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}assigncancel, local_notificationsagent{{/str}}</button>
@@ -194,6 +295,50 @@
                     <button type="submit" id="importfileTemplateModal" class="btn btn-primary importtemplate mb-1">{{#str}}import, local_notificationsagent{{/str}}</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shareRuleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title font-weight-bold"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}cancel, moodle{{/str}}</button>
+                <button type="button" id="acceptShareRule" class="btn btn-primary mb-1">{{#str}}accept, moodle{{/str}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shareAllRuleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title font-weight-bold"></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center">
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}cancel, moodle{{/str}}</button>
+                <button type="button" id="acceptShareAllRule" class="btn btn-primary mb-1">{{#str}}accept, moodle{{/str}}</button>
+            </div>
         </div>
     </div>
 </div>

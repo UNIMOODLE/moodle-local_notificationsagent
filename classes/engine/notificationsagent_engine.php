@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -30,7 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/evaluationcontext.php");
 require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
@@ -40,7 +40,7 @@ use local_notificationsagent\EvaluationContext;
 
 class Notificationsagent_engine {
 
-    public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid = null) {
+    public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid) {
 
         // Del evento que inicia el motor me puede llegar el userid.
 
@@ -52,33 +52,21 @@ class Notificationsagent_engine {
              If result is true -> action messageaget
             */
             $rule = Rule::create_instance($ruleid);
-            $courseid = $rule->get_courseid();
             $context = new EvaluationContext();
             $context->set_userid($userid);
             $context->set_timeaccess($timeaccess);
             $context->set_courseid($courseid);
 
-            $result = $rule->evaluate($context);
-
-            // TODO WIP REFACTOR.
-            if ($result) {
-                $actions = $rule->get_actions();
-                foreach ($actions as $action) {
-                    $coursecontext = context_course::instance($courseid);
-                    $pluginname = $action->get_subtype();
-                    $parameters = $rule->replace_placeholders($action->get_parameters(), $courseid, $userid, $rule);
-                    global $CFG;
-                    require_once($CFG->dirroot . '/local/notificationsagent/action/'
-                        . $action->get_subtype() . '/classes/event/' . $action->get_subtype().'_event.php');
-                    $eventname = '\notificationsaction_'.$pluginname.'\event\notificationsagent_'.$pluginname.'_event';
-                    $event = $eventname::create(
-                        array(
-                        'courseid' => $courseid,
-                        'context' => $coursecontext,
-                        'relateduserid' => $userid,
-                        'other' => $parameters,
-                        ));
-                    $event->trigger();
+            if ($context->is_evaluate($rule)) {
+                $result = $rule->evaluate($context);
+                if ($result) {
+                    $context->set_usertimesfired($rule->set_launched($context));
+                    $context->set_ruletimesfired($rule->get_timesfired());
+                    $actions = $rule->get_actions();
+                    foreach ($actions as $action) {
+                        $parameters = $rule->replace_placeholders($action->get_parameters(), $courseid, $userid, $rule);
+                        $action->execute_action($context, $parameters);
+                    }
                 }
             }
         }

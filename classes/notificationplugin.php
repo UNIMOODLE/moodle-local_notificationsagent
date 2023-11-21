@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -30,6 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 require_once('plugininfo/notificationsbaseinfo.php');
 require_once('rule.php');
 
@@ -47,7 +48,7 @@ abstract class notificationplugin {
      * @var $id int the id of the subplugin instance
      */
     public $id;
-    private  $ruleid;
+    private $ruleid;
     /**
      * @var Rule $rule the assistrule object for this instance
      */
@@ -98,9 +99,11 @@ abstract class notificationplugin {
      * @param array $records
      * @return array of subplugins
      */
-    public abstract static function create_subplugins($records);
+    abstract public static function create_subplugins($records);
 
-    public abstract static function create_subplugin($id) ;
+    abstract public static function create_subplugin($id);
+
+    abstract public function is_generic();
 
     /**
      * @param $ruleid
@@ -181,5 +184,7 @@ abstract class notificationplugin {
     public function set_type($type) {
         $this->type = $type;
     }
+
+
 
 }

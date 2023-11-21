@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -39,6 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
 use local_notificationsagent\Rule;
+require_once($CFG->dirroot . '/local/notificationsagent/notificationsagent.php');
 
 /**
  * Rule external API for deleting a rule.
@@ -78,13 +79,13 @@ class delete_rule extends \external_api {
         if (empty($instance)) {
             throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
         }
-        $context = \context_course::instance($instance->get_courseid());
+        $context = \context_course::instance($instance->get_default_context());
 
         try {
             if (has_capability('local/notificationsagent:deleterule', $context)) {
                 $instance->delete();
             } else {
-                throw new \moodle_exception('nopermissions', '', '', get_capability_string('local/notificationsagent:unlinkrule'));
+                throw new \moodle_exception('nopermissions', '', '', get_capability_string('local/notificationsagent:deleterule'));
             }
         } catch (\moodle_exception $e) {
             $result['warnings'][] = [

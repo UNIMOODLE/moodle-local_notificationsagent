@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -28,13 +28,6 @@
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-/**
- * Index
- *
- * @package    local_notificationsagent
- * @copyright  2023 UNIMOODLE
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -47,9 +40,13 @@ use local_notificationsagent\Rule;
 
 global $CFG, $DB, $PAGE;
 
-
-
-// $PAGE->set_context(context_system::instance()).
+$isroleadmin = false;
+if (is_siteadmin() || !empty($PAGE->settingsnav)) {
+    if (is_siteadmin() || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
+        || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))) {
+            $isroleadmin = true;
+    }
+}
 $courseid = required_param('courseid', PARAM_INT);
 // Limpiar session notificaciones.
 unset($SESSION->NOTIFICATIONS);
@@ -59,17 +56,20 @@ if (!$courseid) {
     throw new \moodle_exception('needcourseid');
 }
 
-
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+if ((!$isroleadmin && $courseid == SITEID) || (!$course = $DB->get_record('course', ['id' => $courseid]))) {
     throw new \moodle_exception('invalidcourseid');
 }
 require_login($course);
 $context = context_course::instance($course->id);
-
+if (get_config('local_notificationsagent', 'disable_user_use')) {
+    if (!has_capability('local/notificationsagent:managecourserule', $context)) {
+        throw new \moodle_exception('nopermissions', '', '',
+            get_capability_string('local/notificationsagent:managecourserule')
+        );
+    }
+}
 $PAGE->set_course($course);
-$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', array('courseid' => $course->id)));
-$PAGE->set_title($course->shortname);
-$PAGE->set_heading($course->fullname);
+$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
@@ -77,132 +77,176 @@ $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/delete', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/share', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/shareall', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
 
 $renderer = $PAGE->get_renderer('core');
 $templatecontext = [
-    "courseid" => $course->id
+    "courseid" => $course->id,
 ];
+
+$templatecontext['iscontextsite'] = false;
+if ($isroleadmin && $courseid == SITEID) {
+    $templatecontext['iscontextsite'] = true;
+}
 
 $importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
 $templatecontext['importruleurl'] = $importruleurl;
-$addruleurl = new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'add'));
-$templatecontext['addruleurl'] = $addruleurl;
+$addruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
+    'courseid' => $course->id, 'action' => 'add', 'type' => Rule::RULE_TYPE,
+]);
+$addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
+    'courseid' => $course->id, 'action' => 'add', 'type' => Rule::TEMPLATE_TYPE,
+]);
+$templatecontext['url'] = [
+    'addrule' => $addruleurl,
+    'addtemplate' => $addtemplate,
+];
 
-$rules = Rule::get_rules();
-$rulecontent = array();
+$rules = Rule::get_rules($context, $courseid);
+$rulecontent = [];
 
-$conditionsarray = array();
-$exceptionsarray = array();
-$actionsarray = array();
+$conditionsarray = [];
+$exceptionsarray = [];
+$actionsarray = [];
 
 foreach ($rules as $rule) {
     $conditions = $rule->get_conditions();
     $exceptions = $rule->get_exceptions();
     $actions = $rule->get_actions();
-    $conditionscontent = array();
-    $exceptionscontent = array();
-    $actionscontent = array();
+    $conditionscontent = [];
+    $exceptionscontent = [];
+    $actionscontent = [];
 
     // Conditions.
     foreach ($conditions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
+            . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
-            array_push($conditionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
+            array_push($conditionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
         }
     }
-    $conditionsarray = array(
+    $conditionsarray = [
         'hascontent' => !empty($conditionscontent),
-        'content' => $conditionscontent
-    );
+        'content' => $conditionscontent,
+    ];
 
     // Exceptions.
     foreach ($exceptions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
+            . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
-            array_push($exceptionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
+            array_push($exceptionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
         }
     }
-    $exceptionsarray = array(
+    $exceptionsarray = [
         'hascontent' => !empty($exceptionscontent),
-        'content' => $exceptionscontent
-    );
+        'content' => $exceptionscontent,
+    ];
 
     // Actions.
     foreach ($actions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/' . $value->get_pluginname() . '.php');
+        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
+            . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()))) {
-            array_push($actionscontent, $pluginobj->process_markups($value->get_parameters(), $rule->get_courseid()));
+        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
+            array_push($actionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
         }
     }
-    $actionsarray = array(
+    $actionsarray = [
         'hascontent' => !empty($actionscontent),
-        'content' => $actionscontent
-    );
+        'content' => $actionscontent,
+    ];
 
-    $rulecontent[] = array(
+    $rulecontent[] = [
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
         'status' => $rule->get_status(),
+        'status_lang' => $rule->get_forced() ?
+            ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
+                : get_string('status_active', 'local_notificationsagent')
+            ) : get_string('status_required', 'local_notificationsagent'),
         'conditions' => $conditionsarray,
         'exceptions' => $exceptionsarray,
         'actions' => $actionsarray,
-        'type' => $rule->get_courseid() == SITEID ? 'template' : 'rule',
-        'isrule' => $rule->get_courseid() == SITEID ? false : true,
-        'type_lang' => $rule->get_courseid() == SITEID ?
-            get_string('type_template', 'local_notificationsagent') :
-            get_string('type_rule', 'local_notificationsagent'),
-        'editurl' => new moodle_url("/local/notificationsagent/editrule.php", array('courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id())),
-        'exporturl' => new moodle_url("/local/notificationsagent/exportrule.php", array('courseid' => $course->id, 'ruleid' => $rule->get_id()))
-    );
+        'type' => $rule->get_type(),
+        'isrule' => $rule->get_template(),
+        'forced' => $rule->get_forced(),
+        'shared' => $rule->get_shared(),
+        'canshare' => $rule->can_share(),
+        'candelete' => $rule->can_delete(),
+        'isallshared' => $rule->get_defaultrule(),
+        'type_lang' => $rule->get_template() ?
+            get_string('type_rule', 'local_notificationsagent') :
+            get_string('type_template', 'local_notificationsagent'),
+        'editurl' => new moodle_url(
+            "/local/notificationsagent/editrule.php", ['courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id()]
+        ),
+        'exporturl' => new moodle_url(
+            "/local/notificationsagent/exportrule.php", ['courseid' => $course->id, 'ruleid' => $rule->get_id()]
+        ),
+        'capabilities' => [
+            'edit' => has_capability('local/notificationsagent:editrule', $context),
+            'delete' => has_capability('local/notificationsagent:deleterule', $context),
+            'resume' => has_capability('local/notificationsagent:updaterulestatus', $context),
+            'assign' => has_capability('local/notificationsagent:assignrule', $context),
+            'export' => has_capability('local/notificationsagent:exportrule', $context),
+            'force' => has_capability('local/notificationsagent:forcerule', $context),
+            'share' => has_capability('local/notificationsagent:updateruleshare', $context),
+        ],
+    ];
 }
 
 $templatecontext['rulecontent'] = $rulecontent;
+$templatecontext['capabilities'] = [
+    'import' => has_capability('local/notificationsagent:importrule', $context),
+    'create' => has_capability('local/notificationsagent:createrule', $context),
+];
 
-$categories_all = core_course_category::top()->get_children();
-$category_array = [];
-//TODO check $ruleid.
+$categoriesall = core_course_category::top()->get_children();
+$categoryarray = [];
+// TODO check $ruleid.
 $ruleid = "";
-foreach ($categories_all as $cat) {
-    /* $ruleid de build_category_array acabará desapareciendo
-    ya que el listado de cursos se obtendrá desde AJAX y la función getListOfCoursesAssigned en lib.php*/
-    $category_array[] = build_category_array($cat, $ruleid);
+foreach ($categoriesall as $cat) {
+    $categoryarray[] = build_category_array($cat, $ruleid);
 }
 
-if (!empty($category_array)) {
+if (!empty($categoryarray)) {
     $outputcategories = html_writer::start_div("", ["class" => "course-category-listing"]);
-        $outputcategories .= html_writer::start_div("", ["class" => "header-listing"]);
-            $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);
-                $outputcategories .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-                    $outputcategories .= html_writer::tag("input", "", ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]);
-                    $outputcategories .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "course-category-select-all"]);
-                $outputcategories .= html_writer::end_div();//.custom-checkbox
-                $outputcategories .= html_writer::start_div("", ["class" => "col px-0 d-flex"]);
-                    $outputcategories .= html_writer::start_div("", ["class" => "header-categoryname"]);
-                        $outputcategories .= get_string('name', 'core');
-                    $outputcategories .= html_writer::end_div();//.header-categoryname
-                $outputcategories .= html_writer::end_div();//.col
-                $outputcategories .= html_writer::start_div("", ["class" => "col-auto px-0 d-flex"]);
-                    $outputcategories .= html_writer::start_div("", ["class" => "header-countcourses"]);
-                        $outputcategories .= get_string('courses', 'core');
-                    $outputcategories .= html_writer::end_div();//.header-countcourses
-                $outputcategories .= html_writer::end_div();//.col-auto
-            $outputcategories .= html_writer::end_div();//.d-flex
-        $outputcategories .= html_writer::end_div();//.header-listing
-        $outputcategories .= html_writer::start_div("", ["class" => "category-listing"]);
-            $outputcategories .= html_writer::start_tag("ul", ["id" => "category-listing-content-0", "class" => "m-0 pl-0"]);
-                $outputcategories .= build_output_categories($category_array);
-            $outputcategories .= html_writer::end_tag("ul");//#category-listing-content-0
-        $outputcategories .= html_writer::end_div();//.category-listing
-    $outputcategories .= html_writer::end_div();//.course-category-listing
+    $outputcategories .= html_writer::start_div("", ["class" => "header-listing"]);
+    $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);
+    $outputcategories .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
+    $outputcategories .= html_writer::tag(
+        "input", "", ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
+    );
+    $outputcategories .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "course-category-select-all"]);
+    $outputcategories .= html_writer::end_div(); // ... .custom-checkbox
+    $outputcategories .= html_writer::start_div("", ["class" => "col px-0 d-flex"]);
+    $outputcategories .= html_writer::start_div("", ["class" => "header-categoryname"]);
+    $outputcategories .= get_string('name', 'core');
+    $outputcategories .= html_writer::end_div(); // ...... .header-categoryname
+    $outputcategories .= html_writer::end_div(); // ... .col
+    $outputcategories .= html_writer::start_div("", ["class" => "col-auto px-0 d-flex"]);
+    $outputcategories .= html_writer::start_div("", ["class" => "header-countcourses"]);
+    $outputcategories .= get_string('courses', 'core');
+    $outputcategories .= html_writer::end_div(); // ... .header-countcourses
+    $outputcategories .= html_writer::end_div(); // ... .col-auto
+    $outputcategories .= html_writer::end_div(); // ... .d-flex
+    $outputcategories .= html_writer::end_div(); // ... .header-listing
+    $outputcategories .= html_writer::start_div("", ["class" => "category-listing"]);
+    $outputcategories .= html_writer::start_tag("ul", ["id" => "category-listing-content-0", "class" => "m-0 pl-0"]);
+    $outputcategories .= build_output_categories($categoryarray);
+    $outputcategories .= html_writer::end_tag("ul"); // ... #category-listing-content-0
+    $outputcategories .= html_writer::end_div(); // ... .category-listing
+    $outputcategories .= html_writer::end_div(); // ... .course-category-listing
 
     $templatecontext['output_categoriescourses'] = $outputcategories;
 }

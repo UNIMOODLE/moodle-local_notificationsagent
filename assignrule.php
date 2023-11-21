@@ -19,7 +19,7 @@
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
-// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
  * Version details
@@ -35,19 +35,25 @@ require_once("classes/rule.php");
 
 use local_notificationsagent\Rule;
 
+defined('MOODLE_INTERNAL') || die();
+require_login();
 $idrule = optional_param('ruleid', null, PARAM_INT);
 $arraycategories = optional_param_array('category', null, PARAM_RAW);
 $arraycourses = optional_param_array('course', null, PARAM_RAW);
- 
+$forced = optional_param('forced', null, PARAM_INT);
+$action = optional_param('action', null, PARAM_TEXT);
+$data = [];
+
 if (!empty($idrule)) {
-    echo json_encode(get_list_assigned_context($idrule));
-} 
+    if ($action == 'SHOW_CONTEXT') {
+        $data = get_list_assigned_context($idrule);
+    } else if ($action == 'SET_CONTEXT') {
+        add_list_courses_assigned($idrule, $arraycategories, $arraycourses);
+        set_forced_rule($idrule, $forced);
+    }
+}
 
-if (!empty($idrule) && (isset($arraycourses) || isset($arraycategories))) {
-    add_list_courses_assigned($idrule, $arraycategories, $arraycourses);
-} 
-
- function get_list_assigned_context($idrule) {
+function get_list_assigned_context($idrule) {
     $rule = Rule::create_instance($idrule);
     $listofcoursesassigned = $rule->get_assignedcontext();
     return $listofcoursesassigned;
@@ -56,30 +62,46 @@ if (!empty($idrule) && (isset($arraycourses) || isset($arraycategories))) {
 function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     global $DB;
 
+    $instance = Rule::create_instance($idrule);
     $DB->delete_records('notificationsagent_context', ['ruleid' => $idrule]);
+    $instance->set_default_context(SITEID);
 
     if (!empty($categories)) {
         foreach ($categories as $category) {
-            $paramscat = array (
+            $paramscat = [
                 'ruleid' => $idrule,
                 'contextid' => CONTEXT_COURSECAT,
-                'objectid' => $category
-            );
+                'objectid' => $category,
+            ];
             $DB->insert_record('notificationsagent_context', $paramscat);
         }
     }
 
     if (!empty($courses)) {
-        $rule = Rule::create_instance($idrule);
-        foreach ($courses as $course) { 
-            if ($course != $rule->get_courseid()) {
-                $paramscourse = array (
-                    'ruleid' => $idrule,
-                    'contextid' => CONTEXT_COURSE,
-                    'objectid' => $course
-                );
-                $DB->insert_record('notificationsagent_context', $paramscourse);
-            }
+        foreach ($courses as $course) {
+            $paramscourse = [
+                'ruleid' => $idrule,
+                'contextid' => CONTEXT_COURSE,
+                'objectid' => $course,
+            ];
+            $DB->insert_record('notificationsagent_context', $paramscourse);
         }
     }
 }
+
+function set_forced_rule($idrule, $forced) {
+    global $DB;
+
+    $instance = Rule::create_instance($idrule);
+    $context = \context_course::instance(SITEID);
+    if (has_capability('local/notificationsagent:forcerule', $context)) {
+        $request = new \stdClass();
+        $request->id = $instance->get_id();
+        $request->forced = !$forced ? Rule::FORCED_RULE : Rule::NONFORCED_RULE;
+
+        $DB->update_record('notificationsagent_rule', $request);
+    }
+}
+
+echo json_encode($data);
+exit();
