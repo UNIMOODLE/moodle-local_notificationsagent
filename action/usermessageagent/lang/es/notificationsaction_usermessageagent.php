@@ -13,22 +13,31 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Plugin strings are defined here.
+ * Version details
  *
- * @package     notificationsaction_usermessageagent
- * @category    string
- * @copyright   2023 ISYC
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    notificationsaction_usermessageagent
+ * @category   string
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Particular user notification';
-$string['messageprovider:particular_message'] = 'Particular Message Provider';
-$string['usermessageagent_action'] = 'Send notification to user [UUUU] with title [TTTT] and message [BBBB]';
+$string['pluginname'] = 'Notificación individual a usuario';
+$string['messageprovider:particular_message'] = 'Proveedor de mensajes particulares';
+$string['usermessageagent_action'] = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
 $string['subtype'] = 'usermessageagent';
-$string['editrule_action_element_title'] = 'Title {$a->typeelement}:';
-$string['editrule_action_element_user'] = 'User {$a->typeelement}';
-$string['editrule_action_element_message'] = 'Message {$a->typeelement}';
+$string['editrule_action_element_title'] = 'Titulo {$a->typeelement}:';
+$string['editrule_action_element_user'] = 'Usuario {$a->typeelement}';
+$string['editrule_action_element_message'] = 'Mensaje {$a->typeelement}';

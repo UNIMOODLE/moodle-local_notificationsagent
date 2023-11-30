@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -140,6 +140,13 @@ $capabilities = [
         'archetypes' => [
             'editingteacher' => CAP_PROHIBIT,
             'student' => CAP_PROHIBIT,
+        ],
+    ],
+    'local/notificationsagent:viewassistantreport' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
         ],
     ],
 ];

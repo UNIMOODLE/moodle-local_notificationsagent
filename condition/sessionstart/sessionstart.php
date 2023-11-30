@@ -12,13 +12,20 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * sessiostart sessionstart.php description here.
+ * Version details
  *
- * @package    sessiostart
- * @copyright  2023 fernando <fpano@isyc.com>
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -35,9 +42,6 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
             'elements' => self::get_elements(),
             'name' => self::get_subtype(),
         ];
-    }
-    protected function get_mod_name() {
-        return get_string('modname', 'notificationscondition_sessionstart');
     }
 
     public function get_title() {
@@ -208,18 +212,18 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
          return json_encode(['time' => $timeinseconds]);
     }
 
-    public function process_markups($params, $courseid) {
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
         $jsonparams = json_decode($params);
 
         $paramstoteplace = [$this->get_human_time($jsonparams->time)];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        return $humanvalue;
+        array_push($content, $humanvalue);
     }
 
     public function is_generic() {
-        return true;
+        return false;
     }
 
     /**

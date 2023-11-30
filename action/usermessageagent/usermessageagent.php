@@ -160,8 +160,21 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         return json_encode(['title' => $title, 'message' => $message, 'user' => $user]);
     }
 
-    public function process_markups($params, $courseid) {
-        return $this->get_title();
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
+        global $DB;
+
+        $jsonparams = json_decode($params);
+
+        $user = $DB->get_record('user', ['id' => $jsonparams->user], 'firstname, lastname', MUST_EXIST);
+
+        $paramstoteplace = [
+            shorten_text($jsonparams->title), shorten_text(format_string($jsonparams->message)),
+            shorten_text($user->firstname . " " . $user->lastname),
+        ];
+
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
+
+        array_push($content, $humanvalue);
     }
 
     public function execute_action($context, $params) {
@@ -178,9 +191,9 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
         $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $message->fullmessagehtml = format_text('<p>' . $sendmessage . '</p>');
-        $message->smallmessage = 'small message'; // TODO.
+        $message->smallmessage = 'small message';
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
-        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification //TODO.
+        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification.
         $message->contexturlname = 'Course list'; // Link title explaining where users get to for the contexturl.
         // The integer ID of the new message or false if there was a problem (with submitted data or sending the message to
         // the message processor).

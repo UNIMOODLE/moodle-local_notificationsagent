@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -42,9 +42,9 @@ class EvaluationContext {
     private $timeaccess; // Evento.
     private $params; // Los que vienen del plugin.
     private $iscomplementary;
-    private $ruletimesfired;
     private $usertimesfired;
     private $objectid;
+    private $rule;
     private $conditions = [];
     private $exceptions = [];
 
@@ -154,20 +154,6 @@ class EvaluationContext {
     /**
      * @return int
      */
-    public function get_ruletimesfired(): int {
-        return $this->ruletimesfired;
-    }
-
-    /**
-     * @param int $ruletimesfired
-     */
-    public function set_ruletimesfired(int $ruletimesfired): void {
-        $this->ruletimesfired = $ruletimesfired;
-    }
-
-    /**
-     * @return int
-     */
     public function get_usertimesfired(): int {
         return $this->usertimesfired;
     }
@@ -191,6 +177,20 @@ class EvaluationContext {
      */
     public function set_objectid(int $objectid): void {
         $this->objectid = $objectid;
+    }
+
+    /**
+     * @return object
+     */
+    public function get_rule(): object {
+        return $this->rule;
+    }
+
+    /**
+     * @param object $rule
+     */
+    public function set_rule(object $rule): void {
+        $this->rule = $rule;
     }
 
     /**

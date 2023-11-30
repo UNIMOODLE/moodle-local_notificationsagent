@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -36,6 +36,7 @@ require_once('plugininfo/notificationsbaseinfo.php');
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\Rule;
+use notificationsagent\notificationsagent;
 abstract class notificationactionplugin extends notificationplugin {
 
     abstract public function get_title();
@@ -79,7 +80,6 @@ abstract class notificationactionplugin extends notificationplugin {
         $subplugins = [];
         global $DB;
         foreach ($records as $record) {
-            // TODO SET CACHE.
             $rule = $DB->get_record('notificationsagent_rule', ['id' => $record->ruleid]);
             $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
             if (!empty($subplugin)) {
@@ -99,11 +99,21 @@ abstract class notificationactionplugin extends notificationplugin {
         global $DB;
         // Find type of subplugin.
         $record = $DB->get_record('notificationsagent_action', ['id' => $id]);
-        $subplugins = create_subplugins([$record]);
+        $subplugins = self::create_subplugins([$record]);
         return $subplugins[0];
     }
 
     abstract public function execute_action($context, $params);
+
+    /**
+     * Check if the action will be sent once or not
+     * @param integer $userid User id
+     *
+     * @return bool $sendonce Will the action be sent once?
+     */
+    public function is_send_once($userid) {
+        return $userid == notificationsagent::GENERIC_USERID ? false : true;
+    }
 
     /**
      * Gets the message to send depending on the timesfired of the rule and the user
@@ -117,7 +127,7 @@ abstract class notificationactionplugin extends notificationplugin {
 
         $messagesplit = preg_split($delimiter, $message);
 
-        if ($context->get_ruletimesfired() == Rule::MINIMUM_EXECUTION) {
+        if ($context->get_rule()->get_timesfired() == Rule::MINIMUM_EXECUTION) {
             $messageindex = rand(0, count($messagesplit) - 1);
         } else {
             $messageindex = min($context->get_usertimesfired(), count($messagesplit)) - 1;

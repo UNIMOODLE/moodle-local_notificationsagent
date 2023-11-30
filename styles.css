@@ -189,3 +189,34 @@ body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"]
 body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"][aria-expanded="true"] i.fa-angle-down:before{
     content: "\f106";
 }
+
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson{
+    display: none;
+}
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson[aria-hidden=false]{
+    display: flex !important;
+}
+
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-header,
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-eye,
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson #id_availabilityconditionsjson[aria-hidden=true]{
+    display: none !important;
+}
+
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner{
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner .availability-plugincontrols{
+    margin-left: 0;
+}
+
+
+body.path-local-notificationsagent .hide-div {
+    display:none !important;
+}
+body.path-local-notificationsagent .show-div {
+    display:block !important;
+}

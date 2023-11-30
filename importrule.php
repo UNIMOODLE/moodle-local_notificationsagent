@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -72,8 +72,9 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
 
         if ($data['actions']) {
             $sqlactions = new \stdClass();
+            $countactions = count($data['actions']);
 
-            for ($i = 0; $i < count($data['actions']); $i++) {
+            for ($i = 0; $i < $countactions; $i++) {
                 foreach ($data['actions'][array_key_first($data['actions']) + $i] as $key => $value) {
                     if ($key == 'ruleid') {
                         $sqlactions->ruleid = $idrule;
@@ -88,8 +89,9 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
 
         if ($data['conditions']) {
             $sqlconditions = new \stdClass();
+            $countconditions = count($data['conditions']);
 
-            for ($i = 0; $i < count($data['conditions']); $i++) {
+            for ($i = 0; $i < $countconditions; $i++) {
                 foreach ($data['conditions'][array_key_first($data['conditions']) + $i] as $key => $value) {
                     if ($key == 'ruleid') {
                         $sqlconditions->ruleid = $idrule;

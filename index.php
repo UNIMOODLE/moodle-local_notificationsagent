@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -101,9 +101,13 @@ $addruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
 $addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
     'courseid' => $course->id, 'action' => 'add', 'type' => Rule::TEMPLATE_TYPE,
 ]);
+$reporturl = new moodle_url("/local/notificationsagent/report.php", [
+    'courseid' => $course->id,
+]);
 $templatecontext['url'] = [
     'addrule' => $addruleurl,
     'addtemplate' => $addtemplate,
+    'reporturl' => $reporturl,
 ];
 
 $rules = Rule::get_rules($context, $courseid);
@@ -115,7 +119,7 @@ $actionsarray = [];
 
 foreach ($rules as $rule) {
     $conditions = $rule->get_conditions();
-    $exceptions = $rule->get_exceptions();
+    $exceptions = $rule->get_exceptions($showac = true);
     $actions = $rule->get_actions();
     $conditionscontent = [];
     $exceptionscontent = [];
@@ -127,9 +131,9 @@ foreach ($rules as $rule) {
             . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
-            array_push($conditionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
-        }
+        $pluginobj->process_markups(
+            $conditionscontent, $value->get_parameters(), $courseid, notificationplugin::CAT_CONDITION_CHILDREN
+        );
     }
     $conditionsarray = [
         'hascontent' => !empty($conditionscontent),
@@ -142,9 +146,9 @@ foreach ($rules as $rule) {
             . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
-            array_push($exceptionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
-        }
+        $pluginobj->process_markups(
+            $exceptionscontent, $value->get_parameters(), $courseid, notificationplugin::CAT_EXCEPTION_CHILDREN
+        );
     }
     $exceptionsarray = [
         'hascontent' => !empty($exceptionscontent),
@@ -157,10 +161,10 @@ foreach ($rules as $rule) {
             . $value->get_pluginname() . '.php');
         $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
         $pluginobj = new $pluginclass($rule);
-        if (!empty($pluginobj->process_markups($value->get_parameters(), $courseid))) {
-            array_push($actionscontent, $pluginobj->process_markups($value->get_parameters(), $courseid));
-        }
+        $parameters = $rule->replace_placeholders($value->get_parameters(), $courseid, $USER->id, $rule);
+        $pluginobj->process_markups($actionscontent, $parameters, $courseid);
     }
+
     $actionsarray = [
         'hascontent' => !empty($actionscontent),
         'content' => $actionscontent,
@@ -190,6 +194,9 @@ foreach ($rules as $rule) {
         'editurl' => new moodle_url(
             "/local/notificationsagent/editrule.php", ['courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id()]
         ),
+        'reporturl' => new moodle_url(
+            "/local/notificationsagent/report.php", ['courseid' => $course->id, 'ruleid' => $rule->get_id()]
+        ),
         'exporturl' => new moodle_url(
             "/local/notificationsagent/exportrule.php", ['courseid' => $course->id, 'ruleid' => $rule->get_id()]
         ),
@@ -201,6 +208,7 @@ foreach ($rules as $rule) {
             'export' => has_capability('local/notificationsagent:exportrule', $context),
             'force' => has_capability('local/notificationsagent:forcerule', $context),
             'share' => has_capability('local/notificationsagent:updateruleshare', $context),
+            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
         ],
     ];
 }
@@ -209,11 +217,11 @@ $templatecontext['rulecontent'] = $rulecontent;
 $templatecontext['capabilities'] = [
     'import' => has_capability('local/notificationsagent:importrule', $context),
     'create' => has_capability('local/notificationsagent:createrule', $context),
+    'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
 ];
 
 $categoriesall = core_course_category::top()->get_children();
 $categoryarray = [];
-// TODO check $ruleid.
 $ruleid = "";
 foreach ($categoriesall as $cat) {
     $categoryarray[] = build_category_array($cat, $ruleid);

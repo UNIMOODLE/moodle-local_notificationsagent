@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Add user to group';
-$string['messageprovider:add_user_group'] = 'Add user group Provider';
-$string['addusergroup_action'] = 'Add user [UUUU] to group [GGGG]';
+$string['pluginname'] = 'Acción relativa a añadir un usuario a un grupo';
+$string['messageprovider:add_user_group'] = 'Proveedor de añadir usuario a grupo';
+$string['addusergroup_action'] = 'Añadir usuario [UUUU] al grupo [GGGG]';
 $string['subtype'] = 'addusergroup';
-$string['editrule_action_element_user'] = 'User {$a->typeelement}';
-$string['editrule_action_element_group'] = 'Group {$a->typeelement}';
+$string['editrule_action_element_user'] = 'Usuario {$a->typeelement}';
+$string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';

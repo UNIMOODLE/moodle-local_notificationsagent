@@ -29,15 +29,7 @@
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
- * Plugin administration pages are defined here.
- *
- * @package     local_notificationsagent
  * @category    admin
- * @copyright   2023 ISYC
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -62,8 +54,7 @@ if ($hassiteconfig) {
             'local_notificationsagent/startdate',
             get_string('startdate', 'local_notificationsagent'),
             get_string('startdate_desc', 'local_notificationsagent'),
-            'mod_assign|assign|allowsubmissionsfromdate|gradingduedate
-mod_assignment|allowsubmissionsfromdate|timeavailable|timedue
+            'mod_assign|assign|allowsubmissionsfromdate|duedate
 mod_bigbluebuttonbn|bigbluebuttonbn|openingtime
 mod_chat|chat|chattime|
 mod_choice|choice|timeopen|timeclose
@@ -116,6 +107,9 @@ mod_workshop|workshop|submissionstart|submissionend',
         /** @var \local_notificationsagent\plugininfo\notificationscondition $plugin */
         $plugin->load_settings($ADMIN, 'notificationsconditionplugins', $hassiteconfig);
     }
+
+    $ADMIN->add('notificationscategory', new admin_externalpage('notificationsreport', get_string('report',
+        'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/report.php'));
 
 }
 

@@ -47,8 +47,6 @@ class notificationscondition_coursestart_observer {
 
         $pluginname = 'coursestart';
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-        $context = \context_course::instance($courseid);
-        $enrolledusers = notificationsagent::get_usersbycourse($context);
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
@@ -56,9 +54,12 @@ class notificationscondition_coursestart_observer {
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
             $cache = $startdate + $param['time'];
-            foreach ($enrolledusers as $enrolleduser) {
-                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid, $cache);
+            if (!notificationsagent::was_launched_indicated_times(
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                );
+                notificationsagent::set_time_trigger($condition->ruleid, notificationsagent::GENERIC_USERID, $courseid, $cache);
             }
         }
     }

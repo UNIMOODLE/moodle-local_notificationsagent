@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -32,6 +32,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 require_once('notificationsagent.php');
+use local_notificationsagent\reportbuilder\datasource\rules;
 class local_notificationsagent_renderer extends plugin_renderer_base {
+
 
 }

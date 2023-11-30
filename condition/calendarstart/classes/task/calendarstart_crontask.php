@@ -48,8 +48,6 @@ class calendarstart_crontask extends scheduled_task {
             $decode = $condition->parameters;
             $param = json_decode($decode);
 
-            $context = \context_course::instance($courseid);
-            $enrolledusers = notificationsagent::get_usersbycourse($context);
             $condtionid = $condition->id;
             $radio = $param->radio;
 
@@ -61,11 +59,14 @@ class calendarstart_crontask extends scheduled_task {
                 $calendarevent[$param->calendar]->timeduration + $param->time;
             }
 
-            foreach ($enrolledusers as $enrolleduser) {
-                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
+            if (!notificationsagent::was_launched_indicated_times(
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                );
             }
+
         }
         custom_mtrace("calendarstart end ");
-
     }
 }

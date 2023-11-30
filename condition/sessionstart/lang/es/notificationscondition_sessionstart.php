@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición relativa a la fecha del primer acceso a un curso';
-$string['conditiontext'] = 'Ha transcurrido [TTTT tiempo] desde el primer inicio de sesión en el curso.';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el primer inicio de sesión en el curso.';
 $string['subtype'] = 'sessionstart';
 $string['modname'] = 'sessionstart';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

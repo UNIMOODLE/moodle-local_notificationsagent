@@ -1,0 +1,10 @@
+{
+  "name": "moodle-local_notificationsagent-form",
+  "builds": {
+    "moodle-local_notificationsagent-form": {
+      "jsfiles": [
+        "form.js"
+      ]
+    }
+  }
+}

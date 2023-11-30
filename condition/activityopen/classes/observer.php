@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../activityopen.php');
 require_once(__DIR__ . '/../../../notificationsagent.php');
 require_once(__DIR__ . '/../../../classes/engine/notificationsagent_engine.php');
-require_once(__DIR__ . '/../lib.php');
 
 use notificationsagent\notificationsagent;
 
@@ -43,19 +42,18 @@ class notificationscondition_activityopen_observer {
         $pluginname = 'activityopen';
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
-        $context = context_course::instance($courseid);
-        $enrolledusers = notificationsagent::get_usersbycourse($context);
-
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
             $cache = $timestart + $param['time'];
-            foreach ($enrolledusers as $enrolleduser) {
-                // Update every time a module is updated.
-                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid, $enrolleduser->id, $courseid, $cache);
+            if (!notificationsagent::was_launched_indicated_times(
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                );
+                notificationsagent::set_time_trigger($condition->ruleid, notificationsagent::GENERIC_USERID, $courseid, $cache);
             }
         }
     }

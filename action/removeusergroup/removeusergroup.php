@@ -111,7 +111,7 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
     }
 
     public function get_elements() {
-        return ['[GGGG]', '[UUUU]'];
+        return ['[UUUU]', '[GGGG]'];
     }
 
     public function check_capability($context) {
@@ -138,8 +138,19 @@ class notificationsagent_action_removeusergroup extends notificationactionplugin
         return json_encode(['user' => $user, 'group' => $group]);
     }
 
-    public function process_markups($params, $courseid) {
-        return $this->get_title();
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
+
+        $jsonparams = json_decode($params);
+
+        $user = \core_user::get_user($jsonparams->user, '*', MUST_EXIST);
+
+        $group = groups_get_group_name($jsonparams->group);
+
+        $paramstoteplace = [shorten_text($user->firstname . " " . $user->lastname), shorten_text($group)];
+
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
+
+        array_push($content, $humanvalue);
     }
 
     public function execute_action($context, $params) {

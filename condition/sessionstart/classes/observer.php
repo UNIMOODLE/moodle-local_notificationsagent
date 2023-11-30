@@ -12,13 +12,19 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * sessionstart observer.php .
+ * Version details
  *
- * @package    sessionstart
- * @copyright  2023 fernando
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -64,14 +70,14 @@ class notificationscondition_sessionstart_observer {
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
-            $ruleids[] = $condition->ruleid;
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
             $cache = $timeaccess + $param['time'];
-            notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, false);
+            if (!notificationsagent::was_launched_indicated_times(
+                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid)) {
+                notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, false);
+                notificationsagent::set_time_trigger($condition->ruleid, $userid, $courseid, $cache);
+            }
         }
-        // Search for conditions with sessionstart and courseid,
-        // Call engine with userid, courseid, timecreated.
-        Notificationsagent_engine::notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid);
     }
 }

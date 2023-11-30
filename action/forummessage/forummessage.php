@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
@@ -95,6 +95,7 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         asort($forumname);
         if (empty($forumname)) {
             $forumname['0'] = 'FFFF';
+            $forumname['-1'] = 'Announcements';
         }
         $mform->addElement(
             'select',
@@ -159,8 +160,30 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
         return json_encode(['title' => $title, 'message' => $message, 'forum' => $forum]);
     }
 
-    public function process_markups($params, $courseid) {
-        return $this->get_title();
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
+        global $DB;
+
+        $jsonparams = json_decode($params);
+
+        $forum = new \stdClass();
+
+        if ($jsonparams->forum > 0) {
+            $forum = $DB->get_record('forum', ['id' => $jsonparams->forum], 'name', MUST_EXIST);
+        } else {
+            if ($jsonparams->forum == 0) {
+                $forum->name = 'FFFF';
+            } else if ($jsonparams->forum == -1) {
+                $forum->name = 'Announcements';
+            }
+        }
+
+        $paramstoteplace = [
+            shorten_text($forum->name), shorten_text($jsonparams->title), shorten_text(format_string($jsonparams->message)),
+        ];
+
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
+
+        array_push($content, $humanvalue);
     }
 
     public function execute_action($context, $params) {
@@ -168,29 +191,29 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
 
         $placeholdershuman = json_decode($params);
         $postsubject = format_text($placeholdershuman->title, FORMAT_PLAIN);
-        $postmessage = format_text($placeholdershuman->message);
+        $postmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
 
         $discussion = new stdClass();
         $discussion->forum = $placeholdershuman->forum;
         $discussion->course = $context->get_courseid();
         $discussion->name = $postsubject;
-        $discussion->message = $postmessage;
+        $discussion->message = format_text($postmessage);
         $discussion->messageformat = FORMAT_HTML;
+        $discussion->pinned = 1;
         $discussion->messagetrust = 0;
         $discussion->attatchment = null;
         $discussion->timelocked = 0;
-        $discussion->pinned = FORUM_DISCUSSION_PINNED;
         $discussion->mailnow = true;
         $discussion->groupid = -1;
         $discussion->timestart = 0;
         $discussion->timeend = 0;
 
-        if ($discussion->id = forum_add_discussion($discussion, null, null, $context->get_userid())) {
+        if ($discussion->id = forum_add_discussion($discussion, null, null, $context->get_rule()->get_createdby())) {
             $cm = get_coursemodule_from_instance('forum', $placeholdershuman->forum);
-            $context = context_module::instance($cm->id);
+            $modulecontext = context_module::instance($cm->id);
             $forumparams = [
-                'userid' => get_admin()->id,
-                'context' => $context,
+                'userid' => $context->get_rule()->get_createdby(),
+                'context' => $modulecontext,
                 'objectid' => $discussion->id,
                 'other' => [
                     'forumid' => $placeholdershuman->forum,
@@ -208,6 +231,16 @@ class notificationsagent_action_forummessage extends notificationactionplugin {
     }
 
     public function is_generic() {
+        return true;
+    }
+
+    /**
+     * Check if the action will be sent once or not
+     * @param integer $userid User id
+     *
+     * @return bool $sendonce Will the action be sent once?
+     */
+    public function is_send_once($userid) {
         return true;
     }
 }

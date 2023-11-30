@@ -80,5 +80,36 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2023112900) {
+
+        // Define table notificationsagent_rule to be created.
+        $table = new xmldb_table('notificationsagent_rule');
+
+        // Adding fields to table notificationsagent_rule.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+        $table->add_field('createdby', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_field('createdat', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+        $table->add_field('shared', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('defaultrule', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('template', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('forced', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('timesfired', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('runtime', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '86400');
+
+        // Adding keys to table notificationsagent_rule.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for notificationsagent_rule.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112900, 'local', 'notificationsagent');
+    }
+
     return true;
 }

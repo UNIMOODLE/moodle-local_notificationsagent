@@ -46,14 +46,16 @@ class coursestart_crontask extends scheduled_task {
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
             $startdate = $DB->get_field('course', 'startdate', ['id' => $courseid]);
-            $context = \context_course::instance($courseid);
-            $enrolledusers = notificationsagent::get_usersbycourse($context);
             $condtionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
             $cache = $startdate + $param['time'];
-            foreach ($enrolledusers as $enrolleduser) {
-                notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, false);
+
+            if (!notificationsagent::was_launched_indicated_times(
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, false
+                );
             }
         }
 

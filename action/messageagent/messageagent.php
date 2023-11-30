@@ -130,51 +130,38 @@ class notificationsagent_action_messageagent extends notificationactionplugin {
         return json_encode(['title' => $title, 'message' => $message]);
     }
 
-    public function process_markups($params, $courseid) {
-        return $this->get_title();
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
+
+        $jsonparams = json_decode($params);
+
+        $paramstoteplace = [shorten_text($jsonparams->title), shorten_text(format_string($jsonparams->message))];
+
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
+
+        array_push($content, $humanvalue);
     }
 
     public function execute_action($context, $params) {
-
-        $users = [];
-
-        if (empty($context->get_userid())) {
-            $users = notificationsagent::get_usersbycourse($context);
-        } else {
-            $users = [$context->get_userid()];
-        }
-
         $placeholdershuman = json_decode($params);
-
         $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
 
         $message = new \core\message\message();
         $message->name = 'individual_message'; // Your notification name from message.php.
+        $message->userto = $context->get_userid();
         $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
         $message->component = 'notificationsaction_messageagent'; // Your plugin's name.
         $message->subject = format_text($placeholdershuman->title); // Será nuestro TTTT.
         $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
-        $message->smallmessage = 'small message'; // TODO.
+        $message->smallmessage = 'small message';
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
-        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification. // TODO.
+        $message->contexturl = (new \moodle_url('/course/'))->out(false); // A relevant URL for the notification.
         $message->contexturlname = 'Course list'; // Link title explaining where users get to for the contexturl.
 
-        // TODO: Check userid -1.
-        //if ($users == -1) {
-            foreach ($users as $user) {
-                $message->userto = $user;
-                // The integer ID of the new message or false if there was a problem
-                // ... (with submitted data or sending the message to the message processor).
-                message_send($message);
-            }
-        /*} else {
-            $message->userto = $context->get_userid();
-            // The integer ID of the new message or false if there was a problem
-            // ... (with submitted data or sending the message to the message processor).
-            message_send($message);
-        }*/
+        // The integer ID of the new message or false if there was a problem
+        // ... (with submitted data or sending the message to the message processor).
+        message_send($message);
     }
 
     public function is_generic() {

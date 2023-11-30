@@ -107,9 +107,11 @@ $string['condition_seconds'] = 'Seconds';
 
 // EditRule.
 $string['editrule_newrule'] = 'New rule';
+$string['editrule_reports'] = 'Reports';
 $string['editrule_activaterule'] = 'Activate';
 $string['editrule_pauserule'] = 'Pause';
 $string['editrule_editrule'] = 'Edit';
+$string['editrule_reportrule'] = 'Report';
 $string['editrule_deleterule'] = 'Delete';
 $string['editrule_newtemplate'] = 'New template';
 $string['editrule_title'] = 'Title';
@@ -122,34 +124,36 @@ $string['editrule_sharedallrule'] = 'Shared';
 $string['editrule_timesfired'] = 'No. of executions';
 $string['editrule_runtime'] = 'Interval';
 
-    // Condition.
-    $string['editrule_newcondition'] = 'New condition:';
-    $string['editrule_condition_title_tocloseactivity'] = 'There is less than [TTTT] left for the closing of the activity [AAAA]';
-    $string['editrule_condition_title_usercompleteactivity'] = 'User has completed the activity [AAAA]';
-    $string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is available';
-    $string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
-    $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
-    $string['editrule_condition_title_forumnotanswer'] = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
+// Condition.
+$string['editrule_generalconditions'] = 'General conditions';
+$string['editrule_newcondition'] = 'New condition:';
+$string['editrule_condition_title_tocloseactivity'] = 'There is less than [TTTT] left for the closing of the activity [AAAA]';
+$string['editrule_condition_title_usercompleteactivity'] = 'User has completed the activity [AAAA]';
+$string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is available';
+$string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
+$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
+$string['editrule_condition_title_forumnotanswer'] = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
 
-        $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-        $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
-        $string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-        $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
-    // Actions.
-    $string['editrule_newaction'] = 'New action:';
-    $string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
-    $string['editrule_action_title_notificationtouser'] = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
-    $string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
-    $string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
-    $string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
-    $string['editrule_action_title_removeuserfromgroup'] = 'Remove a user from a group [GGGG]';
-    $string['editrule_action_title_bootstrapnotification'] = 'Bootstrap Notification';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
+$string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
 
-        $string['editrule_action_element_title'] = 'Title {$a->typeelement}:';
-        $string['editrule_action_element_message'] = 'Message {$a->typeelement}';
-        $string['editrule_action_element_user'] = 'User {$a->typeelement}';
-        $string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
-        $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
+// Actions.
+$string['editrule_newaction'] = 'New action:';
+$string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
+$string['editrule_action_title_notificationtouser'] = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
+$string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
+$string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
+$string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
+$string['editrule_action_title_removeuserfromgroup'] = 'Remove a user from a group [GGGG]';
+$string['editrule_action_title_bootstrapnotification'] = 'Bootstrap Notification';
+
+$string['editrule_action_element_title'] = 'Title {$a->typeelement}:';
+$string['editrule_action_element_message'] = 'Message {$a->typeelement}';
+$string['editrule_action_element_user'] = 'User {$a->typeelement}';
+$string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
+$string['editrule_action_element_group'] = 'Group {$a->typeelement}';
 
 
 $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
@@ -204,6 +208,7 @@ $string['notificationsagent:shareruleall'] = 'Approve the sharing of a rule';
 $string['notificationsagent:managesiterule'] = 'Manage rules at site level';
 $string['notificationsagent:managecourserule'] = 'Manage rules at course level';
 $string['notificationsagent:manageownrule'] = 'Manage your own course rules';
+$string['notificationsagent:viewassistantreport'] = 'View rule report';
 
 $string['notificationsagent:activitycompleted'] = 'Capability needed in order to use activitycompleted condition';
 $string['notificationsagent:activityopen'] = 'Capability needed in order to use activityopen condition';
@@ -221,3 +226,18 @@ $string['notificationsagent:usermessageagent'] = 'Capability needed in order to 
 // Webservices.
 $string['notificationsagent:nosuchinstance'] = 'No such instance was found.';
 $string['isnotrule'] = 'The given rule id is not a rule.';
+
+// Report.
+$string['rulename'] = 'Rule name';
+$string['report'] = 'Notifications agent report';
+$string['id'] = 'id';
+$string['ruleid'] = 'Rule id';
+$string['fullrule'] = 'Rule';
+$string['userid'] = 'User id';
+$string['fulluser'] = 'User';
+$string['fullcourse'] = 'Course';
+$string['courseid'] = 'Course id';
+$string['actionid'] = 'Action id';
+$string['fullaction'] = 'Action';
+$string['actiondetail'] = 'Action detail';
+$string['timestamp'] = 'Time';

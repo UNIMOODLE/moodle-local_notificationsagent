@@ -29,10 +29,6 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         ];
     }
 
-    public function get_mod_name() {
-        return get_string('modname', 'notificationscondition_calendarstart');
-    }
-
     /** Returns the name of the plugin.
      *
      * @return string
@@ -100,11 +96,21 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         $params = json_decode($context->get_params());
         $radio = $params->radio;
         $event = calendar_get_events_by_id([$params->calendar]);
-        if ($radio == 1) {
-            $timestart = $event[$params->calendar]->timestart + $params->time;
+
+        if ($context->is_complementary()) {
+            if ($radio == 1) {
+                $timestart = null;
+            } else {
+                $timestart = null;
+            }
         } else {
-            $timestart = $event[$params->calendar]->timestart + $event[$params->calendar]->timeduration + $params->time;
+            if ($radio == 1) {
+                $timestart = $event[$params->calendar]->timestart + $params->time;
+            } else {
+                $timestart = $event[$params->calendar]->timestart + $event[$params->calendar]->timeduration + $params->time;
+            }
         }
+
         return $timestart;
     }
 
@@ -236,14 +242,14 @@ class notificationsagent_condition_calendarstart extends notification_activityco
         return json_encode(['time' => $timeinseconds, 'calendar' => (int) $calendar, 'radio' => $radio]);
     }
 
-    public function process_markups($params, $courseid) {
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
         $jsonparams = json_decode($params);
 
         $paramstoteplace = [$this->get_human_time($jsonparams->time)];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        return $humanvalue;
+        array_push($content, $humanvalue);
     }
 
     public function is_generic() {

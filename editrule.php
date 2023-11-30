@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -82,6 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$cancel && !$submitbutton) {
         $keyelement = $keypost;
         $action = optional_param('action', null, PARAM_TEXT);
         $formdefault = optional_param_array('formDefault', null, PARAM_RAW);
+        $availabilityconditionsjson = optional_param('availabilityconditionsjson', null, PARAM_TEXT);
+        $SESSION->availabilityconditionsjson = $availabilityconditionsjson;
         switch($action) {
             case 'new':
                 $listelement = [];
@@ -147,18 +149,28 @@ $PAGE->set_title(
     get_string('editrule_newrule', 'local_notificationsagent') . " - " .
     get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(
-    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
-    get_string('heading', 'local_notificationsagent'));
+    ($typeaction == 'add'
+        ? get_string('editrule_newrule', 'local_notificationsagent')
+        : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
+    get_string('heading', 'local_notificationsagent')
+);
 $PAGE->navbar->add(
     get_string('editrule_newrule', 'local_notificationsagent') . " - " .
     get_string('heading', 'local_notificationsagent')
 );
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_newaction', 'init');
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_newcondition', 'init');
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_newexception', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_tabs', 'init',
+    ['newcondition_button', 'newcondition_select', 'condition']
+);
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_tabs', 'init',
+    ['newconditionexception_button', 'newconditionexception_select', 'exception']
+);
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_tabs', 'init',
+    ['newaction_button', 'newaction_select', 'action']
+);
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_editruleformactions', 'init');
 
 if (empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])) {
+    unset($SESSION->availabilityconditionsjson);
     if (isset($_GET['ruleid'])) {
         $ruleid = $_GET['ruleid'];
         $rule = Rule::create_instance($ruleid);
@@ -179,6 +191,13 @@ if (empty($SESSION->NOTIFICATIONS['FORMDEFAULT'])) {
             $type = $condition->type;
             $pluginname = $condition->pluginname;
             $parameters = json_decode($condition->parameters);
+
+            if ($pluginname == 'ac') {
+                $parameters = $condition->parameters;
+                $SESSION->availabilityconditionsjson = $parameters;
+                continue;
+            }
+
             require_once($CFG->dirroot . '/local/notificationsagent/' . $type . '/' . $pluginname . '/' . $pluginname . '.php');
             $pluginclass = 'notificationsagent_' . $type . '_' . $pluginname;
             $pluginobj = new $pluginclass($ruleid);
@@ -311,6 +330,12 @@ $mform = new editrule(
     ['type' => $ruletype, 'timesfired' => Rule::MINIMUM_EXECUTION]
 );
 
+// If there is some availability data...
+if (isset($SESSION->availabilityconditionsjson)) {
+    // Set form data.
+    $mform->set_data(['availabilityconditionsjson' => $SESSION->availabilityconditionsjson]);
+}
+
 // Form processing and displaying is done here.
 if ($mform->is_cancelled()) {
     // No reenvía bien con cancelar, entra en el $_POST.
@@ -320,7 +345,7 @@ if ($mform->is_cancelled()) {
         get_string('rulecancelled', 'local_notificationsagent')
     );
 } else if ($fromform = $mform->get_data()) {
-    // TODO Refactor.
+    $pluginac = [];
     $plugindata = [];
     $plugincount = [];
     $dataplugin = new stdClass();
@@ -355,6 +380,17 @@ if ($mform->is_cancelled()) {
         if (preg_match("/conditionexception\d+$/", $key) && isset($currentpluginkey)) {
             $plugindata[$currentpluginkey]["complementary"] = 1;
         }
+
+        if ($key == "availabilityconditionsjson") {
+            // Save time and database space by setting null if the only data
+            // is an empty tree.
+            if (!mod_ac_availability_info::is_empty($value)) {
+                $pluginac["pluginname"] = 'ac';
+                $pluginac["complementary"] = 0;
+                $pluginac['type'] = 'condition';
+                $pluginac['parameters'] = $value;
+            }
+        }
     }
 
     $countcondition = 0;
@@ -369,9 +405,13 @@ if ($mform->is_cancelled()) {
         }
     }
 
+    if (!empty($pluginac)) {
+        $countcondition++;
+    }
+
     $timer = 0;
     // Edit Rule.
-    if ($countcondition >= 1 && $countaction >= 1) {
+    if ($countcondition > 0 && $countaction > 0) {
         $students = notificationsagent::get_usersbycourse($context);
         if (isset($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid'])) {
             $ruleid = intval($SESSION->NOTIFICATIONS['FORMDEFAULT']['ruleid']);
@@ -420,16 +460,28 @@ if ($mform->is_cancelled()) {
                     $contextevaluation->set_params($params);
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
-                    // Recorre la lista de participantes.
-                    foreach ($students as $student) {
-                        notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
+                    if (!$obj->is_generic()) {
+                        foreach ($students as $student) {
+                            notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
+                            if ($timer <= $cache) {
+                                $timer = $cache;
+                                notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
+                            }
+                        }
+                    } else {
+                        notificationsagent::set_timer_cache(
+                            notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                        );
                         if ($timer <= $cache) {
                             $timer = $cache;
-                            notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
+                            notificationsagent::set_time_trigger(
+                                $ruleid, notificationsagent::GENERIC_USERID, $courseid, $timer
+                            );
                         }
                     }
                 }
             }
+
             // New Rule.
         } else {
             $rule = Rule::create_instance();
@@ -465,17 +517,36 @@ if ($mform->is_cancelled()) {
                     $cache = $pluginobj->estimate_next_time($contextevaluation);
 
                     if (!empty($cache)) {
-                        // Recorre la lista de participantes.
-                        foreach ($students as $student) {
-                            notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $condtionid, true);
+                        if (!$obj->is_generic()) {
+                            foreach ($students as $student) {
+                                notificationsagent::set_timer_cache(
+                                    $student->id, $courseid, $cache, $pluginname, $condtionid, true
+                                );
+                                if ($timer <= $cache) {
+                                    $timer = $cache;
+                                    notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
+                                }
+                            }
+                        } else {
+                            notificationsagent::set_timer_cache(
+                                notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                            );
                             if ($timer <= $cache) {
                                 $timer = $cache;
-                                notificationsagent::set_time_trigger($ruleid, $student->id, $courseid, $timer);
+                                notificationsagent::set_time_trigger(
+                                    $ruleid, notificationsagent::GENERIC_USERID, $courseid, $timer
+                                );
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Create/Update.
+        if (!empty($pluginac)) {
+            $pluginac['ruleid'] = $ruleid;
+            $condtionid = $DB->insert_record('notificationsagent_condition', (object)$pluginac);
         }
 
         // In this case you process validated data. $mform->get_data() returns data posted in form.

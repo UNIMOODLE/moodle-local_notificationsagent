@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición relativa a la fecha de inicio del curso';
-$string['conditiontext'] = 'Ha transcurrido [TTTT tiempo] desde el comienzo del curso.';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el comienzo del curso.';
 $string['subtype'] = 'coursestart';
 $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

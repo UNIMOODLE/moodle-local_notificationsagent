@@ -13,20 +13,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Plugin strings are defined here.
+ * Version details
  *
- * @package     notificationsaction_addusergroup
- * @category    string
- * @copyright   2023 ISYC
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    notificationsaction_bootstrapnotifications
+ * @category   string
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Bootstrap notifications';
-$string['messageprovider:bootstrap_notifications'] = 'Add user group Provider';
-$string['bootstrapnotifications_action'] = 'Bootstrap notification';
+$string['pluginname'] = 'Acción relativa a notificaciones Bootstrap';
+$string['messageprovider:bootstrap_notifications'] = 'Proveedor de notificaciones Bootstrap';
+$string['bootstrapnotifications_action'] = 'Notificación Bootstrap';
 $string['subtype'] = 'bootstrapnotifications';
-$string['editrule_action_element_text'] = 'Text {$a->typeelement}';
+$string['editrule_action_element_text'] = 'Texto {$a->typeelement}';

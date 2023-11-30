@@ -28,10 +28,6 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         ];
     }
 
-    public function get_mod_name() {
-        return get_string('modname', 'notificationscondition_coursestart');
-    }
-
     /** Returns the name of the plugin.
      *
      * @return string
@@ -200,14 +196,14 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         return json_encode(['time' => $timeinseconds]);
     }
 
-    public function process_markups($params, $courseid) {
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
         $jsonparams = json_decode($params);
 
         $paramstoteplace = [$this->get_human_time($jsonparams->time)];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        return $humanvalue;
+        array_push($content, $humanvalue);
     }
 
     public function is_generic() {

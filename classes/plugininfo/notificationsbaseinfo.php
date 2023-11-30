@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -116,7 +116,6 @@ class notificationsbaseinfo extends base {
         global $CFG;
         $courseid = required_param('courseid', PARAM_INT);
         $listactions = [];
-        // TODO enabled.
         $rule = new \stdClass();
         $rule->ruleid = null;
         foreach (array_keys(self::get_system_enabled_plugins(null, $subtype)) as $pluginname) {

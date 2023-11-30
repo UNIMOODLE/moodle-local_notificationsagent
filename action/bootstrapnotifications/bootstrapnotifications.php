@@ -17,6 +17,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
 
+use notificationsagent\notificationsagent;
 
 class notificationsagent_action_bootstrapnotifications extends notificationactionplugin {
 
@@ -102,13 +103,20 @@ class notificationsagent_action_bootstrapnotifications extends notificationactio
         return json_encode(['text' => $text]);
     }
 
-    public function process_markups($params, $courseid) {
-        return $this->get_title();
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
+
+        $jsonparams = json_decode($params);
+
+        $paramstoteplace = [shorten_text($jsonparams->text)];
+
+        $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
+
+        array_push($content, $humanvalue);
     }
 
     public function execute_action($context, $params) {
-        // Create a bootstrap notification.
         global $USER;
+
         $placeholdershuman = json_decode($params);
 
         if ($USER->id == $context->get_userid()) {

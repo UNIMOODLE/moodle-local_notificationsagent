@@ -11,91 +11,126 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Module javascript to place conditionactions.
+ * Module javascript to place conditionremove.
  *
- * @module   mod_simplemod/notification_conditionactions
+ * @module    notification_conditionremove
  * @category  Classes - autoloading
  * @copyright 2023, ISYC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- define([], function() {
+define([], function () {
+
+    /**
+     * FormConditionRemove object.
+     */
+    var FormConditionRemove = function () {
+        this.init();
+        this.registerEvents();
+    };
+
+    /** @var {Boolean} The FormConditionRemove button selector. */
+    FormConditionRemove.prototype.buttonSelector = false;
+
+    FormConditionRemove.prototype.registerEvents = function () {
+        var self = this;
+        window.addEventListener("beforeunload", (event) => {
+            if (self.buttonSelector) {
+                event.stopImmediatePropagation();
+            }
+            self.buttonSelector = false;
+        }, true);
+    }
+
+    FormConditionRemove.prototype.init = function () {
+        var self = this;
+
+        let buttonActions = document.querySelectorAll("h5>i.icon[id*='_']:not(.disabled)");
+        buttonActions.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                self.buttonSelector = true
+                let $typesection = event.target.id.split('_')[0].replace(/[0-9]/g, '');
+                let $actionelement = event.target.id.split('_')[1];
+                let $keyelementsession = parseInt(event.target.id.replace($typesection, '').replace('_remove', ''));
+                let $formDefault = [];
+
+                if (window.location.href.includes('action=edit')) {
+                    let url = new URL(window.location.href);
+                    var ruleid = url.searchParams.get('ruleid');
+                    if (ruleid) {
+                        $formDefault.push("[id]ruleid[/id][value]" + ruleid + "[/value]");
+                    }
+                }
+
+                let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
+                let idSectionRemove = "";
+                Array.from(formNotif.elements).forEach((element) => {
+                    if (element.id) {
+                        var elementID = element.id;
+                        var keySection = elementID.split('_' + $typesection).pop().split('_')[0];
+                        if (element.id.includes("_" + $typesection)) {
+                            //¿Eres la sección eliminada?
+                            if (idSectionRemove && idSectionRemove < keySection) {
+                                //Si lo eres, reduce en 1 el id de la sección (condition, action...)
+                                var elementID = element.id.split($typesection + keySection).join($typesection + (keySection - 1));
+                            }
+                        }
+
+                        //Si no perteneces a la sección eliminada, te guardo el valor
+                        if (!element.id.includes($typesection + ($keyelementsession + 1))) {
+                            $formDefault.push("[id]" + elementID + "[/id][value]" + element.value + "[/value]");
+                        } else {
+                            //Si perteneces a la sección eliminada, idSectionRemove de la sección y las secciones posteriores reducir a 1 el id de las secciones posteriores
+                            idSectionRemove = $keyelementsession + 1;
+                        }
+                    }
+                });
+
+                let $availabilityconditionsjson = document.getElementById('id_availabilityconditionsjson').value
+                let data = {
+                    key: $typesection,
+                    action: $actionelement,
+                    keyelementsession: $keyelementsession,
+                    formDefault: $formDefault,
+                    availabilityconditionsjson: $availabilityconditionsjson
+                };
+                if (data.key === 'conditionexception') {
+                    data.key = data.key.replace(/condition/, '');
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: window.location.pathname.substring(0, '/local/notificationsagent/editrule.php'),
+                    data: data,
+                    success: function (event) {
+                        if (event.state === 'success') {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log("Status: " + textStatus);
+                        console.log(errorThrown);
+                    },
+                    dataType: 'json'
+                });
+
+            });
+        });
+    };
 
     return {
 
-        init: function() {
-
-            let buttonActions = document.querySelectorAll("h5>i.icon[id*='_']:not(.disabled)");
-            buttonActions.forEach( function(button) {
-                button.addEventListener('click', function(event) {
-                    let $typesection = event.target.id.split('_')[0].replace(/[0-9]/g, '');
-                    let $actionelement = event.target.id.split('_')[1];
-                    let $keyelementsession = parseInt(event.target.id.replace($typesection,'').replace('_remove',''));
-                    let $formDefault = [];
-                    
-                    if (window.location.href.includes('action=edit')) {
-                        let url = new URL(window.location.href);
-                        var ruleid = url.searchParams.get('ruleid');
-                        if (ruleid) {
-                            $formDefault.push("[id]ruleid[/id][value]"+ruleid+"[/value]");
-                        }
-                    }
-    
-                    let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
-                    let idSectionRemove = "";
-                    Array.from(formNotif.elements).forEach((element) => {
-                        if(element.id){
-                            var elementID = element.id;
-                            var keySection = elementID.split('_'+$typesection).pop().split('_')[0];
-                            if(element.id.includes("_"+$typesection)){
-                                //¿Eres la sección eliminada?
-                                if(idSectionRemove && idSectionRemove < keySection){
-                                    //Si lo eres, reduce en 1 el id de la sección (condition, action...)
-                                    var elementID = element.id.split($typesection + keySection).join($typesection + (keySection - 1));
-                                }
-                            }
-
-                            //Si no perteneces a la sección eliminada, te guardo el valor
-                            if(!element.id.includes($typesection+($keyelementsession+1))){
-                                $formDefault.push("[id]"+elementID+"[/id][value]"+element.value+"[/value]");
-                            }else{
-                                //Si perteneces a la sección eliminada, idSectionRemove de la sección y las secciones posteriores reducir a 1 el id de las secciones posteriores
-                                idSectionRemove = $keyelementsession+1;
-                            }
-                        }
-                    });
-
-                    let data = {
-                        key: $typesection,
-                        action: $actionelement,
-                        keyelementsession: $keyelementsession,
-                        formDefault: $formDefault
-                    };
-                    if (data.key === 'conditionexception') {
-                        data.key = data.key.replace(/condition/, '');
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: window.location.pathname.substring(0, '/local/notificationsagent/editrule.php'),
-                        data: data,
-                        success: function(event) {
-                            if(event.state === 'success'){
-                                window.location.reload();
-                            }
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                            console.log("Status: " + textStatus); 
-                            console.log(errorThrown); 
-                        },
-                        dataType: 'json'
-                    });
-                    
-                });
-            });
+        /**
+         * Main initialisation.
+         * @method init
+         */
+        init: function () {
+            // Create instance.
+            new FormConditionRemove();
         }
+
     }
 });

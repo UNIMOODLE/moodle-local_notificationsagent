@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -43,6 +43,8 @@ abstract class notificationplugin {
     const CONFIG_ENABLED = 'enabled';
     const CAT_ACTION = 'action';
     const CAT_CONDITION = 'condition';
+    const CAT_CONDITION_CHILDREN = 0;
+    const CAT_EXCEPTION_CHILDREN = 1;
 
     /**
      * @var $id int the id of the subplugin instance
@@ -88,11 +90,13 @@ abstract class notificationplugin {
     /**
      * Returns a human-readable string from database records
      *
+     * @param  mixed $content
      * @param  mixed $params
      * @param  mixed $courseid
+     * @param  mixed $complementary
      * @return string
      */
-    abstract public function process_markups($params, $courseid);
+    abstract public function process_markups(&$content, $params, $courseid, $complementary=null);
 
     /**
      * Factory for loading subplugins from database records

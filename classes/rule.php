@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -62,6 +62,7 @@ class Rule {
     private $conditions;
     private $exceptions;
     private $actions;
+    private $isgeneric;
 
     public const SEPARATOR = '______________________';
 
@@ -150,6 +151,7 @@ class Rule {
             $rule->conditions = $rule->get_conditions();
             $rule->exceptions = $rule->get_exceptions();
             $rule->actions = $rule->get_actions();
+            $rule->isgeneric = $rule->is_generic();
         }
 
         return $rule;
@@ -222,23 +224,71 @@ class Rule {
 
     public function get_conditions() {
         global $DB;
+
         $this->conditions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
             ['ruleid' => $this->id, 'type' => 'condition', 'complementary' => 0]));
         return $this->conditions;
     }
 
-    public function get_exceptions() {
+    public function get_exceptions($showac = false) {
         global $DB;
-        $this->exceptions = notificationconditionplugin::create_subplugins($DB->get_records('notificationsagent_condition',
-            ['ruleid' => $this->id, 'type' => 'condition', 'complementary' => 1]));
+
+        $accondition = [];
+
+        $records = $DB->get_records(
+            'notificationsagent_condition', ['ruleid' => $this->id, 'type' => 'condition', 'complementary' => 1]
+        );
+        if ($showac) {
+            $accondition = $DB->get_record(
+                'notificationsagent_condition', ['ruleid' => $this->id, 'type' => 'condition', 'pluginname' => 'ac']
+            );
+        }
+        if ($accondition) {
+            $records[] = $accondition;
+        }
+        $this->exceptions = notificationconditionplugin::create_subplugins($records);
+
         return $this->exceptions;
     }
 
     public function get_actions() {
         global $DB;
+
         $this->actions = notificationactionplugin::create_subplugins($DB->get_records('notificationsagent_action',
             ['ruleid' => $this->id, 'type' => 'action']));
         return $this->actions;
+    }
+
+    /**
+     * Check if the rule is completely generic
+     *
+     * @return bool $isgeneric Is the rule generic?
+     */
+    private function is_generic() {
+        $this->set_isgeneric(false);
+
+        if ($this->is_subplugin_generic($this->get_conditions()) || $this->is_subplugin_generic($this->get_exceptions())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the rule has any generic conditions or exceptions
+     * @param array $subplugins Conditions plugin
+     *
+     * @return bool $isgeneric Is there any condition or exception as a generic?
+     */
+    private function is_subplugin_generic($subplugins) {
+        foreach ($subplugins as $subplugin) {
+            if ($subplugin->is_generic()) {
+                $this->set_isgeneric(true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function delete_conditions($id) {
@@ -443,15 +493,26 @@ class Rule {
         $this->runtime = $runtime;
     }
 
+    /**
+     * @return bool
+     */
+    public function get_isgeneric() {
+        return $this->isgeneric;
+    }
+
+    /**
+     * @param bool $isgeneric
+     */
+    public function set_isgeneric($isgeneric): void {
+        $this->isgeneric = $isgeneric;
+    }
+
     public function evaluate(EvaluationContext $context): bool {
         // Evaluate conditions.
-        $auxc = [];
-        $auxe = [];
         foreach ($this->conditions as $condition) {
             $auxc[] = $condition;
             $context->set_params($condition->get_parameters());
             $context->set_complementary(false);
-            $context->set_conditions($auxc);
             $result = $condition->evaluate($context);
             if ($result === false) {
                 /* Las condiciones temporales poseen un método adicional que permite calcular y devolver
@@ -477,7 +538,6 @@ class Rule {
             $auxe[] = $exception;
             $context->set_params($exception->get_parameters());
             $context->set_complementary(true);
-            $context->set_exceptions($auxe);
             $result = $exception->evaluate($context);
             if ($result === true) {
                 $timetrigger = $condition->estimate_next_time($context);
@@ -526,7 +586,7 @@ class Rule {
         $placeholders = self::get_placeholders();
         $idcreatedby = $rule->get_createdby();
 
-        if (!empty($userid)) {
+        if ($userid != notificationsagent::GENERIC_USERID) {
             $user = \core_user::get_user($userid, '*', MUST_EXIST);
         }
 
@@ -545,23 +605,23 @@ class Rule {
                 if (strpos($item, $placeholder) !== false) {
                     switch ($placeholder) {
                         case 'User_FirstName':
-                            $paramstoreplace[] = $user->firstname;
+                            $paramstoreplace[] = isset($user->firstname) ? $user->firstname : '';
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
 
                         case 'User_LastName':
-                            $paramstoreplace[] = $user->lastname;
+                            $paramstoreplace[] = isset($user->lastname) ? $user->lastname : '';
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
 
                         case 'User_Email':
-                            $paramstoreplace[] = $user->email;
+                            $paramstoreplace[] = isset($user->email) ? $user->email : '';
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
 
                         case 'User_Username':
-                            $paramstoreplace[] = $user->username;
+                            $paramstoreplace[] = isset($user->username) ? $user->username : '';
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
 
                         case 'User_Address':
-                            $paramstoreplace[] = $user->address;
+                            $paramstoreplace[] = isset($user->address) ? $user->address : '';
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
 
                         case 'Course_FullName':
@@ -634,6 +694,19 @@ class Rule {
         $DB->delete_records('notificationsagent_rule', ['id' => $this->get_id()]);
     }
 
+    public function record_report($ruleid, $userid, $courseid, $actionid, $parameters, $timeaccess) {
+        global $DB;
+        $params = [
+            'ruleid' => $ruleid,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'actionid' => $actionid,
+            'actiondetail' => $parameters,
+            'timestamp' => $timeaccess,
+        ];
+        $DB->insert_record('notificationsagent_report', $params);
+    }
+
     public function get_assignedcontext() {
         global $DB;
 
@@ -648,7 +721,6 @@ class Rule {
                 $data['category'][] = $result->objectid;
             }
         }
-
         return $data;
     }
 

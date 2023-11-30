@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición fecha relativa desde el evento del calendario';
-$string['conditiontext'] = 'Ha transcurrido [TTTT tiempo] desde el evento de calendario [CCCC]]';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el evento de calendario [CCCC]]';
 $string['subtype'] = 'calendarstart';
 $string['modname'] = 'calendarstart';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
     Project implemented by the \"Recovery, Transformation and Resilience Plan.
     Funded by the European Union - Next GenerationEU\".
 
@@ -58,6 +58,9 @@
             <a href="{{{url.addtemplate}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newtemplate, local_notificationsagent{{/str}}</a>
         {{/ iscontextsite}}
     {{/capabilities.create}}
+    {{#capabilities.report}}
+        <a href="{{{url.reporturl}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_reports, local_notificationsagent{{/str}}</a>
+    {{/capabilities.report}}
 </div>
 
 <div class="d-flex flex-wrap">
@@ -156,13 +159,18 @@
                             {{/ isrule}}
                         {{/ iscontextsite}}
                     {{/capabilities.edit}}
+                    {{#capabilities.report}}
+                        {{# isrule}}
+                            <a href="{{{reporturl}}}"><i class="fa fa-file mr-2"></i>{{#str}}editrule_reportrule, local_notificationsagent{{/str}}</a>
+                        {{/ isrule}}
+                    {{/capabilities.report}}
                     {{#capabilities.export}}
                         {{# iscontextsite}}
-                            <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
+                            <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
                         {{/ iscontextsite}}
                         {{^ iscontextsite}}
                             {{# isrule}}
-                                <a href="{{{exporturl}}}" class="btn btn-outline-primary">{{#str}}export, local_notificationsagent{{/str}}</a>
+                                <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
                             {{/ isrule}}
                         {{/ iscontextsite}}
                     {{/capabilities.export}}

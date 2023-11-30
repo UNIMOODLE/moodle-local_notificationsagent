@@ -41,12 +41,17 @@ $string['disable_user_use'] = 'Deshabilitar para el usuario';
 $string['disable_user_use_desc'] = 'Deshabilitar el uso del Agente de notificaciones para el usuario';
 $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Deshabilitar en sitios en producción';
+$string['startdate'] = 'Configuración de fechas de actividad';
+$string['startdate_desc'] = 'Usar una línea por cada actividad con el patrón: pluginname|tablename|startdate|startend';
 
 // Subplugins settings.
 $string['notificationaction_action'] = 'Subplugins tipo action ';
 
 $string['managenotificationsactionplugins'] = 'Gestionar plugins tipo action';
 $string['managenotificationsconditionplugins'] = 'Gestionar plugins tipo condition';
+
+$string['manageactionplugins'] = 'Gestionar plugins action';
+$string['manageconditionplugins'] = 'Gestionar plugins condition';
 
 $string['actionplugins'] = 'Plugins tipo action';
 $string['conditionplugins'] = 'Plugins tipo condition';
@@ -79,8 +84,8 @@ $string['ruledownload'] = 'Exportar regla como';
 
 // Assign Template.
 $string['assign'] = 'Asignar';
-$string['type_template'] = 'plantilla';
-$string['type_rule'] = 'regla';
+$string['type_template'] = 'Plantilla';
+$string['type_rule'] = 'Regla';
 
 // Condition plugins.
 $string['condition_days'] = 'Días';
@@ -90,9 +95,11 @@ $string['condition_seconds'] = 'Segundos';
 
 // EditRule.
 $string['editrule_newrule'] = 'Nueva regla';
+$string['editrule_reports'] = 'Informes';
 $string['editrule_activaterule'] = 'Activar';
 $string['editrule_pauserule'] = 'Pausar';
 $string['editrule_editrule'] = 'Editar';
+$string['editrule_reportrule'] = 'Informe';
 $string['editrule_deleterule'] = 'Borrar';
 $string['editrule_newtemplate'] = 'Nueva plantilla';
 $string['editrule_title'] = 'Título';
@@ -105,34 +112,38 @@ $string['editrule_sharedallrule'] = 'Compartido';
 $string['editrule_timesfired'] = 'Nº de veces ejecución';
 $string['editrule_runtime'] = 'Periocidad';
 
-    // Condition.
-    $string['editrule_newcondition'] = 'Nueva condición:';
-    $string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para el cierre de la actividad [AAAA]';
-    $string['editrule_condition_title_usercompleteactivity'] = 'El usuario tiene completada la actividad [AAAA]';
-    $string['editrule_condition_title_activeactivity'] = 'La actividad [AAAA] está disponible';
-    $string['editrule_condition_title_betweendates'] = 'Estamos entre la fecha [FFFF-1] y [FFFF-2]';
-    $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas las actividades para acceder a este foro [FFFF]';
-    $string['editrule_condition_title_forumnotanswer'] = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
+// Condition.
+$string['editrule_generalconditions'] = 'Condiciones generales';
+$string['editrule_newcondition'] = 'Nueva condición:';
+$string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para el cierre de la actividad [AAAA]';
+$string['editrule_condition_title_usercompleteactivity'] = 'El usuario tiene completada la actividad [AAAA]';
+$string['editrule_condition_title_activeactivity'] = 'La actividad [AAAA] está disponible';
+$string['editrule_condition_title_betweendates'] = 'Estamos entre la fecha [FFFF-1] y [FFFF-2]';
+$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas las actividades para acceder a este foro [FFFF]';
+$string['editrule_condition_title_forumnotanswer'] = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
 
-        $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
-        $string['editrule_condition_element_activity'] = 'Actividad {$a->typeelement}:';
-        $string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-        $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
-    // Actions.
-    $string['editrule_newaction'] = 'Nueva acción:';
-    $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_notificationtouser'] = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postgeneralforum'] = 'Publicar un post general en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postprivateforum'] = 'Publicar un post privado en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_addusertogroup'] = 'Añadir un usuario a grupo [GGGG]';
-    $string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario de un grupo [GGGG]';
-    $string['editrule_action_title_bootstrapnotification'] = 'Notificación bootstrap';
+$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
+$string['editrule_condition_element_activity'] = 'Actividad {$a->typeelement}:';
+$string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
 
-        $string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
-        $string['editrule_action_element_message'] = 'Mensaje {$a->typeelement}:';
-        $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
-        $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
-        $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+// Actions.
+$string['editrule_newaction'] = 'Nueva acción:';
+$string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
+$string['editrule_action_title_notificationtouser'] = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
+$string['editrule_action_title_postgeneralforum'] = 'Publicar un post general en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
+$string['editrule_action_title_postprivateforum'] = 'Publicar un post privado en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
+$string['editrule_action_title_addusertogroup'] = 'Añadir un usuario a grupo [GGGG]';
+$string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario de un grupo [GGGG]';
+$string['editrule_action_title_bootstrapnotification'] = 'Notificación bootstrap';
+
+$string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
+$string['editrule_action_element_message'] = 'Mensaje {$a->typeelement}:';
+$string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
+$string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
+$string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+
+$string['subplugintype_notificationsagentaction'] = 'Subplugins action';
 
 // Rule.
 $string['rulecancelled'] = 'Regla cancelada';
@@ -196,6 +207,7 @@ $string['notificationsagent:shareruleall'] = 'Aprobar la compartición de una re
 $string['notificationsagent:managesiterule'] = 'Gestionar las reglas a nivel de sitio';
 $string['notificationsagent:managecourserule'] = 'Gestionar las reglas a nivel de curso';
 $string['notificationsagent:manageownrule'] = 'Gestionar tus propias reglas en el curso';
+$string['notificationsagent:viewassistantreport'] = 'Ver informe de reglas';
 
 $string['notificationsagent:activitycompleted'] = 'Capacidad para usar la condición activitycompleted';
 $string['notificationsagent:activityopen'] = 'Capacidad para usar la condición activityopen';
@@ -214,3 +226,17 @@ $string['notificationsagent:usermessageagent'] = 'Capacidad para usar la acción
 $string['nosuchinstance'] = 'Dicha instancia no ha sido encontrada.';
 $string['isnotrule'] = 'Dicho identificador de regla no pertenece a una regla.';
 
+// Report.
+$string['rulename'] = 'Nombre de la regla';
+$string['report'] = 'Informe del agente de notificaciones';
+$string['id'] = 'id';
+$string['ruleid'] = 'Id de la regla';
+$string['fullrule'] = 'Regla';
+$string['userid'] = 'Id de usuario';
+$string['fulluser'] = 'Usuario';
+$string['fullcourse'] = 'Curso';
+$string['courseid'] = 'Id del curso';
+$string['actionid'] = 'Ide de la acción';
+$string['fullaction'] = 'Acción';
+$string['actiondetail'] = 'Detalle de la acción';
+$string['timestamp'] = 'Fecha';

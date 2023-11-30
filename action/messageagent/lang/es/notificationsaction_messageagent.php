@@ -13,22 +13,31 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Plugin strings are defined here.
+ * Version details
  *
- * @package     notificationsaction_messageagent
- * @category    string
- * @copyright   2023 ISYC
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    notificationsaction_messageagent
+ * @category   string
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'User individual notification';
-$string['messageprovider:individual_message'] = 'Message Provider';
-$string['messageagent_action'] = 'Send individual notification with title [TTTT] and message [BBBB]';
-$string['editrule_action_title'] = 'Title {$a->typeelement}:';
-$string['editrule_action_message'] = 'Message {$a->typeelement}';
+$string['pluginname'] = 'Notificación individual a usuarios';
+$string['messageprovider:individual_message'] = 'Proveedor de mensajes';
+$string['messageagent_action'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
+$string['editrule_action_title'] = 'Título {$a->typeelement}:';
+$string['editrule_action_message'] = 'Mensaje {$a->typeelement}';
 $string['subtype'] = 'messageagent';
-$string['messageagent_event'] = 'Message agent';
+$string['messageagent_event'] = 'Agente de mensajería';

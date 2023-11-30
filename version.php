@@ -35,6 +35,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_notificationsagent';
 $plugin->release = '0.6.0';
-$plugin->version = 2023112100;
+$plugin->version = 2023112901;
 $plugin->requires = 2022041900;
 $plugin->maturity = MATURITY_BETA;

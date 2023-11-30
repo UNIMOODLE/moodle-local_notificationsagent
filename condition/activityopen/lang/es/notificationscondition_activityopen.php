@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición relativa al comienzo de una actividad';
-$string['conditiontext'] = 'Ha transcurrido [TTTTT tiempo] desde la fecha de apertura de la actividad [AAAA].';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde la fecha de apertura de la actividad [AAAA].';
 $string['subtype'] = 'activityopen';
 $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
@@ -28,10 +28,6 @@ class notificationsagent_condition_activityopen extends notification_activitycon
             'elements' => self::get_elements(),
             'name' => self::get_subtype(),
         ];
-    }
-
-    protected function get_mod_name() {
-        return get_string('modname', 'notificationscondition_activityopen');
     }
 
     public function get_title() {
@@ -214,7 +210,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         return json_encode(['time' => $timeinseconds, 'activity' => (int) $activity]);
     }
 
-    public function process_markups($params, $courseid) {
+    public function process_markups(&$content, $params, $courseid, $complementary=null) {
         $activityincourse = false;
         $jsonparams = json_decode($params);
 
@@ -236,7 +232,7 @@ class notificationsagent_condition_activityopen extends notification_activitycon
         $paramstoreplace = [$this->get_human_time($jsonparams->time), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
-        return $humanvalue;
+        array_push($content, $humanvalue);
     }
 
     public function is_generic() {

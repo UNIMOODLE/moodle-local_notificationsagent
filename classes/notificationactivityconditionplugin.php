@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -34,9 +34,6 @@ namespace local_notificationsagent;
 defined('MOODLE_INTERNAL') || die();
 require_once('notificationconditionplugin.php');
 abstract class notification_activityconditionplugin extends \notificationconditionplugin {
-
-    abstract protected function get_mod_name();
-
     public static function observe_activity_events($event) {
     }
 

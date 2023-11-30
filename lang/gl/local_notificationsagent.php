@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -32,171 +32,209 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Agente de notificaciones';
-// Settings.
-$string['settings'] = 'Ajustes';
-$string['disable_user_use'] = 'Deshabilitar para el usuario';
-$string['disable_user_use_desc'] = 'Deshabilitar el uso del Agente de notificaciones para el usuario';
-$string['tracelog'] = 'Trace log';
-$string['tracelog_desc'] = 'Trace log. Deshabilitar en sitios en producción';
+$string['pluginname'] = 'Axente de notificacións';
+// Configuración.
+$string['settings'] = 'Configuración';
+$string['disable_user_use'] = 'Desactivar para o usuario';
+$string['disable_user_use_desc'] = 'Desactivar o uso do axente de notificacións para o usuario';
+$string['tracelog'] = 'Rexistro de rastrexo';
+$string['tracelog_desc'] = 'Rexistro de rastrexo. Desactivar nos sitios de produción';
+$string['startdate'] = 'Configuración da data da actividade';
+$string['startdate_desc'] = 'Utiliza unha liña para cada actividade co patrón: pluginname|tablename|startdate|startend';
 
-// Subplugins settings.
-$string['notificationaction_action'] = 'Subplugins tipo action ';
+// Configuración dos subplugins.
+$string['notificationaction_action'] = 'Acción do tipo de subcomplementos ';
 
-$string['managenotificationsactionplugins'] = 'Gestionar plugins tipo action';
-$string['managenotificationsconditionplugins'] = 'Gestionar plugins tipo condition';
+$string['managenotificationsactionplugins'] = 'Xestionar complementos de acción';
+$string['managenotificationsconditionplugins'] = 'Xestionar complementos de condicións';
 
-$string['actionplugins'] = 'Plugins tipo action';
-$string['conditionplugins'] = 'Plugins tipo condition';
+$string['manageactionplugins'] = 'Xestionar complementos de acción';
+$string['manageconditionplugins'] = 'Xestionar complementos de condicións';
 
-$string['notificationsactionpluginname'] = 'Plugin action';
-$string['notificationsconditionpluginname'] = 'Plugin condition';
+$string['actionplugins'] = 'Complementos de acción';
+$string['conditionplugins'] = 'Condición de complementos';
+
+$string['notificationsactionpluginname'] = 'Acción do complemento';
+$string['notificationsconditionpluginname'] = 'Condición do complemento';
 
 $string['hideshow'] = 'Ocultar/Mostrar';
 
-// Task.
-$string['tatasktriggerssk'] = 'Tarea de desencadenadores de notificaciones';
-$string['menu'] = 'Mi asistente';
-$string['heading'] = 'Agente de Notificaciones';
+// Tarefa.
+$string['tatasktriggerssk'] = 'Tarefa de activación de notificacións';
+$string['menu'] = 'O meu asistente';
+$string['heading'] = 'Axente de notificación';
 
-// Status Template.
-$string['status_active'] = 'Activa';
-$string['status_paused'] = 'Pausada';
-$string['status_required'] = 'Obligatoria';
+// Modelo de estado.
+$string['status_active'] = 'Activo';
+$string['status_paused'] = 'En pausa';
+$string['status_required'] = 'Requirido';
 
-// Import Template.
-$string['import'] = 'Import';
-$string['no_file_selected'] = 'Ningún archivo seleccionado';
-$string['import_success'] = 'Regla importada correctamente';
-$string['import_error'] = 'No se ha podido importar la regla, revisa el archivo JSON';
-$string['no_json_file'] = 'El archivo no es JSON';
+// Importar modelo.
+$string['import'] = 'Importar';
+$string['no_file_selected'] = 'Non se seleccionou ningún ficheiro';
+$string['import_success'] = 'Regra importada correctamente';
+$string['import_error'] = 'Non se puido importar a regra, comprobe o ficheiro JSON';
+$string['no_json_file'] = 'O ficheiro non é JSON';
 
-// Export Template.
+// Exportar modelo.
 $string['export'] = 'Exportar';
-$string['ruledownload'] = 'Exportar regla como';
+$string['ruledownload'] = 'Exportar regra como';
 
-// Assign Template.
+// Asignar modelo.
 $string['assign'] = 'Asignar';
-$string['type_template'] = 'plantilla';
-$string['type_rule'] = 'regla';
+$string['type_template'] = 'Modelo';
+$string['type_rule'] = 'Regra';
 
-// Condition plugins.
+// Condicionar complementos.
 $string['condition_days'] = 'Días';
-$string['condition_hours'] = 'Horas';
+$string['condition_hours'] = 'Horas ';
 $string['condition_minutes'] = 'Minutos';
 $string['condition_seconds'] = 'Segundos';
 
-// EditRule.
-$string['editrule_newrule'] = 'Nueva regla';
+// Editar regra.
+$string['editrule_newrule'] = 'Nova regra';
 $string['editrule_activaterule'] = 'Activar';
-$string['editrule_pauserule'] = 'Pausar';
-$string['editrule_editrule'] = 'Editar';
-$string['editrule_deleterule'] = 'Borrar';
-$string['editrule_newtemplate'] = 'Nueva plantilla';
+$string['editrule_pauserule'] = 'Pausa';
+$string['ediditrule_editrule'] = 'Editar';
+$string['ediditrule_deleterule'] = 'Eliminar';
+$string['editrule_newtemplate'] = 'Novo modelo';
 $string['editrule_title'] = 'Título';
+$string['editrule_type'] = 'Tipo de regra';
+$string['editrule_usetemplate'] = 'Seleccionar';
 $string['editrule_sharerule'] = 'Compartir';
-$string['editrule_unsharerule'] = 'Descompartir';
+$string['editrule_unsharerule'] = 'Non compartir';
+$string['editrule_shareallrule'] = 'Compartir todo';
+$string['editrule_sharedallrule'] = 'Compartido';
+$string['editrule_timesfired'] = 'Número de veces disparado';
+$string['editrule_runtime'] = 'Periocidade';
 
-    // Condition.
-    $string['editrule_newcondition'] = 'Nueva condición:';
-    $string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para el cierre de la actividad [AAAA]';
-    $string['editrule_condition_title_usercompleteactivity'] = 'El usuario tiene completada la actividad [AAAA]';
-    $string['editrule_condition_title_activeactivity'] = 'La actividad [AAAA] está disponible';
-    $string['editrule_condition_title_betweendates'] = 'Estamos entre la fecha [FFFF-1] y [FFFF-2]';
-    $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas las actividades para acceder a este foro [FFFF]';
-    $string['editrule_condition_title_forumnotanswer'] = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
+// Condition.
+$string['editrule_generalconditions'] = 'Condicións xerais';
+$string['editrule_newcondition'] = 'Nova condición:';
+$string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para que se peche a actividade [AAAA]';
+$string['editrule_condition_title_usercompleteactivity'] = 'O usuario completou a actividade [AAAA]';
+$string['editrule_condition_title_activeactivity'] = 'A actividade [AAAA] está dispoñible';
+$string['editrule_condition_title_betweendates'] = 'Estamos entre a data [FFFF-1] e [FFFF-2]';
+$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas as actividades para acceder a este foro [FFFF]';
+$string['editrule_condition_title_forumnotanswer'] = 'Unha conversa aberta polo usuario no foro [FFFF] sen responder durante máis de [TTTT] tempo';
 
-        $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
-        $string['editrule_condition_element_activity'] = 'Actividad {$a->typeelement}:';
-        $string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-        $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
-    // Actions.
-    $string['editrule_newaction'] = 'Nueva acción:';
-    $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_notificationtouser'] = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postgeneralforum'] = 'Publicar un post general en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postprivateforum'] = 'Publicar un post privado en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_addusertogroup'] = 'Añadir un usuario a grupo [GGGG]';
-    $string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario de un grupo [GGGG]';
-    $string['editrule_action_title_bootstrapnotification'] = 'Notificación bootstrap';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['editrule_condition_element_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_date_from'] = get_string('de').' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
 
-        $string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
-        $string['editrule_action_element_message'] = 'Mensaje {$a->typeelement}:';
-        $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
-        $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
-        $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+// Accións.
+$string['editrule_newaction'] = 'Nova acción:';
+$string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] e mensaxe [BBBB]';
+$string['editrule_action_title_notificationtouser'] = 'Enviar notificación a un usuario específico [UUUU] con título [TTTT] e mensaxe [BBBB]';
+$string['editrule_action_title_postgeneralforum'] = 'Publicar unha publicación xeral no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
+$string['editrule_action_title_postprivateforum'] = 'Publicar unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
+$string['editrule_action_title_addusertogroup'] = 'Engadir usuario ao grupo [GGGG]';
+$string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario dun grupo [GGGG]';
+$string['editrule_action_title_bootstrapnotification'] = 'Notificación de arranque';
+
+$string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
+$string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}:';
+$string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
+$string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
+$string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+
+$string['subplugintype_notificationsagentaction'] = 'Acción de subplugins';
 
 // Rule.
-$string['rulecancelled'] = 'Regla cancelada';
-$string['rulesaved'] = 'Regla guardada';
+$string['rulecancelled'] = 'Regra cancelada';
+$string['rulesaved'] = 'Gardouse a regra';
 
-// Card content.
+// Contido da tarxeta.
 $string['cardif'] = 'Si:';
-$string['cardunless'] = 'Excepto si:';
-$string['cardthen'] = 'Entonces:';
+$string['cardunless'] = 'Excepto se:';
+$string['cardthen'] = 'Entón:';
 
-// Card Condition time.
+// Tempo de condición da tarxeta.
 $string['card_day'] = 'día';
 $string['card_hour'] = 'hora';
 $string['card_minute'] = 'minuto';
 $string['card_second'] = 'segundo';
 
-// Status modal.
-$string['statustitle'] = '{$a->textstatus} regla {$a->title}';
-$string['statuscontent'] = 'Se va a {$a->textstatus} la regla {$a->title}, ¿desea continuar?';
+// Estado modal.
+$string['statustitle'] = '{$a->textstatus} regra {$a->title}';
+$string['statuscontent'] = 'Vas a regra {$a->textstatus} {$a->title}, queres continuar?';
 $string['statuscancel'] = 'Cancelar';
 $string['statusaccept'] = 'Aceptar';
-$string['statusacceptactivated'] = 'Regla activada';
-$string['statusacceptpaused'] = 'Regla pausada';
+$string['statusacceptactivated'] = 'Regra activada';
+$string['statusacceptpaused'] = 'Regra en pausa';
 
-// Delete modal.
-$string['deletetitle'] = 'Borrar la {$a->type} {$a->title}';
-$string['deletecontent_nocontext'] = 'Se va a borrar {$a->type} {$a->title}, ¿desea continuar?';
-$string['deletecontent_hascontext'] = 'La {$a->type} {$a->title} que desea borrar, se encuentra asociada a otros contextos, ¿desea continuar?';
-$string['deleteaccept'] = 'Regla borrada';
+// Eliminar modal.
+$string['deletetitle'] = 'Eliminar o {$a->type} {$a->title}';
+$string['deletecontent_nocontext'] = '{$a->type} {$a->title} estase a eliminar, queres continuar?';
+$string['deletecontent_hascontext'] = 'O {$a->type} {$a->title} que quere eliminar está asociado con outros contextos, quere continuar?';
+$string['deleteaccept'] = 'Regra eliminada';
 
-// Assign modal.
-$string['assignassign'] = 'Assignar: ';
+// Asignar modal.
+$string['assignassign'] = 'Asignar: ';
 $string['assigncancel'] = 'Cancelar';
-$string['assignsave'] = 'Guardar cambios';
-$string['assignforced'] = 'Asignar la regla forzosamente';
+$string['assignsave'] = 'Gardar os cambios';
+$string['assignforced'] = 'Asignar a regra á forza';
 
-// Share modal.
-$string['sharetitle'] = 'Compartir la regla {$a->title}';
-$string['sharecontent'] = 'Se va a compartir la regla {$a->title} con el administrador, ¿desea continuar?';
-$string['unsharetitle'] = 'Descompartir la regla {$a->title}';
-$string['unsharecontent'] = 'Se va a descompartir la regla {$a->title} con el administrador, ¿desea continuar?';
-$string['shareaccept'] = 'Regla compartida';
-$string['unshareaccept'] = 'Regla descompartida';
+// Compartir modal.
+$string['sharetitle'] = 'Compartir regra {$a->title}';
+$string['sharecontent'] = 'A regra {$a->title} estase compartindo co administrador, queres continuar?';
+$string['unsharetitle'] = 'Descompartir a regra {$a->title}';
+$string['unsharecontent'] = 'A regra {$a->title} está a piques de deixarse de compartir co administrador, queres continuar?';
+$string['shareaccept'] = 'Regra compartida';
+$string['unshareaccept'] = 'Regra non compartida';
+
+// Compartir todos os modais.
+$string['sharealltitle'] = 'Aprobar a regra de uso compartido {$a->title}';
+$string['shareallcontent'] = 'A regra de uso compartido {$a->title} está a piques de ser aprobada, queres continuar?';
 
 // Capabilities.
-$string['notificationsagent:createrule'] = 'Crear una regla';
-$string['notificationsagent:editrule'] = 'Actualizar una regla';
-$string['notificationsagent:deleterule'] = 'Borrar una regla';
-$string['notificationsagent:updaterulestatus'] = 'Actualizar el estado de una regla';
-$string['notificationsagent:exportrule'] = 'Exportar una regla';
-$string['notificationsagent:importrule'] = 'Importar una regla';
-$string['notificationsagent:assignrule'] = 'Asignar una regla';
-$string['notificationsagent:forcerule'] = 'Forzar una regla';
-$string['notificationsagent:updateruleshare'] = 'Actualizar el estado de compartición de una regla';
+$string['notificationsagent:createrule'] = 'Crear unha regra';
+$string['notificationsagent:etrule'] = 'Actualizar unha regra';
+$string['notificationsagent:checkrulecontext'] = 'Comprobar o contexto dunha regra';
+$string['notificationsagent:deleterule'] = 'Eliminar unha regra';
+$string['notificationsagent:updaterulestatus'] = 'Actualizar o estado dunha regra';
+$string['notificationsagent:exportrule'] = 'Exportar unha regra';
+$string['notificationsagent:importrule'] = 'Importar unha regra';
+$string['notificationsagent:assignrule'] = 'Asignar unha regra';
+$string['notificationsagent:forcerule'] = 'Forzar unha regra';
+$string['notificationsagent:updateruleshare'] = 'Actualizar o estado de uso compartido dunha regra';
+$string['notificationsagent:shareruleall'] = 'Aprobar a compartición dunha regra';
+$string['notificationsagent:managesiterule'] = 'Xestionar regras de nivel de sitio';
+$string['notificationsagent:managecourserule'] = 'Xestionar regras a nivel de curso';
+$string['notificationsagent:manageownrule'] = 'Xestiona as túas propias regras no curso';
+$string['notificationsagent:viewassistantreport'] = 'Ver informe regra';
 
-$string['notificationsagent:activitycompleted'] = 'Capacidad para usar la condición activitycompleted';
-$string['notificationsagent:activityopen'] = 'Capacidad para usar la condición activityopen';
-$string['notificationsagent:coursestart'] = 'Capacidad para usar la condición coursestart';
-$string['notificationsagent:calendarstart'] = 'Capacidad para usar la condición calendarstart';
-$string['notificationsagent:sessionstart'] = 'Capacidad para usar la condición sessionstart';
+$string['notificationsagent:activitycompleted'] = 'Capacidade de usar a condición de actividade completada';
+$string['notificationsagent:activityopen'] = 'Capacidade de usar a condición activityopen';
+$string['notificationsagent:coursestart'] = 'Capacidade de usar a condición de inicio do curso';
+$string['notificationsagent:calendarstart'] = 'Capacidade de usar a condición de calendarstart';
+$string['notificationsagent:sessionstart'] = 'Capacidade de usar a condición de inicio de sesión';
 
-$string['notificationsagent:addusergroup'] = 'Capacidad para usar la acción addusergroup';
-$string['notificationsagent:bootstrapnotifications'] = 'Capacidad para usar la acción bootstrapnotifications';
-$string['notificationsagent:forummessage'] = 'Capacidad para usar la acción forummessage';
-$string['notificationsagent:messageagent'] = 'Capacidad para usar la acción messageagent';
-$string['notificationsagent:removeusergroup'] = 'Capacidad para usar la acción removeusergroup';
-$string['notificationsagent:usermessageagent'] = 'Capacidad para usar la acción usermessageagent';
+$string['notificationsagent:addusergroup'] = 'Capacidade de usar a acción addusergroup';
+$string['notificationsagent:bootstrapnotifications'] = 'Capacidade de usar a acción bootstrapnotifications';
+$string['notificationsagent:forummessage'] = 'Capacidade de usar a acción forummessage';
+$string['notificationsagent:messageagent'] = 'Capacidade de usar a acción messageagent';
+$string['notificationsagent:removeusergroup'] = 'Capacidade de usar a acción removeusergroup';
+$string['notificationsagent:usermessageagent'] = 'Capacidade de usar a acción usermessageagent';
 
-// Webservices.
-$string['nosuchinstance'] = 'Dicha instancia no ha sido encontrada.';
-$string['isnotrule'] = 'Dicho identificador de regla no pertenece a una regla.';
+// Servizos web.
+$string['nosuchinstance'] = 'Non se atopou esta instancia.';
+$string['isnotrule'] = 'Este identificador de regra non pertence a unha regra.';
 
+// Report.
+$string['rulename'] = 'Nome da regra';
+$string['report'] = 'Informe do axente de notificación';
+$string['id'] = 'id';
+$string['ruleid'] = 'ID da regra';
+$string['fullrule'] = 'Regra';
+$string['userid'] = 'ID de usuario';
+$string['fulluser'] = 'Usuario';
+$string['fullcourse'] = 'Curso';
+$string['courseid'] = 'ID do curso';
+$string['actionid'] = 'ID de acción';
+$string['fullaction'] = 'Acción';
+$string['actiondetail'] = 'Detalle da acción';
+$string['timestamp'] = 'Data';

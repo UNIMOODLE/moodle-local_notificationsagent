@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -32,171 +32,211 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Agente de notificaciones';
-// Settings.
-$string['settings'] = 'Ajustes';
-$string['disable_user_use'] = 'Deshabilitar para el usuario';
-$string['disable_user_use_desc'] = 'Deshabilitar el uso del Agente de notificaciones para el usuario';
-$string['tracelog'] = 'Trace log';
-$string['tracelog_desc'] = 'Trace log. Deshabilitar en sitios en producción';
+$string['pluginname'] = 'Jakinarazpen-agentea';
+// Ezarpenak.
+$string['settings'] = 'Ezarpenak';
+$string['disable_user_use'] = 'Desgaitu erabiltzailearentzat';
+$string['disable_user_use_desc'] = 'Erabiltzaileentzako Jakinarazpen Agentearen erabilera desgaitu';
+$string['tracelog'] = 'Aztarnaren erregistroa';
+$string['tracelog_desc'] = 'Aztarnaren erregistroa. Desgaitu ekoizpen guneetan';
+$string['startdate'] = 'Jarduera-dataren ezarpenak';
+$string['startdate_desc'] = 'Erabili lerro bat jarduera bakoitzeko ereduarekin: pluginname|tablename|startdate|startend';
 
-// Subplugins settings.
-$string['notificationaction_action'] = 'Subplugins tipo action ';
+// Azpipluginen ezarpenak.
+$string['notificationaction_action'] = 'Subplugin motako ekintza ';
 
-$string['managenotificationsactionplugins'] = 'Gestionar plugins tipo action';
-$string['managenotificationsconditionplugins'] = 'Gestionar plugins tipo condition';
+$string['managenotificationsactionplugins'] = 'Kudeatu ekintza-pluginak';
+$string['managenotificationsconditionplugins'] = 'Kudeatu baldintza-pluginak';
 
-$string['actionplugins'] = 'Plugins tipo action';
-$string['conditionplugins'] = 'Plugins tipo condition';
+$string['manageactionplugins'] = 'Kudeatu ekintza-pluginak';
+$string['manageconditionplugins'] = 'Kudeatu baldintza-pluginak';
 
-$string['notificationsactionpluginname'] = 'Plugin action';
-$string['notificationsconditionpluginname'] = 'Plugin condition';
+$string['actionplugins'] = 'Ekintza-pluginak';
+$string['conditionplugins'] = 'Baldintza pluginak';
 
-$string['hideshow'] = 'Ocultar/Mostrar';
+$string['notificationsactionpluginname'] = 'Plugin ekintza';
+$string['notificationsconditionpluginname'] = 'Plugin-baldintza';
 
-// Task.
-$string['tatasktriggerssk'] = 'Tarea de desencadenadores de notificaciones';
-$string['menu'] = 'Mi asistente';
-$string['heading'] = 'Agente de Notificaciones';
+$string['hideshow'] = 'Ezkutatu/Erakutsi';
 
-// Status Template.
-$string['status_active'] = 'Activa';
-$string['status_paused'] = 'Pausada';
-$string['status_required'] = 'Obligatoria';
+// Zeregin.
+$string['tatasktriggerssk'] = 'Jakinarazpen-abiarazleen ataza';
+$string['menu'] = 'Nire laguntzailea';
+$string['heading'] = 'Jakinarazpen-agentea';
 
-// Import Template.
-$string['import'] = 'Import';
-$string['no_file_selected'] = 'Ningún archivo seleccionado';
-$string['import_success'] = 'Regla importada correctamente';
-$string['import_error'] = 'No se ha podido importar la regla, revisa el archivo JSON';
-$string['no_json_file'] = 'El archivo no es JSON';
+// Egoera Txantiloia.
+$string['status_active'] = 'Aktibo';
+$string['status_paused'] = 'Pausatuta';
+$string['status_required'] = 'Beharrezkoa';
 
-// Export Template.
-$string['export'] = 'Exportar';
-$string['ruledownload'] = 'Exportar regla como';
+// Inportatu Txantiloia.
+$string['import'] = 'Inportatu';
+$string['no_file_selected'] = 'Ez dago fitxategirik hautatu';
+$string['import_success'] = 'Araua ondo inportatu da';
+$string['import_error'] = 'Ezin izan da araua inportatu, egiaztatu JSON fitxategia';
+$string['no_json_file'] = 'Fitxategia ez da JSON';
 
-// Assign Template.
-$string['assign'] = 'Asignar';
-$string['type_template'] = 'plantilla';
-$string['type_rule'] = 'regla';
+// Esportatu Txantiloia.
+$string['export'] = 'Esportatu';
+$string['ruledownload'] = 'Esportatu araua honela';
 
-// Condition plugins.
-$string['condition_days'] = 'Días';
-$string['condition_hours'] = 'Horas';
-$string['condition_minutes'] = 'Minutos';
-$string['condition_seconds'] = 'Segundos';
+// Txantiloia esleitu.
+$string['assign'] = 'Esleitu';
+$string['type_template'] = 'Txantiloia';
+$string['type_rule'] = 'Araua';
 
-// EditRule.
-$string['editrule_newrule'] = 'Nueva regla';
-$string['editrule_activaterule'] = 'Activar';
-$string['editrule_pauserule'] = 'Pausar';
-$string['editrule_editrule'] = 'Editar';
-$string['editrule_deleterule'] = 'Borrar';
-$string['editrule_newtemplate'] = 'Nueva plantilla';
-$string['editrule_title'] = 'Título';
-$string['editrule_sharerule'] = 'Compartir';
-$string['editrule_unsharerule'] = 'Descompartir';
+// Baldintza pluginak.
+$string['condition_days'] = 'Egunak';
+$string['condition_hours'] = 'Orduak';
+$string['condition_minutes'] = 'Minututuak';
+$string['condition_seconds'] = 'Segunduak';
 
-    // Condition.
-    $string['editrule_newcondition'] = 'Nueva condición:';
-    $string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para el cierre de la actividad [AAAA]';
-    $string['editrule_condition_title_usercompleteactivity'] = 'El usuario tiene completada la actividad [AAAA]';
-    $string['editrule_condition_title_activeactivity'] = 'La actividad [AAAA] está disponible';
-    $string['editrule_condition_title_betweendates'] = 'Estamos entre la fecha [FFFF-1] y [FFFF-2]';
-    $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas las actividades para acceder a este foro [FFFF]';
-    $string['editrule_condition_title_forumnotanswer'] = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
+// Editatu Araua.
+$string['editrule_newrule'] = 'Arau berria';
+$string['editrule_reports'] = 'Txostenak';
+$string['editrule_activaterule'] = 'Aktibatu';
+$string['editrule_pauserule'] = 'Eten';
+$string['editrule_editrule'] = 'Editatu';
+$string['editrule_reportrule'] = 'Txostena';
+$string['editrule_deleterule'] = 'Ezabatu';
+$string['editrule_newtemplate'] = 'Txantiloi berria';
+$string['editrule_title'] = 'Izenburua';
+$string['editrule_type'] = 'Arau mota';
+$string['editrule_usetemplate'] = 'Hautatu';
+$string['editrule_sharerule'] = 'Partekatu';
+$string['editrule_unsharerule'] = 'Ez partekatu';
+$string['editrule_shareallrule'] = 'Dena partekatu';
+$string['editrule_sharedallrule'] = 'Partekatua';
+$string['editrule_timesfired'] = 'Tiro kopurua';
+$string['editrule_runtime'] = 'Aldikotasuna';
 
-        $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
-        $string['editrule_condition_element_activity'] = 'Actividad {$a->typeelement}:';
-        $string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-        $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
-    // Actions.
-    $string['editrule_newaction'] = 'Nueva acción:';
-    $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_notificationtouser'] = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postgeneralforum'] = 'Publicar un post general en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_postprivateforum'] = 'Publicar un post privado en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
-    $string['editrule_action_title_addusertogroup'] = 'Añadir un usuario a grupo [GGGG]';
-    $string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario de un grupo [GGGG]';
-    $string['editrule_action_title_bootstrapnotification'] = 'Notificación bootstrap';
+// Condition.
+$string['editrule_generalconditions'] = 'Baldintza orokorrak';
+$string['editrule_newcondition'] = 'Baldintza berria:';
+$string['editrule_condition_title_tocloseactivity'] = '[TTTT] baino gutxiago falta da [AAAA] jarduera ixteko';
+$string['editrule_condition_title_usercompleteactivity'] = 'Erabiltzaileak jarduera burutu du [AAAA]';
+$string['editrule_condition_title_activeactivity'] = '[AAAA] jarduera eskuragarri dago';
+$string['editrule_condition_title_betweendates'] = '[FFFF-1] eta [FFFF-2] dataren artean gaude';
+$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Osatu jarduera guztiak foro honetara sartzeko [FFFF]';
+$string['editrule_condition_title_forumnotanswer'] = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
 
-        $string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
-        $string['editrule_action_element_message'] = 'Mensaje {$a->typeelement}:';
-        $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
-        $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
-        $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['editrule_condition_element_activity'] = '{$a->typeelement} jarduera:';
+$string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
+
+// Ekintzak.
+$string['editrule_newaction'] = 'Ekintza berria:';
+$string['editrule_action_title_individualnotification'] = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_notificationtouser'] = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_postgeneralforum'] = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_postprivateforum'] = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_addusertogroup'] = 'Gehitu erabiltzailea [GGGG] taldean';
+$string['editrule_action_title_removeuserfromgroup'] = 'Kendu erabiltzaile bat [GGGG] talde batetik';
+$string['editrule_action_title_bootstrapnotification'] = 'Bootstrap jakinarazpena';
+
+$string['editrule_action_element_title'] = '{$a->typeelement} izenburua:';
+$string['editrule_action_element_message'] = '{$a->typeelement} mezua:';
+$string['editrule_action_element_user'] = '{$a->typeelement} erabiltzailea:';
+$string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}:';
+$string['editrule_action_element_group'] = '{$a->typeelement} taldea';
+
+$string['subplugintype_notificationsagentaction'] = 'Azpipluginen ekintza';
 
 // Rule.
-$string['rulecancelled'] = 'Regla cancelada';
-$string['rulesaved'] = 'Regla guardada';
+$string['rulecancelled'] = 'Araua bertan behera utzi da';
+$string['rulesaved'] = 'Araua gorde da';
 
-// Card content.
-$string['cardif'] = 'Si:';
-$string['cardunless'] = 'Excepto si:';
-$string['cardthen'] = 'Entonces:';
+// Txartelaren edukia.
+$string['cardif'] = 'Bai:';
+$string['cardunless'] = 'Bada izan ezik:';
+$string['cardthen'] = 'Orduan:';
 
-// Card Condition time.
-$string['card_day'] = 'día';
-$string['card_hour'] = 'hora';
-$string['card_minute'] = 'minuto';
-$string['card_second'] = 'segundo';
+// Txartelaren baldintza-denbora.
+$string['card_day'] = 'eguna';
+$string['card_hour'] = 'ordua';
+$string['card_minute'] = 'minutu';
+$string['card_second'] = 'segundoa';
 
-// Status modal.
-$string['statustitle'] = '{$a->textstatus} regla {$a->title}';
-$string['statuscontent'] = 'Se va a {$a->textstatus} la regla {$a->title}, ¿desea continuar?';
-$string['statuscancel'] = 'Cancelar';
-$string['statusaccept'] = 'Aceptar';
-$string['statusacceptactivated'] = 'Regla activada';
-$string['statusacceptpaused'] = 'Regla pausada';
+// Egoera modala.
+$string['statustitle'] = '{$a->textstatus} araua {$a->title}';
+$string['statuscontent'] = '{$a->textstatus} {$a->title} araura zoaz, jarraitu nahi duzu?';
+$string['statuscancel'] = 'Utzi';
+$string['statusaccept'] = 'Onartu';
+$string['statusacceptativated'] = 'Araua aktibatuta';
+$string['statusacceptpaused'] = 'Araua pausatu da';
 
-// Delete modal.
-$string['deletetitle'] = 'Borrar la {$a->type} {$a->title}';
-$string['deletecontent_nocontext'] = 'Se va a borrar {$a->type} {$a->title}, ¿desea continuar?';
-$string['deletecontent_hascontext'] = 'La {$a->type} {$a->title} que desea borrar, se encuentra asociada a otros contextos, ¿desea continuar?';
-$string['deleteaccept'] = 'Regla borrada';
+// Modala ezabatu.
+$string['deletetitle'] = 'Ezabatu {$a->type} {$a->title}';
+$string['deletecontent_nocontext'] = '{$a->type} {$a->title} ezabatzen ari da, jarraitu nahi duzu?';
+$string['deletecontent_hascontext'] = 'Ezabatu nahi duzun {$a->type} {$a->title} beste testuinguru batzuekin lotuta dago, jarraitu nahi duzu?';
+$string['deleteaccept'] = 'Ezabatutako araua';
 
-// Assign modal.
-$string['assignassign'] = 'Assignar: ';
-$string['assigncancel'] = 'Cancelar';
-$string['assignsave'] = 'Guardar cambios';
-$string['assignforced'] = 'Asignar la regla forzosamente';
+// Modala esleitu.
+$string['assignassign'] = 'Esleitu: ';
+$string['assigncancel'] = 'Utzi';
+$string['assignsave'] = 'Gorde aldaketak';
+$string['assignforced'] = 'Indarrean esleitu araua';
 
-// Share modal.
-$string['sharetitle'] = 'Compartir la regla {$a->title}';
-$string['sharecontent'] = 'Se va a compartir la regla {$a->title} con el administrador, ¿desea continuar?';
-$string['unsharetitle'] = 'Descompartir la regla {$a->title}';
-$string['unsharecontent'] = 'Se va a descompartir la regla {$a->title} con el administrador, ¿desea continuar?';
-$string['shareaccept'] = 'Regla compartida';
-$string['unshareaccept'] = 'Regla descompartida';
+// Partekatu modala.
+$string['sharetitle'] = 'Partekatu {$a->title} araua';
+$string['sharecontent'] = '{$a->title} araua administratzailearekin partekatzen ari da, jarraitu nahi duzu?';
+$string['unsharetitle'] = 'Ez partekatu araua {$a->title}';
+$string['unsharecontent'] = '{$a->title} araua administratzailearekin partekatzear dago, jarraitu nahi duzu?';
+$string['shareaccept'] = 'Arau partekatua';
+$string['unshareaccept'] = 'Partekatu gabeko araua';
+
+// Partekatu modal guztiak.
+$string['sharealltitle'] = 'Onartu {$a->title} partekatze-araua';
+$string['shareallcontent'] = '{$a->title} partekatzeko araua onartzear dago, jarraitu nahi duzu?';
 
 // Capabilities.
-$string['notificationsagent:createrule'] = 'Crear una regla';
-$string['notificationsagent:editrule'] = 'Actualizar una regla';
-$string['notificationsagent:deleterule'] = 'Borrar una regla';
-$string['notificationsagent:updaterulestatus'] = 'Actualizar el estado de una regla';
-$string['notificationsagent:exportrule'] = 'Exportar una regla';
-$string['notificationsagent:importrule'] = 'Importar una regla';
-$string['notificationsagent:assignrule'] = 'Asignar una regla';
-$string['notificationsagent:forcerule'] = 'Forzar una regla';
-$string['notificationsagent:updateruleshare'] = 'Actualizar el estado de compartición de una regla';
+$string['notificationsagent:createrule'] = 'Sortu arau bat';
+$string['notificationsagent:etrule'] = 'Eguneratu arau bat';
+$string['notificationsagent:checkrulecontext'] = 'Egiaztatu arau baten testuingurua';
+$string['notificationsagent:deleterule'] = 'Ezabatu arau bat';
+$string['notificationsagent:updaterulestatus'] = 'Eguneratu arau baten egoera';
+$string['notificationsagent:exportrule'] = 'Esportatu arau bat';
+$string['notificationsagent:importrule'] = 'Inportatu arau bat';
+$string['notificationsagent:assignrule'] = 'Esleitu arau bat';
+$string['notificationsagent:forcerule'] = 'Behartu arau bat';
+$string['notificationsagent:updateruleshare'] = 'Eguneratu arau baten partekatze-egoera';
+$string['notificationsagent:shareruleall'] = 'Onartu arau bat partekatzea';
+$string['notificationsagent:managesiterule'] = 'Kudeatu gune-mailako arauak';
+$string['notificationsagent:managecourserule'] = 'Kudeatu arauak kurtso mailan';
+$string['notificationsagent:manageownrule'] = 'Kudeatu zure arauak ikastaroan';
+$string['notificationsagent:viewassistantreport'] = 'Ikusi arauen txostena';
 
-$string['notificationsagent:activitycompleted'] = 'Capacidad para usar la condición activitycompleted';
-$string['notificationsagent:activityopen'] = 'Capacidad para usar la condición activityopen';
-$string['notificationsagent:coursestart'] = 'Capacidad para usar la condición coursestart';
-$string['notificationsagent:calendarstart'] = 'Capacidad para usar la condición calendarstart';
-$string['notificationsagent:sessionstart'] = 'Capacidad para usar la condición sessionstart';
+$string['notificationsagent:activitycompleted'] = 'Jarduera amaitutako baldintza erabiltzeko gaitasuna';
+$string['notificationsagent:activityopen'] = 'Activityopen baldintza erabiltzeko gaitasuna';
+$string['notificationsagent:coursestart'] = 'Ikastaroaren hasierako baldintza erabiltzeko gaitasuna';
+$string['notificationsagent:calendarstart'] = 'Calendarstart baldintza erabiltzeko gaitasuna';
+$string['notificationsagent:sessionstart'] = 'Sesio hasierako baldintza erabiltzeko gaitasuna';
 
-$string['notificationsagent:addusergroup'] = 'Capacidad para usar la acción addusergroup';
-$string['notificationsagent:bootstrapnotifications'] = 'Capacidad para usar la acción bootstrapnotifications';
-$string['notificationsagent:forummessage'] = 'Capacidad para usar la acción forummessage';
-$string['notificationsagent:messageagent'] = 'Capacidad para usar la acción messageagent';
-$string['notificationsagent:removeusergroup'] = 'Capacidad para usar la acción removeusergroup';
-$string['notificationsagent:usermessageagent'] = 'Capacidad para usar la acción usermessageagent';
+$string['notificationsagent:addusergroup'] = 'Addusergroup ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:bootstrapnotifications'] = 'Bootstrapnotifications ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:forummessage'] = 'Forummessage ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:messageagent'] = 'Messageagent ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:removeusergroup'] = 'removeusergroup ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:usermessageagent'] = 'Usermessageagent ekintza erabiltzeko gaitasuna';
 
-// Webservices.
-$string['nosuchinstance'] = 'Dicha instancia no ha sido encontrada.';
-$string['isnotrule'] = 'Dicho identificador de regla no pertenece a una regla.';
+// Webzerbitzuak.
+$string['nosuchinstance'] = 'Instantzia hau ez da aurkitu.';
+$string['isnotrule'] = 'Arau-identifikatzaile hau ez dago arau bati.';
 
+// Report.
+$string['rulename'] = 'Arauaren izena';
+$string['report'] = 'Jakinarazpen-agentearen txostena';
+$string['id'] = 'id';
+$string['ruleid'] = 'Arauaren ID';
+$string['fullrule'] = 'Araua';
+$string['userid'] = 'Erabiltzaile ID';
+$string['fulluser'] = 'Erabiltzailea';
+$string['fullcourse'] = 'Ikastaroa';
+$string['courseid'] = 'Ikastaroaren IDa';
+$string['actionid'] = 'Ekintzaren IDa';
+$string['fullaction'] = 'Ekintza';
+$string['actiondetail'] = 'Ekintzaren xehetasuna';
+$string['timestamp'] = 'Data';
