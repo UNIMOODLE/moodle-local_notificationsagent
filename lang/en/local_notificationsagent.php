@@ -215,6 +215,19 @@ $string['notificationsagent:activityopen'] = 'Capability needed in order to use 
 $string['notificationsagent:calendarstart'] = 'Capability needed in order to use calendarstart condition';
 $string['notificationsagent:coursestart'] = 'Capability needed in order to use coursestart condition';
 $string['notificationsagent:sessionstart'] = 'Capability needed in order to use sessionstart condition';
+$string['notificationsagent:activityavailable'] = 'Capability needed in order to use activity available condition';
+$string['notificationsagent:activityend'] = 'Capability needed in order to use activity end condition';
+$string['notificationsagent:activitylastsend'] = 'Capability needed in order to use activity lastsend condition';
+$string['notificationsagent:activitymodified'] = 'Capability needed in order to use activity modified condition';
+$string['notificationsagent:activitynewcontent'] = 'Capability needed in order to use activity new content condition';
+$string['notificationsagent:activitysinceend'] = 'Capability needed in order to use activity since end condition';
+$string['notificationsagent:activitystudentend'] = 'Capability needed in order to use activity student end condition';
+$string['notificationsagent:calendareventto'] = 'Capability needed in order to use calendar event to condition';
+$string['notificationsagent:courseend'] = 'Capability needed in order to use course end condition';
+$string['notificationsagent:forumnoreply'] = 'Capability needed in order to use forum no reply condition';
+$string['notificationsagent:numberoftimes'] = 'Capability needed in order to use number of times condition';
+$string['notificationsagent:sessionend'] = 'Capability needed in order to use session end condition';
+$string['notificationsagent:weekend'] = 'Capability needed in order to use weekend condition';
 
 $string['notificationsagent:addusergroup'] = 'Capability needed in order to use addusergroup action';
 $string['notificationsagent:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
@@ -222,6 +235,7 @@ $string['notificationsagent:forummessage'] = 'Capability needed in order to use 
 $string['notificationsagent:messageagent'] = 'Capability needed in order to use messageagent action';
 $string['notificationsagent:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
 $string['notificationsagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
+$string['notificationsagent:privateforummessage'] = 'Capability needed in order to use privateforummessage action';
 
 // Webservices.
 $string['notificationsagent:nosuchinstance'] = 'No such instance was found.';
@@ -240,4 +254,9 @@ $string['courseid'] = 'Course id';
 $string['actionid'] = 'Action id';
 $string['fullaction'] = 'Action';
 $string['actiondetail'] = 'Action detail';
-$string['timestamp'] = 'Time';
+$string['timestamp'] = 'Date';
+
+// Nav.
+$string['conditions'] = 'Conditions';
+$string['exceptions'] = 'Exceptions';
+$string['actions'] = 'Actions';

@@ -45,7 +45,7 @@ class coursestart_crontask extends scheduled_task {
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $startdate = $DB->get_field('course', 'startdate', ['id' => $courseid]);
+            $startdate = get_course($courseid)->startdate;
             $condtionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);

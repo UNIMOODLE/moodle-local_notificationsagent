@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,8 +33,11 @@ use notificationsagent\notificationsagent;
 
 class notificationscondition_activitystudentend_observer {
 
+    /**
+     * @throws dml_exception
+     */
     public static function course_module_viewed($event) {
-        if (!isloggedin() || $event->courseid == 1) {
+        if ($event->courseid == 1 || !isloggedin()) {
             return;
         }
 
@@ -53,7 +56,6 @@ class notificationscondition_activitystudentend_observer {
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
-            $ruleids[] = $condition->ruleid;
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
             $cache = $timecreated + $param['time'];

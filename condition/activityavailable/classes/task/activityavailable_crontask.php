@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +12,25 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace notificationscondition_activityavailable\task;
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../notificationsagent.php');
@@ -46,10 +64,14 @@ class activityavailable_crontask extends scheduled_task {
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
             $context = \context_course::instance($courseid);
-
-            Notificationsagent_engine::notificationsagent_engine_evaluate_rule([$condition->ruleid],
-            time(), notificationsagent::GENERIC_USERID, $courseid);
-
+            $enrolledusers = notificationsagent::get_usersbycourse($context);
+            foreach ($enrolledusers as $enrolleduser) {
+                if (!notificationsagent::was_launched_indicated_times(
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id)) {
+                        Notificationsagent_engine::notificationsagent_engine_evaluate_rule(
+                        [$condition->ruleid], time(), $enrolleduser->id, $courseid);
+                }
+            }
         }
         custom_mtrace("Activityavailable end ");
     }

@@ -31,10 +31,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\constants;
+
 /**
  * Custom uninstallation procedure.
  */
 function xmldb_local_notificationsagent_uninstall() {
+    global $DB;
 
+    $user = $DB->get_record('user', ['username' => constants::USERNAME_WS]);
+    if ($user) {
+        delete_user($user);
+    }
+    $role = $DB->get_record('role', ['shortname' => constants::ROLE_WS]);
+    if ($role) {
+        delete_role($role->id);
+    }
     return true;
 }

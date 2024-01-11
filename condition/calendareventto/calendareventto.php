@@ -22,9 +22,9 @@ class notificationsagent_condition_calendareventto extends notification_activity
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -71,13 +71,13 @@ class notificationsagent_condition_calendareventto extends notification_activity
             'timestart',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
-
+        $event = calendar_get_events_by_id([$params->calendar]);
         if (empty($timestart)) {
-            $event = calendar_get_events_by_id([$params->calendar]);
             $timestart = $event[$params->calendar]->timestart - $params->time;
         }
+        ($timeaccess > $timestart) && ($timeaccess < $event[$params->calendar]->timestart) ? $meetcondition = true
+            : $meetcondition = false;
 
-        ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
         return $meetcondition;
     }
 
@@ -109,18 +109,21 @@ class notificationsagent_condition_calendareventto extends notification_activity
         $timegroup = [];
         // Days.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
-            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_days', 'local_notificationsagent'),
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? 0,
             ]
         );
+
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
-            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                   'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? 0,
             ]
         );
         // Minutes.
@@ -128,16 +131,17 @@ class notificationsagent_condition_calendareventto extends notification_activity
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? 0,
             ]
         );
         // Seconds.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
-            ['class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+            [
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? 0,
             ]
         );
         // GroupTime.

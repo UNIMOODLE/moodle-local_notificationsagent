@@ -214,6 +214,19 @@ $string['notificationsagent:activityopen'] = 'Activityopen baldintza erabiltzeko
 $string['notificationsagent:coursestart'] = 'Ikastaroaren hasierako baldintza erabiltzeko gaitasuna';
 $string['notificationsagent:calendarstart'] = 'Calendarstart baldintza erabiltzeko gaitasuna';
 $string['notificationsagent:sessionstart'] = 'Sesio hasierako baldintza erabiltzeko gaitasuna';
+$string['notificationsagent:activityavailable'] = 'Jarduera erabilgarri dagoen baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activityend'] = 'Jardueraren amaiera-baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activitylastsend'] = 'Aktibitatearen azken bidalketa-baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activitymodified'] = 'Jarduera aldatutako baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activitynewcontent'] = 'Jarduera eduki berriaren baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activitysinceend'] = 'Aktibitatearen amaierako baldintzatik aurrera erabiltzeko gaitasuna behar da';
+$string['notificationsagent:activitystudentend'] = 'Jarduera ikaslearen amaiera-baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:calendareventto'] = 'Egutegiko gertaerak baldintzatzeko gaitasuna behar da';
+$string['notificationsagent:courseend'] = 'Ikastaroaren amaierako baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:forumnoreply'] = 'Foroan erantzunik gabeko baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:numberoftimes'] = 'Baldintza kopurua erabiltzeko gaitasuna behar da';
+$string['notificationsagent:sessionend'] = 'Saio amaierako baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:weekend'] = 'Asteburuko baldintza erabiltzeko gaitasuna behar da';
 
 $string['notificationsagent:addusergroup'] = 'Addusergroup ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:bootstrapnotifications'] = 'Bootstrapnotifications ekintza erabiltzeko gaitasuna';
@@ -221,6 +234,7 @@ $string['notificationsagent:forummessage'] = 'Forummessage ekintza erabiltzeko g
 $string['notificationsagent:messageagent'] = 'Messageagent ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:removeusergroup'] = 'removeusergroup ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:usermessageagent'] = 'Usermessageagent ekintza erabiltzeko gaitasuna';
+$string['notificationsagent:privateforummessage'] = 'Privateforummessage ekintza erabiltzeko gaitasuna';
 
 // Webzerbitzuak.
 $string['nosuchinstance'] = 'Instantzia hau ez da aurkitu.';
@@ -240,3 +254,8 @@ $string['actionid'] = 'Ekintzaren IDa';
 $string['fullaction'] = 'Ekintza';
 $string['actiondetail'] = 'Ekintzaren xehetasuna';
 $string['timestamp'] = 'Data';
+
+// Nab.
+$string['conditions'] = 'Baldintzak';
+$string['exceptions'] = 'Salbuespenak';
+$string['actions'] = 'Ekintzak';

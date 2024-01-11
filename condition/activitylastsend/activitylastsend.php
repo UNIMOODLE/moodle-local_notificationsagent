@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ class notificationsagent_condition_activitylastsend extends notification_activit
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -105,7 +105,7 @@ class notificationsagent_condition_activitylastsend extends notification_activit
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                 'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? 0,
             ]
         );
 
@@ -115,7 +115,7 @@ class notificationsagent_condition_activitylastsend extends notification_activit
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                    'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? 0,
             ]
         );
         // Minutes.
@@ -124,7 +124,7 @@ class notificationsagent_condition_activitylastsend extends notification_activit
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
             'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? 0,
             ]
         );
         // Seconds.
@@ -133,7 +133,7 @@ class notificationsagent_condition_activitylastsend extends notification_activit
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? 0,
             ]
         );
         // GroupTime.

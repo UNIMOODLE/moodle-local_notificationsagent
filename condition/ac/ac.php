@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ class notificationsagent_condition_ac extends \notificationconditionplugin {
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 

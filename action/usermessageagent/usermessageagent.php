@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,24 +12,43 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactionplugin.php");
-
+use local_notificationsagent\Rule;
+use notificationsagent\notificationsagent;
 
 class notificationsagent_action_usermessageagent extends notificationactionplugin {
 
     public function get_description() {
         return [
             'title' => $this->get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
-        global $SESSION;
+        global $SESSION, $USER;
         $valuesession = 'id_' . $this->get_subtype() . '_' . $this->get_type() . $exception . $id;
 
         $mform->addElement('hidden', 'pluginname' . $this->get_type() . $exception . $id, $this->get_subtype());
@@ -79,13 +98,31 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
 
         // Users.
         $context = \context_course::instance($courseid);
-        $enrolledusers = get_enrolled_users($context);
+
         $listusers = [];
-        foreach ($enrolledusers as $uservalue) {
-            $listusers[$uservalue->id] = format_string(
-                $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
-            );
+        $enrolledusers = [];
+
+        if (has_capability('local/notificationsagent:managecourserule', $context)) {
+            $enrolledusers = get_enrolled_users($context);
+
+            foreach ($enrolledusers as $uservalue) {
+                $listusers[$uservalue->id] = format_string(
+                    $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
+                );
+            }
+        } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
+            // User view - restricted to own user.
+            $enrolledusers = notificationsagent::get_usersbycourse($context);
+
+            foreach ($enrolledusers as $uservalue) {
+                if ($uservalue->id == $USER->id) {
+                    $listusers[$uservalue->id] = format_string(
+                        $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
+                    );
+                }
+            }
         }
+
         if (empty($listusers)) {
             $listusers['0'] = 'UUUU';
         }
@@ -167,8 +204,8 @@ class notificationsagent_action_usermessageagent extends notificationactionplugi
 
         $user = $DB->get_record('user', ['id' => $jsonparams->user], 'firstname, lastname', MUST_EXIST);
 
-        $paramstoteplace = [
-            shorten_text($jsonparams->title), shorten_text(format_string($jsonparams->message)),
+        $paramstoteplace = [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $jsonparams->title)),
+            shorten_text(format_string(str_replace('{' . Rule::SEPARATOR . '}', ' ', $jsonparams->message))),
             shorten_text($user->firstname . " " . $user->lastname),
         ];
 

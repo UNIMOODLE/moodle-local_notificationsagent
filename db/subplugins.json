@@ -1,5 +1,6 @@
 {
   "plugintypes": {
+    "notificationsrequisite"    : "local/notificationsagent/requisite",
     "notificationscondition"    : "local/notificationsagent/condition",
     "notificationsaction"       : "local/notificationsagent/action"
   }

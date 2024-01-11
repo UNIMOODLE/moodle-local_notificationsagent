@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,8 +27,10 @@
  */
 function set_activity_access($userid, $courseid, $idactivity, $timecreated) {
     global $DB;
-    $exists = $DB->record_exists('notificationsagent_cmview',
-    ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]);
+    $exists = $DB->record_exists(
+        'notificationsagent_cmview',
+        ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]
+    );
 
     $objdb = new stdClass();
     $objdb->userid = $userid;
@@ -41,10 +43,49 @@ function set_activity_access($userid, $courseid, $idactivity, $timecreated) {
         $DB->insert_record('notificationsagent_cmview', $objdb);
     } else {
         // Si el registro existe, obtén la ID y actualiza el registro.
-        $existingrecord = $DB->get_record('notificationsagent_cmview',
-        ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]);
+        $existingrecord = $DB->get_record(
+            'notificationsagent_cmview',
+            ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]
+        );
         $objdb->id = $existingrecord->id;
         $DB->update_record('notificationsagent_cmview', $objdb);
     }
 }
+function get_cmlastaccess($userid, $courseid, $cmid) {
+    global $DB;
+    $lastaccess = $DB->get_field(
+        'notificationsagent_cmview',
+        'firstaccess', ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid],
+    );
+
+    if (empty($lastaccess)) {
+        $query = "SELECT timecreated
+                FROM {logstore_standard_log} mlsl
+                JOIN {course_modules} mcm ON mcm.id = mlsl.contextinstanceid
+                 AND mlsl.courseid = :courseid
+                 AND mlsl.contextinstanceid = :cmid
+                 AND mlsl.userid = :userid
+                JOIN {modules} mm ON mcm.module = mm.id
+               WHERE eventname = CONCAT('\\mod_',mm.name,'\\event\\course_module_viewed')
+            ORDER BY timecreated
+               LIMIT 1";
+
+        $result = $DB->get_record_sql(
+            $query, [
+                'courseid' => $courseid,
+                'userid' => $userid,
+                'cmid' => $cmid,
+            ]
+        );
+
+        if (!$result) {
+            $lastaccess = null;
+        } else {
+            $lastaccess = $result->timecreated;
+        }
+    }
+
+    return $lastaccess;
+}
+
 

@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,9 +31,14 @@
 namespace local_notificationsagent\local\entities;
 
 use core_reportbuilder\local\report\{column, filter};
+use core_collator;
 use core_reportbuilder\local\entities\base;
+use core_reportbuilder\local\filters\autocomplete;
+use core_reportbuilder\local\filters\date;
 use core_reportbuilder\local\filters\number;
 use core_reportbuilder\local\filters\text;
+use core_reportbuilder\local\filters\course_selector;
+use core_reportbuilder\local\filters\user;
 use core_reportbuilder\local\helpers\format;
 use lang_string;
 
@@ -98,13 +103,10 @@ class rule extends base {
         $columns = [];
 
         $reportalias = $this->get_table_alias('notificationsagent_report');
-        $useralias = $this->get_table_alias('user');
-        $coursealias = $this->get_table_alias('course');
+
         $ruleealias = $this->get_table_alias('notificationsagent_rule');
         $actionealias = $this->get_table_alias('notificationsagent_action');
 
-        $userjoin = $this->userjoin();
-        $coursejoin = $this->coursejoin();
         $rulejoin = $this->rulejoin();
         $actionjoin = $this->actionjoin();
 
@@ -117,34 +119,6 @@ class rule extends base {
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(true)
             ->add_field("{$ruleealias}.name");
-
-        $columns[] = (new column(
-            'fulluser',
-            new lang_string('fulluser', 'local_notificationsagent'),
-            $this->get_entity_name()
-        ))
-            ->add_join($userjoin)
-            ->set_type(column::TYPE_TEXT)
-            ->set_is_sortable(true)
-            ->add_field("{$useralias}.firstname");
-
-        $columns[] = (new column(
-            'courseid',
-            new lang_string('courseid', 'local_notificationsagent'),
-            $this->get_entity_name()
-        ))
-            ->set_type(column::TYPE_INTEGER)
-            ->set_is_sortable(true)
-            ->add_field("{$reportalias}.courseid");
-
-        $columns[] = (new column(
-            'actionid',
-            new lang_string('actionid', 'local_notificationsagent'),
-            $this->get_entity_name()
-        ))
-            ->set_type(column::TYPE_INTEGER)
-            ->set_is_sortable(true)
-            ->add_field("{$reportalias}.actionid");
 
         $columns[] = (new column(
             'actionname',
@@ -187,51 +161,48 @@ class rule extends base {
         $narralias = $this->get_table_alias('notificationsagent_report');
         $narrualias = $this->get_table_alias('notificationsagent_rule');
         $coursealias = $this->get_table_alias('course');
-        $userealias = $this->get_table_alias('user');
         $rulejoin = $this->rulejoin();
 
         $filters[] = (new filter(
-            number::class,
-            'ruleid',
-            new lang_string('ruleid', 'local_notificationsagent'),
-            $this->get_entity_name(),
-            "{$narralias}.ruleid"
-        ))
-            ->add_joins($this->get_joins());
-
-        $filters[] = (new filter(
-            text::class,
+            autocomplete::class,
             'rulename',
             new lang_string('rulename', 'local_notificationsagent'),
             $this->get_entity_name(),
             "{$narrualias}.name"
         ))
-            ->add_joins([$rulejoin]);
+            ->add_joins($this->get_joins())
+            ->set_options_callback(static function(): array {
+                global $DB;
+                $options = [];
+                $rulenames = $DB->get_fieldset_sql('SELECT DISTINCT name FROM {notificationsagent_rule} ORDER BY name');
+                foreach ($rulenames as $rulename) {
+                    $options[$rulename] = $rulename;
+                }
+                core_collator::asort($options);
+                return $options;
+            });
 
         $filters[] = (new filter(
-            number::class,
-            'courseid',
-            new lang_string('courseid', 'local_notificationsagent'),
+            date::class,
+            'timestamp',
+            new lang_string('timestamp', 'local_notificationsagent'),
             $this->get_entity_name(),
-            "{$narralias}.courseid"
+            "{$narralias}.timestamp"
         ))
-            ->add_joins($this->get_joins());
+            ->add_joins($this->get_joins())
+            ->set_limited_operators([
+                date::DATE_ANY,
+                date::DATE_RANGE,
+                date::DATE_PREVIOUS,
+                date::DATE_CURRENT,
+            ]);
 
         $filters[] = (new filter(
-            text::class,
-            'fullcourse',
-            new lang_string('fullcourse', 'local_notificationsagent'),
+            course_selector::class,
+            'courseselector',
+            new lang_string('courses'),
             $this->get_entity_name(),
-            "{$coursealias}.name"
-        ))
-            ->add_joins($this->get_joins());
-
-        $filters[] = (new filter(
-            text::class,
-            'fulluser',
-            new lang_string('fulluser', 'local_notificationsagent'),
-            $this->get_entity_name(),
-            "{$userealias}.lastname"
+            "{$coursealias}.id"
         ))
             ->add_joins($this->get_joins());
 
@@ -239,19 +210,6 @@ class rule extends base {
 
     }
 
-    public function userjoin() {
-        $useralias = $this->get_table_alias('user');
-        $rulesreportalias = $this->get_table_alias('notificationsagent_report');
-        return "JOIN {notificationsagent_report} {$rulesreportalias}
-                    ON {$rulesreportalias}.userid = {$useralias}.id";
-    }
-
-    public function coursejoin() {
-        $coursealias = $this->get_table_alias('course');
-        $rulesreportalias = $this->get_table_alias('notificationsagent_report');
-        return "JOIN {notificationsagent_report} {$rulesreportalias}
-                    ON {$rulesreportalias}.courseid = {$coursealias}.id";
-    }
 
     public function rulejoin() {
         $rulealias = $this->get_table_alias('notificationsagent_rule');

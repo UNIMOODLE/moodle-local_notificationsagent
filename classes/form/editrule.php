@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ class editrule extends \moodleform {
 
     // Add elements to form.
     public function definition() {
-        global $CFG, $SESSION, $COURSE;
+        global $CFG, $SESSION, $COURSE, $PAGE;
 
         $mform = $this->_form; // Don't forget the underscore!
-
+        $render = $PAGE->get_renderer('local_notificationsagent');
         $mform->addElement(
             'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
             ['size' => '64']
@@ -99,18 +99,7 @@ class editrule extends \moodleform {
         $mform->setType('type', PARAM_INT);
         $mform->setDefault('type', $this->_customdata['type']);
 
-        $mform->addElement('html', '
-        <nav>
-            <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link" id="nav-conditions-tab" data-toggle="tab" href="#nav-conditions"
-                role="tab" aria-controls="nav-conditions" aria-selected="false">Condiciones</a>
-                <a class="nav-item nav-link" id="nav-exceptions-tab" data-toggle="tab" href="#nav-exceptions"
-                role="tab" aria-controls="nav-exceptions" aria-selected="false">Excepciones</a>
-                <a class="nav-item nav-link" id="nav-actions-tab" data-toggle="tab" href="#nav-actions"
-                role="tab" aria-controls="nav-actions" aria-selected="false">Acciones</a>
-            </div>
-        </nav>
-        ');
+        $mform->addElement('html', $render->tabnav());
         $mform->addElement('html', '
             <div class="tab-content" id="nav-tabContent">
         ');

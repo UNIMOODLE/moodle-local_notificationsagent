@@ -22,9 +22,9 @@ class notificationsagent_condition_coursestart extends notification_activitycond
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -84,19 +84,16 @@ class notificationsagent_condition_coursestart extends notification_activitycond
 
 
     /** Estimate next time when this condition will be true. */
+
     public function estimate_next_time(EvaluationContext $context) {
-        global $DB;
-        $params = json_decode($context->get_params());
-        $courseid = $context->get_courseid();
-        $course = get_course($courseid);
-
-        if ($context->is_complementary()) {
-            $timestart = null;
-        } else {
-            $timestart = $course->startdate;
+        $timestart = null;
+        if (!$context->is_complementary()) {
+            $params = json_decode($context->get_params());
+            $courseid = $context->get_courseid();
+            $course = get_course($courseid);
+            $timestart = $course->startdate + $params->time;
         }
-
-        return $timestart + $params->time;
+        return $timestart;
     }
 
     public function get_ui($mform, $id, $courseid, $exception) {
@@ -112,39 +109,40 @@ class notificationsagent_condition_coursestart extends notification_activitycond
         // Days.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
             [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? 0,
             ]
-        );
-        // Hours.
-        $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_hours', 'local_notificationsagent'),
-                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
-            ]
-        );
-        // Minutes.
-        $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
-                'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
-            ]
-        );
-        // Seconds.
-        $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
-                'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
-            ]
-        );
+          );
+
+          // Hours.
+          $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
+              [
+                  'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                     'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                     'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                     'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? 0,
+              ]
+          );
+          // Minutes.
+          $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_minutes', '',
+              [
+                  'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+                  'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+              'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+              'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? 0,
+              ]
+          );
+          // Seconds.
+          $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_seconds', '',
+              [
+                  'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+                  'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
+                  'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                  'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? 0,
+              ]
+          );
         // GroupTime.
         $mform->addGroup($timegroup, $this->get_subtype().'_condition'.$exception.$id.'_time',
             get_string('editrule_condition_element_time', 'notificationscondition_sessionstart',

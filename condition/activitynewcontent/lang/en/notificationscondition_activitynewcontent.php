@@ -31,5 +31,5 @@ $string['subtype'] = 'activitynewcontent';
 $string['modname'] = 'activitynewcontent';
 $string['editrule_condition_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
-$string['activitynewcontent_crontask'] = 'Activiy end cron task';
+$string['activitynewcontent_crontask'] = 'Activity end cron task';
 

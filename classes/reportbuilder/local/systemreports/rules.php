@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -47,10 +47,7 @@ class rules extends system_report {
     protected function initialise(): void {
         $ruleentity = new rule();
         $narralias = $ruleentity->get_table_alias('notificationsagent_report');
-        $actionalias = $ruleentity->get_table_alias('notificationsagent_action');
-        $actionjoin = "JOIN {notificationsagent_action} {$actionalias} ON {$narralias}.actionid = {$actionalias}.id";
         $this->set_main_table('notificationsagent_report', $narralias);
-        $this->add_entity($ruleentity->add_join($actionjoin));
         $this->add_entity($ruleentity);
 
         $userentity = new user();
@@ -84,22 +81,27 @@ class rules extends system_report {
         $this->add_columns_from_entities(
             [
                 'rule:rulename',
-                'user:fullname',
+                'user:fullnamewithlink',
+                'course:coursefullnamewithlink',
                 'rule:actionname',
-                'course:fullname',
                 'rule:actiondetail',
                 'rule:timestamp',
             ]
         );
 
+        $this->set_initial_sort_column('rule:timestamp', SORT_DESC);
+
+        if ($column = $this->get_column('course:coursefullnamewithlink')) {
+            $column->set_title(new \lang_string('fullcourse', 'local_notificationsagent'));
+        }
     }
 
     protected function add_filters(): void {
         $filters = [
             'rule:rulename',
-            'course:fullname',
-            'user:firstname',
-            'user:lastname',
+            'course:courseselector',
+            'user:fullname',
+            'rule:timestamp',
         ];
 
         $this->add_filters_from_entities($filters);

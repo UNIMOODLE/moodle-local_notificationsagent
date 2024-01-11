@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 
 use core_reportbuilder\system_report_factory;
 use core_reportbuilder\local\filters\text;
+use core_reportbuilder\local\filters\number;
 use local_notificationsagent\reportbuilder\local\systemreports;
 use local_notificationsagent\Rule;
 
@@ -38,20 +39,16 @@ global $PAGE, $CFG, $OUTPUT;
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/local/notificationsagent/classes/rule.php');
 
-
 require_login();
-
-
 
 $ruleid = optional_param('ruleid', '', PARAM_INT);
 $courseid = optional_param('courseid', '', PARAM_INT);
 $filters = [];
 if ($courseid) {
     $context = context_course::instance($courseid);
-    $coursefilter = get_course($courseid)->fullname;
-    $filters['course:fullname_operator'] = text::IS_EQUAL_TO;
-    $filters['course:fullname_value'] = $coursefilter;
-
+    $coursefilter = get_course($courseid)->id;
+    $filters['course:courseselector_operator'] = number::EQUAL_TO;
+    $filters['course:courseselector_values'] = $coursefilter;
 } else {
     $context = context_system::instance();
 }
@@ -60,7 +57,7 @@ if ($ruleid) {
     $rule = Rule::create_instance($ruleid);
     $filter = $rule->get_name();
     $filters['rule:rulename_operator'] = text::IS_EQUAL_TO;
-    $filters['rule:rulename_value'] = $filter;
+    $filters['rule:rulename_values'] = $filter;
 }
 
 if (!has_capability('local/notificationsagent:viewassistantreport', $context)) {

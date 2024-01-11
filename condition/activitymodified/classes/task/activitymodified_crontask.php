@@ -58,6 +58,7 @@ class activitymodified_crontask extends scheduled_task {
                     $condition->ruleid, $condition->ruletimesfired, $courseid, $result->userid)) {
                         $cache = $result->timemodified;
                         notificationsagent::set_timer_cache($result->userid, $courseid, $cache, $pluginname, $condtionid, true);
+                        notificationsagent::set_time_trigger($condition->ruleid, $result->userid, $courseid, $cache);
                 }
             }
 

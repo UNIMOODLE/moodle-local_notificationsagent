@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,5 +41,44 @@ function set_first_course_access($userid, $courseid, $timeaccess) {
         $objdb->firstaccess = $timeaccess;
         $DB->insert_record('notificationsagent_crseview', $objdb);
     }
+}
+
+/**
+ * @param $userid
+ * @param $courseid
+ *
+ * @return false|mixed
+ * @throws dml_exception
+ */
+function get_first_course_access($userid, $courseid) {
+    global $DB;
+    $firstacces = $DB->get_field('notificationsagent_crseview', 'firstaccess',
+        ['userid' => $userid, 'courseid' => $courseid]);
+
+    if (empty($firstacces)) {
+        $query = 'SELECT timecreated
+                    FROM {logstore_standard_log}
+                   WHERE courseid = :courseid
+                    AND userid = :userid
+                    AND eventname = :eventname
+               ORDER BY timecreated
+                  LIMIT 1';
+
+        $result = $DB->get_record_sql(
+            $query, [
+                'courseid' => $courseid,
+                'userid' => $userid,
+                'eventname' => '\\core\\event\\course_viewed',
+            ]
+        );
+
+        if (!$result) {
+            $firstacces = null;
+        } else {
+            $firstacces = $result->timecreated;
+        }
+    }
+
+    return $firstacces;
 }
 

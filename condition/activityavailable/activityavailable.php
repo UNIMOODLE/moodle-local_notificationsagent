@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,10 +12,29 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG, $SESSION;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
+require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationacplugin.php");
 
 use local_notificationsagent\notification_activityconditionplugin;
 use local_notificationsagent\EvaluationContext;
@@ -23,9 +42,9 @@ class notificationsagent_condition_activityavailable extends notification_activi
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -50,13 +69,18 @@ class notificationsagent_condition_activityavailable extends notification_activi
      */
     public function evaluate(EvaluationContext $context): bool {
         $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
         $params = json_decode($context->get_params());
         $cmid = $params->activity;
 
         $modinfo = get_fast_modinfo($courseid);
         $cm = $modinfo->get_cm($cmid);
 
-        return $cm->available;
+        $infoclass = new notificationacplugin($courseid, $cm->availability);
+        $variable = '';
+        $available = $infoclass->is_available($variable, false, $userid);
+
+        return $available;
     }
 
     /** Estimate next time when this condition will be true. */
@@ -159,7 +183,7 @@ class notificationsagent_condition_activityavailable extends notification_activi
     }
 
     public function is_generic() {
-        return true;
+        return false;
     }
 
     /**

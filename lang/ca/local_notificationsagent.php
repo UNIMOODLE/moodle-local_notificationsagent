@@ -214,6 +214,20 @@ $string['notificationsagent:activityopen'] = 'Capacitat per utilitzar la condici
 $string['notificationsagent:coursestart'] = 'Capacitat per utilitzar la condició coursestart';
 $string['notificationsagent:calendarstart'] = 'Capacitat per utilitzar la condició calendarstart';
 $string['notificationsagent:sessionstart'] = 'Capacitat per utilitzar la condició sessionstart';
+$string['notificationsagent:activityavailable'] = 'Capacitat necessària per utilitzar la condició d\'activitat disponible';
+$string['notificationsagent:activityend'] = 'Capacitat necessària per utilitzar la condició de finalització de l\'activitat';
+$string['notificationsagent:activitylastsend'] = 'Capacitat necessària per utilitzar la condició d\'últim enviament de l\'activitat';
+$string['notificationsagent:activitymodified'] = 'Capacitat necessària per utilitzar la condició modificada per l\'activitat';
+$string['notificationsagent:activitynewcontent'] = 'Capacitat necessària per utilitzar la condició de contingut nou de l\'activitat';
+$string['notificationsagent:activitysinceend'] = 'Capacitat necessària per utilitzar l\'activitat des de la condició final';
+$string['notificationsagent:activitystudentend'] = 'Capacitat necessària per utilitzar la condició final de l\'activitat de l\'estudiant';
+$string['notificationsagent:calendareventto'] = 'Capacitat necessària per utilitzar l\'esdeveniment del calendari per condicionar';
+$string['notificationsagent:courseend'] = 'Capacitat necessària per utilitzar la condició de finalització del curs';
+$string['notificationsagent:forumnoreply'] = 'Capacitat necessària per utilitzar la condició sense resposta del fòrum';
+$string['notificationsagent:numberoftimes'] = 'Capacitat necessària per utilitzar la condició de nombre de vegades';
+$string['notificationsagent:sessionend'] = 'Capacitat necessària per utilitzar la condició de finalització de la sessió';
+$string['notificationsagent:weekend'] = 'Capacitat necessària per utilitzar la condició del cap de setmana';
+
 
 $string['notificationsagent:addusergroup'] = 'Capacitat per utilitzar l\'acció addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacitat per utilitzar l\'acció bootstrapnotifications';
@@ -221,6 +235,7 @@ $string['notificationsagent:forummessage'] = 'Capacitat per utilitzar l\'acció 
 $string['notificationsagent:messageagent'] = 'Capacitat per utilitzar l\'acció messageagent';
 $string['notificationsagent:removeusergroup'] = 'Capacitat per utilitzar l\'acció removeusergroup';
 $string['notificationsagent:usermessageagent'] = 'Capacitat per utilitzar l\'acció usermessageagent';
+$string['notificationsagent:privateforummessage'] = 'Capacitat per utilitzar l\'acció privateforummessage';
 
 // Webservices.
 $string['nosuchinstance'] = 'No s\'ha trobat aquesta instància.';
@@ -239,4 +254,9 @@ $string['courseid'] = 'Id del curs';
 $string['actionid'] = 'Ide de la acció';
 $string['fullaction'] = 'Acció';
 $string['actiondetail'] = 'Detalle de la acció';
-$string['timestamp'] = 'Time';
+$string['timestamp'] = 'Data';
+
+// Nav.
+$string['conditions'] = 'Condicions';
+$string['exceptions'] = 'Excepcions';
+$string['actions'] = 'Accions';

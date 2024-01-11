@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ class activitylastsend_crontask extends scheduled_task {
                     $condition->ruleid, $condition->ruletimesfired, $courseid, $result->userid)) {
                         $cache = $result->timemodified + $param['time'];
                         notificationsagent::set_timer_cache($result->userid, $courseid, $cache, $pluginname, $condtionid, true);
+                        notificationsagent::set_time_trigger($condition->ruleid, $result->userid, $courseid, $cache);
                 }
             }
 

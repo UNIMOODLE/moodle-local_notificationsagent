@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,15 +32,16 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationactivityconditionplugin.php");
+require_once(__DIR__ . '/lib.php');
 use local_notificationsagent\notification_activityconditionplugin;
 use local_notificationsagent\EvaluationContext;
 class notificationsagent_condition_sessionstart extends notification_activityconditionplugin {
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -81,22 +82,17 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
             'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
-        if (!empty($timestart)) {
-            ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
-            // La regla se hizo después de que el usuario entrara en el curso.
-        } else {
+        if (empty($timestart)) {
             // Check own plugin table.
-            $firstacces = $DB->get_field('notificationsagent_crseview',
-                'firstaccess', ['courseid' => $courseid, 'userid' => $userid],
-            );
-            // El usuario no ha desencadenado nunca un course_view ¿Comprobar log_standard_log?.
+            $firstacces = get_first_course_access($userid, $courseid);
+
             if (empty($firstacces)) {
                 return $meetcondition;
             }
-
-            ($timeaccess > $firstacces + $params->time) ? $meetcondition = true : $meetcondition = false;
-
+            $timestart = $firstacces + $params->time;
         }
+
+        ($timeaccess > $timestart) ? $meetcondition = true : $meetcondition = false;
 
         return $meetcondition;
 
@@ -124,18 +120,19 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
-                   'placeholder' => get_string('condition_days', 'local_notificationsagent'),
-                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? 0,
             ]
         );
+
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
             [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                   'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? 0,
             ]
         );
         // Minutes.
@@ -143,8 +140,8 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? 0,
             ]
         );
         // Seconds.
@@ -153,7 +150,7 @@ class notificationsagent_condition_sessionstart extends notification_activitycon
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? 0,
             ]
         );
         // GroupTime.

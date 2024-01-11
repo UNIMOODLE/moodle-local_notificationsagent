@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,15 +12,25 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * sessionend sessionend.php description here.
+ * Version details
  *
- * @package    sessiostart
- * @copyright  2023 fernando <fpano@isyc.com>
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -31,9 +41,9 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
 
     public function get_description() {
         return [
-            'title' => self::get_title(),
-            'elements' => self::get_elements(),
-            'name' => self::get_subtype(),
+            'title' => $this->get_title(),
+            'elements' => $this->get_elements(),
+            'name' => $this->get_subtype(),
         ];
     }
 
@@ -58,8 +68,6 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
      */
     public function evaluate(EvaluationContext $context): bool {
 
-        // Miramos mdl_notificationsagent_cache si hay registro, comprobar.
-        // si no hay registro comprobar en la tabla del plugin.
         global $DB;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
@@ -69,29 +77,23 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
         $params = json_decode($context->get_params());
         $meetcondition = false;
 
-        // Timestart es el tiempo de ultimo acceso más time.
         $timend = $DB->get_field('notificationsagent_cache',
             'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
-        if (!empty($timend)) {
-            ($timeaccess > $timend) ? $meetcondition = true : $meetcondition = false;
-            // La regla se hizo después de que el usuario entrara en el curso.
-        } else {
+        if (empty($timend)) {
             $lastaccess = $DB->get_field('user_lastaccess',
                 'timeaccess', ['courseid' => $courseid, 'userid' => $userid],
             );
-            // El usuario no ha desencadenado nunca un course_view ¿Comprobar log_standard_log?.
             if (empty($lastaccess)) {
                 return $meetcondition;
             }
-
-            ($timeaccess > $lastaccess + $params->time) ? $meetcondition = true : $meetcondition = false;
-
+            $timend = $lastaccess + $params->time;
         }
 
-        return $meetcondition;
+        ($timeaccess > $timend) ? $meetcondition = true : $meetcondition = false;
 
+        return $meetcondition;
     }
 
     /** Estimate next time when this condition will be true. */
@@ -121,18 +123,19 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_days', '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
-                   'placeholder' => get_string('condition_days', 'local_notificationsagent'),
-                   'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? null,
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_days'] ?? 0,
             ]
         );
+
         // Hours.
         $timegroup[] =& $mform->createElement('float', 'condition'.$exception.$id.'_hours', '',
             [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3', '
-                   placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                   'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                    'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? null,
+                   'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_hours'] ?? 0,
             ]
         );
         // Minutes.
@@ -140,8 +143,8 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? null,
+            'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+            'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_minutes'] ?? 0,
             ]
         );
         // Seconds.
@@ -150,7 +153,7 @@ class notificationsagent_condition_sessionend extends notification_activitycondi
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? null,
+                'value' => $SESSION->NOTIFICATIONS['FORMDEFAULT'][$valuesession . '_seconds'] ?? 0,
             ]
         );
         // GroupTime.
