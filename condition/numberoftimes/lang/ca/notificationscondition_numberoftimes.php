@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició de la regla ha estat iniciada menys de vegades i almenys fa algun temps.';
+$string['conditiontext'] = 'La regla ha estat iniciada menys de [N] vegades i almenys fa [TTTT].';
 $string['subtype'] = 'numberoftimes';
 $string['modname'] = 'numberoftimes';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

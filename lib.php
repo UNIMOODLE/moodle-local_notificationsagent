@@ -50,7 +50,7 @@ function local_notificationsagent_extend_navigation_course(navigation_node $pare
 
     $menuentrytext = get_string('menu', 'local_notificationsagent');
     $courseid = $course->id;
-    $url = '/local/notificationsagent/index.php?courseid='.$courseid;
+    $url = '/local/notificationsagent/index.php?courseid=' . $courseid;
     $parentnode->add(
         $menuentrytext,
         new moodle_url($url),
@@ -122,13 +122,13 @@ function count_category_courses($category) {
     return $countcategorycourses;
 }
 
-
 /**
  * Retrieve output for modal window
  *
- * @param $arraycategories
+ * @param     $arraycategories
+ * @param int $categoryid
  *
- * @return array
+ * @return string
  */
 
 function build_output_categories($arraycategories, $categoryid = 0) {
@@ -172,7 +172,7 @@ function build_output_categories($arraycategories, $categoryid = 0) {
             "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
         ]);
         if (!empty($category["categories"])) {
-                    $output .= build_output_categories($category["categories"], $category["id"]);
+            $output .= build_output_categories($category["categories"], $category["id"]);
         }
         if (!empty($category["courses"])) {
             foreach ($category["courses"] as $key => $course) {
@@ -200,7 +200,7 @@ function build_output_categories($arraycategories, $categoryid = 0) {
                 $output .= html_writer::end_div();// ... .coursename
                 $output .= html_writer::end_div();// ... .d-flex
                 $output .= html_writer::end_tag("li");
-                        // ... .listitem.listitem-course.list-group-item.list-group-item-action
+                // ... .listitem.listitem-course.list-group-item.list-group-item-action
             }
         }
         $output .= html_writer::end_tag("ul");// ... #category-listing-content-x
@@ -212,9 +212,11 @@ function build_output_categories($arraycategories, $categoryid = 0) {
 function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
     global $DB;
     $rulesidquery = "
-                    SELECT id, ruleid, courseid, userid
-                      FROM {notificationsagent_triggers}
+                    SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid
+                      FROM {notificationsagent_triggers} nt
+                      JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid
                      WHERE startdate
+                       AND nr.status = 0 
                    BETWEEN :tasklastrunttime AND :timestarted
                      ";
 
@@ -232,34 +234,37 @@ function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
  * Returns seconds in human format
  *
  * @param integer $seconds Seconds
- * @return array $data Time in days, hours, minutes and seconds
+ *
+ * @return array|string $data Time in days, hours, minutes and seconds
  */
-function to_human_format($seconds) {
-    $secondsinaminute = 60;
-    $secondsinhour = 60 * $secondsinaminute;
-    $secondsinday = 24 * $secondsinhour;
+function to_human_format($seconds, $toshow = false) {
+    $dtF = new \DateTime('@0');
+    $dtT = new \DateTime("@$seconds");
 
-    $days = floor($seconds / $secondsinday);
+    $stringtoshow = [];
+    $a = $dtF->diff($dtT)->format('%a') and
+    $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
+    $h = $dtF->diff($dtT)->format('%h') and
+    $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
+    $i = $dtF->diff($dtT)->format('%i') and
+    $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
+    $s = $dtF->diff($dtT)->format('%s') and
+    $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
 
-    $hourseconds = $seconds % $secondsinday;
-    $hours = floor($hourseconds / $secondsinhour);
+    if(empty($stringtoshow)){
+        $stringtoshow[] = "0 " . get_string('card_second', 'local_notificationsagent');
+    }
 
-    $minuteseconds = $hourseconds % $secondsinhour;
-    $minutes = floor($minuteseconds / $secondsinaminute);
+    if ($toshow) {
+        return implode(",", $stringtoshow);
+    }
 
-    $remainingseconds = $minuteseconds % $secondsinaminute;
-    $seconds = ceil($remainingseconds);
-
-    return [
-        'days' => $days,
-        'hours' => $hours,
-        'minutes' => $minutes,
-        'seconds' => $seconds,
-    ];
+    return ['days' => $a, 'hours' => $h, 'minutes' => $i, 'seconds' => $s];
 }
 
 /**
  * Returns human format in seconds
+ *
  * @param array $time Time in days, hours, minutes and seconds
  *
  * @return integer $seconds Seconds
@@ -283,5 +288,39 @@ function to_seconds_format($time) {
     return $seconds;
 }
 
+/**
+ * Get the URL used to access the course that the instance is in.
+ *
+ * @return moodle_url
+ */
+function get_course_url($id) {
+    return new moodle_url('/course/view.php', ['id' => $id]);
+}
 
+/**
+ * Get the URL for a specific module in a course.
+ *
+ * @param int $courseid The ID of the course.
+ * @param int $cmid The ID of the course module.
+ * @return moodle_url The URL of the course module.
+ */
+function get_module_url($courseid, $cmid) {
+    return new moodle_url(
+        get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(), ['id' => $cmid]
+    );
+}
 
+/**
+ * Get the direct link to the course or module based on the trigger condition.
+ *
+ * @param object $context The Evaluation context object
+ * @throws moodle_exception When there is an error with the condition ID
+ * @return string The URL of the module or course
+ */
+function get_follow_link($context) {
+    $conditions = $context->get_rule()->get_conditions();
+    $condition = $conditions[$context->get_triggercondition()] ?? '';
+    $cmid = !empty($condition) ? (json_decode($condition->get_parameters()))->cmid : '';
+
+    return !empty($cmid) ? get_module_url($context->get_courseid(), $cmid) : get_course_url($context->get_courseid());
+}

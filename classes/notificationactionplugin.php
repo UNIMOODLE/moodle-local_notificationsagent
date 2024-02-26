@@ -30,29 +30,35 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-require_once('notificationplugin.php');
-require_once('plugininfo/notificationsbaseinfo.php');
 
+namespace local_notificationsagent;
+
+use moodle_exception;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
-use local_notificationsagent\Rule;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
+
 abstract class notificationactionplugin extends notificationplugin {
 
     abstract public function get_title();
+
     abstract public function get_elements();
 
     /**
      * Returns the main plugin type qualifier.
+     *
      * @return string "condition" or "action".
      */
     final public function get_type() {
-        return parent::CAT_ACTION;
+        return parent::TYPE_ACTION;
     }
+
     /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
      * @return string subplugin type. "messageagent"
      */
     abstract public function get_subtype();
+
     /*
      * Check whether a user has capabilty to use an action.
      */
@@ -61,22 +67,37 @@ abstract class notificationactionplugin extends notificationplugin {
     /*
      * Show placeholder where needed
      */
-    public function placeholders(&$mform, $idaction, $typeitem) {
-
-        $mform->addElement('html', "<div class='form-group row fitem'>
-        <div class='col-md-12'><div class='notificationvars' id='notificationvars_".$idaction."_".$typeitem."'>");
-        foreach (Rule::get_placeholders() as $option) {
-            $clipboardtarget = "#notificationvars_" . $idaction . "_" . $typeitem . "_" . $option;
-            $mform->addElement('html', "<a href='#' id='notificationvars_" . $idaction . "_" . $typeitem . "_" . $option
-                . "' data-text='$option' data-action='copytoclipboard' data-clipboard-target='$clipboardtarget'
-                class='clickforword'><span>{" . $option . "}</span></a> "
+    public function placeholders($mform, $id, $type) {
+        $placeholders = \html_writer::start_tag(
+            'div', ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
+        );
+        $placeholders .= \html_writer::start_tag('div', ["class" => "col-md-12"]);
+        $placeholders .= \html_writer::start_tag(
+            'div', ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
+        );
+        foreach (rule::get_placeholders() as $option) {
+            $clipboardtarget = "#notificationvars_" . $id . "_" . $type . "_" . $option;
+            $placeholders .= \html_writer::start_tag(
+                'a', [
+                    "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
+                    "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget
+                ]
             );
+            $placeholders .= \html_writer::start_tag('span');
+            $placeholders .= "{" . $option . "}";
+            $placeholders .= \html_writer::end_tag('span');
+            $placeholders .= \html_writer::end_tag('a');
         }
-        $mform->addElement('html', "</div></div></div>");
+        $placeholders .= \html_writer::end_tag('div');
+        $placeholders .= \html_writer::end_tag('div');
+        $placeholders .= \html_writer::end_tag('div');
+
+        $group = $mform->createElement('html', $placeholders);
+
+        $mform->insertElementBefore($group, 'new' . $type . '_group');
     }
 
     public static function create_subplugins($records) {
-
         $subplugins = [];
         global $DB;
         foreach ($records as $record) {
@@ -107,6 +128,7 @@ abstract class notificationactionplugin extends notificationplugin {
 
     /**
      * Check if the action will be sent once or not
+     *
      * @param integer $userid User id
      *
      * @return bool $sendonce Will the action be sent once?
@@ -117,17 +139,18 @@ abstract class notificationactionplugin extends notificationplugin {
 
     /**
      * Gets the message to send depending on the timesfired of the rule and the user
+     *
      * @param object $context Evaluation Context
      * @param string $message Message
      *
      * @return string $result Message to sent
      */
     public static function get_message_by_timesfired($context, $message) {
-        $delimiter = '/{' . Rule::SEPARATOR . '}|&lt;!-- pagebreak --&gt;/';
+        $delimiter = '/{' . rule::SEPARATOR . '}|&lt;!-- pagebreak --&gt;/';
 
         $messagesplit = preg_split($delimiter, $message);
 
-        if ($context->get_rule()->get_timesfired() == Rule::MINIMUM_EXECUTION) {
+        if ($context->get_rule()->get_timesfired() == rule::MINIMUM_EXECUTION) {
             $messageindex = rand(0, count($messagesplit) - 1);
         } else {
             $messageindex = min($context->get_usertimesfired(), count($messagesplit)) - 1;
@@ -135,5 +158,29 @@ abstract class notificationactionplugin extends notificationplugin {
         $result = $messagesplit[$messageindex];
 
         return $result;
+    }
+
+    public function save($idname, $data): bool {
+        global $DB;
+
+        $dataplugin = new \stdClass();
+        $dataplugin->ruleid = $this->rule->get_id();
+        $dataplugin->pluginname = get_called_class()::NAME;
+        $dataplugin->type = $this->get_type();
+        $dataplugin->parameters = $this->convert_parameters($idname, $data);
+        // Insert plugin.
+        if (!$dataplugin->id = $DB->insert_record('notificationsagent_action', $dataplugin)) {
+            throw new moodle_exception('errorinserting_notificationsagent_action');
+        }
+        return true;
+    }
+
+    /**
+     * Returns the parameters to be replaced in the placeholders
+     *
+     * @return string $json Parameters
+     */
+    public function get_parameters_placeholders() {
+        return $this->get_parameters();
     }
 }

@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Baldintza: azken sarrera-dataren data erlatiboa ikastarora';
+$string['conditiontext'] = 'Azken saioaren ondoren [TTTT] igaro da erabiltzailearen azken sarrera-data ikastarora.';
 $string['subtype'] = 'sessionend';
 $string['modname'] = 'sessionend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

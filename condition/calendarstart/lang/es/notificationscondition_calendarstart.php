@@ -32,14 +32,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición fecha relativa desde el evento del calendario';
-$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el evento de calendario [CCCC]]';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el evento de calendario [CCCC]';
 $string['subtype'] = 'calendarstart';
 $string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'calendarstart cron task';
-
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['calendarstart_crontask'] = 'Tarea cron de inicio de calendario';
+$string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
+$string['afterend'] = 'Después del fin del "evento"';
+$string['afterstart'] = 'Después del inicio del "evento"';

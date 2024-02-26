@@ -30,9 +30,10 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationacplugin.php");
+
+namespace notificationscondition_ac;
+
+use local_notificationsagent\notificationacplugin;
 
 class mod_ac_availability_info extends notificationacplugin {
 

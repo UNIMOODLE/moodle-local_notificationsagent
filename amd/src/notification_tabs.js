@@ -22,97 +22,47 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(['core/copy_to_clipboard']);
-
 define([], function () {
 
     /**
      * FormCondition object.
      * @param {String} idButton The button ID.
      * @param {String} idSelect The select ID.
-     * @param {String} key Value for form.
      */
-    var FormCondition = function (idButton, idSelect, key) {
-        this.init(idButton, idSelect, key);
-        this.registerEvents();
-    };
+    class FormCondition {
+        constructor(idButton, idSelect) {
+            this.init(idButton, idSelect);
+        }
+        init(idButton, idSelect) {
+            var self = this;
 
-    /** @var {Boolean} The FormCondition button selector. */
-    FormCondition.prototype.buttonSelector = false;
+            let button = document.querySelector('[id*="' + idButton + '"]');
+            button.addEventListener('click', function (ev) {
+                let select = document.querySelector('[id*="' + idSelect + '"]');
 
-    FormCondition.prototype.registerEvents = function () {
-        var self = this;
-        window.addEventListener("beforeunload", (event) => {
-            if (self.buttonSelector) {
-                event.stopImmediatePropagation();
-            }
-            self.buttonSelector = false;
-        }, true);
+                // if select option is AC
+                let selectDataset = select.options[select.selectedIndex].dataset;
+                if (selectDataset.type) {
+                    ev.preventDefault();
+                    let selectValue = select.options[select.selectedIndex].value;
+                    document.getElementById(selectValue).click();
+                    return;
+                }
+            });
+        }
     }
 
-    FormCondition.prototype.init = function (idButton, idSelect, key) {
-        var self = this;
-
-        let button = document.querySelector('[id*="' + idButton + '"]');
-        button.addEventListener('click', function () {
-            self.buttonSelector = true
-            let select = document.querySelector('[id*="' + idSelect + '"]');
-
-            // if select option is AC
-            let selectDataset = select.options[select.selectedIndex].dataset;
-            if (selectDataset.type) {
-                let selectValue = select.options[select.selectedIndex].value;
-                document.getElementById(selectValue).click();
-                return
-            }
-
-            let $title = select.options[select.selectedIndex].text;
-            let $formDefault = [];
-
-            if (window.location.href.includes('action=edit')) {
-                let url = new URL(window.location.href);
-                var ruleid = url.searchParams.get('ruleid');
-                if (ruleid) {
-                    $formDefault.push("[id]ruleid[/id][value]" + ruleid + "[/value]");
-                }
-            }
-
-            let formNotif = document.querySelector('form[action*="notificationsagent"].mform');
-            Array.from(formNotif.elements).forEach((element) => {
-                if (element.id) {
-                    $formDefault.push("[id]" + element.id + "[/id][value]" + element.value + "[/value]");
-                }
-            });
-            let $elements = JSON.parse(select.value.split(':')[1]);
-            let $name = select.options[select.selectedIndex].value.substring(0, select.options[select.selectedIndex].value.indexOf(':['));
-            let $availabilityconditionsjson = document.getElementById('id_availabilityconditionsjson').value
-            let data = {
-                key: key,
-                action: 'new',
-                title: $title,
-                elements: $elements,
-                name: $name,
-                formDefault: $formDefault,
-                availabilityconditionsjson: $availabilityconditionsjson
-            };
-
-            $.ajax({
-                type: "POST",
-                url: window.location.pathname.substring(0, '/local/notificationsagent/editrule.php'),
-                data: data,
-                success: function (event) {
-                    if (event.state === 'success') {
-                        window.location.reload();
-                    }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    console.log("Status: " + textStatus);
-                    console.log(errorThrown);
-                },
-                dataType: 'json'
+    function initRemove (removeSpan, submitRemove) {
+        // Event to remove icon click
+        document.querySelectorAll('.'+removeSpan).forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                let selector = document.querySelector('input[name="'+submitRemove+'"]');
+                selector.value = e.target.id;
+                selector.click();
             });
         });
-    };
+    }
+
 
     return {
 
@@ -120,13 +70,20 @@ define([], function () {
          * Main initialisation.
          * @param {String} idButton The button ID.
          * @param {String} idSelect The select ID.
-         * @param {String} key Value for form.
          * @method init
          */
-        init: function (idButton, idSelect, key) {
+        init: function (idButton, idSelect) {
             // Create instance.
-            new FormCondition(idButton, idSelect, key);
+            new FormCondition(idButton, idSelect);
+        },
+        /**
+         * Remove initialisation.
+         * @param {String} removeSpan The span selector.
+         * @param {String} submitRemove The button name.
+         * @method init
+         */
+        initRemove: function (removeSpan, submitRemove) {
+            initRemove(removeSpan, submitRemove);
         }
-
     }
 });

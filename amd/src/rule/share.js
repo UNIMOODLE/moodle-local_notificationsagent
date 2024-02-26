@@ -30,117 +30,133 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {get_strings as getStrings} from 'core/str';
+import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
+import ModalFactory from 'core/modal_factory';
+import ModalEvents from 'core/modal_events';
+import Templates from 'core/templates';
 import {updateRuleShare} from 'local_notificationsagent/rule/repository';
 
 /**
- * Types of rule sharing
+ * Types of rule sharing.
  * 
- * @type {{RULE_SHARE: boolean}}
+ * @type {{SHARING_TYPE: boolean}}
  */
-const RULE_SHARE = {
+const SHARING_TYPE = {
     SHARED: 0,
     UNSHARED: 1,
 };
 
 /**
- * Text to be displayed when sharing, or stop sharing a rule.
- * 
- * @type {{RULE_SHARE_STRING: string}}
+ * Selectors for the Share Button.
+ *
+ * @property {string} shareRuleId The element ID of the Share Rule button.
  */
-const RULE_SHARE_STRING = [
-    {
-        key: 'shareaccept', component: 'local_notificationsagent',
-    },
-    {
-        key: 'unshareaccept', component: 'local_notificationsagent',
-    }
-];
+const selectors = {
+    shareRuleId: '[id^="share-rule-"]:not(.disabled)',
+    shareRuleDataShared: 'data-shared',
+};
 
-export const init = () => {
-    $('#shareRuleModal').on('show.bs.modal', function (e) {
-        shareRuleBtn = $(e.relatedTarget);
-        let id = shareRuleBtn.data('ruleid');
-        let shareValue = shareRuleBtn.data('value');
+/**
+ * Initialises the Share Rule module.
+ *
+ * @method init
+ */
+export const init = async () => {
+    let shareItems = document.querySelectorAll(selectors.shareRuleId);
 
-        if (!shareValue) {
-            shareValue = RULE_SHARE.SHARED;
-        } else {
-            shareValue = RULE_SHARE.UNSHARED;
-        }
-
-        const modal = $(this);
-
-        const requiredStrings = [
-            [
-                {key: 'sharetitle', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-                {key: 'sharecontent', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-            ],
-            [
-                {key: 'unsharetitle', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-                {key: 'unsharecontent', component: 'local_notificationsagent', param: {
-                    title: $('#card-' + id + ' .name').text()
-                }},
-            ]
-        ]
-
-        getStrings(requiredStrings[shareValue]).then(([ruleTitle, ruleContent]) => {
-            modal.find('.modal-title').text(ruleTitle);
-            modal.find('.modal-body > div').text(ruleContent);
+    shareItems.forEach((shareItem) => {
+        shareItem.addEventListener('click', async function(e) {
+            await showModal(shareItem);
         });
-    });
+    });   
+};
 
-    $('#shareRuleModal #acceptShareRule').on('click', (e) => {
-        e.preventDefault();
-        setRuleShare(shareRuleBtn);
+/**
+ * 
+ * Shows the share modal for a given rule.
+ * 
+ * @param {HTMLElement} shareItem
+ * @returns {Promise<void>}
+ */
+const showModal = async (shareItem) => {
+    let ruleObj = {};
+    
+    ruleObj.id = shareItem.dataset.ruleid;
+    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+    ruleObj.shared = shareItem.dataset.shared == SHARING_TYPE.SHARED ? SHARING_TYPE.SHARED : SHARING_TYPE.UNSHARED;
+
+    if (!ruleObj.shared) {
+        ruleObj.name = await getString('unsharetitle', 'local_notificationsagent', ruleObj);
+    } else {
+        ruleObj.name = await getString('sharetitle', 'local_notificationsagent', ruleObj);
+    }
+    
+    ModalFactory.create({
+        type: ModalFactory.types.SAVE_CANCEL,
+        title: ruleObj.name,
+        body: Templates.render('local_notificationsagent/modal/share', {
+            rule: ruleObj,
+        }),
+    }).then(function(modal) {
+        let isShared = !ruleObj.shared ? SHARING_TYPE.UNSHARED : SHARING_TYPE.SHARED;
+        let shareBtnText = isShared ? getString('editrule_unsharerule', 'local_notificationsagent') : getString('editrule_sharerule', 'local_notificationsagent');
+
+        modal.setSaveButtonText(shareBtnText);
+
+        // Handle save event.
+        modal.getRoot().on(ModalEvents.save, function() {
+            setRuleShare(ruleObj.id, isShared);
+        });
+
+        // Handle hidden event.
+        modal.getRoot().on(ModalEvents.hidden, function() {
+            // Destroy when hidden.
+            modal.destroy();
+        });
+
+        modal.show();
+
+        return true;
     });
 };
 
 /**
- * Changes the sharing status for a given rule
+ * Changes the sharing status for a given rule.
  * 
- * @param {HTMLElement} ruleButton
+ * @param {integer} id Rule id.
+ * @param {boolean} shared Rule shared type.
  * @returns {Promise<void>}
  */
-const setRuleShare = async(shareRuleBtn) => {
-    let id = shareRuleBtn.data('ruleid');
-    let status = shareRuleBtn.data('value');
-
-    if (!status) {
-        status = RULE_SHARE.SHARED;
-    } else {
-        status = RULE_SHARE.UNSHARED;
-    }
-
-    $('#shareRuleModal').modal('hide');
-
+const setRuleShare = async(id, shared) => {
     try {
-        response = await updateRuleShare(id, status);
-        
-        if ($.isEmptyObject(response['warnings'])) {
-            shareRuleBtn.addClass('d-none');
+        response = await updateRuleShare(id, shared);
 
-            getStrings(RULE_SHARE_STRING).then(([ruleShared, ruleUnshared]) => {
-                if (status) {
-                    $('a[data-ruleid="' + id + '"][data-target="#shareRuleModal"][data-value="0"]').removeClass('d-none');
-                    Notification.addNotification({
-                        message: ruleUnshared,
-                        type: "info"
-                    });
-                } else {
-                    $('a[data-ruleid="' + id + '"][data-target="#shareRuleModal"][data-value="1"]').removeClass('d-none');
-                    Notification.addNotification({
-                        message: ruleShared,
-                        type: "info"
-                    });
-                }
+        if ($.isEmptyObject(response['warnings'])) {
+            let shareItem = document.querySelector('a#share-rule-' + id);
+            let shareItemIcon = document.createElement('i');
+            let shareItemText = '';
+            let shareItemMessage = '';
+            
+            if (!shared) {
+                shareItemText = await getString('editrule_unsharerule', 'local_notificationsagent');
+                shareItem.setAttribute(selectors.shareRuleDataShared, SHARING_TYPE.SHARED);
+                shareItemIcon.className = 'fa fa-chain-broken mr-2';
+                shareItemMessage = await getString('shareaccept', 'local_notificationsagent');
+            } else {
+                shareItemText = await getString('editrule_sharerule', 'local_notificationsagent');
+                shareItem.setAttribute(selectors.shareRuleDataShared, SHARING_TYPE.UNSHARED);
+                shareItemIcon.className = 'fa fa-link mr-2';
+                shareItemMessage = await getString('unshareaccept', 'local_notificationsagent');
+            }
+
+            shareItem.innerHTML = '';
+            shareItem.appendChild(shareItemIcon);
+            shareItem.appendChild(document.createTextNode(shareItemText));
+
+            Notification.addNotification({
+                message: shareItemMessage,
+                type: 'info'
             });
         } else {
             Notification.addNotification({

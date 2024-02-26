@@ -35,11 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición de data relativa dende o evento do calendario';
+$string['conditiontext'] = 'Pasaron [TTTT] dende o evento do calendario [CCCC]';
 $string['subtype'] = 'calendarstart';
 $string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'calendarstart cron task';
-
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['calendarstart_crontask'] = 'Tarefa cron de inicio do calendario';
+$string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
+$string['afterend'] = 'Despois do fin do "evento"';
+$string['afterstart'] = 'Despois do inicio do "evento"';

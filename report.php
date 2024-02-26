@@ -28,16 +28,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require('../../config.php');
+global $PAGE, $CFG, $OUTPUT;
+require_once($CFG->libdir . '/adminlib.php');
+
 use core_reportbuilder\system_report_factory;
 use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\filters\number;
 use local_notificationsagent\reportbuilder\local\systemreports;
-use local_notificationsagent\Rule;
-
-require('../../config.php');
-global $PAGE, $CFG, $OUTPUT;
-require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->dirroot . '/local/notificationsagent/classes/rule.php');
+use local_notificationsagent\rule;
 
 require_login();
 
@@ -54,7 +53,7 @@ if ($courseid) {
 }
 
 if ($ruleid) {
-    $rule = Rule::create_instance($ruleid);
+    $rule = rule::create_instance($ruleid);
     $filter = $rule->get_name();
     $filters['rule:rulename_operator'] = text::IS_EQUAL_TO;
     $filters['rule:rulename_values'] = $filter;

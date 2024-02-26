@@ -84,7 +84,7 @@ mod_workshop|workshop|submissionstart|submissionend',
 
     $ADMIN->add('notificationscategory', $settingspage);
     $ADMIN->add('notificationscategory', new admin_externalpage('notificationsexternalpage', get_string('menu',
-        'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/index.php?courseid=1'));
+        'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/index.php'));
 
 
     // Add subplugins management in settings view.

@@ -36,7 +36,7 @@ defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Ekintza garrantzitsua den baldintza gehitu erabiltzailea taldera';
 $string['messageprovider:addusergroup'] = 'Gehitu erabiltzaile-talde Hornitzailea';
-$string['addusergroup_action'] = 'Gehitu [UUUU] erabiltzailea taldean [GGGG]';
+$string['addusergroup_action'] = 'Gehitu erabiltzailea taldean [GGGG]';
 $string['subtype'] = 'addusergroup';
 $string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}:';
 $string['editrule_action_element_group'] = 'Taldea {$a->typeelement}:';

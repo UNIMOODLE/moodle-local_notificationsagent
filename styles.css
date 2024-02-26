@@ -2,6 +2,14 @@ body.path-local-notificationsagent h5 i.icon{
     font-size: 1.2rem;
     line-height: initial;
 }
+body.path-local-notificationsagent #id_remove_condition_button,
+body.path-local-notificationsagent #id_remove_exception_button,
+body.path-local-notificationsagent #id_remove_action_button,
+body.path-local-notificationsagent #fitem_id_remove_condition_button,
+body.path-local-notificationsagent #fitem_id_remove_exception_button,
+body.path-local-notificationsagent #fitem_id_remove_action_button{
+    display: none;
+}
 
 body.path-local-notificationsagent h5 > i.icon:first-child{
     margin-left: .5rem;
@@ -212,7 +220,6 @@ body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availab
 body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner .availability-plugincontrols{
     margin-left: 0;
 }
-
 
 body.path-local-notificationsagent .hide-div {
     display:none !important;

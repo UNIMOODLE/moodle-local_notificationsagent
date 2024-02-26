@@ -41,5 +41,6 @@ $string['modname'] = 'weekend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['weekend_crontask'] = 'Weekend cron task';
-$string['weekendtext'] = 'In this Moodle, the weekend is configured as: ';
+$string['weekendtext'] = 'It is weekend ({$a->weekend})';
+$string['weekendtag'] = 'Weekend';
 

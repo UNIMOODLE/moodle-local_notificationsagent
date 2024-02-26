@@ -34,12 +34,11 @@
 namespace notificationscondition_activityend\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
 
 class activityend_crontask extends scheduled_task {
 
@@ -66,14 +65,15 @@ class activityend_crontask extends scheduled_task {
             $context = \context_course::instance($courseid);
             $enrolledusers = notificationsagent::get_usersbycourse($context);
             $condtionid = $condition->id;
-            $decode = $condition->parameters;
-            $param = json_decode($decode, true);
-            $cmid = $param['activity'];
+            $param = json_decode($condition->parameters, true);
+            $cmid = $param[notificationplugin::UI_ACTIVITY];
             $timeend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
-            $cache = $timeend;
+            $cache = $timeend - $param[notificationplugin::UI_TIME];
             foreach ($enrolledusers as $enrolleduser) {
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id)) {
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
+                )
+                ) {
                     notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
                 }
             }

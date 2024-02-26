@@ -31,17 +31,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once('notificationplugin.php');
-require_once('plugininfo/notificationsbaseinfo.php');
+namespace local_notificationsagent;
 
+use moodle_exception;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
-use local_notificationsagent\EvaluationContext;
+use local_notificationsagent\evaluationcontext;
+
 abstract class notificationconditionplugin extends notificationplugin {
 
     public function get_type() {
-        return parent::CAT_CONDITION;
+        return parent::TYPE_CONDITION;
     }
+
     abstract public function get_title();
 
     abstract public function get_elements();
@@ -50,11 +53,12 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     /**
      * Return the module identifier specified in the condition
-     * @param object $parameters Plugin parameters
      *
      * @return int|null $cmid Course module id or null
      */
-    abstract protected function get_cmid($parameters);
+    public function get_cmid() {
+        return json_decode($this->get_parameters(), true)[self::UI_ACTIVITY] ?? null;
+    }
 
     /*
      * Check whether a user has capabilty to use a condition.
@@ -63,18 +67,17 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param EvaluationContext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
      */
-    abstract public function evaluate(EvaluationContext $context): bool;
+    abstract public function evaluate(evaluationcontext $context): bool;
 
-     /** Estimate next time when this condition will be true. */
-    abstract public function estimate_next_time(EvaluationContext $context);
+    /** Estimate next time when this condition will be true. */
+    abstract public function estimate_next_time(evaluationcontext $context);
 
     public static function create_subplugins($records) {
-
         $subplugins = [];
         global $DB;
         foreach ($records as $record) {
@@ -88,7 +91,7 @@ abstract class notificationconditionplugin extends notificationplugin {
                 $subplugin->set_type($record->type);
                 $subplugin->set_ruleid($record->ruleid);
 
-                $subplugins[] = $subplugin;
+                $subplugins[$record->id] = $subplugin;
             }
         }
         return $subplugins;
@@ -99,55 +102,52 @@ abstract class notificationconditionplugin extends notificationplugin {
         // Find type of subplugin.
         $record = $DB->get_record('notificationsagent_condition', ['id' => $id]);
         $subplugins = self::create_subplugins([$record]);
-        return $subplugins[0];
+        return $subplugins[$id];
     }
 
-    /**
-     * Returns date from seconds value
-     *
-     * @param  mixed $inputseconds
-     * @return void
-     */
-    public function get_human_time($inputseconds) {
-        $secondsinaminute = 60;
-        $secondsinhour = 60 * $secondsinaminute;
-        $secondsinday = 24 * $secondsinhour;
+    public function save($idname, $data, $complementary, $students = [], &$timer = 0) {
+        global $DB;
 
-        // Extract days.
-        $days = floor($inputseconds / $secondsinday);
+        $dataplugin = new \stdClass();
+        $dataplugin->ruleid = $this->rule->get_id();
+        $dataplugin->pluginname = get_called_class()::NAME;
+        $dataplugin->type = $this->get_type();
+        $dataplugin->complementary = $complementary;
+        $dataplugin->parameters = $this->convert_parameters($idname, $data);
+        $dataplugin->cmid = $this->get_cmid();
+        // Insert plugin.
+        if (!$dataplugin->id = $DB->insert_record('notificationsagent_condition', $dataplugin)) {
+            throw new moodle_exception('errorinserting_notificationsagent_condition');
+        }
 
-        // Extract hours.
-        $hourseconds = $inputseconds % $secondsinday;
-        $hours = floor($hourseconds / $secondsinhour);
+        $contextevaluation = new evaluationcontext();
+        $contextevaluation->set_courseid($data->courseid);
+        $contextevaluation->set_params($this->get_parameters());
+        $cache = $this->estimate_next_time($contextevaluation);
 
-        // Extract minutes.
-        $minuteseconds = $hourseconds % $secondsinhour;
-        $minutes = floor($minuteseconds / $secondsinaminute);
-
-        // Extract the remaining seconds.
-        $remainingseconds = $minuteseconds % $secondsinaminute;
-        $seconds = ceil($remainingseconds);
-
-        // Format and return.
-        $timeparts = [];
-        $sections = [
-            get_string('card_day', 'local_notificationsagent')  => (int)$days,
-            get_string('card_hour', 'local_notificationsagent') => (int)$hours,
-            get_string('card_minute', 'local_notificationsagent') => (int)$minutes,
-            get_string('card_second', 'local_notificationsagent') => (int)$seconds,
-        ];
-
-        foreach ($sections as $name => $value) {
-            if ($value > 0) {
-                $timeparts[] = $value . ' ' . $name . ($value == 1 ? '' : 's');
+        if (!$this->is_generic()) {
+            foreach ($students as $student) {
+                notificationsagent::set_timer_cache(
+                    $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+                );
+                if ($timer <= $cache) {
+                    $timer = $cache;
+                    notificationsagent::set_time_trigger(
+                        $dataplugin->ruleid, $dataplugin->id, $student->id, $data->courseid, $timer
+                    );
+                }
+            }
+        } else {
+            notificationsagent::set_timer_cache(
+                notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+            );
+            if ($timer <= $cache) {
+                $timer = $cache;
+                notificationsagent::set_time_trigger(
+                    $dataplugin->ruleid, $dataplugin->id, notificationsagent::GENERIC_USERID, $data->courseid, $timer
+                );
             }
         }
-
-        if (empty($timeparts)) {
-            $timeparts[] = 0 . ' ' . get_string('card_second', 'local_notificationsagent') . 's';
-        }
-
-        return implode(', ', $timeparts);
     }
 
 }

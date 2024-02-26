@@ -36,7 +36,7 @@ defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Acció relativa a eliminar un grup d\'usuaris';
 $string['messageprovider:removeusergroup'] = 'Eliminar un grup d\'usuaris Proveïdor';
-$string['removeusergroup_action'] = 'Eliminar usuari [UUUU] al grup [GGGG]';
+$string['removeusergroup_action'] = 'Eliminar usuari al grup [GGGG]';
 $string['subtype'] = 'removeusergroup';
 $string['editrule_action_element_user'] = 'Usuari {$a->typeelement}:';
 $string['editrule_action_element_group'] = 'Grup {$a->typeelement}:';

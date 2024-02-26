@@ -1,0 +1,8 @@
+<div id="delete-rule-modal-{{{ rule.id }}}" class="d-flex align-items-center">
+    {{#rule.hascontext}}
+            {{#str}}deletecontent_hascontext, local_notificationsagent, {"type": "{{rule.type}}", "title": "{{rule.title}}"}{{/str}}
+    {{/rule.hascontext}}
+    {{^rule.hascontext}}
+        {{#str}}deletecontent_nocontext, local_notificationsagent, {"type": "{{rule.type}}", "title": "{{rule.title}}"}{{/str}}
+    {{/rule.hascontext}}
+</div>

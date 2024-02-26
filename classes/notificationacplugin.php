@@ -30,7 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace local_notificationsagent;
 use core_availability\info;
 
 class notificationacplugin extends info {
@@ -86,7 +86,7 @@ class notificationacplugin extends info {
         if (!empty($children[$complementary])) {
             $conditions = $children[$complementary]->get_all_children('core_availability\condition');
             list($innernot) = $children[$complementary]->get_logic_flags(
-                $complementary == notificationplugin::CAT_EXCEPTION_CHILDREN
+                $complementary == notificationplugin::COMPLEMENTARY_EXCEPTION
             );
             foreach ($conditions as $child) {
                 $childdescription = $child->get_description(true, $innernot, $this);

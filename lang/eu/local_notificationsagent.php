@@ -120,19 +120,26 @@ $string['editrule_condition_title_usercompleteactivity'] = 'Erabiltzaileak jardu
 $string['editrule_condition_title_activeactivity'] = '[AAAA] jarduera eskuragarri dago';
 $string['editrule_condition_title_betweendates'] = '[FFFF-1] eta [FFFF-2] dataren artean gaude';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Osatu jarduera guztiak foro honetara sartzeko [FFFF]';
-$string['editrule_condition_title_forumnotanswer'] = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
+$string['editrule_condition_title_forumnotanswer']
+    = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
 
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = '{$a->typeelement} jarduera:';
-$string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
+$string['editrule_condition_element_date_from'] = get_string('from') . ' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to') . ' {$a->typeelement}:';
+
+$string['editrule_condition_error'] = 'Gutxienez baldintza bat gehitu behar duzu';
 
 // Ekintzak.
 $string['editrule_newaction'] = 'Ekintza berria:';
-$string['editrule_action_title_individualnotification'] = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_notificationtouser'] = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_postgeneralforum'] = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_postprivateforum'] = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_individualnotification']
+    = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_notificationtouser']
+    = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_postgeneralforum']
+    = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['editrule_action_title_postprivateforum']
+    = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Gehitu erabiltzailea [GGGG] taldean';
 $string['editrule_action_title_removeuserfromgroup'] = 'Kendu erabiltzaile bat [GGGG] talde batetik';
 $string['editrule_action_title_bootstrapnotification'] = 'Bootstrap jakinarazpena';
@@ -145,6 +152,8 @@ $string['editrule_action_element_group'] = '{$a->typeelement} taldea';
 
 $string['subplugintype_notificationsagentaction'] = 'Azpipluginen ekintza';
 
+$string['editrule_action_error'] = 'Gutxienez ekintza bat gehitu behar duzu';
+
 // Rule.
 $string['rulecancelled'] = 'Araua bertan behera utzi da';
 $string['rulesaved'] = 'Araua gorde da';
@@ -156,22 +165,29 @@ $string['cardthen'] = 'Orduan:';
 
 // Txartelaren baldintza-denbora.
 $string['card_day'] = 'eguna';
+$string['card_day_plural'] = 'egunak';
 $string['card_hour'] = 'ordua';
-$string['card_minute'] = 'minutu';
-$string['card_second'] = 'segundoa';
+$string['card_hour_plural'] = 'orduak';
+$string['card_minute'] = 'minutua';
+$string['card_minute_plural'] = 'minutu';
+$string['card_second'] = 'segundu';
+$string['card_second_plural'] = 'segundoak';
 
 // Egoera modala.
-$string['statustitle'] = '{$a->textstatus} araua {$a->title}';
-$string['statuscontent'] = '{$a->textstatus} {$a->title} araura zoaz, jarraitu nahi duzu?';
-$string['statuscancel'] = 'Utzi';
-$string['statusaccept'] = 'Onartu';
-$string['statusacceptativated'] = 'Araua aktibatuta';
-$string['statusacceptpaused'] = 'Araua pausatu da';
+$string['status_pausetitle'] = 'Pausatu araua {$a->title}';
+$string['status_activatetitle'] = 'Erregela aktibatu {$a->title}';
+$string['status_pausecontent'] = 'Araua geldituko da {$a->title}, jarraitu nahi duzu?';
+$string['status_activatecontent'] = '{$a->title} araua aktibatuko da, jarraitu nahi duzu?';
+$string['status_acceptactivated'] = 'Erregela aktibatua';
+$string['status_acceptpaused'] = 'Erregela pausatua';
+$string['statuspause'] = 'Pausatu';
+$string['statusactivate'] = 'Activatu';
 
 // Modala ezabatu.
 $string['deletetitle'] = 'Ezabatu {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = '{$a->type} {$a->title} ezabatzen ari da, jarraitu nahi duzu?';
-$string['deletecontent_hascontext'] = 'Ezabatu nahi duzun {$a->type} {$a->title} beste testuinguru batzuekin lotuta dago, jarraitu nahi duzu?';
+$string['deletecontent_hascontext']
+    = 'Ezabatu nahi duzun {$a->type} {$a->title} beste testuinguru batzuekin lotuta dago, jarraitu nahi duzu?';
 $string['deleteaccept'] = 'Ezabatutako araua';
 
 // Modala esleitu.

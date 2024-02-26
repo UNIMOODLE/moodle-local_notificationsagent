@@ -32,6 +32,7 @@
  */
 
 require_once("../../config.php");
+
 global $DB;
 require_login();
 $ruleid = required_param('ruleid', PARAM_INT);

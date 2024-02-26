@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició: data relativa a l\'inici de l\'activitat';
+$string['conditiontext'] = 'Heu transcorregut [TTTTT] des de la data d\'obertura de l\'activitat [AAAA].';
 $string['subtype'] = 'activityopen';
 $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

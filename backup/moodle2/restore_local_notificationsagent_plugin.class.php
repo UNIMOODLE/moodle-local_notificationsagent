@@ -48,12 +48,6 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
             new restore_path_element('local_notificationsagent_rule_action',
                 $this->get_pathfor('/rules/rule/actions/action')
             ),
-            new restore_path_element('local_notificationsagent_rule_cache',
-                $this->get_pathfor('/rules/rule/conditions/condition/caches/cache')
-            ),
-            new restore_path_element('local_notificationsagent_rule_trigger',
-                $this->get_pathfor('/rules/rule/triggers/trigger')
-            ),
             new restore_path_element('local_notificationsagent_rule_launched',
                 $this->get_pathfor('/rules/rule/launcheds/launched')
             ),
@@ -87,7 +81,11 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         $record = new \stdClass;
         $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
         $record->contextid = $data['contextid'];
-        $record->objectid = $this->get_mappingid('course', $data['objectid']);
+        if ($this->task->get_courseid() == SITEID) {
+            $record->objectid = $data['objectid'];
+        } else {
+            $record->objectid = $this->get_mappingid('course', $data['objectid']);
+        }
 
         $DB->insert_record('notificationsagent_context', $record);
     }
@@ -120,44 +118,20 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         $DB->insert_record('notificationsagent_action', $record);
     }
 
-    public function process_local_notificationsagent_rule_cache($data) {
-        global $DB;
-
-        $record = new \stdClass;
-        $record->conditionid = $this->get_mappingid('notificationsagent_condition', $data['conditionid']);
-        $record->pluginname = $data['pluginname'];
-        $record->courseid = $this->get_mappingid('course', $data['courseid']);
-        $record->userid = $data['userid'];
-        $record->timestart = $data['timestart'];
-        $record->timeto = $data['timeto'];
-        $record->cache = $data['cache'];
-
-        $DB->insert_record('notificationsagent_cache', $record);
-    }
-
-    public function process_local_notificationsagent_rule_trigger($data) {
-        global $DB;
-
-        $record = new \stdClass;
-        $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
-        $record->courseid = $this->get_mappingid('course', $data['courseid']);
-        $record->userid = $data['userid'];
-        $record->startdate = $data['startdate'];
-
-        $DB->insert_record('notificationsagent_triggers', $record);
-    }
-
     public function process_local_notificationsagent_rule_launched($data) {
         global $DB;
 
-        $record = new \stdClass;
-        $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
-        $record->courseid = $this->get_mappingid('course', $data['courseid']);
-        $record->userid = $data['userid'];
-        $record->timesfired = $data['timesfired'];
-        $record->timecreated = $data['timecreated'];
-        $record->timemodified = $data['timemodified'];
+        // Only import the history of rules launched if the source and target course is the same.
+        if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
+            $record = new \stdClass;
+            $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+            $record->courseid = $this->get_mappingid('course', $data['courseid']);
+            $record->userid = $data['userid'];
+            $record->timesfired = $data['timesfired'];
+            $record->timecreated = $data['timecreated'];
+            $record->timemodified = $data['timemodified'];
 
-        $DB->insert_record('notificationsagent_launched', $record);
+            $DB->insert_record('notificationsagent_launched', $record);
+        }
     }
 }

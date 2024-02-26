@@ -125,6 +125,8 @@ $string['editrule_condition_element_activity'] = 'Actividade {$a->typeelement}:'
 $string['editrule_condition_element_date_from'] = get_string('de').' {$a->typeelement}:';
 $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
 
+$string['editrule_condition_error'] = 'Debes engadir polo menos unha condición';
+
 // Accións.
 $string['editrule_newaction'] = 'Nova acción:';
 $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] e mensaxe [BBBB]';
@@ -143,6 +145,8 @@ $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
 
 $string['subplugintype_notificationsagentaction'] = 'Acción de subplugins';
 
+$string['editrule_action_error'] = 'Debes engadir polo menos unha acción';
+
 // Rule.
 $string['rulecancelled'] = 'Regra cancelada';
 $string['rulesaved'] = 'Gardouse a regra';
@@ -154,17 +158,23 @@ $string['cardthen'] = 'Entón:';
 
 // Tempo de condición da tarxeta.
 $string['card_day'] = 'día';
+$string['card_day_plural'] = 'días';
 $string['card_hour'] = 'hora';
+$string['card_hour_plural'] = 'horas';
 $string['card_minute'] = 'minuto';
+$string['card_minute_plural'] = 'minutos';
 $string['card_second'] = 'segundo';
+$string['card_second_plural'] = 'segundos';
 
 // Estado modal.
-$string['statustitle'] = '{$a->textstatus} regra {$a->title}';
-$string['statuscontent'] = 'Vas a regra {$a->textstatus} {$a->title}, queres continuar?';
-$string['statuscancel'] = 'Cancelar';
-$string['statusaccept'] = 'Aceptar';
-$string['statusacceptactivated'] = 'Regra activada';
-$string['statusacceptpaused'] = 'Regra en pausa';
+$string['status_pausetitle'] = 'Pausar regra {$a->title}';
+$string['status_activatetitle'] = 'Activar regra {$a->title}';
+$string['status_pausecontent'] = 'Vaise a pausar a regra {$a->title}, desexa continuar?';
+$string['status_activatecontent'] = 'Vai activar a regra {$a->title}, desexa continuar?';
+$string['status_acceptactivated'] = 'Regra activada';
+$string['status_acceptpaused'] = 'Regra pausada';
+$string['statuspause'] = 'Pausar';
+$string['statusactivate'] = 'Activar';
 
 // Eliminar modal.
 $string['deletetitle'] = 'Eliminar o {$a->type} {$a->title}';

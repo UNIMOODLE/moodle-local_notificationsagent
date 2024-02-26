@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición: data relativa dende o remate da actividade';
+$string['conditiontext'] = 'Pasaron [TTTT] dende o logro do punto de referencia da actividade [AAAA].';
 $string['subtype'] = 'activitysinceend';
 $string['modname'] = 'activitysinceend';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';

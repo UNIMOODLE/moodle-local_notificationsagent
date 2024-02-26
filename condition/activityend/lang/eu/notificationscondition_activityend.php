@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
+$string['conditiontext'] = '[TTTT] baino gutxiago falta da jardueraren amaiera datarako [AAAA].';
 $string['subtype'] = 'activityend';
 $string['modname'] = 'activityend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

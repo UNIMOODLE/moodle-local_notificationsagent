@@ -36,6 +36,6 @@ defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Acción relacionada coas notificacións de Bootstrap';
 $string['messageprovider:bootstrapnotifications'] = 'Provedor de notificacións Bootstrap';
-$string['bootstrapnotifications_action'] = 'Notificación Bootstrap';
+$string['bootstrapnotifications_action'] = 'Notificación Bootstrap con texto [TTTT]';
 $string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Texto {$a->typeelement}:';

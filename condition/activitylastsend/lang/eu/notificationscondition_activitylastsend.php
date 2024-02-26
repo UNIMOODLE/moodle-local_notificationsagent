@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['conditiontext'] = '[TTTT] baino gehiago izan da ikasleak [AAAA] jardueran azken edukia bidali zuenetik.';
 $string['subtype'] = 'activitylastsend';
 $string['modname'] = 'activitylastsend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

@@ -27,15 +27,12 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace notificationscondition_weekend\task;
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
-require_once(__DIR__ . '/../../../../lib.php');
-require_once(__DIR__ . '/../../lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationsagent;
+use notificationscondition_weekend\weekend;
 
 class weekend_crontask extends scheduled_task {
 
@@ -52,11 +49,10 @@ class weekend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        global $DB;
         custom_mtrace("Weekend start");
-        $currenttime = time();
+        $currenttime = $this->get_timestarted();
 
-        if (!is_weekend($currenttime)) {
+        if (!weekend::is_weekend($currenttime)) {
             return null;
         }
 
@@ -67,14 +63,13 @@ class weekend_crontask extends scheduled_task {
             $condtionid = $condition->id;
 
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
-
-                if (is_weekend($currenttime)) {
-                    notificationsagent::set_timer_cache
-                    (notificationsagent::GENERIC_USERID, $courseid, $currenttime, $pluginname, $condtionid, true);
-                    notificationsagent::set_time_trigger
-                    ($condition->ruleid, notificationsagent::GENERIC_USERID, $courseid, $currenttime);
-                }
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+            )
+            ) {
+                notificationsagent::set_time_trigger
+                (
+                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $currenttime
+                );
             }
         }
         custom_mtrace("Weekend end ");

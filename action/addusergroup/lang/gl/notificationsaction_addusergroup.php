@@ -36,7 +36,7 @@ defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Acción relativa a engadir usuario ao grupo';
 $string['messageprovider:addusergroup'] = 'Engadir fornecedor do grupo de usuarios';
-$string['addusergroup_action'] = 'Engadir usuario [UUUU] ao grupo [GGGG]';
+$string['addusergroup_action'] = 'Engadir usuario ao grupo [GGGG]';
 $string['subtype'] = 'addusergroup';
 $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';

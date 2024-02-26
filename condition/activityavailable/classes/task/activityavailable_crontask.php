@@ -32,14 +32,13 @@
  */
 
 namespace notificationscondition_activityavailable\task;
+
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ .'/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
-use Notificationsagent_engine;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\engine\notificationsagent_engine;
 
 class activityavailable_crontask extends scheduled_task {
 
@@ -57,7 +56,7 @@ class activityavailable_crontask extends scheduled_task {
      */
     public function execute() {
         custom_mtrace("Activityavailable start");
-
+        $timer = $this->get_timestarted();
         $pluginname = 'activityavailable';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
@@ -67,9 +66,10 @@ class activityavailable_crontask extends scheduled_task {
             $enrolledusers = notificationsagent::get_usersbycourse($context);
             foreach ($enrolledusers as $enrolleduser) {
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id)) {
-                        Notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                        [$condition->ruleid], time(), $enrolleduser->id, $courseid);
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
+                )
+                ) {
+                    notificationsagent::set_time_trigger($condition->ruleid, $condition->id, $enrolleduser->id, $courseid, $timer);
                 }
             }
         }

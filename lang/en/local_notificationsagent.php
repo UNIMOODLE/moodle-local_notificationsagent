@@ -139,6 +139,8 @@ $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
 $string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
 $string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
 
+$string['editrule_condition_error'] = 'You must add at least one condition';
+
 // Actions.
 $string['editrule_newaction'] = 'New action:';
 $string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
@@ -155,8 +157,9 @@ $string['editrule_action_element_user'] = 'User {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
 
-
 $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
+
+$string['editrule_action_error'] = 'You must add at least one action';
 
 // Rule.
 $string['rulecancelled'] = 'Rule cancelled';
@@ -169,17 +172,23 @@ $string['cardthen'] = 'Then:';
 
 // Card Condition time.
 $string['card_day'] = 'day';
+$string['card_day_plural'] = 'days';
 $string['card_hour'] = 'hour';
+$string['card_hour_plural'] = 'hours';
 $string['card_minute'] = 'minute';
+$string['card_minute_plural'] = 'minutes';
 $string['card_second'] = 'second';
+$string['card_second_plural'] = 'seconds';
 
 // Status modal.
-$string['statustitle'] = '{$a->textstatus} rule {$a->title}';
-$string['statuscontent'] = 'You are going to {$a->textstatus} rule {$a->title}, do you want to continue?';
-$string['statuscancel'] = 'Cancel';
-$string['statusaccept'] = 'Accept';
-$string['statusacceptactivated'] = 'Rule activated';
-$string['statusacceptpaused'] = 'Rule paused';
+$string['status_pausetitle'] = 'Pause rule {$a->title}';
+$string['status_activatetitle'] = 'Activate rule {$a->title}';
+$string['status_pausecontent'] = 'You are going to pause rule {$a->title}, do you want to continue?';
+$string['status_activatecontent'] = 'You are going to activate rule {$a->title}, do you want to continue?';
+$string['status_acceptactivated'] = 'Rule activated';
+$string['status_acceptpaused'] = 'Rule paused';
+$string['statuspause'] = 'Pause';
+$string['statusactivate'] = 'Activate';
 
 // Delete modal.
 $string['deletetitle'] = 'Delete {$a->type} {$a->title}';

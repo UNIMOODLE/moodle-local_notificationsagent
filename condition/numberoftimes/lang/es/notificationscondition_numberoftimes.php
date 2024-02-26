@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a la fecha del primer acceso a un curso';
-$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el primer inicio de sesión en el curso.';
+$string['pluginname'] = 'Condición de la regla ha sido iniciada menos de un número de veces y al menos hace algún tiempo.';
+$string['conditiontext'] = 'La regla ha sido iniciada menos de [N] veces y al menos hace [TTTT].';
 $string['subtype'] = 'numberoftimes';
 $string['modname'] = 'numberoftimes';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

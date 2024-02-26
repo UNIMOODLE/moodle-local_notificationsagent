@@ -35,11 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Ikastaroaren hasierako dataren arabera egindako baldintza';
+$string['conditiontext'] = 'Igaro da [TTTT] ikastaroa hasi zenetik.';
 $string['subtype'] = 'coursestart';
 $string['modname'] = 'coursestart';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['coursestart_crontask'] = 'coursestart cron task';
-
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
+$string['editrule_condition_activity'] = 'Ekintza {$a->typeelement}:';
+$string['coursestart_crontask'] = 'ikastaro_hasiera cron lan';

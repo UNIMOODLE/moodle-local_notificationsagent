@@ -31,9 +31,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once("../../config.php");
-require_once("classes/rule.php");
 
-use local_notificationsagent\Rule;
+use local_notificationsagent\rule;
 
 defined('MOODLE_INTERNAL') || die();
 require_login();
@@ -54,7 +53,7 @@ if (!empty($idrule)) {
 }
 
 function get_list_assigned_context($idrule) {
-    $rule = Rule::create_instance($idrule);
+    $rule = rule::create_instance($idrule);
     $listofcoursesassigned = $rule->get_assignedcontext();
     return $listofcoursesassigned;
 }
@@ -62,7 +61,7 @@ function get_list_assigned_context($idrule) {
 function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     global $DB;
 
-    $instance = Rule::create_instance($idrule);
+    $instance = rule::create_instance($idrule);
     $DB->delete_records('notificationsagent_context', ['ruleid' => $idrule]);
     $instance->set_default_context(SITEID);
 
@@ -92,12 +91,12 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
 function set_forced_rule($idrule, $forced) {
     global $DB;
 
-    $instance = Rule::create_instance($idrule);
+    $instance = rule::create_instance($idrule);
     $context = \context_course::instance(SITEID);
     if (has_capability('local/notificationsagent:forcerule', $context)) {
         $request = new \stdClass();
         $request->id = $instance->get_id();
-        $request->forced = !$forced ? Rule::FORCED_RULE : Rule::NONFORCED_RULE;
+        $request->forced = !$forced ? rule::FORCED_RULE : rule::NONFORCED_RULE;
 
         $DB->update_record('notificationsagent_rule', $request);
     }

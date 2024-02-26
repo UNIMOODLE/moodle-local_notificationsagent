@@ -27,18 +27,16 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ .'/../sessionend.php');
-require_once(__DIR__ .'/../../../notificationsagent.php');
-require_once(__DIR__ .'/../../../classes/engine/notificationsagent_engine.php');
-use notificationsagent\notificationsagent;
+
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
+
 class notificationscondition_sessionend_observer {
 
     /**
      * @throws \dml_exception
      */
     public static function course_viewed(\core\event\course_viewed $event) {
-
         if (!isloggedin() || $event->courseid == 1) {
             return;
         }
@@ -56,11 +54,13 @@ class notificationscondition_sessionend_observer {
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
-            $cache = $timeaccess + $param['time'];
+            $cache = $timeaccess + $param[notificationplugin::UI_TIME];
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid)) {
+                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid
+            )
+            ) {
                 notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, true);
-                notificationsagent::set_time_trigger($condition->ruleid, $userid, $courseid, $cache);
+                notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $userid, $courseid, $cache);
             }
         }
     }

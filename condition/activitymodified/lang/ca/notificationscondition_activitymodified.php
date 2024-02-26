@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició relativa a S\'ha modificat el contingut de l\'activitat';
+$string['conditiontext'] = 'S\'ha modificat el contingut de l\'activitat [AAAA]';
 $string['subtype'] = 'activitymodified';
 $string['modname'] = 'activitymodified';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'El curs té nou contingut.';
+$string['conditiontext'] = 'Hi ha nou contingut en el curs de tipus [AAAA].';
 $string['subtype'] = 'activitynewcontent';
 $string['modname'] = 'activitynewcontent';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició relativa a fa més de [TTTT] des del darrer enviament de contingut de l\'estudiant a l\'activitat';
+$string['conditiontext'] = 'Fa més de [TTTT] des del darrer enviament de contingut de l\'estudiant a l\'activitat [AAAA].';
 $string['subtype'] = 'activitylastsend';
 $string['modname'] = 'activitylastsend';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

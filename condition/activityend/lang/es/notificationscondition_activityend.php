@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición: fecha relativa al fin de la actividad';
+$string['conditiontext'] = 'Queda menos de [TTTT] para la fecha de cierre de la actividad [AAAA].';
 $string['subtype'] = 'activityend';
 $string['modname'] = 'activityend';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

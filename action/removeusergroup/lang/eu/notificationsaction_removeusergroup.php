@@ -36,7 +36,7 @@ defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Ekintza Baldintza garrantzitsua kendu erabiltzailea taldetik';
 $string['messageprovider:removeusergroup'] = 'Ezabatu erabiltzaile taldea Hornitzailea';
-$string['removeusergroup_action'] = 'Ezabatu [UUUU] erabiltzailea [AAAA] taldetik';
+$string['removeusergroup_action'] = 'Ezabatu erabiltzailea [AAAA] taldetik';
 $string['subtype'] = 'removeusergroup';
 $string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}:';
 $string['editrule_action_element_group'] = 'Taldea {$a->typeelement}:';

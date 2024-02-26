@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición: data relativa ata o remate do curso';
+$string['conditiontext'] = 'Quedan menos de [TTTT] para o remate do curso.';
 $string['subtype'] = 'courseend';
 $string['modname'] = 'courseend';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';

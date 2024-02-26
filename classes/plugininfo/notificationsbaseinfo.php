@@ -32,12 +32,14 @@
  */
 
 namespace local_notificationsagent\plugininfo;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/classes/rule.php');
 
 use core\plugininfo\base;
-use core_plugin_manager, core_component;
+use core_plugin_manager;
+use local_notificationsagent\notificationplugin;
+// use notificationscondition_activityavailable\activityavailable;
 
 class notificationsbaseinfo extends base {
 
@@ -49,11 +51,9 @@ class notificationsbaseinfo extends base {
      * @param string $pluginname
      * @return \notificationplugin */
     public static function instance($rule, $subtype, $pluginname) {
-        $path = \core_component::get_plugin_directory('notifications' . $subtype, $pluginname);
-        $classfile = $pluginname;
-        if (file_exists($path .'/' . $classfile.'.php')) {
-            require_once($path . '/' . $classfile.'.php');
-            $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
+        $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION : notificationplugin::TYPE_CONDITION);
+        $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
+        if (class_exists($pluginclass)) {
             $plugin = new $pluginclass($rule);
             return $plugin;
         }
@@ -65,8 +65,8 @@ class notificationsbaseinfo extends base {
      * @return \notificationplugin[] of enabled plugins $pluginname=>$plugin,
      */
     public static function get_system_enabled_plugins_all_types($rule = null) {
-        $conditions = self::get_system_enabled_plugins($rule, 'condition');
-        $actions = self::get_system_enabled_plugins($rule, 'action');
+        $conditions = self::get_system_enabled_plugins($rule, notificationplugin::TYPE_CONDITION);
+        $actions = self::get_system_enabled_plugins($rule, notificationplugin::TYPE_ACTION);
         return array_merge($conditions, $actions);
     }
 
@@ -112,20 +112,20 @@ class notificationsbaseinfo extends base {
         return $enabled;
     }
 
-    public static function get_description($subtype) {
-        global $CFG;
-        $courseid = required_param('courseid', PARAM_INT);
+    public static function get_description($courseid, $subtype) {
         $listactions = [];
         $rule = new \stdClass();
         $rule->ruleid = null;
         foreach (array_keys(self::get_system_enabled_plugins(null, $subtype)) as $pluginname) {
-            require_once($CFG->dirroot . '/local/notificationsagent/' . $subtype . '/' . $pluginname . '/' . $pluginname . '.php');
-            $pluginclass = 'notificationsagent_' . $subtype . '_' . $pluginname;
-            $pluginobj = new $pluginclass($rule);
-            $context = \context_course::instance($courseid);
-            // Check subplugin capability for current user in course.
-            if ($pluginobj->check_capability($context)) {
-                $listactions[] = $pluginobj->get_description();
+            $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION : notificationplugin::TYPE_CONDITION);
+            $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
+            if (class_exists($pluginclass)) {
+                $pluginobj = new $pluginclass($rule);
+                $context = \context_course::instance($courseid);
+                // Check subplugin capability for current user in course.
+                if ($pluginobj->check_capability($context)) {
+                    $listactions[] = $pluginobj->get_description();
+                }
             }
         }
 

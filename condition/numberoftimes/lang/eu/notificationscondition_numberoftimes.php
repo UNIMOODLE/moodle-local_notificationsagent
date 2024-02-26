@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Baldintzaren baldintza gutxiago baino gehiagotan zenbaki batzuk baino gutxiago hasi da eta gutxienez denbora bat.';
+$string['conditiontext'] = 'Baldintza gutxiago baino gehiagotan [N] aldiz hasi da eta gutxienez [TTTT] denbora darama.';
 $string['subtype'] = 'numberoftimes';
 $string['modname'] = 'numberoftimes';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

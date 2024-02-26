@@ -32,6 +32,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Availability Condition';
+$string['conditiontext'] = 'Availability Condition';
 $string['subtype'] = 'ac';
 $string['modname'] = 'ac';
 $string['ac_crontask'] = 'Availability condition cron task';

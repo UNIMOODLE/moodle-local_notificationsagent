@@ -35,11 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Jarduera baten baldintza aldatu da.';
+$string['conditiontext'] = '[AAAA] jarduaren edukia aldatu da.';
 $string['subtype'] = 'activitymodified';
 $string['modname'] = 'activitymodified';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['activitymodified_crontask'] = 'activitymodified cron task';
+$string['activitymodified_crontask'] = 'Jarduera amaitzeko krono-lan';
+
 

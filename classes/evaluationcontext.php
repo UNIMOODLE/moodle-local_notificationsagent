@@ -33,9 +33,7 @@
 
 namespace local_notificationsagent;
 
-use local_notificationsagent\Rule;
-
-class EvaluationContext {
+class evaluationcontext {
 
     private $userid; // Evento.
     private $courseid; // Evento o regla.
@@ -44,15 +42,10 @@ class EvaluationContext {
     private $iscomplementary;
     private $usertimesfired;
     private $objectid;
+    private $triggercondition;
     private $rule;
     private $conditions = [];
     private $exceptions = [];
-
-    /** @var array Type of complementary condition */
-    public const COMPLEMENTARY = [
-        0 => false,
-        1 => true,
-    ];
 
     /**
      * @return mixed
@@ -177,6 +170,20 @@ class EvaluationContext {
      */
     public function set_objectid(int $objectid): void {
         $this->objectid = $objectid;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_triggercondition(): int {
+        return $this->triggercondition;
+    }
+
+    /**
+     * @param int $triggercondition
+     */
+    public function set_triggercondition(int $triggercondition): void {
+        $this->triggercondition = $triggercondition;
     }
 
     /**

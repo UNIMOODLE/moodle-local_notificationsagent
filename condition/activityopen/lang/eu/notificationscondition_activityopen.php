@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Baldintza: jarduera hasierako data erlatiboa';
+$string['conditiontext'] = '[TTTTT] jardueraren irekiera datatik [AAAA] igaro da.';
 $string['subtype'] = 'activityopen';
 $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

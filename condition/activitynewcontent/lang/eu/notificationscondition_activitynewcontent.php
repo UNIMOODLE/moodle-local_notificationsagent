@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Ikastaroan eduki berria dago.';
+$string['conditiontext'] = '[AAAA] motako ikastaroan eduki berria dago.';
 $string['subtype'] = 'activitynewcontent';
 $string['modname'] = 'activitynewcontent';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

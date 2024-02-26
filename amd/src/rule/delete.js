@@ -19,68 +19,89 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {get_string as getString, get_strings as getStrings} from 'core/str';
+import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
+import ModalFactory from 'core/modal_factory';
+import ModalEvents from 'core/modal_events';
+import Templates from 'core/templates';
 import {checkRuleContext, deleteRule} from 'local_notificationsagent/rule/repository';
 
 /**
- * Registers the click event listener for the delete button of a rule
+ * Selectors for the Delete Button.
+ *
+ * @property {string} deleteRuleId The element ID of the Delete Rule button.
  */
-export const init = () => {
-    $('#deleteRuleModal').on('show.bs.modal', function (e) {
-        ruleButton = $(e.relatedTarget);
-        let id = ruleButton.data('ruleid');
-        let ruleType = ruleButton.data('type');
+const selectors = {
+    deleteRuleId: '[id^="delete-rule-"]:not(.disabled)',
+};
 
-        const modal = $(this);
+/**
+ * Initialises the Delete Rule module.
+ *
+ * @method init
+ */
+export const init = async () => {
+    let deleteItems = document.querySelectorAll(selectors.deleteRuleId);
 
-        hasRuleContext(ruleButton).then(hasContext => {
-            if (hasContext) {
-                requiredStrings = [
-                    {key: 'deletetitle', component: 'local_notificationsagent', param: {
-                        title: $('#card-' + id + ' .name').text(),
-                        type: ruleType,
-                    }},
-                    {key: 'deletecontent_hascontext', component: 'local_notificationsagent', param: {
-                        title: $('#card-' + id + ' .name').text(),
-                        type: ruleType,
-                    }},
-                ];
-            } else {
-                requiredStrings = [
-                    {key: 'deletetitle', component: 'local_notificationsagent', param: {
-                        title: $('#card-' + id + ' .name').text(),
-                        type: ruleType,
-                    }},
-                    {key: 'deletecontent_nocontext', component: 'local_notificationsagent', param: {
-                        title: $('#card-' + id + ' .name').text(),
-                        type: ruleType,
-                    }},
-                ];
-            }
-    
-            getStrings(requiredStrings).then(([ruleTitle, ruleContent]) => {
-                modal.find('.modal-title').text(ruleTitle);
-                modal.find('.modal-body > div').text(ruleContent);
-            });
+    deleteItems.forEach((deleteItem) => {
+        deleteItem.addEventListener('click', async function(e) {
+            await showModal(deleteItem);
         });
-    });
+    });   
+};
 
-    $('#deleteRuleModal #acceptDeleteRule').on('click', (e) => {
-        e.preventDefault();
+/**
+ * 
+ * Shows the delete modal for a given rule.
+ * 
+ * @param {HTMLElement} deleteItem
+ * @returns {Promise<void>}
+ */
+const showModal = async (deleteItem) => {
+    let ruleObj = {};
+    
+    ruleObj.id = deleteItem.dataset.ruleid;
+    ruleObj.type = deleteItem.dataset.type;
+    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
 
-        setDeleteRule(ruleButton);
+    hasRuleContext(deleteItem).then(hasContext => {
+        ruleObj.hascontext = hasContext;
+
+        ModalFactory.create({
+            type: ModalFactory.types.SAVE_CANCEL,
+            title: getString('deletetitle', 'local_notificationsagent', ruleObj),
+            body: Templates.render('local_notificationsagent/modal/delete', {
+                rule: ruleObj,
+            }),
+        }).then(function(modal) {
+            modal.setSaveButtonText(getString('delete'));
+
+            // Handle save event.
+            modal.getRoot().on(ModalEvents.save, function() {
+                setDeleteRule(ruleObj.id);
+            });
+
+            // Handle hidden event.
+            modal.getRoot().on(ModalEvents.hidden, function() {
+                // Destroy when hidden.
+                modal.destroy();
+            });
+
+            modal.show();
+    
+            return true;
+        }).catch(Notification.exception);
     });
 };
 
 /**
- * Check if the rule has any other context before deleting
+ * Checks if the rule has any other context before deleting
  * 
- * @param {HTMLElement} ruleButton
+ * @param {HTMLElement} deleteItem Card rule element.
  * @returns {boolean} Has it context?
  */
-const hasRuleContext = async(ruleButton) => {
-    let id = ruleButton.data('ruleid');
+const hasRuleContext = async(deleteItem) => {
+    let id = deleteItem.dataset.ruleid;
     let hasContext = false;
 
     try {
@@ -101,28 +122,19 @@ const hasRuleContext = async(ruleButton) => {
     return hasContext;
 };
 
-
 /**
- * Deletes a given rule
+ * Deletes a given rule.
  * 
- * @param {HTMLElement} ruleButton
+ * @param {Integer} id Rule id.
  * @returns {Promise<void>}
  */
-const setDeleteRule = async(ruleButton) => {
-    let id = ruleButton.data('ruleid');
-
-    $('#deleteRuleModal').modal('hide');
-
+const setDeleteRule = async(id) => {
     try {
         response = await deleteRule(id);
         
         if ($.isEmptyObject(response['warnings'])) {
-            ruleButton.addClass('d-none');
-    
             getString('deleteaccept', 'local_notificationsagent').then(ruleDeleted => {
-                ruleButton.addClass('d-none');
-        
-                $('div[id="card-' + id + '"]').remove();
+                document.querySelector('#card-' + id).remove();
                
                 Notification.addNotification({
                     message: ruleDeleted,

@@ -13,15 +13,33 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace notificationscondition_calendareventto\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
 
 class calendareventto_crontask extends scheduled_task {
 
@@ -50,7 +68,7 @@ class calendareventto_crontask extends scheduled_task {
             $condtionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
-            $cache = $startdate - $param['time'];
+            $cache = $startdate - $param[notificationplugin::UI_TIME];
 
             if (!notificationsagent::was_launched_indicated_times(
                 $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {

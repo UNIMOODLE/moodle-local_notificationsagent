@@ -36,7 +36,7 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['conditiontext'] = 'Jarduera [AAAA] eskuragarri dago';
 $string['subtype'] = 'activityavailable';
 $string['modname'] = 'activityavailable';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';

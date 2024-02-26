@@ -32,14 +32,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace local_notificationsagent\external;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
-use local_notificationsagent\Rule;
-require_once($CFG->dirroot . '/local/notificationsagent/notificationsagent.php');
+use local_notificationsagent\rule;
 
 /**
  * Rule external API for deleting a rule.
@@ -64,18 +59,20 @@ class delete_rule extends \external_api {
      * Return a list of the required fields
      *
      * @param int $ruleid The rule ID
+     *
      * @return array
      */
     public static function execute(int $ruleid) {
         [
             'ruleid' => $ruleid,
-        ] = self::validate_parameters(self::execute_parameters(), [
+        ]
+            = self::validate_parameters(self::execute_parameters(), [
             'ruleid' => $ruleid,
         ]);
 
         $result = ['warnings' => []];
 
-        $instance = Rule::create_instance($ruleid);
+        $instance = rule::create_instance($ruleid);
         if (empty($instance)) {
             throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
         }

@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición relativa á data de inicio do curso';
+$string['conditiontext'] = 'Pasaron [TTTT] dende o comezo do curso.';
 $string['subtype'] = 'coursestart';
 $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
-$string['coursestart_crontask'] = 'coursestart cron task';
+$string['coursestart_crontask'] = 'Tarefa cron de inicio de curso';
 

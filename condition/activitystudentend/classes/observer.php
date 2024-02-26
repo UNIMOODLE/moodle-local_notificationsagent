@@ -12,24 +12,31 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * activitystudentend observer.php .
+ * Version details
  *
- * @package    activitystudentend
- * @copyright  2023 fernando
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../lib.php');
-require_once(__DIR__ . '/../activitystudentend.php');
-require_once(__DIR__ . '/../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../classes/engine/notificationsagent_engine.php');
 
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
 
 class notificationscondition_activitystudentend_observer {
 
@@ -42,25 +49,26 @@ class notificationscondition_activitystudentend_observer {
         }
 
         $courseid = $event->courseid;
-
+        $cmid = $event->objectid;
         $userid = $event->userid;
-        $idactivity = $event->contextinstanceid;
         $timecreated = $event->timecreated;
 
         $pluginname = 'activitystudentend';
 
-        set_activity_access($userid, $courseid, $idactivity, $timecreated);
+        set_activity_access($userid, $courseid, $cmid, $timecreated);
 
-        $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
+        $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
             $condtionid = $condition->id;
             $param = json_decode($decode, true);
-            $cache = $timecreated + $param['time'];
+            $cache = $timecreated + $param[notificationplugin::UI_TIME];
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid)) {
+                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid
+            )
+            ) {
                 notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, true);
             }
         }

@@ -111,5 +111,27 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023112900, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024020600) {
+
+        // Define field conditionid to be added to notificationsagent_triggers.
+        $table = new xmldb_table('notificationsagent_triggers');
+        $field = new xmldb_field('conditionid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, 'ruleid');
+
+        // Conditionally launch add field conditionid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key fk_conditionid (foreign) to be added to notificationsagent_triggers.
+        $table = new xmldb_table('notificationsagent_triggers');
+        $key = new xmldb_key('fk_conditionid', XMLDB_KEY_FOREIGN, ['conditionid'], 'notificationsagent_condition', ['id']);
+
+        // Launch add key fk_conditionid.
+        $dbman->add_key($table, $key);
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024020600, 'local', 'notificationsagent');
+    }
+
     return true;
 }

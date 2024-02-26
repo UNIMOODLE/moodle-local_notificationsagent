@@ -87,6 +87,7 @@ $services = [
         // A list of external functions available in this service.
         'functions' => [
             'mod_forum_add_discussion',
+            'mod_forum_add_discussion_post',
         ],
 
         // If set, the external service user will need this capability to access

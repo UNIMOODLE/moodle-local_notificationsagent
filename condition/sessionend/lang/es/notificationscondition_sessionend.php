@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condición: fecha relativa al último acceso al curso';
+$string['conditiontext'] = 'Han pasado [TTTT] desde la última sesión del usuario en el curso.';
 $string['subtype'] = 'sessionend';
 $string['modname'] = 'sessionend';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';

@@ -35,13 +35,6 @@ use local_notificationsagent\local\entities\rule;
 use core_reportbuilder\local\entities\course;
 use core_reportbuilder\local\entities\user;
 
-/**
- * local_notificationsagent system_rules.php description here.
- *
- * @package    local_notificationsagent
- * @copyright  2023 fernando <soporte@isyc.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class rules extends system_report {
 
     protected function initialise(): void {

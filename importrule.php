@@ -32,9 +32,17 @@
  */
 
 require_once("../../config.php");
-global $DB;
+require_once('renderer.php');
+global $CFG, $DB;
+
+use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationconditionplugin;
 
 $courseid = required_param('courseid', PARAM_INT);
+$context = context_course::instance($courseid);
+$pluginname = '';
+$timer = 0;
 
 if (!$courseid) {
     require_login();
@@ -88,6 +96,8 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         }
 
         if ($data['conditions']) {
+            $students = notificationsagent::get_usersbycourse($context);
+
             $sqlconditions = new \stdClass();
             $countconditions = count($data['conditions']);
 
@@ -95,12 +105,48 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
                 foreach ($data['conditions'][array_key_first($data['conditions']) + $i] as $key => $value) {
                     if ($key == 'ruleid') {
                         $sqlconditions->ruleid = $idrule;
+                    } else if ($key == 'pluginname') {
+                        $pluginname = $value;
+                        $sqlconditions->$key = $value;
                     } else {
                         $sqlconditions->$key = $value;
                     }
                 }
 
-                $idconditions = $DB->insert_record('notificationsagent_condition', $sqlconditions);
+                // Ruta y creación de objetos de plugin.
+                $rule = new \stdClass();
+                $pluginclass = '\notificationscondition_' . $pluginname . '\\' . $pluginname;
+                if (class_exists($pluginclass)) {
+                    $pluginobj = new $pluginclass($rule);
+
+                    $idconditions = $DB->insert_record('notificationsagent_condition', $sqlconditions);
+                    $obj = notificationconditionplugin::create_subplugin($idconditions);
+                    $pluginname = $obj->get_subtype();
+                    $params = $obj->get_parameters();
+                    $contextevaluation = new evaluationcontext();
+                    $contextevaluation->set_courseid($courseid);
+                    $contextevaluation->set_params($params);
+                    $cache = $pluginobj->estimate_next_time($contextevaluation);
+                    if (!$obj->is_generic()) {
+                        foreach ($students as $student) {
+                            notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $idconditions, true);
+                            if ($timer <= $cache) {
+                                $timer = $cache;
+                                notificationsagent::set_time_trigger($idrule, $idconditions, $student->id, $courseid, $timer);
+                            }
+                        }
+                    } else {
+                        notificationsagent::set_timer_cache(
+                            notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $idconditions, true
+                        );
+                        if ($timer <= $cache) {
+                            $timer = $cache;
+                            notificationsagent::set_time_trigger(
+                                $idrule, $idconditions, notificationsagent::GENERIC_USERID, $courseid, $timer
+                            );
+                        }
+                    }
+                }
             }
         }
 

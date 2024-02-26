@@ -35,11 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Eguneratze data txandakako eguna';
+$string['conditiontext'] = 'Izena eman [TTTT] kalendarioko ekitaldiaren ostean [CCCC]';
 $string['subtype'] = 'calendarstart';
 $string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'calendarstart cron task';
-
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
+$string['calendarstart_crontask'] = 'Kalendari hasiera kron lan';
+$string['editrule_condition_calendar'] = 'Ekitaldia {$a->typeelement}aren ostean:';
+$string['afterend'] = '"Ekitaldi"aren amaieran ondoren';
+$string['afterstart'] = '"Ekitaldi"aren hasieran ondoren';

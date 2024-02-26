@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_addusergroup
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Acción relativa a añadir un usuario a un grupo';
 $string['messageprovider:add_user_group'] = 'Proveedor de añadir usuario a grupo';
-$string['addusergroup_action'] = 'Añadir usuario [UUUU] al grupo [GGGG]';
+$string['addusergroup_action'] = 'Añadir usuario a un grupo [GGGG]';
 $string['subtype'] = 'addusergroup';
 $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';

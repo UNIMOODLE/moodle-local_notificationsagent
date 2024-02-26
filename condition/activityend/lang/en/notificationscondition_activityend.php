@@ -37,7 +37,7 @@ $string['pluginname'] = 'Condition relative date to activity end';
 $string['conditiontext'] = "Less than [TTTT] remains until the closing date of activity [AAAA].";
 $string['subtype'] = 'activityend';
 $string['modname'] = 'activityend';
-$string['editrule_condition_time'] = 'Time {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activityend_crontask'] = 'Activity end cron task';
 

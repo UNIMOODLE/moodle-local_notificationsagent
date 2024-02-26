@@ -31,25 +31,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * This file contains the classes for the admin settings of the assign module.
- *
- * @package   local_notificationsagent
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
 
-/**
- * Admin external page that displays a list of the installed submission plugins.
- *
- * @package   local_notificationsagent
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class notificationsagent_admin_page_manage_notificationsagent_plugins extends admin_externalpage {
 
     /** @var string the name of plugin subtype */

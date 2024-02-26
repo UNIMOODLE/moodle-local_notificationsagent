@@ -89,11 +89,6 @@ M.core_availability.form.init = function (pluginParams) {
     
     // Generate root json
     this.rootList = new M.core_availability.List(null, true);
-    if(!dataConditions.c.length > 0 || !dataExceptions.c.length > 0){
-        // const jsondiv = Y.one('#fitem_id_availabilityconditionsjson');
-        // jsondiv.setAttribute('aria-hidden', 'false');
-        this.rootList.setVisibilityDiv(false);
-    }
 
     this.rootList.removeButton();
     var newItemCondition,newItemException;
@@ -108,6 +103,10 @@ M.core_availability.form.init = function (pluginParams) {
     newItemException.constructorChildrenCustom(dataExceptions, false, this.rootList,'ac-exceptions');
     // Generate json
     this.rootList.addChildCustom(newItemException);
+
+    if(dataConditions.c.length > 0 || dataExceptions.c.length > 0){
+        this.rootList.setVisibilityDiv(false);
+    }
     
     this.mainDiv.appendChild(this.rootList.node);
     
@@ -119,7 +118,7 @@ M.core_availability.form.init = function (pluginParams) {
     
     // // Add to select
     newItemCondition.selectAddCustom('newcondition');
-    newItemException.selectAddCustom('newconditionexception');
+    newItemException.selectAddCustom('newexception');
 
     // Mark main area as dynamically updated.
     this.mainDiv.setAttribute('aria-live', 'polite');
@@ -145,6 +144,10 @@ M.core_availability.form.init = function (pluginParams) {
         }
         this.updateRestrictByGroup();
     }
+
+    const tab_active = document.querySelector('#nav-tab a.active');
+    const tab_active_id = tab_active.id;
+    showHideTab(tab_active_id);
 }
 
 /**
@@ -261,7 +264,6 @@ M.local_notificationsagent.List.prototype.addChildCustom = function(newItem) {
     // Add item to array and to HTML.
     this.children.push(newItem);
     this.inner.one('.availability-children').appendChild(newItem.node);
-    this.setVisibilityDiv(false);
 };
 
 /**
@@ -302,7 +304,7 @@ M.core_availability.List.prototype.setVisibilityDiv = function(visible) {
  */
 M.local_notificationsagent.List.prototype.selectAddCustom = function(conditionType) {
     // Add elements to select // 
-    const select = Y.one('#id_'+conditionType+'_group_'+conditionType+'_select');
+    const select = Y.one('#id_'+conditionType+'_select');
     const fgroupDiv = Y.one('#fgroup_id_'+conditionType+'_group');
     const div = Y.Node.create('<div class="hide-div"></div>');
 
@@ -348,11 +350,14 @@ M.local_notificationsagent.List.prototype.getAddHandlerCustom = function(type) {
         }
         // Add to list.
         this.addChildCustom(newItem);
+        
         // Update the form and list HTML.
         M.core_availability.form.update();
         M.core_availability.form.rootList.renumber();
         this.updateHtml();
         newItem.focusAfterAdd();
+        
+        M.core_availability.form.rootList.setVisibilityDiv(false);//show
     };
 };
 
@@ -384,7 +389,7 @@ M.local_notificationsagent.List.prototype.deleteDescendant = function(descendant
             this.updateHtml();
 
             if(!this.children.length>0){
-                console.log('M.local_notificationsagent.List.prototype.deleteDescendant',this.root);
+                // console.log('M.local_notificationsagent.List.prototype.deleteDescendant',this.root);
                 this.setVisibilityDiv(true);
             }
 
@@ -401,23 +406,16 @@ M.local_notificationsagent.List.prototype.deleteDescendant = function(descendant
     return false;
 };
 
-$( document ).ready(function() {
-    // read hash from page load and change tab
-    const hash = document.location.hash;
-    if (hash) {
-        $('.nav-tabs a[href="'+hash+'"]').tab('show');
-    }else{
-        $('a[data-toggle="tab"]').first().tab('show');
-    }
+// Event to tab click
+document.querySelectorAll('a[data-toggle="tab"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+        showHideTab(e.target.id);
+    });
 });
 
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    clickTab(e)
-})
-
 //////////////// UTILS //////////////////////////
-function clickTab(event) {
-    const id = event.target.id
+function showHideTab(id){
+    document.querySelector('input[name="tab-target"]').value = id;
     const ac_conditions = document.querySelector('#ac-conditions .availability-inner');
     const ac_exceptions = document.querySelector('#ac-exceptions .availability-inner');
 

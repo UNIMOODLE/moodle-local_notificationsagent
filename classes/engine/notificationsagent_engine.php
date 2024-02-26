@@ -31,24 +31,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_notificationsagent\engine;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . "/local/notificationsagent/classes/evaluationcontext.php");
-require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
-use local_notificationsagent\Rule;
-use local_notificationsagent\EvaluationContext;
-use notificationsagent\notificationsagent;
 
-class Notificationsagent_engine {
+use local_notificationsagent\rule;
+use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
 
-    public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid) {
+class notificationsagent_engine {
+    public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid, $triggercondition) {
         foreach ($ruleids as $ruleid) {
-            $rule = Rule::create_instance($ruleid);
-            $context = new EvaluationContext();
+            $rule = rule::create_instance($ruleid);
+            $context = new evaluationcontext();
             $context->set_timeaccess($timeaccess);
             $context->set_courseid($courseid);
             $context->set_userid($userid);
             $context->set_rule($rule);
+            $context->set_triggercondition($triggercondition);
 
             if ($userid == notificationsagent::GENERIC_USERID && !$rule->get_isgeneric()) {
                 $coursecontext = \context_course::instance($context->get_courseid());
@@ -61,13 +63,30 @@ class Notificationsagent_engine {
                             $context->set_usertimesfired($rule->set_launched($context));
                             $actions = $rule->get_actions();
                             foreach ($actions as $action) {
+                                $actionparams = json_decode($action->get_parameters(), true);
+                                $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
+
+                                // If the action has a specific user, send the action only to that user.
+                                // otherwise, send the action for each user.
+                                if ($hasuser
+                                    && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $hasuser)) {
+                                    if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                        || ($context->get_userid() == $hasuser)
+                                    ) {
+                                        $context->set_userid($hasuser);
+                                    } else {
+                                        continue;
+                                    }
+                                }
+
                                 $parameters = $rule->replace_placeholders(
-                                    $action->get_parameters(),
-                                    $context->get_courseid(),
-                                    $context->get_userid(),
-                                    $context->get_rule()
+                                    $context,
+                                    $action->get_parameters_placeholders(),
                                 );
-                                $action->execute_action($context, $parameters);
+                                $result = $action->execute_action($context, $parameters);
+                                if (!$result) {
+                                    $parameters = "ERROR" . $parameters;
+                                }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
                                     $parameters, $timeaccess
@@ -79,18 +98,36 @@ class Notificationsagent_engine {
             } else {
                 if ($context->is_evaluate($rule)) {
                     $result = $rule->evaluate($context);
+                    $contextcourse = \context_course::instance($context->get_courseid());
                     if ($result) {
                         $context->set_usertimesfired($rule->set_launched($context));
                         $actions = $rule->get_actions();
                         foreach ($actions as $action) {
+                            $actionparams = json_decode($action->get_parameters(), true);
+                            $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
+
+                            // If the action has a specific user, send the action only to that user.
+                            // otherwise, send the action for each user.
+                            if ($hasuser &&
+                                !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)) {
+                                if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                    || ($context->get_userid() == $hasuser)
+                                ) {
+                                    $context->set_userid($hasuser);
+                                } else {
+                                    continue;
+                                }
+                            }
+
                             if ($action->is_send_once($context->get_userid())) {
                                 $parameters = $rule->replace_placeholders(
-                                    $action->get_parameters(),
-                                    $context->get_courseid(),
-                                    $context->get_userid(),
-                                    $context->get_rule()
+                                    $context,
+                                    $action->get_parameters_placeholders(),
                                 );
-                                $action->execute_action($context, $parameters);
+                                $result = $action->execute_action($context, $parameters);
+                                if (!$result) {
+                                    $parameters = "ERROR to perfom action";
+                                }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid() == notificationsagent::GENERIC_USERID ? get_admin()->id
                                     : $context->get_userid(), $context->get_courseid(), $action->get_id(),
@@ -101,13 +138,29 @@ class Notificationsagent_engine {
                                 $users = notificationsagent::get_usersbycourse($coursecontext);
                                 foreach ($users as $user) {
                                     $context->set_userid($user->id);
+                                    $actionparams = json_decode($action->get_parameters(), true);
+                                    $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
+
+                                    // If the action has a specific user, send the action only to that user.
+                                    // otherwise, send the action for each user.
+                                    if ($hasuser &&
+                                        !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)) {
+                                        if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                            || ($context->get_userid() == $hasuser)
+                                        ) {
+                                            $context->set_userid($hasuser);
+                                        } else {
+                                            continue;
+                                        }
+                                    }
                                     $parameters = $rule->replace_placeholders(
-                                        $action->get_parameters(),
-                                        $context->get_courseid(),
-                                        $context->get_userid(),
-                                        $context->get_rule()
+                                        $context,
+                                        $action->get_parameters_placeholders(),
                                     );
-                                    $action->execute_action($context, $parameters);
+                                    $result = $action->execute_action($context, $parameters);
+                                    if (!$result) {
+                                        $parameters = "ERROR to perfom action";
+                                    }
                                     $rule->record_report(
                                         $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
                                         $parameters, $timeaccess

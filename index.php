@@ -35,47 +35,52 @@ require_once("../../config.php");
 require_once('renderer.php');
 require_once("../../lib/modinfolib.php");
 require_once("lib.php");
-require_once("classes/rule.php");
-use local_notificationsagent\Rule;
 
-global $CFG, $DB, $PAGE;
+use local_notificationsagent\rule;
+use local_notificationsagent\notificationplugin;
 
 $isroleadmin = false;
 if (is_siteadmin() || !empty($PAGE->settingsnav)) {
-    if (is_siteadmin() || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
-        || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))) {
-            $isroleadmin = true;
+    if (is_siteadmin()
+        || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
+            || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
+    ) {
+        $isroleadmin = true;
     }
 }
-$courseid = required_param('courseid', PARAM_INT);
-// Limpiar session notificaciones.
-unset($SESSION->NOTIFICATIONS);
 
-if (!$courseid) {
-    require_login();
-    throw new \moodle_exception('needcourseid');
+require_login();
+
+$courseidparam = optional_param('courseid', 0, PARAM_INT);
+
+if ($courseidparam) {
+    $course = $DB->get_record('course', ['id' => $courseidparam], '*', MUST_EXIST);
+    $PAGE->set_course($course);
+    $context = $PAGE->context;
+} else {
+    $context = context_system::instance();
+    $PAGE->set_context($context);
 }
 
-if ((!$isroleadmin && $courseid == SITEID) || (!$course = $DB->get_record('course', ['id' => $courseid]))) {
-    throw new \moodle_exception('invalidcourseid');
-}
-require_login($course);
-$context = context_course::instance($course->id);
+$courseid = $COURSE->id;
+
+$context = context_course::instance($courseid);
 if (get_config('local_notificationsagent', 'disable_user_use')) {
     if (!has_capability('local/notificationsagent:managecourserule', $context)) {
-        throw new \moodle_exception('nopermissions', '', '',
+        throw new \moodle_exception(
+            'nopermissions', '', '',
             get_capability_string('local/notificationsagent:managecourserule')
         );
     }
 }
-$PAGE->set_course($course);
-$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $course->id]));
+
+$PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/update_status', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/delete', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/share', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/shareall', 'init');
@@ -85,7 +90,7 @@ echo $output->header();
 
 $renderer = $PAGE->get_renderer('core');
 $templatecontext = [
-    "courseid" => $course->id,
+    "courseid" => $courseid,
 ];
 
 $templatecontext['iscontextsite'] = false;
@@ -96,13 +101,13 @@ if ($isroleadmin && $courseid == SITEID) {
 $importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
 $templatecontext['importruleurl'] = $importruleurl;
 $addruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
-    'courseid' => $course->id, 'action' => 'add', 'type' => Rule::RULE_TYPE,
+    'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
 ]);
 $addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
-    'courseid' => $course->id, 'action' => 'add', 'type' => Rule::TEMPLATE_TYPE,
+    'action' => 'add', 'type' => rule::TEMPLATE_TYPE,
 ]);
 $reporturl = new moodle_url("/local/notificationsagent/report.php", [
-    'courseid' => $course->id,
+    'courseid' => $courseid,
 ]);
 $templatecontext['url'] = [
     'addrule' => $addruleurl,
@@ -110,7 +115,7 @@ $templatecontext['url'] = [
     'reporturl' => $reporturl,
 ];
 
-$rules = Rule::get_rules($context, $courseid);
+$rules = rule::get_rules($context, $courseid, true);
 $rulecontent = [];
 
 $conditionsarray = [];
@@ -118,53 +123,50 @@ $exceptionsarray = [];
 $actionsarray = [];
 
 foreach ($rules as $rule) {
+    $ac = $rule->get_ac();
     $conditions = $rule->get_conditions();
-    $exceptions = $rule->get_exceptions($showac = true);
+    $exceptions = $rule->get_exceptions();
     $actions = $rule->get_actions();
     $conditionscontent = [];
     $exceptionscontent = [];
     $actionscontent = [];
 
-    // Conditions.
-    foreach ($conditions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
-            . $value->get_pluginname() . '.php');
-        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
-        $pluginobj = new $pluginclass($rule);
-        $pluginobj->process_markups(
-            $conditionscontent, $value->get_parameters(), $courseid, notificationplugin::CAT_CONDITION_CHILDREN
-        );
+    // AC (conditions and exceptions)
+    if ($ac) {
+        $ac->process_markups($conditionscontent, $courseid, notificationplugin::COMPLEMENTARY_CONDITION);
+        $ac->process_markups($exceptionscontent, $courseid, notificationplugin::COMPLEMENTARY_EXCEPTION);
     }
+
+    // Conditions
+    if (!empty($conditions)) {
+        foreach ($conditions as $subplugin) {
+            $subplugin->process_markups($conditionscontent, $courseid);
+        }
+    }
+
+    // Exceptions.
+    if (!empty($exceptions)) {
+        foreach ($exceptions as $subplugin) {
+            $subplugin->process_markups($exceptionscontent, $courseid);
+        }
+    }
+
     $conditionsarray = [
         'hascontent' => !empty($conditionscontent),
         'content' => $conditionscontent,
     ];
 
-    // Exceptions.
-    foreach ($exceptions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
-            . $value->get_pluginname() . '.php');
-        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
-        $pluginobj = new $pluginclass($rule);
-        $pluginobj->process_markups(
-            $exceptionscontent, $value->get_parameters(), $courseid, notificationplugin::CAT_EXCEPTION_CHILDREN
-        );
-    }
     $exceptionsarray = [
         'hascontent' => !empty($exceptionscontent),
         'content' => $exceptionscontent,
     ];
 
     // Actions.
-    foreach ($actions as $key => $value) {
-        require_once($CFG->dirroot . '/local/notificationsagent/' . $value->get_type() . '/' . $value->get_pluginname() . '/'
-            . $value->get_pluginname() . '.php');
-        $pluginclass = 'notificationsagent_' . $value->get_type() . '_' . $value->get_pluginname();
-        $pluginobj = new $pluginclass($rule);
-        $parameters = $rule->replace_placeholders($value->get_parameters(), $courseid, $USER->id, $rule);
-        $pluginobj->process_markups($actionscontent, $parameters, $courseid);
+    if (!empty($actions)) {
+        foreach ($actions as $subplugin) {
+            $subplugin->process_markups($actionscontent, $courseid);
+        }
     }
-
     $actionsarray = [
         'hascontent' => !empty($actionscontent),
         'content' => $actionscontent,
@@ -188,17 +190,19 @@ foreach ($rules as $rule) {
         'canshare' => $rule->can_share(),
         'candelete' => $rule->can_delete(),
         'isallshared' => $rule->get_defaultrule(),
-        'type_lang' => $rule->get_template() ?
-            get_string('type_rule', 'local_notificationsagent') :
+        'type_lang' => $rule->get_template()
+            ?
+            get_string('type_rule', 'local_notificationsagent')
+            :
             get_string('type_template', 'local_notificationsagent'),
         'editurl' => new moodle_url(
-            "/local/notificationsagent/editrule.php", ['courseid' => $course->id, 'action' => 'edit', 'ruleid' => $rule->get_id()]
+            "/local/notificationsagent/editrule.php", ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
         ),
         'reporturl' => new moodle_url(
-            "/local/notificationsagent/report.php", ['courseid' => $course->id, 'ruleid' => $rule->get_id()]
+            "/local/notificationsagent/report.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
         ),
         'exporturl' => new moodle_url(
-            "/local/notificationsagent/exportrule.php", ['courseid' => $course->id, 'ruleid' => $rule->get_id()]
+            "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
         ),
         'capabilities' => [
             'edit' => has_capability('local/notificationsagent:editrule', $context),

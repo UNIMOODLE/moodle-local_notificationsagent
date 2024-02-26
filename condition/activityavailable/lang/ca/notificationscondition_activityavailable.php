@@ -35,8 +35,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició relativa a l\'activitat està disponible';
+$string['conditiontext'] = 'L\'activitat [AAAA] està disponible';
 $string['subtype'] = 'activityavailable';
 $string['modname'] = 'activityavailable';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';

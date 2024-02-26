@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Condició relativa a la data del primer accés a un curs';
+$string['conditiontext'] = 'Han passat [TTTT] des del primer inici de sessió al curs.';
 $string['subtype'] = 'sessionstart';
 $string['modname'] = 'sessionstart';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temps {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
-$string['sessionstart_crontask'] = 'sessionstart cron task';
+$string['sessionstart_crontask'] = 'Tasca cron d\'inici de sessió';
 

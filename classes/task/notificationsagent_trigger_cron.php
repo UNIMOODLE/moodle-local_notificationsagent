@@ -30,15 +30,14 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_notificationsagent\task;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . "/local/notificationsagent/classes/engine/notificationsagent_engine.php");
-require_once($CFG->dirroot . '/local/notificationsagent/notificationsagent.php');
 
 use core\task\scheduled_task;
-use Notificationsagent_engine;
+use local_notificationsagent\engine\notificationsagent_engine;
 
 /*
  * Para asegurar un proceso de reevaluación oportuno, se implementa un proceso cron que periódicamente chequea la tabla de control
@@ -57,7 +56,8 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $timestarted = $this->get_timestarted();
         $classname = get_called_class();
         $component = $this->get_component();
-        $lastruntime = $DB->get_records('task_log',
+        $lastruntime = $DB->get_records(
+            'task_log',
             [
                 'classname' => $classname,
                 'component' => $component,
@@ -74,10 +74,10 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $triggers = get_rulesbytimeinterval($timestarted, $tasklastrunttime);
         // Evalutate rules.
         foreach ($triggers as $trigger) {
-            Notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid
+            notificationsagent_engine::notificationsagent_engine_evaluate_rule(
+                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid
             );
         }
-        custom_mtrace("Task finished-> " . time() );
+        custom_mtrace("Task finished-> " . time());
     }
 }

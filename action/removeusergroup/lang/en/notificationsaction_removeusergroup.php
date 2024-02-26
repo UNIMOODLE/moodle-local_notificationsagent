@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Remove user from group';
 $string['messageprovider:remove_user_group'] = 'Remove user group Provider';
-$string['removeusergroup_action'] = 'Remove user [UUUU] from group [GGGG]';
+$string['removeusergroup_action'] = 'Remove user from group [GGGG]';
 $string['subtype'] = 'removeusergroup';
 $string['editrule_action_element_user'] = 'User {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Group {$a->typeelement}';

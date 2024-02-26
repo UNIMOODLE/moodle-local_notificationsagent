@@ -35,12 +35,10 @@ namespace notificationscondition_ac\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationsagent;
 
 class ac_crontask extends scheduled_task {
 
@@ -65,9 +63,9 @@ class ac_crontask extends scheduled_task {
             foreach ($users as $user) {
                 if (!notificationsagent::was_launched_indicated_times(
                     $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id)) {
-                    // TODO Add ac trigger time as setting.
+                    // Todo Add ac trigger time as setting.
                     notificationsagent::set_time_trigger(
-                        $condition->ruleid, $user->id, $condition->courseid, time() + 120
+                        $condition->ruleid, $condition->id, $user->id, $condition->courseid, time() + 120
                     );
                 }
             }

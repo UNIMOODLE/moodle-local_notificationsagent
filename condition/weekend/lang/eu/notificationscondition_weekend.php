@@ -36,10 +36,12 @@
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['conditiontext'] = 'Asteburua da';
 $string['subtype'] = 'weekend';
 $string['modname'] = 'weekend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['weekend_crontask'] = 'weekend cron task';
+$string['weekendtext'] = 'Asteburua dad ({$a->weekend})';
+$string['weekendtag'] = 'Asteburu';
 

@@ -25,6 +25,41 @@ Alternatively, you can run
 
 to complete the installation from the command line.
 
+## Plugin testing
+
+### PHPUNIT
+
+On your Moodle installation run the command to setup the enviroment:
+```sh
+php admin/tool/phpunit/cli/init.php
+```
+
+This command will run all the test in the plug-in and subplugin suites.
+```sh
+vendor/bin/phpunit --testdox --group notificationsagent
+```
+
+If we only need to test one of the suites:
+```sh
+vendor/bin/phpunit --testdox --testsuite local_notificationsagent_testsuite
+```
+
+Or one particular test:
+```sh
+vendor/bin/phpunit --testdox local/notificationsagent/condition/weekend/tests/weekend_test.php
+```
+
+Some test use some uopz funcionality. Install it with the following commad:
+```sh
+pecl install uopz
+```
+
+For further information, visit:
+
+- <https://moodledev.io/general/development/tools/phpunit>
+- <https://docs.phpunit.de/>
+- <https://pecl.php.net/package/uopz>
+
 ## License ##
 
 2023 ISYC

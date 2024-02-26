@@ -1,0 +1,8 @@
+<div id="update-status-rule-modal-{{{ rule.id }}}" class="d-flex align-items-center">
+    {{^rule.status}}
+        {{#str}}status_pausecontent, local_notificationsagent, {"title": "{{rule.title}}"}{{/str}}
+    {{/rule.status}}
+    {{#rule.status}}
+        {{#str}}status_activatecontent, local_notificationsagent, {"title": "{{rule.title}}"}{{/str}}
+    {{/rule.status}}
+</div>

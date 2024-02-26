@@ -13,15 +13,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace notificationscondition_calendarstart\task;
+
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../notificationsagent.php');
-require_once(__DIR__ . '/../../../../classes/engine/notificationsagent_engine.php');
 require_once(__DIR__ . '/../../../../lib.php');
 require_once(__DIR__ . '/../../../../../../calendar/lib.php');
 
 use core\task\scheduled_task;
-use notificationsagent\notificationsagent;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
+use notificationscondition_calendarstart\calendarstart;
 
 class calendarstart_crontask extends scheduled_task {
 
@@ -38,7 +57,6 @@ class calendarstart_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        global $DB;
         custom_mtrace("calendarstart start");
 
         $pluginname = get_string('subtype', 'notificationscondition_calendarstart');
@@ -46,21 +64,23 @@ class calendarstart_crontask extends scheduled_task {
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
             $decode = $condition->parameters;
-            $param = json_decode($decode);
+            $param = json_decode($decode, false);
 
             $condtionid = $condition->id;
-            $radio = $param->radio;
 
-            $calendarevent = calendar_get_events_by_id([$param->calendar]);
-            if ($radio == 1) {
-                $cache = $calendarevent[$param->calendar]->timestart + $param->time;
+            $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
+            if ($param->{calendarstart::UI_RADIO} == 1) {
+                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart
+                    + $param->{notificationplugin::UI_TIME};
             } else {
-                $cache = $calendarevent[$param->calendar]->timestart +
-                $calendarevent[$param->calendar]->timeduration + $param->time;
+                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart +
+                    $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timeduration + $param->{notificationplugin::UI_TIME};
             }
 
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+            )
+            ) {
                 notificationsagent::set_timer_cache(
                     notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
                 );

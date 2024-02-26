@@ -35,11 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '';
+$string['pluginname'] = 'Ikastaroan lehen saioa dataren arabera egindako baldintza';
+$string['conditiontext'] = 'Igaro da [TTTT] ikastaroan lehenengo saioa hasi zenetik.';
 $string['subtype'] = 'sessionstart';
 $string['modname'] = 'sessionstart';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['sessionstart_crontask'] = 'sessionstart cron task';
+$string['sessionstart_crontask'] = 'saioa_hasi cron-lan';
+
 

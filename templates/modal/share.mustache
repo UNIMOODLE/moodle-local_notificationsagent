@@ -1,0 +1,8 @@
+<div id="share-rule-modal-{{{ rule.id }}}" class="d-flex align-items-center">
+    {{^rule.shared}}
+        {{#str}}unsharecontent, local_notificationsagent, {"title": "{{rule.title}}"}{{/str}}
+    {{/rule.shared}}
+    {{#rule.shared}}
+        {{#str}}sharecontent, local_notificationsagent, {"title": "{{rule.title}}"}{{/str}}
+    {{/rule.shared}}
+</div>
