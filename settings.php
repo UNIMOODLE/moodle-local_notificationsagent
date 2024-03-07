@@ -24,11 +24,11 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
- * @copyright  2023 Proyecto UNIMOODLE
- * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * @author     ISYC <soporte@isyc.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_notificationsagent
+ * @copyright   2023 Proyecto UNIMOODLE
+ * @author      UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author      ISYC <soporte@isyc.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @category    admin
  */
 
@@ -37,9 +37,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/notificationsagent/adminlib.php');
 
 if ($hassiteconfig) {
-
-    $settingspage = new admin_settingpage('manage_notificationsagent', get_string('settings',
-        'local_notificationsagent'));
+    $settingspage = new admin_settingpage(
+        'manage_notificationsagent', get_string(
+            'settings',
+            'local_notificationsagent'
+        )
+    );
 
     if ($ADMIN->fulltree) {
         $settingdisableuseruse = new admin_setting_configcheckbox(
@@ -72,31 +75,54 @@ mod_workshop|workshop|submissionstart|submissionend',
         );
         $settingspage->add($settingstartdate);
 
-        $settingstracelog = new admin_setting_configcheckbox('notificationsagent/tracelog',
+        $settingstracelog = new admin_setting_configcheckbox(
+            'notificationsagent/tracelog',
             get_string('tracelog', 'local_notificationsagent'),
-            get_string('tracelog_desc', 'local_notificationsagent'), false);
+            get_string('tracelog_desc', 'local_notificationsagent'), false
+        );
 
         $settingspage->add($settingstracelog);
     }
 
-    $ADMIN->add('localplugins', new admin_category('notificationscategory',
-        get_string('pluginname', 'local_notificationsagent')));
+    $ADMIN->add(
+        'localplugins', new admin_category(
+            'notificationscategory',
+            get_string('pluginname', 'local_notificationsagent')
+        )
+    );
 
     $ADMIN->add('notificationscategory', $settingspage);
-    $ADMIN->add('notificationscategory', new admin_externalpage('notificationsexternalpage', get_string('menu',
-        'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/index.php'));
-
+    $ADMIN->add(
+        'notificationscategory', new admin_externalpage(
+            'notificationsexternalpage', get_string(
+            'menu',
+            'local_notificationsagent'
+        ), $CFG->wwwroot . '/local/notificationsagent/index.php'
+        )
+    );
 
     // Add subplugins management in settings view.
 
-    $ADMIN->add('notificationscategory', new admin_category('notificationsactionplugins',
-        get_string('actionplugins', 'local_notificationsagent')));
-    $ADMIN->add('notificationsactionplugins',
-        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationsaction'));
-    $ADMIN->add('notificationscategory', new admin_category('notificationsconditionplugins',
-        get_string('conditionplugins', 'local_notificationsagent')));
-    $ADMIN->add('notificationsconditionplugins',
-        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationscondition'));
+    $ADMIN->add(
+        'notificationscategory', new admin_category(
+            'notificationsactionplugins',
+            get_string('actionplugins', 'local_notificationsagent')
+        )
+    );
+    $ADMIN->add(
+        'notificationsactionplugins',
+        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationsaction')
+    );
+    $ADMIN->add(
+        'notificationscategory', new admin_category(
+            'notificationsconditionplugins',
+            get_string('conditionplugins', 'local_notificationsagent')
+        )
+    );
+    $ADMIN->add(
+        'notificationsconditionplugins',
+        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationscondition')
+    );
 
     foreach (core_plugin_manager::instance()->get_plugins_of_type('notificationsaction') as $plugin) {
         /** @var \local_notificationsagent\plugininfo\notificationsaction $plugin */
@@ -108,8 +134,21 @@ mod_workshop|workshop|submissionstart|submissionend',
         $plugin->load_settings($ADMIN, 'notificationsconditionplugins', $hassiteconfig);
     }
 
-    $ADMIN->add('notificationscategory', new admin_externalpage('notificationsreport', get_string('report',
-        'local_notificationsagent'), $CFG->wwwroot . '/local/notificationsagent/report.php'));
+    $ADMIN->add(
+        'notificationscategory', new admin_externalpage(
+            'notificationsreport', get_string(
+            'report',
+            'local_notificationsagent'
+        ), $CFG->wwwroot . '/local/notificationsagent/report.php'
+        )
+    );
+
+    $ADMIN->add(
+        'reports', new admin_externalpage(
+            'notificationsagent', get_string('report', 'local_notificationsagent'),
+            "$CFG->wwwroot/local/notificationsagent/report.php"
+        )
+    );
 
 }
 
