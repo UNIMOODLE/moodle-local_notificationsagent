@@ -20,7 +20,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str'], function(str) {
+define(['core/str', 'core/url'], function(str, URL) {
     /**
      * Types of rule type
      * 
@@ -78,7 +78,7 @@ define(['core/str'], function(str) {
                 /* Rellenar cursos asignados */
                 $.ajax({
                     type: "POST",
-                    url: '/local/notificationsagent/assignrule.php',
+                    url: URL.relativeUrl('/local/notificationsagent/assignrule.php'),
                     data: {
                         ruleid: idtemplate,
                         action: ACTION[0]
@@ -184,7 +184,7 @@ define(['core/str'], function(str) {
 
                 $.ajax({
                     type: "POST",
-                    url: '/local/notificationsagent/assignrule.php',
+                    url: URL.relativeUrl('/local/notificationsagent/assignrule.php'),
                     data: {
                         ruleid: idtemplate,
                         category: data['category'],
