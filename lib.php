@@ -216,7 +216,7 @@ function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
                       FROM {notificationsagent_triggers} nt
                       JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid
                      WHERE startdate
-                       AND nr.status = 0 
+                       AND nr.status = 0
                    BETWEEN :tasklastrunttime AND :timestarted
                      ";
 
@@ -251,7 +251,7 @@ function to_human_format($seconds, $toshow = false) {
     $s = $dtF->diff($dtT)->format('%s') and
     $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
 
-    if(empty($stringtoshow)){
+    if (empty($stringtoshow)) {
         $stringtoshow[] = "0 " . get_string('card_second', 'local_notificationsagent');
     }
 
@@ -301,7 +301,8 @@ function get_course_url($id) {
  * Get the URL for a specific module in a course.
  *
  * @param int $courseid The ID of the course.
- * @param int $cmid The ID of the course module.
+ * @param int $cmid     The ID of the course module.
+ *
  * @return moodle_url The URL of the course module.
  */
 function get_module_url($courseid, $cmid) {
@@ -314,13 +315,14 @@ function get_module_url($courseid, $cmid) {
  * Get the direct link to the course or module based on the trigger condition.
  *
  * @param object $context The Evaluation context object
- * @throws moodle_exception When there is an error with the condition ID
+ *
  * @return string The URL of the module or course
+ * @throws moodle_exception When there is an error with the condition ID
  */
 function get_follow_link($context) {
     $conditions = $context->get_rule()->get_conditions();
     $condition = $conditions[$context->get_triggercondition()] ?? '';
-    $cmid = !empty($condition) ? (json_decode($condition->get_parameters()))->cmid : '';
+    $cmid = !empty($condition) ? ((json_decode($condition->get_parameters()))->cmid ?? '') : '';
 
     return !empty($cmid) ? get_module_url($context->get_courseid(), $cmid) : get_course_url($context->get_courseid());
 }
