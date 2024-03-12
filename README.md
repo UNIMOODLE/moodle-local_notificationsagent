@@ -60,6 +60,13 @@ For further information, visit:
 - <https://docs.phpunit.de/>
 - <https://pecl.php.net/package/uopz>
 
+### PHPDOC
+Generate Phpdoc documentation. Run this command on plugin directory.
+```sh
+docker run -ti -u $UID:$UID --rm -v $(pwd):/data phpdoc/phpdoc -t phpdoc
+```
+
+
 ## License ##
 
 2023 ISYC
