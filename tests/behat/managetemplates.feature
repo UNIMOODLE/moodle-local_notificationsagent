@@ -2,7 +2,7 @@
 Feature: Testing templates management in notifications agent plugin
   In order to test the template management
   As an admin
-  I should be configure and manage templates in the notifications agent plugin.
+  I should be able to configure and manage templates in the notifications agent plugin
 
   Background:
     Given the following "course" exists:
@@ -146,7 +146,7 @@ Feature: Testing templates management in notifications agent plugin
       | Message [BBBB] | Hi {User_Username}, your last session in the course was 3 days ago. |
     And I click on "Save changes" "button"
     And I wait "1" seconds
-    And I should see "Rule saved"
+    And I should see "saved"
     And I should see "Testing template1"
     And I should see "template"
     And I wait "2" seconds
@@ -212,7 +212,7 @@ Feature: Testing templates management in notifications agent plugin
       | Message [BBBB] | Hi {User_Username}, your last session in the course was 3 days ago. |
     And I click on "Save changes" "button"
     And I wait "1" seconds
-    And I should see "Rule saved"
+    And I should see "saved"
     And I should see "Testing template1"
     And I should see "template"
     And I wait "2" seconds

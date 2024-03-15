@@ -2,7 +2,7 @@
 Feature: Testing rules management in notifications agent plugin
   In order to test the rule management in a course
   As a teacher
-  I should be configure and manage rules in the notifications agent plugin.
+  I should be able to configure and manage rules in the notifications agent plugin
 
   Background:
     Given the following "course" exists:

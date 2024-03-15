@@ -43,8 +43,16 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_notificationsagent extends behat_base {
+
     /**
+     * Click on input element
      * @When /^I click on the input element with placeholder "([^"]*)" inside div with id "([^"]*)"$/
+     *
+     * @param string $placeholder
+     * @param int    $divid
+     *
+     * @return void
+     * @throws Exception
      */
     public function i_click_on_input_element_with_placeholder_inside_div($placeholder, $divid) {
         $selector = sprintf("//div[@id='%s']//input[@placeholder='%s']", $divid, $placeholder);
