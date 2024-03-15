@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_forumnoreply
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -40,6 +40,9 @@ use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 
+/**
+ *  Scheduled task for forumnoreply subplugin
+ */
 class forumnoreply_crontask extends scheduled_task {
 
     /**
@@ -68,7 +71,7 @@ class forumnoreply_crontask extends scheduled_task {
             $condtionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
-            $timenow = time();
+            $timenow = $this->get_timestarted();
 
             $modinfo = get_fast_modinfo($courseid);
             $foroid = $modinfo->get_cm($param[notificationplugin::UI_ACTIVITY])->instance;
@@ -81,7 +84,7 @@ class forumnoreply_crontask extends scheduled_task {
                        AND fd.course = :course
                        AND fd.timestart >= :timestart
                        AND (fd.timeend = :timeend OR fd.timeend > :timenow)
-                       AND timemodified < :timenowandtime
+                       AND :timenow2 >= fd.timemodified + CAST( :timenowandtime AS INTEGER )
                        AND fp2.id IS NULL
                  ";
 
@@ -93,22 +96,25 @@ class forumnoreply_crontask extends scheduled_task {
                     'timestart' => 0,
                     'timeend' => 0,
                     'timenow' => $timenow,
-                    'timenowandtime' => $timenow + $param[notificationplugin::UI_TIME],
+                    'timenow2' => $timenow,
+                    'timenowandtime' => $param[notificationplugin::UI_TIME],
                 ]
             );
 
             foreach ($threads as $thread) {
-                $cache = $thread->timemodified + $param[notificationplugin::UI_TIME];
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $thread->userid
-                )
+                        $condition->ruleid, $condition->ruletimesfired, $courseid, $thread->userid
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $thread->userid)
                 ) {
-                    notificationsagent::set_timer_cache($thread->userid, $courseid, $cache, $pluginname, $condtionid, true);
-                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $thread->userid, $courseid, $cache);
+                    notificationsagent::set_timer_cache(
+                        $thread->userid, $courseid, $thread->timemodified + $param[notificationplugin::UI_TIME], $pluginname,
+                        $condtionid, true
+                    );
+                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $thread->userid, $courseid, $timenow);
                 }
             }
         }
         custom_mtrace("forumnoreply end ");
     }
 }
-
