@@ -41,7 +41,23 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 
+/**
+ * Engine class to evaluate notifications agent rules.
+ */
 class notificationsagent_engine {
+
+    /**
+     * Evaluates a set of rules for notifications agent and performs the corresponding actions.
+     *
+     * @param array $ruleids          An array of rule ids to be evaluated
+     * @param int   $timeaccess       The time access for evaluation
+     * @param int   $userid           The user id for whom the rules are being evaluated
+     * @param int   $courseid         The course id for which the rules are being evaluated
+     * @param int   $triggercondition The trigger condition for rule evaluation
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid, $triggercondition) {
         foreach ($ruleids as $ruleid) {
             $rule = rule::create_instance($ruleid);
@@ -69,7 +85,8 @@ class notificationsagent_engine {
                                 // If the action has a specific user, send the action only to that user.
                                 // otherwise, send the action for each user.
                                 if ($hasuser
-                                    && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $hasuser)) {
+                                    && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $hasuser)
+                                ) {
                                     if (($context->get_userid() == notificationsagent::GENERIC_USERID)
                                         || ($context->get_userid() == $hasuser)
                                     ) {
@@ -108,8 +125,9 @@ class notificationsagent_engine {
 
                             // If the action has a specific user, send the action only to that user.
                             // otherwise, send the action for each user.
-                            if ($hasuser &&
-                                !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)) {
+                            if ($hasuser
+                                && !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
+                            ) {
                                 if (($context->get_userid() == notificationsagent::GENERIC_USERID)
                                     || ($context->get_userid() == $hasuser)
                                 ) {
@@ -143,8 +161,9 @@ class notificationsagent_engine {
 
                                     // If the action has a specific user, send the action only to that user.
                                     // otherwise, send the action for each user.
-                                    if ($hasuser &&
-                                        !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)) {
+                                    if ($hasuser
+                                        && !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
+                                    ) {
                                         if (($context->get_userid() == notificationsagent::GENERIC_USERID)
                                             || ($context->get_userid() == $hasuser)
                                         ) {

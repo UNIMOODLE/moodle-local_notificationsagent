@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendareventto
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,14 +33,13 @@
 
 namespace notificationscondition_calendareventto\task;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../../../lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 
+/**
+ * Scheduled tak for condition
+ */
 class calendareventto_crontask extends scheduled_task {
 
     /**
@@ -56,7 +55,6 @@ class calendareventto_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        global $DB;
         custom_mtrace("calendareventto start");
 
         $pluginname = get_string('subtype', 'notificationscondition_calendareventto');
@@ -64,16 +62,23 @@ class calendareventto_crontask extends scheduled_task {
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $startdate = $DB->get_field('event', 'timestart', ['id' => $courseid]);
             $condtionid = $condition->id;
             $decode = $condition->parameters;
-            $param = json_decode($decode, true);
-            $cache = $startdate - $param[notificationplugin::UI_TIME];
+            $param = json_decode($decode);
+            $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
+            $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart - $param->{notificationplugin::UI_TIME};
 
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
+            ) {
                 notificationsagent::set_timer_cache(
                     notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, false
+                );
+
+                notificationsagent::set_time_trigger(
+                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }

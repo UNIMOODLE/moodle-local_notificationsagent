@@ -54,7 +54,7 @@ return new class extends phpunit_coverage_info {
             'lang',
             'condition/*/lang',
             'action/*/lang',
-            'classes/helper/test'
+            'classes/helper/test',
         ];
 
     /** @var array The list of files relative to the plugin root to exclude from coverage generation. */

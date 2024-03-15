@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitysinceend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -74,8 +74,9 @@ class activitysinceend_crontask extends scheduled_task {
 
                 if (isset($completion->userid)) {
                     if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $courseid, $completion->userid
-                    )
+                            $condition->ruleid, $condition->ruletimesfired, $courseid, $completion->userid
+                        )
+                        && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
                     ) {
                         $cache = $completion->timemodified + $param[notificationplugin::UI_TIME];
                         notificationsagent::set_timer_cache
@@ -95,4 +96,3 @@ class activitysinceend_crontask extends scheduled_task {
 
     }
 }
-

@@ -40,4 +40,4 @@ $string['modname'] = 'activityend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activityend_crontask'] = 'Activity end cron task';
-
+$string['validation_editrule_form_dateend'] = 'It is necessary to add an activity/course end date';

@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición: data relativa ao remate da actividade';
@@ -42,4 +41,4 @@ $string['modname'] = 'activityend';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
-
+$string['validation_editrule_form_dateend'] = 'É necesario engadir unha data de finalización da actividade/curso';

@@ -30,18 +30,28 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_notificationsagent\plugininfo;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo, core_plugin_manager, moodle_url;
 
+/**
+ * Information class for notifications condition plugins.
+ */
 class notificationscondition extends notificationsbaseinfo {
 
+    /**
+     * Return uninstall allowed.
+     *
+     * @return true
+     */
     public function is_uninstall_allowed() {
         return true;
     }
 
     /**
      * Finds all enabled plugins, the result may include missing plugins.
+     *
      * @return array|null of enabled plugins $pluginname=>$pluginname, null means unknown
      */
     public static function get_enabled_plugins() {
@@ -53,7 +63,7 @@ class notificationscondition extends notificationsbaseinfo {
         }
         $installed = [];
         foreach ($plugins as $plugin => $version) {
-            $installed[] = 'notificationscondition_'.$plugin;
+            $installed[] = 'notificationscondition_' . $plugin;
         }
 
         list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
@@ -74,6 +84,14 @@ class notificationscondition extends notificationsbaseinfo {
         return $enabled;
     }
 
+    /**
+     * Enable or disable a plugin and update the configuration settings accordingly.
+     *
+     * @param string $pluginname The name of the plugin to enable or disable.
+     * @param int    $enabled    The flag to enable (1) or disable (0) the plugin.
+     *
+     * @return bool True if the configuration has been changed, false otherwise.
+     */
     public static function enable_plugin(string $pluginname, int $enabled): bool {
         $haschanged = false;
 
@@ -94,12 +112,18 @@ class notificationscondition extends notificationsbaseinfo {
 
     /**
      * Return URL used for management of plugins of this type.
+     *
      * @return moodle_url
      */
     public static function get_manage_url() {
         return new moodle_url('/local/notificationsagent/adminmanageplugins.php', ['subtype' => 'notificationscondition']);
     }
 
+    /**
+     * Get settings of the section name.
+     *
+     * @return string
+     */
     public function get_settings_section_name() {
         return $this->type . '_' . $this->name;
     }
@@ -111,8 +135,8 @@ class notificationscondition extends notificationsbaseinfo {
      * Alternatively it can create a link to some settings page (instance of admin_externalpage)
      *
      * @param \part_of_admin_tree $adminroot
-     * @param string $parentnodename
-     * @param bool $hassiteconfig whether the current user has moodle/site:config capability
+     * @param string              $parentnodename
+     * @param bool                $hassiteconfig whether the current user has moodle/site:config capability
      */
     public function load_settings(\part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.

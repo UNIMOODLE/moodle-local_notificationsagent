@@ -24,14 +24,13 @@
 /**
  * Version details
  *
- * @package    notificationscondition_
+ * @package    notificationscondition_calendareventto
  * @category   string
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined("MOODLE_INTERNAL") || die();
 
@@ -42,5 +41,3 @@ $string['modname'] = 'calendareventto';
 $string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Tasca de finalització del calendari';
 $string['editrule_condition_calendar'] = 'Esdeveniment {$a->typeelement}:';
-
-

@@ -158,6 +158,9 @@ $string['editrule_action_error'] = 'Gutxienez ekintza bat gehitu behar duzu';
 $string['rulecancelled'] = 'Araua bertan behera utzi da';
 $string['rulesaved'] = 'Araua gorde da';
 
+// Rule errors
+$string['editrule_runtime_error'] = 'Ez '.$string['editrule_timesfired'].' > 0 da, tarte bat adierazi behar du';
+
 // Txartelaren edukia.
 $string['cardif'] = 'Bai:';
 $string['cardunless'] = 'Bada izan ezik:';

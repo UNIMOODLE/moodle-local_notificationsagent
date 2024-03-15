@@ -35,9 +35,16 @@ namespace local_notificationsagent\plugininfo;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo, core_plugin_manager, moodle_url;
 
+/**
+ * Notification action plugin info class.
+ */
 class notificationsaction extends notificationsbaseinfo {
 
-
+    /**
+     * Checks if uninstall is allowed.
+     *
+     * @return boolean
+     */
     public function is_uninstall_allowed() {
         return true;
     }
@@ -76,6 +83,13 @@ class notificationsaction extends notificationsbaseinfo {
         return $enabled;
     }
 
+    /**
+     * Enable or disable a plugin and return whether the value has changed.
+     *
+     * @param string $pluginname The name of the plugin to enable or disable.
+     * @param int $enabled The flag to enable (1) or disable (0) the plugin.
+     * @return bool Whether the value has changed after enabling or disabling the plugin.
+     */
     public static function enable_plugin(string $pluginname, int $enabled): bool {
         $haschanged = false;
 
@@ -102,6 +116,10 @@ class notificationsaction extends notificationsbaseinfo {
         return new moodle_url('/local/notificationsagent/adminmanageplugins.php', ['subtype' => 'notificationsaction']);
     }
 
+    /**
+     * Get settings section name.
+     * @return string
+     */
     public function get_settings_section_name() {
         return $this->type . '_' . $this->name;
     }

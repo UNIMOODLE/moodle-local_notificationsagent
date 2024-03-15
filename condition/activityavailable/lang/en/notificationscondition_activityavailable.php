@@ -41,4 +41,3 @@ $string['modname'] = 'activityavailable';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activityavailable_crontask'] = 'Activity available cron task';
-

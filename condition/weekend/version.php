@@ -21,7 +21,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_weekend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -36,6 +36,6 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023101802;
+$plugin->version = 2023101803;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationscondition_weekend';

@@ -37,6 +37,9 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 
+/**
+ *  Helper class for phpunit
+ */
 class phpunitutil {
     /**
      * Get a private or protected method for testing/documentation purposes.

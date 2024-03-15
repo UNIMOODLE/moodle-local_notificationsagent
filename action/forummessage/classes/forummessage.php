@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_forummessage
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -47,10 +47,20 @@ class forummessage extends notificationactionplugin {
     public const UI_MESSAGE = 'message';
     public const UI_TITLE = 'title';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('forummessage_action', 'notificationsaction_forummessage');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[FFFF]', '[TTTT]', '[BBBB]'];
     }
@@ -102,9 +112,9 @@ class forummessage extends notificationactionplugin {
             $forumname
         );
         $this->placeholders($mform, $id, $type);
-        $mform->insertElementBefore($title, 'new'.$type.'_group');
-        $mform->insertElementBefore($message, 'new'.$type.'_group');
-        $mform->insertElementBefore($cm, 'new'.$type.'_group');
+        $mform->insertElementBefore($title, 'new' . $type . '_group');
+        $mform->insertElementBefore($message, 'new' . $type . '_group');
+        $mform->insertElementBefore($cm, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui($id, self::UI_TITLE), PARAM_TEXT);
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
@@ -139,7 +149,19 @@ class forummessage extends notificationactionplugin {
         return $this->get_parameters();
     }
 
-    public function process_markups(&$content, $courseid, $options=null) {
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
+    public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
         // Check if activity is found, if is not, return [FFFF].
@@ -152,14 +174,15 @@ class forummessage extends notificationactionplugin {
         }
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
-        $paramstoteplace = [shorten_text($activityname),
+        $paramstoteplace = [
+            shorten_text($activityname),
             shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
             shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     /**
@@ -201,6 +224,7 @@ class forummessage extends notificationactionplugin {
 
     /**
      * Check if the action will be sent once or not
+     *
      * @param integer $userid User id
      *
      * @return bool $sendonce Will the action be sent once?

@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_privateforummessage
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,13 +33,15 @@
 
 namespace notificationsaction_privateforummessage;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
-
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
 
+/**
+ * Class representing privateforummessage action plugin.
+ *
+ * This class provides the necessary structure and methods that all notification action plugins should inherit and implement
+ * according to their specific needs.
+ */
 class privateforummessage extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
@@ -47,10 +49,20 @@ class privateforummessage extends notificationactionplugin {
     public const UI_MESSAGE = 'message';
     public const UI_TITLE = 'title';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('privateforummessage_action', 'notificationsaction_privateforummessage');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[FFFF]', '[TTTT]', '[BBBB]'];
     }
@@ -141,6 +153,18 @@ class privateforummessage extends notificationactionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters(), false);
 
@@ -160,7 +184,7 @@ class privateforummessage extends notificationactionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function execute_action($context, $params) {
@@ -179,16 +203,11 @@ class privateforummessage extends notificationactionplugin {
 
         $timenow = time();
         $pluginname = 'forumnoreply';
-
-        $conditions = $context->get_rule()->get_conditions();
-
-        foreach ($conditions as $condition) {
-            if ($condition->get_pluginname() == $pluginname) {
-                $decode = $condition->get_parameters();
-                $param = json_decode($decode);
-                $time = $param->{self::UI_TIME};
-                break;
-            }
+        $condition = $context->get_rule()->get_condition($pluginname);
+        if ($condition) {
+            $decode = $condition->get_parameters();
+            $param = json_decode($decode);
+            $time = $param->{self::UI_TIME};
         }
 
         $sqlthreads = "SELECT DISTINCT fd.id AS discussionid, fp.id AS postid
@@ -231,7 +250,7 @@ class privateforummessage extends notificationactionplugin {
         $obj->forum = $forumid;
         $obj->course = $courseid;
 
-        return notificationsaction_privateforummessage_forum_add_post($obj);
+        return self::forum_add_post($obj);
 
     }
 
@@ -252,5 +271,39 @@ class privateforummessage extends notificationactionplugin {
             'message' => $parameters->{self::UI_MESSAGE}->text,
             'cmid' => $parameters->{self::UI_ACTIVITY},
         ]);
+    }
+
+    /**
+     * Replying private to a post.
+     *
+     * @param $obj
+     *
+     * @return bool|int
+     * @throws \dml_exception
+     */
+    public static function forum_add_post($obj) {
+        global $DB;
+
+        $timenow = $obj->timenow ?? time();
+
+        $forum = $DB->get_record('forum', ['id' => $obj->forum]);
+
+        $post = new \stdClass();
+        $post->discussion = $obj->discussion;
+        $post->parent = $obj->parent;
+        $post->privatereplyto = $obj->privatereplyto; // User we are replying to.
+        $post->userid = $obj->userid; // Admin in replying.
+        $post->created = $timenow;
+        $post->modified = $timenow;
+        $post->mailed = FORUM_MAILED_PENDING;
+        $post->subject = $obj->subject;
+        $post->message = $obj->message;
+        $post->forum = $forum->id;
+        $post->course = $forum->course;
+
+        \mod_forum\local\entities\post::add_message_counts($post);
+        $post->id = $DB->insert_record("forum_posts", $post);
+
+        return $post->id;
     }
 }

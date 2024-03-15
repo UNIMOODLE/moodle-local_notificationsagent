@@ -80,7 +80,18 @@ class update_rule_status extends \external_api {
 
         $instance = rule::create_instance($ruleid);
         if (empty($instance)) {
-            throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
+            try {
+                throw new \moodle_exception(
+                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                );
+            } catch (\moodle_exception $e) {
+                $result['warnings'][] = [
+                    'item' => 'local_notificationsagent',
+                    'warningcode' => $e->errorcode,
+                    'message' => $e->getMessage(),
+                ];
+                return $result;
+            }
         }
         $context = \context_course::instance($instance->get_default_context());
 

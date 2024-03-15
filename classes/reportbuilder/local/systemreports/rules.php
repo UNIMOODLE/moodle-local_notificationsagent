@@ -35,8 +35,14 @@ use local_notificationsagent\local\entities\rule;
 use core_reportbuilder\local\entities\course;
 use core_reportbuilder\local\entities\user;
 
+/**
+ * System report class for listing notification rules.
+ */
 class rules extends system_report {
 
+    /**
+     * A function to initialise the entities, tables, joins, columns, filters, and set downloadable for the report.
+     */
     protected function initialise(): void {
         $ruleentity = new rule();
         $narralias = $ruleentity->get_table_alias('notificationsagent_report');
@@ -70,6 +76,9 @@ class rules extends system_report {
         return true;
     }
 
+    /**
+     * Add columns to the function.
+     */
     public function add_columns() {
         $this->add_columns_from_entities(
             [
@@ -89,6 +98,10 @@ class rules extends system_report {
         }
     }
 
+    /**
+     * Add filters to the function.
+     *
+     */
     protected function add_filters(): void {
         $filters = [
             'rule:rulename',

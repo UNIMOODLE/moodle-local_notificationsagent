@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendarstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,6 +33,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname'   => '\core\event\calendar_event_updated',
+    'eventname' => '\core\event\calendar_event_updated',
     'callback' => 'notificationscondition_calendarstart_observer::calendar_updated',
 ];

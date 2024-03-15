@@ -22,7 +22,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_sessionstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -31,9 +31,11 @@
 
 /**
  * Stub for upgrade code
+ *
  * @param int $oldversion
+ *
  * @return bool
  */
-function xmldb_notificationsagentcondition_sessionstart_upgrade($oldversion) {
+function xmldb_notificationscondition_sessionstart_upgrade($oldversion) {
     return true;
 }

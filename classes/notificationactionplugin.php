@@ -38,10 +38,26 @@ use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 
+/**
+ * Abstract class representing a notification action plugin.
+ *
+ * This class provides the necessary structure and methods that all notification action
+ * plugins should inherit and implement according to their specific needs.
+ */
 abstract class notificationactionplugin extends notificationplugin {
 
+    /**
+     * Get the title of the notification action plugin.
+     *
+     * @return string Title of the plugin.
+     */
     abstract public function get_title();
 
+    /**
+     * Get the elements for the notification action plugin.
+     *
+     * @return array elements as an associative array.
+     */
     abstract public function get_elements();
 
     /**
@@ -59,13 +75,21 @@ abstract class notificationactionplugin extends notificationplugin {
      */
     abstract public function get_subtype();
 
-    /*
-     * Check whether a user has capabilty to use an action.
+    /**
+     * Checks whether a user has the capability to use an action within a given context.
+     *
+     * @param \context $context The context to check the capability in.
+     *
+     * @return bool True if the user has the capability, false otherwise.
      */
     abstract public function check_capability($context);
 
-    /*
-     * Show placeholder where needed
+    /**
+     * Generate placeholders for the given form and insert them before a specific group.
+     *
+     * @param mixed  $mform the moodle form object
+     * @param string $id    the id of the form
+     * @param string $type  the type of the form
      */
     public function placeholders($mform, $id, $type) {
         $placeholders = \html_writer::start_tag(
@@ -80,7 +104,7 @@ abstract class notificationactionplugin extends notificationplugin {
             $placeholders .= \html_writer::start_tag(
                 'a', [
                     "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
-                    "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget
+                    "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget,
                 ]
             );
             $placeholders .= \html_writer::start_tag('span');
@@ -97,6 +121,13 @@ abstract class notificationactionplugin extends notificationplugin {
         $mform->insertElementBefore($group, 'new' . $type . '_group');
     }
 
+    /**
+     * Create subplugins from records.
+     *
+     * @param array $records The records to create subplugins from.
+     *
+     * @return array The array of created subplugins.
+     */
     public static function create_subplugins($records) {
         $subplugins = [];
         global $DB;
@@ -110,20 +141,36 @@ abstract class notificationactionplugin extends notificationplugin {
                 $subplugin->set_type($record->type);
                 $subplugin->set_ruleid($record->ruleid);
 
-                $subplugins[] = $subplugin;
+                $subplugins[$record->id] = $subplugin;
             }
         }
         return $subplugins;
     }
 
+    /**
+     * Create a subplugin.
+     *
+     * @param int $id id of action
+     *
+     * @return mixed
+     * @throws \dml_exception
+     */
     public static function create_subplugin($id) {
         global $DB;
         // Find type of subplugin.
         $record = $DB->get_record('notificationsagent_action', ['id' => $id]);
         $subplugins = self::create_subplugins([$record]);
-        return $subplugins[0];
+        return $subplugins[$id];
     }
 
+    /**
+     * Execute an action with the given parameters in the specified context.
+     *
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param array             $params  An associative array of parameters for the action.
+     *
+     * @return mixed The result of the action execution.
+     */
     abstract public function execute_action($context, $params);
 
     /**
@@ -160,19 +207,24 @@ abstract class notificationactionplugin extends notificationplugin {
         return $result;
     }
 
-    public function save($idname, $data): bool {
-        global $DB;
-
+    /**
+     * Save data to the database.
+     *
+     * @param string $action
+     * @param string $idname The name ID.
+     * @param mixed  $data   The data to be saved.
+     *
+     * @return void
+     * @throws moodle_exception errorinserting_notificationsagent_action description of exception
+     */
+    public function save($action, $idname, $data) {
         $dataplugin = new \stdClass();
         $dataplugin->ruleid = $this->rule->get_id();
         $dataplugin->pluginname = get_called_class()::NAME;
         $dataplugin->type = $this->get_type();
         $dataplugin->parameters = $this->convert_parameters($idname, $data);
-        // Insert plugin.
-        if (!$dataplugin->id = $DB->insert_record('notificationsagent_action', $dataplugin)) {
-            throw new moodle_exception('errorinserting_notificationsagent_action');
-        }
-        return true;
+
+        parent::insert_update_delete($action, $idname, $dataplugin);
     }
 
     /**

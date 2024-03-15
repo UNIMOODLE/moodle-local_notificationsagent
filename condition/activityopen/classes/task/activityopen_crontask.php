@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activityopen
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -32,6 +32,7 @@
  */
 
 namespace notificationscondition_activityopen\task;
+
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../lib.php');
 
@@ -55,12 +56,6 @@ class activityopen_crontask extends scheduled_task {
      */
     public function execute() {
         custom_mtrace("Activity open start");
-        /*
-        * Debido a que las condiciones temporales disponen de un método para calcular la próxima fecha en que se cumplirán,
-        * solo se volverán a evaluar cuando un evento específico requiera esa información.
-        * De lo contrario, se utilizará la fecha almacenada en caché para evitar cálculos innecesarios y
-        * reducir la carga en el sistema.
-        * */
 
         $pluginname = 'activityopen';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -74,9 +69,15 @@ class activityopen_crontask extends scheduled_task {
             $timestart = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
             $cache = $timestart + $param[notificationplugin::UI_TIME];
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID)) {
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
+            ) {
                 notificationsagent::set_timer_cache(
                     notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, false
+                );
+                notificationsagent::set_time_trigger(
+                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }
@@ -85,4 +86,3 @@ class activityopen_crontask extends scheduled_task {
 
     }
 }
-

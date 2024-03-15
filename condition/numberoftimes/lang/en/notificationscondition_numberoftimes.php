@@ -24,13 +24,12 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_numberoftimes
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 $string['pluginname'] = 'Condition of the rule has been initiated fewer than a number of times and at least some time ago.';
 $string['conditiontext'] = 'The rule has been initiated fewer than [N] times and at least [TTTT] ago.';

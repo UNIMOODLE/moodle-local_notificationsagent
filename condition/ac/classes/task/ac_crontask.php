@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -62,10 +62,12 @@ class ac_crontask extends scheduled_task {
             $users = notificationsagent::get_usersbycourse($context);
             foreach ($users as $user) {
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id)) {
-                    // Todo Add ac trigger time as setting.
+                        $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
+                ) {
                     notificationsagent::set_time_trigger(
-                        $condition->ruleid, $condition->id, $user->id, $condition->courseid, time() + 120
+                        $condition->ruleid, $condition->id, $user->id, $condition->courseid, $this->get_timestarted()
                     );
                 }
             }

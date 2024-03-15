@@ -33,49 +33,105 @@
 
 namespace local_notificationsagent;
 
+/**
+ * Context of a notification evaluation.
+ */
 class evaluationcontext {
 
-    private $userid; // Evento.
-    private $courseid; // Evento o regla.
-    private $timeaccess; // Evento.
-    private $params; // Los que vienen del plugin.
+    /**
+     * @var int The user ID.
+     */
+    private $userid;
+
+    /**
+     * @var int The course ID.
+     */
+    private $courseid;
+
+    /**
+     * @var int The time access.
+     */
+    private $timeaccess;
+
+    /**
+     * @var array Additional parameters.
+     */
+    private $params;
+
+    /**
+     * @var bool Indicates if it is complementary.
+     */
     private $iscomplementary;
+
+    /**
+     * @var int The number of times fired.
+     */
     private $usertimesfired;
+
+    /**
+     * @var mixed The object ID.
+     */
     private $objectid;
+
+    /**
+     * @var string The trigger condition.
+     */
     private $triggercondition;
+
+    /**
+     * @var object The rule.
+     */
     private $rule;
+
+    /**
+     * @var array List of conditions.
+     */
     private $conditions = [];
+
+    /**
+     * @var array List of exceptions.
+     */
     private $exceptions = [];
 
     /**
-     * @return mixed
+     * Get the user ID.
+     *
+     * @return int
      */
     public function get_userid() {
         return $this->userid;
     }
 
     /**
-     * @param mixed $userid
+     * Set the user ID.
+     *
+     * @param int $userid description
      */
     public function set_userid($userid): void {
         $this->userid = $userid;
     }
 
     /**
-     * @return mixed
+     * Retrieve the course ID.
+     *
+     * @return int
      */
     public function get_courseid() {
         return $this->courseid;
     }
 
     /**
-     * @param mixed $courseid
+     * Set the course ID.
+     *
+     * @param int $courseid The course ID to be set
      */
     public function set_courseid($courseid): void {
         $this->courseid = $courseid;
     }
 
     /**
+     * Get the value of timeaccess
+     *
      * @return mixed
      */
     public function get_timeaccess() {
@@ -83,13 +139,17 @@ class evaluationcontext {
     }
 
     /**
-     * @param mixed $timeaccess
+     * Set the timeaccess property.
+     *
+     * @param int $timeaccess The new value for the timeaccess property
      */
     public function set_timeaccess($timeaccess): void {
         $this->timeaccess = $timeaccess;
     }
 
     /**
+     * Get the parameters of the PHP function.
+     *
      * @return mixed
      */
     public function get_params() {
@@ -97,26 +157,35 @@ class evaluationcontext {
     }
 
     /**
-     * @param mixed $params
+     * Set the parameters for the PHP function.
+     *
+     * @param array $params description
      */
     public function set_params($params): void {
         $this->params = $params;
     }
+
     /**
-     * @return bool
+     * Get if it is complementary.
+     *
+     * @return boolean
      */
     public function is_complementary() {
         return $this->iscomplementary;
     }
 
     /**
-     * @param bool $iscomplementary
+     * Set the complementary flag.
+     *
+     * @param bool $iscomplementary The value to set the complementary flag to
      */
     public function set_complementary(bool $iscomplementary): void {
         $this->iscomplementary = $iscomplementary;
     }
 
     /**
+     * Get the conditions.
+     *
      * @return array
      */
     public function get_conditions(): array {
@@ -124,6 +193,8 @@ class evaluationcontext {
     }
 
     /**
+     * Set the conditions.
+     *
      * @param array $conditions
      */
     public function set_conditions(array $conditions): void {
@@ -131,6 +202,8 @@ class evaluationcontext {
     }
 
     /**
+     * Get the exceptions.
+     *
      * @return array
      */
     public function get_exceptions(): array {
@@ -138,13 +211,17 @@ class evaluationcontext {
     }
 
     /**
-     * @param array $exceptions
+     * Set the exceptions.
+     *
+     * @param array $exceptions The array of exceptions to set
      */
     public function set_exceptions(array $exceptions): void {
         $this->exceptions = $exceptions;
     }
 
     /**
+     * Get the number of times the user has fired.
+     *
      * @return int
      */
     public function get_usertimesfired(): int {
@@ -152,13 +229,17 @@ class evaluationcontext {
     }
 
     /**
-     * @param int $usertimesfired
+     * Set the usertimesfired property to the specified value.
+     *
+     * @param int $usertimesfired The new value for the usertimesfired property
      */
     public function set_usertimesfired(int $usertimesfired): void {
         $this->usertimesfired = $usertimesfired;
     }
 
     /**
+     * Get the object ID.
+     *
      * @return int
      */
     public function get_objectid(): int {
@@ -166,13 +247,17 @@ class evaluationcontext {
     }
 
     /**
-     * @param int $objectid
+     * Set the object id.
+     *
+     * @param int $objectid The object id to set.
      */
     public function set_objectid(int $objectid): void {
         $this->objectid = $objectid;
     }
 
     /**
+     * Get the trigger condition.
+     *
      * @return int
      */
     public function get_triggercondition(): int {
@@ -180,13 +265,17 @@ class evaluationcontext {
     }
 
     /**
-     * @param int $triggercondition
+     * Set the trigger condition.
+     *
+     * @param int $triggercondition The trigger condition to set
      */
     public function set_triggercondition(int $triggercondition): void {
         $this->triggercondition = $triggercondition;
     }
 
     /**
+     * Get the rule object.
+     *
      * @return object
      */
     public function get_rule(): object {
@@ -194,6 +283,8 @@ class evaluationcontext {
     }
 
     /**
+     * Set a rule for the PHP function.
+     *
      * @param object $rule
      */
     public function set_rule(object $rule): void {
@@ -202,6 +293,7 @@ class evaluationcontext {
 
     /**
      * Check if the context can be evaluated
+     *
      * @param object $rule Rule object
      *
      * @return bool $isevaluate Is the context evaluable?

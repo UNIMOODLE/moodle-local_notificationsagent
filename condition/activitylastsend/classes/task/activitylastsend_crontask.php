@@ -24,20 +24,22 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitylastsend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace notificationscondition_activitylastsend\task;
+
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../lib.php');
-require_once(__DIR__ . '/../../lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
+use notificationscondition_activitylastsend\activitylastsend;
 
 class activitylastsend_crontask extends scheduled_task {
 
@@ -54,32 +56,50 @@ class activitylastsend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Activity open start");
+        custom_mtrace("Activity last send start");
 
         $pluginname = 'activitylastsend';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
-        $ruleids = [];
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
-            $ruleids[] = $condition->ruleid;
-            $condtionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
             $cmid = $param[notificationplugin::UI_ACTIVITY];
-            $results = notificationsagent_condition_activitylastsend_get_cm_endtime($cmid);
-            foreach ($results as $result) {
-                if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $result->userid)) {
-                        $cache = $result->timemodified + $param[notificationplugin::UI_TIME];
-                        notificationsagent::set_timer_cache($result->userid, $courseid, $cache, $pluginname, $condtionid, true);
-                        notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $result->userid, $courseid, $cache);
+
+            $users = notificationsagent::get_usersbycourse(\context_course::instance($condition->courseid));
+            foreach ($users as $user) {
+                $data = activitylastsend::get_cmidfiles(
+                    $cmid,
+                    $user->id,
+                    $param[notificationplugin::UI_TIME],
+                    $this->get_timestarted()
+                );
+
+                if (isset($data->timemodified)
+                    && !notificationsagent::was_launched_indicated_times(
+                        $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
+                ) {
+                    $cache = $data->timemodified + $param[notificationplugin::UI_TIME];
+                    notificationsagent::set_timer_cache(
+                        $user->id,
+                        $condition->courseid,
+                        $cache,
+                        $pluginname,
+                        $condition->id,
+                        true
+                    );
+                    notificationsagent::set_time_trigger(
+                        $condition->ruleid,
+                        $condition->id,
+                        $user->id,
+                        $condition->courseid,
+                        $cache
+                    );
                 }
             }
-
         }
 
-        custom_mtrace("Activity open end ");
-
+        custom_mtrace("Activity lastsend end");
     }
 }
-

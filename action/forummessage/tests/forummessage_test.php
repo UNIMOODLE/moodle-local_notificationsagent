@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_forummessage
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,6 +33,7 @@
 
 namespace notificationsaction_forummessage;
 
+use Generator;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationplugin;
@@ -45,16 +46,47 @@ use notificationsaction_forummessage\forummessage;
  */
 class forummessage_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -244,8 +276,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationsaction_forummessage\forummessage::get_parameters_placeholders
-     * 
+     * @covers       \notificationsaction_forummessage\forummessage::get_parameters_placeholders
+     *
      * @dataProvider dataprovidergetparametersplaceholders
      */
     public function test_getparametersplaceholders($param) {
@@ -255,11 +287,11 @@ class forummessage_test extends \advanced_testcase {
         ]);
 
         $auxarray = json_decode($param, true);
-        // add cmid
+        // Add cmid.
         $auxarray['cmid'] = $cmtestaf->cmid;
         $param = json_encode($auxarray);
 
-        // format message text // delete ['text']
+        // Format message text // delete ['text'].
         $auxarray['message'] = $auxarray['message']['text'];
 
         self::$subplugin->set_parameters($param);
@@ -268,7 +300,7 @@ class forummessage_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
-    public static function dataprovidergetparametersplaceholders(): iterable {
+    public static function dataprovidergetparametersplaceholders(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
         yield [json_encode($data)];

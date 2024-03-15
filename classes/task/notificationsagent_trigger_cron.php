@@ -33,23 +33,26 @@
 
 namespace local_notificationsagent\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-
 use core\task\scheduled_task;
 use local_notificationsagent\engine\notificationsagent_engine;
 
-/*
- * Para asegurar un proceso de reevaluación oportuno, se implementa un proceso cron que periódicamente chequea la tabla de control
- * de verificación de reglas. Este proceso se encarga de reevaluar las reglas que han sido programadas para verificar sus
- * condiciones en el momento correspondiente, garantizando así la precisión y puntualidad de las notificaciones.
- * */
 
+/**
+ * Class to define the task to trigger notifications agent.
+ */
 class notificationsagent_trigger_cron extends scheduled_task {
+    /**
+     * Get the name using the get_string function from the local_notificationsagent plugin.
+     *
+     * @return string the retrieved name
+     */
     public function get_name() {
         return get_string('tasktriggers', 'local_notificationsagent');
     }
 
+    /**
+     * Execute the cron.
+     */
     public function execute() {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
@@ -64,7 +67,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
             ],
             'id DESC',
             'timestart',
-            '1',
+            '0',
             '1'
 
         );

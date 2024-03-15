@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_removeusergroup
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -36,4 +36,3 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version = 2023101802;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationsaction_removeusergroup';
-

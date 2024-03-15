@@ -24,14 +24,13 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activityend
+ * @package    notificationscondition_activitysinceend
  * @category   string
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined("MOODLE_INTERNAL") || die();
 

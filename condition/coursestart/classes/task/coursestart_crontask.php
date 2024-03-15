@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_coursestart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -69,15 +69,19 @@ class coursestart_crontask extends scheduled_task {
             $cache = $startdate + $param[notificationplugin::UI_TIME];
 
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
             ) {
                 notificationsagent::set_timer_cache(
                     notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, false
+                );
+
+                notificationsagent::set_time_trigger(
+                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }
         custom_mtrace("Coursestart end ");
     }
 }
-

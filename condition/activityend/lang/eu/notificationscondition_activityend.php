@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
@@ -42,4 +41,4 @@ $string['modname'] = 'activityend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
-
+$string['validation_editrule_form_dateend'] = 'Beharrezkoa da jarduera/ikastaroaren amaiera data gehitzea';

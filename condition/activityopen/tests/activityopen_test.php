@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activityopen
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -45,21 +45,60 @@ use notificationscondition_activityopen\activityopen;
  */
 class activityopen_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * @var \stdClass
+     */
     private static $cmtestao;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
     public const CMID = 246000;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Activity date start
+     */
     public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
+    /**
+     * Activity date end
+     */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
 
     public function setUp(): void {

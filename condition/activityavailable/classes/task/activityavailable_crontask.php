@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activityavailable
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -38,7 +38,6 @@ require_once(__DIR__ . '/../../../../lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
-use local_notificationsagent\engine\notificationsagent_engine;
 
 class activityavailable_crontask extends scheduled_task {
 
@@ -66,8 +65,9 @@ class activityavailable_crontask extends scheduled_task {
             $enrolledusers = notificationsagent::get_usersbycourse($context);
             foreach ($enrolledusers as $enrolleduser) {
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
-                )
+                        $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $enrolleduser->id)
                 ) {
                     notificationsagent::set_time_trigger($condition->ruleid, $condition->id, $enrolleduser->id, $courseid, $timer);
                 }
@@ -76,4 +76,3 @@ class activityavailable_crontask extends scheduled_task {
         custom_mtrace("Activityavailable end ");
     }
 }
-

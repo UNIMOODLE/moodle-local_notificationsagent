@@ -131,13 +131,13 @@ foreach ($rules as $rule) {
     $exceptionscontent = [];
     $actionscontent = [];
 
-    // AC (conditions and exceptions)
+    // AC (conditions and exceptions).
     if ($ac) {
         $ac->process_markups($conditionscontent, $courseid, notificationplugin::COMPLEMENTARY_CONDITION);
         $ac->process_markups($exceptionscontent, $courseid, notificationplugin::COMPLEMENTARY_EXCEPTION);
     }
 
-    // Conditions
+    // Conditions.
     if (!empty($conditions)) {
         foreach ($conditions as $subplugin) {
             $subplugin->process_markups($conditionscontent, $courseid);

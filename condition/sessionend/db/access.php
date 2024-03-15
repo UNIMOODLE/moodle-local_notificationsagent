@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_sessionend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,14 +33,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
- $capabilities = [
+$capabilities = [
     'local/notificationsagent:sessionend' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
         ],
     ],
-    ];
+];
 

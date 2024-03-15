@@ -35,6 +35,7 @@
  * Execute local_notificationsagent upgrade from the given old version.
  *
  * @param int $oldversion
+ *
  * @return bool
  */
 function xmldb_local_notificationsagent_upgrade($oldversion) {
@@ -43,7 +44,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2023112100) {
-
         // Define table notificationsagent_context to be created.
         $table = new xmldb_table('notificationsagent_context');
 
@@ -66,7 +66,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
     }
 
     if ($oldversion < 2023112100) {
-
         // Define field cmid to be added to notificationsagent_condition.
         $table = new xmldb_table('notificationsagent_condition');
         $field = new xmldb_field('cmid', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'parameters');
@@ -81,7 +80,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
     }
 
     if ($oldversion < 2023112900) {
-
         // Define table notificationsagent_rule to be created.
         $table = new xmldb_table('notificationsagent_rule');
 
@@ -112,7 +110,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024020600) {
-
         // Define field conditionid to be added to notificationsagent_triggers.
         $table = new xmldb_table('notificationsagent_triggers');
         $field = new xmldb_field('conditionid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, 'ruleid');
@@ -131,6 +128,20 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
 
         // Notificationsagent savepoint reached.
         upgrade_plugin_savepoint(true, 2024020600, 'local', 'notificationsagent');
+    }
+
+    if ($oldversion < 2024020602) {
+        // Define field ruleoff to be added to notificationsagent_triggers.
+        $table = new xmldb_table('notificationsagent_triggers');
+        $field = new xmldb_field('ruleoff', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'startdate');
+
+        // Conditionally launch add field ruleoff.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024020602, 'local', 'notificationsagent');
     }
 
     return true;

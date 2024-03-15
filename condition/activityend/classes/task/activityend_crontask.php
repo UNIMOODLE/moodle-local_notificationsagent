@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activityend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -71,10 +71,12 @@ class activityend_crontask extends scheduled_task {
             $cache = $timeend - $param[notificationplugin::UI_TIME];
             foreach ($enrolledusers as $enrolleduser) {
                 if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
-                )
+                        $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $enrolleduser->id)
                 ) {
                     notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
+                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $enrolleduser->id, $courseid, $cache);
                 }
             }
         }

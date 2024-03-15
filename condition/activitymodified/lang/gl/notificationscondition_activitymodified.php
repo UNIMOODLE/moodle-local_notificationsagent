@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición relativa a Modificouse o contido da actividade [AAAA].';
@@ -42,4 +41,3 @@ $string['modname'] = 'activitymodified';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'activitymodified cron task';
-

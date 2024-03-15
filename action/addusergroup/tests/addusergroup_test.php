@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_addusergroup
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,6 +33,7 @@
 
 namespace notificationsaction_addusergroup;
 
+use Generator;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationplugin;
@@ -45,21 +46,59 @@ use notificationsaction_addusergroup\addusergroup;
  */
 class addusergroup_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
     private static $group;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
         parent::setUp();
+
+        $creategroup = true;
+        $arguments = $this->getProvidedData();
+        foreach ($arguments as $key => $value) {
+            $$key = $value;
+        }
+
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
@@ -70,7 +109,9 @@ class addusergroup_test extends \advanced_testcase {
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
         self::getDataGenerator()->enrol_user(self::$user->id, self::$coursetest->id);
-        self::$group = self::getDataGenerator()->create_group(['courseid' => self::$coursetest->id]);
+        if ($creategroup) {
+            self::$group = self::getDataGenerator()->create_group(['courseid' => self::$coursetest->id]);
+        }
         self::$context = new evaluationcontext();
         self::$context->set_userid(self::$user->id);
         self::$context->set_courseid(self::$coursetest->id);
@@ -162,7 +203,9 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationsaction_addusergroup\addusergroup::get_ui
+     * @covers       \notificationsaction_addusergroup\addusergroup::get_ui
+     *
+     * @dataProvider dataprovidergetui
      */
     public function test_getui() {
         $courseid = self::$coursetest->id;
@@ -191,6 +234,11 @@ class addusergroup_test extends \advanced_testcase {
         $uiactivityname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_ACTIVITY);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
+    }
+
+    public static function dataprovidergetui(): Generator {
+        yield ['creategroup' => false];
+        yield ['creategroup' => true];
     }
 
     /**

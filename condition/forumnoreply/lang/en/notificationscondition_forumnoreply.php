@@ -24,13 +24,12 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_forumnoreply
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 $string['pluginname'] = 'Condition of a thread opened by the user without a response.';
 $string['conditiontext'] = 'An open thread by the user in the [FFFF] forum without any response for more than [TTTT] time.';

@@ -42,4 +42,4 @@ $string['modname'] = 'courseend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['courseend_crontask'] = 'courseend cron task';
-
+$string['validation_editrule_form_dateend'] = 'Ikastaroaren amaiera data gehitu behar duzu';

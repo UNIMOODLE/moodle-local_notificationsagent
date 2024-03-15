@@ -22,7 +22,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_sessionstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -32,21 +32,42 @@
 namespace notificationscondition_sessionstart;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
+/**
+ * This class handles the condition of session start.
+ */
 class sessionstart extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'sessionstart';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_sessionstart');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_sessionstart');
     }
@@ -59,8 +80,6 @@ class sessionstart extends notificationconditionplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(evaluationcontext $context): bool {
-        // Miramos mdl_notificationsagent_cache si hay registro, comprobar.
-        // si no hay registro comprobar en la tabla del plugin.
         global $DB;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
@@ -70,7 +89,6 @@ class sessionstart extends notificationconditionplugin {
         $params = json_decode($context->get_params());
         $meetcondition = false;
 
-        // Timestart es el tiempo de primer acceso más time.
         $timestart = $DB->get_field(
             'notificationsagent_cache',
             'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
@@ -92,25 +110,54 @@ class sessionstart extends notificationconditionplugin {
 
     }
 
+    /**
+     * Get the user interface of the subplugin
+     *
+     * @param editrule_form $mform
+     * @param int           $id
+     * @param int           $courseid
+     * @param string        $type
+     *
+     * @return void
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         $this->get_ui_select_date($mform, $id, $type);
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     * Estimate the next time the condition will be true.
+     *
+     * @param evaluationcontext $context Context for the condition evaluation.
+     *
+     * @return mixed Estimated time as a Unix timestamp or null if cannot be estimated.
+     */
     public function estimate_next_time(evaluationcontext $context) {
         // No devolvemos fecha en los subplugins que responden a un evento core de moodle.
         return null;
     }
 
+    /**
+     * Checks whether the user has the capability to use the condition within a given context.
+     *
+     * @param \context $context The context to check the capability in.
+     *
+     * @return bool True if the user has the capability, false otherwise.
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:sessionstart', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -126,6 +173,18 @@ class sessionstart extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -133,25 +192,39 @@ class sessionstart extends notificationconditionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
+    /**
+     * Get if it is generic.
+     *
+     * @return boolean
+     */
     public function is_generic() {
         return false;
     }
 
+    /**
+     * Set the defalut values
+     *
+     * @param editrule_form $form
+     * @param int           $id
+     *
+     * @return void
+     */
     public function set_default($form, $id) {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);
     }
 
     /**
-     * @param $userid
-     * @param $courseid
-     * @param $timeaccess
+     * Set the first course access for a user.
      *
-     * @return void
-     * @throws \dml_exception
+     * @param int $userid
+     * @param int $courseid
+     * @param int $timeaccess
+     *
+     * @return bool
      */
     public static function set_first_course_access($userid, $courseid, $timeaccess) {
         global $DB;
@@ -163,14 +236,17 @@ class sessionstart extends notificationconditionplugin {
             $objdb->firstaccess = $timeaccess;
             $DB->insert_record('notificationsagent_crseview', $objdb);
         }
+
+        return $exists;
     }
 
     /**
-     * @param $userid
-     * @param $courseid
+     * Get the first access time for a specific user and course.
      *
-     * @return false|mixed
-     * @throws dml_exception
+     * @param int $userid   description of user id
+     * @param int $courseid description of course id
+     *
+     * @return mixed description of the return value
      */
     public static function get_first_course_access($userid, $courseid) {
         global $DB;

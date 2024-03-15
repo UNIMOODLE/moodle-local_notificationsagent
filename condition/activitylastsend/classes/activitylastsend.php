@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitylastsend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,22 +33,31 @@
 
 namespace notificationscondition_activitylastsend;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
-
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
 class activitylastsend extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'activitylastsend';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_activitylastsend');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]', '[AAAA]'];
     }
@@ -143,6 +152,18 @@ class activitylastsend extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -156,16 +177,64 @@ class activitylastsend extends notificationconditionplugin {
         $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function is_generic() {
         return false;
     }
 
+    /**
+     * Set the defalut values
+     *
+     * @param editrule_form $form
+     * @param int           $id
+     *
+     * @return void
+     */
     public function set_default($form, $id) {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);
     }
 
+    /**
+     * Get the files that have not been modified by the user in the activity for a specified time.
+     *
+     * @param int $cmid          The course module id.
+     * @param int $userid        The user id.
+     * @param int $conditiontime The end time for the course module.
+     * @param int $crontasktime  The time of the cron task.
+     *
+     * @return object The file that has not been modified for the specified time
+     */
+    public static function get_cmidfiles($cmid, $userid, $conditiontime, $crontasktime) {
+        global $DB;
+
+        $data = [];
+
+        $sql = '
+            SELECT f.id, f.userid, f.timemodified
+              FROM {context} ctx
+              JOIN {files} f
+                ON ctx.id = f.contextid
+               AND ctx.instanceid = :cmid
+               AND ctx.contextlevel = :contextlevel
+             WHERE f.filesize <> 0
+               AND f.timemodified < :now + :time
+               AND f.userid = :userid
+        ';
+
+        $data = $DB->get_record_sql(
+            $sql,
+            [
+                'cmid' => $cmid,
+                'contextlevel' => CONTEXT_MODULE,
+                'userid' => $userid,
+                'time' => $conditiontime,
+                'now' => $crontasktime,
+            ]
+        );
+
+        return $data;
+    }
 }

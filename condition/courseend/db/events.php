@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_courseend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -35,6 +35,6 @@
 // Used for updating temporary triggers in case of configuration changes in a course.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname'   => 'core\event\course_updated',
+    'eventname' => 'core\event\course_updated',
     'callback' => 'notificationscondition_courseend_observer::course_updated',
 ];

@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició relativa a fa més de [TTTT] des del darrer enviament de contingut de l\'estudiant a l\'activitat';
@@ -42,4 +41,3 @@ $string['modname'] = 'activitylastsend';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'activitylastsend cron task';
-

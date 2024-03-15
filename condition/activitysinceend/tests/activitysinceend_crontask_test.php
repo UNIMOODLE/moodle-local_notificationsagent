@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitysinceend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -45,14 +45,41 @@ require_once(__DIR__ . '/../../../../../lib/completionlib.php');
  */
 class activitysinceend_crontask_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var \stdClass
+     */
     private static $course;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    /**
+     * Activity date start
+     */
     public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
+    /**
+     * Activity date end
+     */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * User first access to a course
+     */
     public const USER_FIRSTACCESS = 1704099600;
+    /**
+     * User last access to a course
+     */
     public const USER_LASTACCESS = 1704099600;
 
     final public function setUp(): void {

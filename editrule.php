@@ -75,13 +75,19 @@ $courseid = $COURSE->id;
 $url = new moodle_url('/local/notificationsagent/editrule.php');
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
+$heading = rule::RULE_TYPE === $ruletype
+    ? get_string('editrule_newrule', 'local_notificationsagent')
+    : get_string(
+        'editrule_newtemplate', 'local_notificationsagent'
+    );
 $PAGE->set_title(
-    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
+    $heading . " - " .
     get_string('heading', 'local_notificationsagent')
 );
+
 $PAGE->set_heading(
     ($typeaction == 'add'
-        ? get_string('editrule_newrule', 'local_notificationsagent')
+        ? $heading
         : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
     get_string('heading', 'local_notificationsagent')
 );
@@ -112,10 +118,10 @@ $PAGE->requires->js_call_amd(
 );
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
 
-// LOAD RULE
+// LOAD RULE.
 $ruleid = optional_param('ruleid', null, PARAM_INT);
 $ruleid = empty($ruleid) ? null : $ruleid;
-$rule = rule::create_instance($ruleid);
+$rule = new rule($ruleid);
 $customdata = [
     'ruleid' => $rule->get_id(),
     notificationplugin::TYPE_CONDITION => $rule->get_conditions(),

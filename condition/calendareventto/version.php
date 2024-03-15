@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendareventto
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -32,6 +32,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023101803;
+$plugin->version = 2023101804;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationscondition_calendareventto';

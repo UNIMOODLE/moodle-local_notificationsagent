@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitymodified
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -45,16 +45,47 @@ use local_notificationsagent\form\editrule_form;
  */
 class activitymodified_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    private static $activity;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -73,45 +104,76 @@ class activitymodified_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'activitymodified';
         self::$elements = ['[AAAA]'];
+        self::$activity = self::getDataGenerator()->create_module('assign', ['course' => self::$coursetest->id]);
     }
 
     /**
      *
-     * @param int    $timeaccess
-     * @param string $param
-     * @param bool   $expected
+     * @param int  $timeaccess    Time access
+     * @param bool $usecache      Use cache?
+     * @param bool $useuploadfile Use an uploaded file?
+     * @param bool $expected      Expected result
      *
      * @covers       \notificationscondition_activitymodified\activitymodified::evaluate
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $param, $expected) {
-        self::$context->set_params($param);
+    public function test_evaluate($timeaccess, $usecache, $useuploadfile, $expected) {
+        global $DB;
+
+        self::$context->set_params(
+            json_encode(
+                ['cmid' => self::$activity->cmid],
+            )
+        );
         self::$context->set_timeaccess($timeaccess);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        global $DB;
-        $params = json_decode(self::$context->get_params(), true);
-        $objdb = new \stdClass();
-        $objdb->userid = self::$user->id;
-        $objdb->courseid = self::$coursetest->id;
-        $objdb->timestart = self::COURSE_DATESTART + $params['time'];
-        $objdb->pluginname = self::$subtype;
-        $objdb->conditionid = self::CONDITIONID;
-        // Insert.
-        $DB->insert_record('notificationsagent_cache', $objdb);
+        uopz_set_return('time', self::$context->get_timeaccess());
+        $activityctx = \context_module::instance(self::$activity->cmid);
+
+        if ($usecache) {
+            $objdb = new \stdClass();
+            $objdb->userid = self::$user->id;
+            $objdb->courseid = self::$coursetest->id;
+            $objdb->timestart = self::COURSE_DATESTART + 864000;
+            $objdb->pluginname = self::$subtype;
+            $objdb->conditionid = self::CONDITIONID;
+            // Insert.
+            $DB->insert_record('notificationsagent_cache', $objdb);
+        }
+
+        if ($useuploadfile) {
+            $fs = get_file_storage();
+            $filerecord = [
+                'contextid' => $activityctx->id,
+                'component' => 'mod_assign',
+                'filearea' => 'content',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'user-test-file.txt',
+                'userid' => self::$user->id,
+                'timecreated' => $timeaccess + 60,
+                'timemodified' => $timeaccess + 60,
+            ];
+
+            $fs->create_file_from_string($filerecord, 'User upload');
+        }
 
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
 
+        uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {
         return [
-            [1704445200, '{"time":864000}', false],
-            [1706173200, '{"time":864000}', true],
-            [1707123600, '{"time":864000}', true],
+            'Testing evaluate with cache #0' => [1704445200, true, false, false],
+            'Testing evaluate with cache #1' => [1706173200, true, false, true],
+            'Testing evaluate with cache #2' => [1707123600, true, false, true],
+            'Testing evaluate without cache and an uploaded file 1 minute ago' => [1707123600, false, true, true],
+            'Testing evaluate without cache and not uploaded file' => [1707123600, false, false, false],
         ];
     }
 
@@ -225,5 +287,64 @@ class activitymodified_test extends \advanced_testcase {
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
 
+    /**
+     * @return void
+     * @throws \coding_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
+     * @covers       \notificationscondition_activitymodified\activitymodified::get_any_new_content
+     * @dataProvider dataprovider_getanynewcontent
+     */
+    public function test_get_any_new_content($fileuploadtime, $eventtimecreation, $expected) {
+        $activity = $this->getDataGenerator()->create_module('assign', ['course' => self::$coursetest->id]);
+        $activityctx = \context_module::instance($activity->cmid);
+
+        $editingteacher = self::getDataGenerator()->create_and_enrol(self::$coursetest, 'editingteacher');
+
+        if (!is_null($fileuploadtime)) {
+            $fs = get_file_storage();
+            $filerecord = [
+                'contextid' => $activityctx->id,
+                'component' => 'mod_assign',
+                'filearea' => 'content',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'teacher-test-file.txt',
+                'userid' => $editingteacher->id,
+                'timecreated' => $fileuploadtime,
+                'timemodified' => $fileuploadtime,
+            ];
+
+            $fs->create_file_from_string($filerecord, 'Teacher upload');
+        }
+
+        $istherecontent = activitymodified::get_any_new_content(
+            $activity->cmid, $eventtimecreation
+        );
+
+        if (!is_null($fileuploadtime)) {
+            $this->assertEquals($istherecontent, $expected);
+        } else {
+            $this->assertFalse($istherecontent);
+        }
+    }
+
+    /**
+     * Set up the data to be used in the test_get_any_new_content execution.
+     *
+     * @return array
+     */
+    public static function dataprovider_getanynewcontent(): array {
+        return [
+            'Testing a file that was not uploaded' => [null, 1709796705, false],
+            'Testing a file that was uploaded 1 second ago' => [1709793643, 1709793644, true],
+            'Testing a file that was uploaded 30 seconds ago' => [1709793809, 1709793839, true],
+            'Testing a file that was uploaded 59 seconds ago' => [1709793960, 1709794019, true],
+            'Testing a file that was uploaded 1 minute ago' => [1709793104, 1709793164, true],
+            'Testing a file that was uploaded 2 minutes ago' => [1709794112, 1709794232, false],
+            'Testing a file that was uploaded 7 minutes ago' => [1709880112, 1709880532, false],
+            'Testing a file that was uploaded several days ago' => [1709966932, 1711443119, false],
+        ];
+    }
 }
 

@@ -31,7 +31,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_notificationsagent;
+namespace local_notificationsagent\engine;
 
 use local_notificationsagent\engine\notificationsagent_engine;
 use local_notificationsagent\evaluationcontext;
@@ -39,22 +39,66 @@ use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
 
 /**
+ * Testing notificationsagent engine class
+ *
  * @group notificationsagent
  */
 class notificationsagent_engine_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+
+    /**
+     * @var \stdClass
+     */
     private static $course;
+
+    /**
+     * @var \stdClass
+     */
     private static $cmteste;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    /**
+     * Activity date start
+     */
     public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
+    /**
+     * Activity date end
+     */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * User first access to a course
+     */
     public const USER_FIRSTACCESS = 1704099600; // 30/01/2024 10:00:00,
+    /**
+     * User last access to a course
+     */
     public const USER_LASTACCESS = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     *  Random id for activity
+     */
     public const CMID = 246000;
 
+    /**
+     * Settin up test context
+     *
+     * @return void
+     * @throws \coding_exception
+     */
     final public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -81,12 +125,20 @@ class notificationsagent_engine_test extends \advanced_testcase {
     }
 
     /**
-     * @return void
+     * Testin engine evaluate rule
+     *
      * @dataProvider dataprovider
-     * @throws \dml_exception
-     * @covers ::notificationsagent_engine_evaluate_rule
+     *
+     * @param int   $date
+     * @param array $conditiondata
+     * @param array $exceptiondata
+     * @param array $actiondata
+     * @param bool  $genericuser
+     * @param bool  $expected
+     *
+     * @return void
+     * @covers       ::notificationsagent_engine_evaluate_rule
      */
-
     public function test_notificationsagent_engine_evaluate_rule(
         int $date, array $conditiondata, array $exceptiondata, array $actiondata, bool $genericuser, bool $expected
     ) {
@@ -185,6 +237,11 @@ class notificationsagent_engine_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for engine
+     *
+     * @return array[]
+     */
     public static function dataprovider(): array {
         return [
             [ // ACCION A UNO.
@@ -198,8 +255,8 @@ class notificationsagent_engine_test extends \advanced_testcase {
                         'pluginname' => 'messageagent',
                         'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName} {User_LastName} {User_Email} {User_Username} {User_Address} {Course_FullName} {Course_Url} {Teacher_FirstName} {Teacher_LastName} {Teacher_Email} {Teacher_Username} {Teacher_Address} {Current_time} "}
-                        }'
-                    ]
+                        }',
+                    ],
                 ],
                 false,
                 true,
@@ -215,7 +272,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
                     [
                         'pluginname' => 'messageagent',
                         'params' => '{
-                        "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
+                        "title":"Title" ,"message":{"text":"Message to {User_FirstName} {Follow_Link}"}
                         }',
                     ],
                 ],
@@ -225,7 +282,6 @@ class notificationsagent_engine_test extends \advanced_testcase {
             [
                 1706173200,
                 [
-                    //['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
                     ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
                 ],
                 [['pluginname' => '', 'params' => '']],
@@ -280,7 +336,6 @@ class notificationsagent_engine_test extends \advanced_testcase {
                 1706173200,
                 [
                     ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
-                    //['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
                 ],
                 [['pluginname' => '', 'params' => '']],
                 [

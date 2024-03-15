@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_forumnoreply
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -41,20 +41,55 @@ use local_notificationsagent\rule;
 use notificationscondition_forumnoreply\forumnoreply;
 
 /**
+ * Test forumnoreply class
+ *
  * @group notificationsagent
  */
 class forumnoreply_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
+    /**
+     * @var \notificationscondition_forumnoreply\forumnoreply
+     */
     private static $subplugin;
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -76,6 +111,7 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing evaluate
      *
      * @param int    $timeaccess
      * @param string $param
@@ -107,6 +143,11 @@ class forumnoreply_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for evaluate
+     *
+     * @return array[]
+     */
     public static function dataprovider(): array {
         return [
 
@@ -118,6 +159,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing getsubtype
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_subtype
      */
     public function test_getsubtype() {
@@ -125,6 +168,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing is generic
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::is_generic
      */
     public function test_isgeneric() {
@@ -132,6 +177,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing get elements
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_elements
      */
     public function test_getelements() {
@@ -139,6 +186,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::check_capability
      */
     public function test_checkcapability() {
@@ -149,6 +198,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing estimate next timee
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::estimate_next_time
      */
     public function test_estimatenexttime() {
@@ -157,6 +208,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing get cmid
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_cmid
      */
     public function test_getcmid() {
@@ -164,6 +217,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing get title
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_title
      */
     public function test_gettitle() {
@@ -174,6 +229,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing get description
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_description
      */
     public function test_getdescription() {
@@ -187,6 +244,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::process_markups
      */
     public function test_processmarkups() {
@@ -207,6 +266,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Test get user interface
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_ui
      */
     public function test_getui() {
@@ -253,6 +314,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Testing set default
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::set_default
      */
     public function test_setdefault() {
@@ -304,6 +367,8 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters
+     *
      * @covers \notificationscondition_forumnoreply\forumnoreply::convert_parameters
      */
     public function test_convertparameters() {
@@ -321,4 +386,3 @@ class forumnoreply_test extends \advanced_testcase {
     }
 
 }
-

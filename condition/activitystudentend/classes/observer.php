@@ -24,19 +24,16 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitystudentend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
-
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
+use notificationscondition_activitystudentend\activitystudentend;
 
 class notificationscondition_activitystudentend_observer {
 
@@ -44,10 +41,6 @@ class notificationscondition_activitystudentend_observer {
      * @throws dml_exception
      */
     public static function course_module_viewed($event) {
-        if ($event->courseid == 1 || !isloggedin()) {
-            return;
-        }
-
         $courseid = $event->courseid;
         $cmid = $event->objectid;
         $userid = $event->userid;
@@ -55,7 +48,7 @@ class notificationscondition_activitystudentend_observer {
 
         $pluginname = 'activitystudentend';
 
-        set_activity_access($userid, $courseid, $cmid, $timecreated);
+        activitystudentend::set_activity_access($userid, $courseid, $cmid, $timecreated);
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
 
@@ -70,6 +63,7 @@ class notificationscondition_activitystudentend_observer {
             )
             ) {
                 notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $condtionid, true);
+                notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $userid, $courseid, $cache);
             }
         }
     }

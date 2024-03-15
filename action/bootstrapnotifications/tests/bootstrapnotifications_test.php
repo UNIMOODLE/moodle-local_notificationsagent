@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_bootstrapnotifications
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -41,20 +41,54 @@ use local_notificationsagent\rule;
 use notificationsaction_bootstrapnotifications\bootstrapnotifications;
 
 /**
+ * Test boostrapnotificationss
+ *
  * @group notificationsagent
  */
 class bootstrapnotifications_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -78,7 +112,6 @@ class bootstrapnotifications_test extends \advanced_testcase {
     /**
      *
      * @param string $param
-     * @param bool   $expected
      *
      * @covers       \notificationsaction_bootstrapnotifications\bootstrapnotifications::execute_action
      *
@@ -197,7 +230,10 @@ class bootstrapnotifications_test extends \advanced_testcase {
      */
     public function test_processmarkups() {
         $UI_MESSAGE = 'test message';
-        $expected = str_replace(self::$subplugin->get_elements(), [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $UI_MESSAGE))], self::$subplugin->get_title());
+        $expected = str_replace(
+            self::$subplugin->get_elements(), [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $UI_MESSAGE))],
+            self::$subplugin->get_title()
+        );
         $params[self::$subplugin::UI_MESSAGE] = $UI_MESSAGE;
         $params = json_encode($params);
         self::$subplugin->set_parameters($params);
@@ -206,4 +242,3 @@ class bootstrapnotifications_test extends \advanced_testcase {
         $this->assertSame([$expected], $content);
     }
 }
-

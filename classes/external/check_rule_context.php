@@ -34,9 +34,6 @@
 
 namespace local_notificationsagent\external;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
 use local_notificationsagent\rule;
 
 /**
@@ -59,12 +56,14 @@ class check_rule_context extends \external_api {
      * Return a list of the required fields
      *
      * @param int $ruleid The rule ID
+     *
      * @return array
      */
     public static function execute(int $ruleid) {
         [
             'ruleid' => $ruleid,
-        ] = self::validate_parameters(self::execute_parameters(), [
+        ]
+            = self::validate_parameters(self::execute_parameters(), [
             'ruleid' => $ruleid,
         ]);
 
@@ -72,7 +71,18 @@ class check_rule_context extends \external_api {
 
         $instance = rule::create_instance($ruleid);
         if (empty($instance)) {
-            throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
+            try {
+                throw new \moodle_exception(
+                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                );
+            } catch (\moodle_exception $e) {
+                $result['warnings'][] = [
+                    'item' => 'local_notificationsagent',
+                    'warningcode' => $e->errorcode,
+                    'message' => $e->getMessage(),
+                ];
+                return $result;
+            }
         }
         $context = \context_course::instance($instance->get_default_context());
 
@@ -80,7 +90,8 @@ class check_rule_context extends \external_api {
             if (has_capability('local/notificationsagent:checkrulecontext', $context)) {
                 $result['hascontext'] = $instance->has_context();
             } else {
-                throw new \moodle_exception('nopermissions', '', '',
+                throw new \moodle_exception(
+                    'nopermissions', '', '',
                     get_capability_string('local/notificationsagent:checkrulecontext')
                 );
             }

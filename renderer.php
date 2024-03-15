@@ -32,6 +32,13 @@
  */
 class local_notificationsagent_renderer extends plugin_renderer_base {
 
+    /**
+     * Function for the Tabs.
+     *
+     * @param string $tabtarget description
+     *
+     * @return string
+     */
     public function tabnav($tabtarget) {
         $classnabdefault = "nav-item nav-link";
         $classnavconditions = ($tabtarget == 'nav-conditions-tab') ? $classnabdefault . ' active' : $classnabdefault;

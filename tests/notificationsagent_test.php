@@ -33,23 +33,56 @@
 
 namespace local_notificationsagent;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Testing notificationsagent class
+ *
  * @group notificationsagent
  */
 class notificationsagent_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var \stdClass
+     */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $cmtestnt;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
-    public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
-    public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
-    public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * Date end for the course
+     */
+    public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00-
+    /**
+     * Activity date start
+     */
+    public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Activity date end
+     */
+    public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00.
+    /**
+     * User first access to a course
+     */
     public const USER_FIRSTACCESS = 1704099600;
+    /**
+     * User last access to a course
+     */
     public const USER_LASTACCESS = 1704099600;
+    /**
+     *  Random id for activity
+     */
     public const CMID = 246000;
 
     final public function setUp(): void {
@@ -59,7 +92,9 @@ class notificationsagent_test extends \advanced_testcase {
         $rule->set_name("Rule Test");
         $rule->set_id(246000);
         $rule->set_runtime(['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0]);
-        self::$rule = $rule;
+        $rule->set_status(0);
+        $rule->set_template(1);
+
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
@@ -78,14 +113,23 @@ class notificationsagent_test extends \advanced_testcase {
         ]);
 
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
+        self::$rule = $rule;
 
     }
 
     /**
-     * Testing notificationsagent_condition_get_cm_dates.
+     *  * Testing notificationsagent_condition_get_cm_dates.
      *
      * @covers       \local_notificationsagent\notificationsagent::notificationsagent_condition_get_cm_dates
      * @dataProvider dataprovider
+     *
+     * @param int    $timeopen
+     * @param int    $timeclose
+     * @param string $modname
+     * @param string $fieldopen
+     * @param string $fieldclose
+     *
+     * @return void
      */
     public function test_notificationsagent_condition_get_cm_dates($timeopen, $timeclose, $modname, $fieldopen, $fieldclose) {
         $this->resetAfterTest();
@@ -93,12 +137,13 @@ class notificationsagent_test extends \advanced_testcase {
         $manager = self::getDataGenerator()->create_and_enrol($course, 'manager');
         self::setUser($manager);
         $cmtest = self::getDataGenerator()->create_module(
-            "{$modname}", [
-            'name' => 'Quiz unittest',
-            'course' => $course->id,
-            "{$fieldopen}" => $timeopen,
-            "{$fieldclose}" => $timeclose,
-        ],
+            "{$modname}",
+            [
+                'name' => 'Quiz unittest',
+                'course' => $course->id,
+                "{$fieldopen}" => $timeopen,
+                "{$fieldclose}" => $timeclose,
+            ],
         );
 
         $result = notificationsagent::notificationsagent_condition_get_cm_dates($cmtest->cmid);
@@ -107,6 +152,9 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals($timeclose, $result->timeend);
     }
 
+    /**
+     * Dataprovider for condition_get_cm_dates
+     */
     public static function dataprovider(): array {
         return [
             [1704099600, 1705741200, 'assign', 'allowsubmissionsfromdate', 'duedate'],
@@ -124,9 +172,14 @@ class notificationsagent_test extends \advanced_testcase {
     /**
      * Testing was_launched_indicated_times.
      *
+     * @param int  $timesfired
+     * @param int  $firedtimes
+     * @param bool $expected
+     *
      * @return void
      * @throws \dml_exception
      * @dataProvider launched_provider
+     * @covers       \local_notificationsagent\notificationsagent::was_launched_indicated_times
      */
     public function test_was_launched_indicated_times($timesfired, $firedtimes, $expected) {
         global $DB;
@@ -149,6 +202,11 @@ class notificationsagent_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Dataprovider for launched
+     *
+     * @return array[]
+     */
     public static function launched_provider(): array {
         return [
             [3, 3, true],
@@ -157,13 +215,19 @@ class notificationsagent_test extends \advanced_testcase {
         ];
     }
 
+    /**
+     * Testing get_userbycourse
+     *
+     * @covers \local_notificationsagent\notificationsagent::get_usersbycourse
+     * @return void
+     */
     public function test_get_usersbycourse() {
         $context = \context_course::instance(self::$course->id);
         $noenrolluser = self::getDataGenerator()->create_user();
         $manager = self::getDataGenerator()->create_and_enrol(self::$course, 'manager');
         $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'teacher');
         $studentsuspended = self::getDataGenerator()->create_and_enrol(self::$course, 'student', ['suspended' => 1]);
-        //$studentnotactive = self::getDataGenerator()->create_and_enrol(self::$course, 'student', ['status' => 1]);
+        // ... $studentnotactive = self::getDataGenerator()->create_and_enrol(self::$course, 'student', ['status' => 1]);
 
         $this->assertCount(1, notificationsagent::get_usersbycourse($context));
         $this->assertEquals(self::$user->id, notificationsagent::get_usersbycourse($context)[self::$user->id]->id);
@@ -380,5 +444,296 @@ class notificationsagent_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Testing get_conditions_by_course
+     *
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_course
+     * @return void
+     */
+    public function test_get_conditions_by_course() {
+        global $USER, $DB;
+        // Rule.
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+
+        $defaultcontext = self::$rule->get_default_context();
+
+        $this->assertIsNumeric($defaultcontext);
+
+        $context = self::$rule->has_context();
+        $this->assertTrue($context);
+
+        // Condition.
+        $pluginname = 'sessionend';
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"86400"}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $DB->insert_record('notificationsagent_condition', $objdb);
+
+        rule::create_instance($ruleid);
+        $data = notificationsagent::get_conditions_by_course($pluginname, self::$course->id);
+
+        $data = $data[key($data)];
+        $this->assertEquals(self::$rule->get_id(), $data->ruleid);
+        $this->assertEquals(self::$course->id, $data->courseid);
+        $this->assertEquals($pluginname, $data->pluginname);
+
+    }
+
+    /**
+     * Testing get_conditons_by_cm
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_cm
+     */
+    public function test_get_conditions_by_cm() {
+        global $DB, $USER;
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        // Condition.
+        $pluginname = 'sessionend';
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"86400"}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $DB->insert_record('notificationsagent_condition', $objdb);
+
+        $instance = rule::create_instance($ruleid);
+        $context = self::$rule->get_default_context();
+        $this->assertNotEmpty($context);
+
+        $conditions = notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID);
+        $conditions = $conditions[key($conditions)];
+
+        $this->assertEquals($instance->get_id(), $conditions->ruleid);
+        $this->assertEquals($pluginname, $conditions->pluginname);
+        $this->assertEquals(self::CMID, $conditions->cmid);
+        $this->assertEquals($instance->get_timesfired(), $conditions->ruletimesfired);
+        $this->assertEquals($instance->get_conditions($pluginname)[0]->get_parameters(), $conditions->parameters);
+
+    }
+
+    /**
+     * Testing get conditions by plugin
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_plugin
+     */
+    public function test_get_conditions_by_plugin() {
+        global $DB, $USER;
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+
+        // Condition.
+        $pluginname = 'sessionstart';
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"86400"}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $DB->insert_record('notificationsagent_condition', $objdb);
+
+        $instance = rule::create_instance($ruleid);
+        $context = self::$rule->get_default_context();
+        $this->assertNotEmpty($context);
+
+        $result = notificationsagent::get_conditions_by_plugin($pluginname);
+        $result = $result[key($result)];
+
+        $this->assertEquals($instance->get_id(), $result->ruleid);
+        $this->assertEquals(self::$course->id, $result->courseid);
+        $this->assertEquals($pluginname, $result->pluginname);
+        $this->assertEquals($instance->get_timesfired(), $result->ruletimesfired);
+        $this->assertEquals($instance->get_conditions($pluginname)[0]->get_parameters(), $result->parameters);
+
+    }
+
+    /**
+     * Testing get availability conditions
+     *
+     * @return void
+     * @covers \local_notificationsagent\notificationsagent::get_availability_conditions
+     */
+    public function test_get_availability_conditions() {
+        global $USER, $DB;
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+        $pluginname = 'ac';
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+        $this->assertIsNumeric($conditionid);
+        $defaultcontext = self::$rule->get_default_context();
+        $this->assertIsNumeric($defaultcontext);
+
+        $rule = rule::create_instance(self::$rule->get_id());
+
+        $data = notificationsagent::get_availability_conditions();
+        $data = $data[key($data)];
+
+        $this->assertEquals($rule->get_id(), $data->ruleid);
+        $this->assertEquals(self::$course->id, $data->courseid);
+        $this->assertEquals($rule->get_timesfired(), $data->ruletimesfired);
+
+    }
+
+    /**
+     * Testing get_course_category_context_byruleid
+     *
+     * @return void
+     * @covers \local_notificationsagent\notificationsagent::get_course_category_context_byruleid
+     */
+    public function test_get_course_category_context_byruleid() {
+        global $DB, $USER;
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+        $data = notificationsagent::get_course_category_context_byruleid($ruleid);
+        $data = $data[key($data)];
+        $this->assertEquals(self::$course->id, $data);
+
+    }
+
+    /**
+     * Testing is rule off
+     *
+     * @covers       \local_notificationsagent\notificationsagent::is_ruleoff
+     * @dataProvider ruleoffprovider
+     *
+     * @param int|null $ruleoff
+     * @param bool     $expected
+     *
+     * @return void
+     * @throws \dml_exception
+     */
+    public function test_is_ruleoff($ruleoff, $expected) {
+        global $DB;
+        $ruleid = self::$rule->get_id();
+        $courseid = self::$course->id;
+        $pluginname = 'sessionstart';
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = $courseid;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":84600}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+        $this->assertIsNumeric($conditionid);
+
+        $objdbtrigger = new \stdClass();
+        $objdbtrigger->ruleid = self::$rule->get_id();
+        $objdbtrigger->conditionid = $conditionid;
+        $objdbtrigger->courseid = $courseid;
+        $objdbtrigger->userid = self::$user->id;
+        $objdbtrigger->startdate = time();
+        $objdbtrigger->ruleoff = $ruleoff;
+
+        // Insert.
+        $cacheid = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
+        $this->assertIsNumeric($cacheid);
+
+        $this->assertSame($expected, notificationsagent::is_ruleoff(self::$rule->get_id(), self::$user->id));
+
+    }
+
+    /**
+     * Provider for ruleoff
+     *
+     * @return array[]
+     */
+    public static function ruleoffprovider(): array {
+        return [
+            [1704099600, true],
+            [null, false],
+        ];
+    }
 }
 

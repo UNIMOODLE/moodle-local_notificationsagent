@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_forumnoreply
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,14 +33,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 $tasks = [
-        [
+    [
         'classname' => 'notificationscondition_forumnoreply\task\forumnoreply_crontask',
         'blocking' => 0,
         'minute' => '*/10',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*', ],
+        'month' => '*',
+    ],
 ];

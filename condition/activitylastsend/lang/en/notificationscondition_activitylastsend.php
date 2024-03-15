@@ -24,12 +24,12 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package     notificationscondition_activitylastsend
  * @category    string
- * @copyright  2023 Proyecto UNIMOODLE
- * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * @author     ISYC <soporte@isyc.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2023 Proyecto UNIMOODLE
+ * @author      UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author      ISYC <soporte@isyc.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -41,4 +41,3 @@ $string['modname'] = 'activitylastsend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'Activity end cron task';
-

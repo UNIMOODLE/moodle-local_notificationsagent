@@ -70,7 +70,7 @@ class removeusergroup extends notificationactionplugin {
             $listgroups
         );
 
-        $mform->insertElementBefore($group, 'new'.$type.'_group');
+        $mform->insertElementBefore($group, 'new' . $type . '_group');
     }
 
     /**
@@ -80,10 +80,20 @@ class removeusergroup extends notificationactionplugin {
         return get_string('subtype', 'notificationsaction_removeusergroup');
     }
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('removeusergroup_action', 'notificationsaction_removeusergroup');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[GGGG]'];
     }
@@ -98,13 +108,25 @@ class removeusergroup extends notificationactionplugin {
      * @return mixed
      */
     protected function convert_parameters($id, $params) {
-        $params = (array)$params;
+        $params = (array) $params;
         $group = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
         $this->set_parameters(json_encode([self::UI_ACTIVITY => $group]));
         return $this->get_parameters();
     }
 
-    public function process_markups(&$content, $courseid, $options=null) {
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
+    public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
         $group = groups_get_group_name($jsonparams->{self::UI_ACTIVITY});
@@ -113,7 +135,7 @@ class removeusergroup extends notificationactionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function execute_action($context, $params) {

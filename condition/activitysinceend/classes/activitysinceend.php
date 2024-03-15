@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitysinceend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -34,17 +34,30 @@
 namespace notificationscondition_activitysinceend;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
 class activitysinceend extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'activitysinceend';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_activitysinceend');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]', '[AAAA]'];
     }
@@ -143,6 +156,18 @@ class activitysinceend extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -156,13 +181,21 @@ class activitysinceend extends notificationconditionplugin {
         $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function is_generic() {
         return false;
     }
 
+    /**
+     * Set the defalut values
+     *
+     * @param editrule_form $form
+     * @param int           $id
+     *
+     * @return void
+     */
     public function set_default($form, $id) {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);

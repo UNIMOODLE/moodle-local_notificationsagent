@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendarstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -38,20 +38,33 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../calendar/lib.php');
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
 class calendarstart extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'calendarstart';
     public const UI_RADIO_GROUP = 'radiogroup';
     public const UI_RADIO = 'radio';
     public const UI_RADIO_DEFAULT_VALUE = 1;
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_calendarstart');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]', '[CCCC]'];
     }
@@ -193,6 +206,18 @@ class calendarstart extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -200,13 +225,21 @@ class calendarstart extends notificationconditionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function is_generic() {
         return true;
     }
 
+    /**
+     * Set the defalut values
+     *
+     * @param editrule_form $form
+     * @param int           $id
+     *
+     * @return void
+     */
     public function set_default($form, $id) {
         $params = $this->set_default_select_date($id);
         $params[$this->get_name_ui($id, self::UI_RADIO)] = self::UI_RADIO_DEFAULT_VALUE;

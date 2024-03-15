@@ -21,7 +21,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_weekend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -36,20 +36,25 @@ use core_calendar\type_factory;
 
 class weekend extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'weekend';
     public const UI_DESCRIPTION = 'description';
 
     /**
+     * Subplugin title
+     *
      * @return \lang_string|string
-     * @throws \coding_exception
      */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_weekend');
     }
 
     /**
-     * @return array
+     *  Subplugins elements
+     *
+     * @return string[]
      */
     public function get_elements() {
         return [];
@@ -131,12 +136,16 @@ class weekend extends notificationconditionplugin {
     }
 
     /**
-     * @param $content
-     * @param $courseid
-     * @param $options
+     * Process and replace markups in the supplied content.
      *
-     * @return string|void
-     * @throws \coding_exception
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
      */
     public function process_markups(&$content, $courseid, $options = null) {
         $content[] = $this->get_title();

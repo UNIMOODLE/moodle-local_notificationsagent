@@ -38,3 +38,4 @@ $string['subtype'] = 'courseend';
 $string['modname'] = 'courseend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['courseend_crontask'] = 'Course end cron task';
+$string['validation_editrule_form_dateend'] = 'It is necessary to add an course end date';

@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_usermessageagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,6 +33,7 @@
 
 namespace notificationsaction_usermessageagent;
 
+use Generator;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationplugin;
@@ -45,16 +46,47 @@ use notificationsaction_usermessageagent\usermessageagent;
  */
 class usermessageagent_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -140,7 +172,7 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationsaction_messageagent\messageagent::convert_parameters
+     * @covers \notificationsaction_usermessageagent\usermessageagent::convert_parameters
      */
     public function test_convert_parameters() {
         $params = [
@@ -213,17 +245,17 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationsaction_usermessageagent\usermessageagent::get_parameters_placeholders
-     * 
+     * @covers       \notificationsaction_usermessageagent\usermessageagent::get_parameters_placeholders
+     *
      * @dataProvider dataprovidergetparametersplaceholders
      */
     public function test_getparametersplaceholders($param) {
         $auxarray = json_decode($param, true);
-        // add cmid
+        // Add cmid.
         $auxarray[self::$subplugin::UI_USER] = self::$user->id;
         $param = json_encode($auxarray);
 
-        // format message text // delete ['text']
+        // Format message text // delete ['text'].
         $auxarray['message'] = $auxarray['message']['text'];
 
         self::$subplugin->set_parameters($param);
@@ -232,13 +264,46 @@ class usermessageagent_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
-    public static function dataprovidergetparametersplaceholders(): iterable {
+    public static function dataprovidergetparametersplaceholders(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
         yield [json_encode($data)];
         $data['title'] = 'TEST2';
         $data['message']['text'] = 'Message body';
         yield [json_encode($data)];
+    }
+
+    /**
+     * @covers \notificationsaction_usermessageagent\usermessageagent::process_markups
+     *
+     */
+    public function test_processmarkups() {
+        $UI_TITLE = 'test title';
+        $UI_MESSAGE = 'test message';
+
+        $params[self::$subplugin::UI_USER] = self::$user->id;
+        $params[self::$subplugin::UI_TITLE] = $UI_TITLE;
+        $params[self::$subplugin::UI_MESSAGE]['text'] = $UI_MESSAGE;
+        $params = json_encode($params);
+
+        $paramstoreplace = [
+            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
+            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+            shorten_text(self::$user->firstname . " " . self::$user->lastname),
+        ];
+        $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());
+
+        self::$subplugin->set_parameters($params);
+        $content = [];
+        self::$subplugin->process_markups($content, self::$coursetest->id);
+        $this->assertSame([$expected], $content);
+    }
+
+    /**
+     * @covers \notificationsaction_usermessageagent\usermessageagent::is_send_once
+     */
+    public function test_issendonce() {
+        $this->assertTrue(self::$subplugin->is_send_once(self::$user->id));
     }
 }
 

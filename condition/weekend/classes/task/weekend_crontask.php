@@ -21,7 +21,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_weekend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -63,8 +63,9 @@ class weekend_crontask extends scheduled_task {
             $condtionid = $condition->id;
 
             if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
             ) {
                 notificationsagent::set_time_trigger
                 (

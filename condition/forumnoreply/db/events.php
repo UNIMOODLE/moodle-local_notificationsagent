@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_forumnoreply
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -35,6 +35,6 @@
 // Used for updating temporary triggers in case of configuration changes in a course.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname'   => 'mod_forum\event\post_created',
+    'eventname' => 'mod_forum\event\post_created',
     'callback' => 'notificationscondition_forumnoreply_observer::post_created',
 ];

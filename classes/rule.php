@@ -33,8 +33,11 @@
 
 namespace local_notificationsagent;
 
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once("$CFG->dirroot/local/notificationsagent/lib.php");
 
+use context;
 use moodle_url;
 use context_course;
 use local_notificationsagent\notificationsagent;
@@ -42,32 +45,71 @@ use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\form\editrule_form;
 use notificationscondition_ac\ac;
 
+/**
+ * Class rule manages the rules for notifications in the notifications agent system.
+ */
 class rule {
+    /** @var int $id Unique identifier for the rule */
     private $id;
+
+    /** @var string $name Name of the rule */
     private $name;
+
+    /** @var string $description Description of the rule */
     private $description;
+
+    /** @var int $status Status of the rule, default is 0 */
     private $status = 0;
+
+    /** @var int $createdby User ID of the creator */
     private $createdby;
+
+    /** @var int $createdat Timestamp when the rule was created */
     private $createdat;
+
+    /** @var int $shared Flag indicating if the rule is shared, default is 1 */
     private $shared = 1;
+
+    /** @var int $defaultrule Flag indicating if it is a default rule, default is 1 */
     private $defaultrule = 1;
+
+    /** @var int $template Flag indicating if the rule is a template, default is 1 */
     private $template = 1;
+
+    /** @var int $forced Flag indicating if the rule is forced, default is 1 */
     private $forced = 1;
+
+    /** @var int $assigned Flag indicating if the rule is assigned, default is 1 */
     private $assigned = 1;
+
+    /** @var int $timesfired Number of times the rule has been fired, default is 1 */
     private $timesfired = 1;
+
+    /** @var int $runtime Execution runtime in seconds, default is 86400 */
     private $runtime = 86400;
+
+    /** @var mixed $ac Access control instance or null */
     private $ac = null;
+
+    /** @var array $conditions List of conditions for the rule */
     private $conditions = [];
+
+    /** @var array $exceptions List of exceptions for the rule */
     private $exceptions = [];
+
+    /** @var array $actions List of actions for the rule */
     private $actions;
-    /**
-     * @var
-     */
+
+    /** @var bool $isgeneric Flag indicating if the rule is generic */
     private $isgeneric;
+
+    /** @var mixed $dataform Data form associated with the rule */
     private $dataform;
 
+    /** @var string Separator for placeholders */
     public const SEPARATOR = '______________________';
 
+    /** @var string[] List of allowed placeholders in rule templates */
     private const PLACEHOLDERS
         = [
             'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address', 'Course_FullName', 'Course_Url',
@@ -103,15 +145,24 @@ class rule {
     /** @var int Minimum days of rule execution */
     public const MINIMUM_RUNTIME = 1;
 
-    /** Construct an empty Rule.
+    /**
+     * Constructs a Rule object and initializes its properties from a record in the database.
      *
-     * @param $rule
+     * If an ID is provided, the constructor will attempt to retrieve the corresponding
+     * record from the `notificationsagent_rule` table and populate the object's properties.
+     * It also loads additional related information such as access controls, conditions,
+     * exceptions, and actions associated with the rule.
+     *
+     * @param int|null $id Optional ID of the rule to load from the database.
      */
     public function __construct($id = null) {
         global $DB;
 
         if (!is_null($id)) {
+            // Retrieve the rule record from the database based on the provided ID.
             $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
+
+            // Set the properties of the rule object.
             $this->set_id($rule->id);
             $this->set_name($rule->name);
             $this->set_description($rule->description);
@@ -124,15 +175,22 @@ class rule {
             $this->set_forced($rule->forced);
             $this->set_timesfired($rule->timesfired);
             $this->set_runtime($rule->runtime);
-            $this->load_ac();
-            $this->load_conditions();
-            $this->load_exceptions();
-            $this->load_actions();
-            $this->is_generic();
-            $this->load_dataform();
+
+            // Load additional rule details.
+            $this->load_ac(); // Load access control settings.
+            $this->load_conditions(); // Load rule conditions.
+            $this->load_exceptions(); // Load rule exceptions.
+            $this->load_actions(); // Load rule actions.
+            $this->is_generic(); // Check if the rule is generic.
+            $this->load_dataform(); // Load the data form associated with the rule.
         }
     }
 
+    /**
+     * A function to convert the object properties into a record.
+     *
+     * @return object
+     */
     private function to_record() {
         $record = [
             'id' => $this->get_id(),
@@ -153,16 +211,28 @@ class rule {
     }
 
     /**
-     * Factory for loading a Rule from database .
+     * Creates a new rule instance.
+     *
+     * If an ID is provided, it will initialize the rule object with data from the database.
+     * If no ID is provided, it will create a new, empty rule object.
+     *
+     * @param int|null $id Optional ID of the rule to load from the database.
+     *
+     * @return rule The newly created rule object.
      */
     public static function create_instance($id = null) {
+        global $DB;
+        $rule = $DB->get_field('notificationsagent_rule', 'id', ['id' => $id]);
+        if (empty($rule)) {
+            return null;
+        }
         return new rule($id);
     }
 
     /**
      * Get the rules
      *
-     * @param object  $context  context object
+     * @param context $context  context object
      * @param integer $courseid course id
      *
      * @return array $instances Rule object
@@ -191,35 +261,45 @@ class rule {
     }
 
     /**
-     * @return mixed
+     * Retrieves the ID of the current rule.
+     *
+     * @return mixed The ID of the rule.
      */
     public function get_id() {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * Check if the object is new by checking if the id is null.
+     *
+     * @return bool
      */
     private function is_new() {
         return is_null($this->id);
     }
 
     /**
-     * @return mixed
+     * Retrieves the name of the rule.
+     *
+     * @return mixed The name of the rule.
      */
     public function get_name() {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * Sets the name of the rule.
+     *
+     * @param mixed $name The new name for the rule.
      */
     public function set_name($name): void {
         $this->name = $name;
     }
 
     /**
-     * @return mixed
+     * Retrieves the description of the rule.
+     *
+     * @return mixed The description of the rule.
      */
     public function get_description() {
         return $this->description;
@@ -239,42 +319,61 @@ class rule {
         $this->dataform = $data;
 
         if ($this->get_ac()) {
-            $dataform_ac = $this->get_ac()->load_dataform();
-            $this->dataform = array_merge($this->dataform, $dataform_ac);
+            $dataformac = $this->get_ac()->load_dataform();
+            $this->dataform = array_merge($this->dataform, $dataformac);
         }
         foreach ($this->get_conditions() as $condition) {
-            $dataform_conditions = $condition->load_dataform();
-            $this->dataform = array_merge($this->dataform, $dataform_conditions);
+            $dataformconditions = $condition->load_dataform();
+            $this->dataform = array_merge($this->dataform, $dataformconditions);
         }
         foreach ($this->get_exceptions() as $exception) {
-            $dataform_exceptions = $exception->load_dataform();
-            $this->dataform = array_merge($this->dataform, $dataform_exceptions);
+            $dataformexceptions = $exception->load_dataform();
+            $this->dataform = array_merge($this->dataform, $dataformexceptions);
         }
         foreach ($this->get_actions() as $action) {
-            $dataform_actions = $action->load_dataform();
-            $this->dataform = array_merge($this->dataform, $dataform_actions);
+            $dataformactions = $action->load_dataform();
+            $this->dataform = array_merge($this->dataform, $dataformactions);
         }
 
     }
 
     /**
-     * @return mixed
+     * Retrieves the data form array.
+     *
+     * This method returns the array representing the data form which
+     * may contain various settings and values associated with the rule.
+     *
+     * @return array The data form array.
      */
     public function get_dataform() {
         return $this->dataform;
     }
 
     /**
-     * @param mixed $description
+     * Set the description of the object.
+     *
+     * @param string $description The new description
+     *
+     * @return void
      */
     public function set_description($description): void {
         $this->description = $description;
     }
 
+    /**
+     * Get the 'activity completions'.
+     *
+     * @return notificationconditionplugin|null The 'ac' subplugin instance if loaded, null otherwise.
+     */
     public function get_ac() {
         return $this->ac;
     }
 
+    /**
+     * Load the 'ac' type condition from the database and initialize the 'ac' property.
+     *
+     * @return void
+     */
     private function load_ac() {
         global $DB;
 
@@ -287,8 +386,42 @@ class rule {
         }
     }
 
-    public function get_conditions() {
-        return $this->conditions;
+    /**
+     * Get conditions based on the plugin name.
+     *
+     * @param mixed $pluginname (optional) The plugin name to filter conditions.
+     *
+     * @return array The filtered conditions.
+     */
+    public function get_conditions($pluginname = null) {
+        $conditions = [];
+        if ($pluginname) {
+            foreach ($this->conditions as $condition) {
+                if ($condition->get_pluginname() == $pluginname) {
+                    $conditions[] = $condition;
+                }
+            }
+        } else {
+            $conditions = $this->conditions;
+        }
+        return $conditions;
+    }
+
+    /**
+     * Get a condition by plugin name.
+     *
+     * @param string $pluginname The name of the plugin
+     *
+     * @return mixed The condition object or null if not found
+     */
+    public function get_condition($pluginname) {
+        foreach ($this->conditions as $condition) {
+            if ($condition->get_pluginname() == $pluginname) {
+                return $condition;
+            }
+        }
+        return null;
+
     }
 
     /**
@@ -304,6 +437,9 @@ class rule {
         return !empty($this->get_conditions()) ? $this->get_conditions() : [$this->get_ac()];
     }
 
+    /**
+     * Load conditions from the database and assign them to the current instance.
+     */
     private function load_conditions() {
         global $DB;
 
@@ -314,10 +450,18 @@ class rule {
         $this->conditions = notificationconditionplugin::create_subplugins($selectconditions);
     }
 
+    /**
+     * Retrieve the exceptions associated with the current object.
+     *
+     * @return array The exceptions associated with the current object.
+     */
     public function get_exceptions() {
         return $this->exceptions;
     }
 
+    /**
+     * Loads exceptions from the database and initializes the exceptions property.
+     */
     private function load_exceptions() {
         global $DB;
 
@@ -328,10 +472,18 @@ class rule {
         $this->exceptions = notificationconditionplugin::create_subplugins($selectexceptions);
     }
 
+    /**
+     * Get the actions.
+     *
+     * @return mixed
+     */
     public function get_actions() {
         return $this->actions;
     }
 
+    /**
+     * Load actions from the database and create subplugins.
+     */
     private function load_actions() {
         global $DB;
 
@@ -344,7 +496,7 @@ class rule {
     }
 
     /**
-     * Check if the rule is completely generic
+     * Check if the object is generic.
      */
     private function is_generic() {
         $isgeneric = false;
@@ -371,12 +523,22 @@ class rule {
         return true;
     }
 
+    /**
+     * Delete conditions function from the notificationsagent_condition table based on the ruleid.
+     *
+     * @return array The deleted conditions
+     */
     private function delete_conditions() {
         global $DB;
         $this->conditions = $DB->delete_records('notificationsagent_condition', ['ruleid' => $this->get_id()]);
         return $this->conditions;
     }
 
+    /**
+     * Delete actions from the notificationsagent_action table based on the ruleid.
+     *
+     * @return array The deleted actions
+     */
     public function delete_actions() {
         global $DB;
         $this->actions = $DB->delete_records('notificationsagent_action', ['ruleid' => $this->get_id()]);
@@ -406,13 +568,23 @@ class rule {
     }
 
     /**
-     * @param mixed $conditions
+     * Set the conditions for the rule.
+     *
+     * This method assigns the provided conditions to the rule object. Conditions are
+     * typically an array or a collection of criteria that must be met for the rule
+     * to be applicable.
+     *
+     * @param mixed $conditions The conditions to set for the rule.
+     *
+     * @return void
      */
     public function set_conditions($conditions): void {
         $this->conditions = $conditions;
     }
 
     /**
+     * Set the exceptions.
+     *
      * @param mixed $exceptions
      */
     public function set_exceptions($exceptions): void {
@@ -420,6 +592,8 @@ class rule {
     }
 
     /**
+     * Set the actions.
+     *
      * @param mixed $actions
      */
     public function set_actions($actions): void {
@@ -427,20 +601,28 @@ class rule {
     }
 
     /**
-     * @return mixed
+     * Get the assigned property.
+     *
+     * @return mixed The assigned value
      */
     public function get_assigned() {
         return $this->assigned;
     }
 
     /**
-     * @param mixed $assigned
+     * Set the assigned property.
+     *
+     * @param mixed $assigned The new value for assigned
+     *
+     * @return void
      */
     public function set_assigned($assigned): void {
         $this->assigned = $assigned;
     }
 
     /**
+     * Get the template.
+     *
      * @return mixed
      */
     public function get_template() {
@@ -448,6 +630,8 @@ class rule {
     }
 
     /**
+     * Set the template.
+     *
      * @param mixed $template
      */
     public function set_template($template): void {
@@ -455,6 +639,8 @@ class rule {
     }
 
     /**
+     * Get the status.
+     *
      * @return mixed
      */
     public function get_status() {
@@ -462,6 +648,8 @@ class rule {
     }
 
     /**
+     * Set the status.
+     *
      * @param mixed $status
      */
     public function set_status($status): void {
@@ -469,6 +657,8 @@ class rule {
     }
 
     /**
+     * Set the id.
+     *
      * @param mixed $id
      */
     public function set_id($id): void {
@@ -476,6 +666,8 @@ class rule {
     }
 
     /**
+     * Get the createdby.
+     *
      * @return mixed
      */
     public function get_createdby() {
@@ -483,6 +675,8 @@ class rule {
     }
 
     /**
+     * Set the createdby.
+     *
      * @param mixed $createdby
      */
     public function set_createdby($createdby): void {
@@ -490,6 +684,8 @@ class rule {
     }
 
     /**
+     * Get the createdat.
+     *
      * @return mixed
      */
     public function get_createdat() {
@@ -497,6 +693,8 @@ class rule {
     }
 
     /**
+     * Set the createdat.
+     *
      * @param mixed $createdat
      */
     public function set_createdat($createdat): void {
@@ -504,6 +702,8 @@ class rule {
     }
 
     /**
+     * Get the value of forced.
+     *
      * @return mixed
      */
     public function get_forced() {
@@ -511,6 +711,8 @@ class rule {
     }
 
     /**
+     * Set the value of forced.
+     *
      * @param mixed $forced
      */
     public function set_forced($forced): void {
@@ -518,6 +720,8 @@ class rule {
     }
 
     /**
+     * Get the value of shared.
+     *
      * @return mixed
      */
     public function get_shared() {
@@ -525,13 +729,17 @@ class rule {
     }
 
     /**
-     * @param mixed $forced
+     * Set the value of shared.
+     *
+     * @param mixed $shared The new value for shared.
      */
     public function set_shared($shared): void {
         $this->shared = $shared;
     }
 
     /**
+     * Get the default rule.
+     *
      * @return mixed
      */
     public function get_defaultrule() {
@@ -539,6 +747,8 @@ class rule {
     }
 
     /**
+     * Set the default rule.
+     *
      * @param mixed $defaultrule
      */
     public function set_defaultrule($defaultrule): void {
@@ -546,47 +756,71 @@ class rule {
     }
 
     /**
-     * @return mixed
+     * Get the number of times the rule has been fired.
+     *
+     * @return int The times fired.
      */
     public function get_timesfired() {
         return $this->timesfired;
     }
 
     /**
-     * @param mixed $timesfired
+     * Set the number of times the rule has been fired.
+     *
+     * @param int $timesfired The new number of times fired.
      */
     public function set_timesfired($timesfired): void {
         $this->timesfired = $timesfired;
     }
 
     /**
-     * @return mixed
+     * Get the runtime configuration.
+     *
+     * @return mixed The runtime configuration.
      */
     public function get_runtime() {
         return $this->runtime;
     }
 
     /**
-     * @param mixed $runtime
+     * Set the runtime configuration.
+     *
+     * @param mixed $runtime The new runtime configuration.
      */
     public function set_runtime($runtime): void {
         $this->runtime = $runtime;
     }
 
     /**
-     * @return bool
+     * Check if the rule is generic.
+     *
+     * @return bool true if the rule is generic, false otherwise.
      */
     public function get_isgeneric() {
         return $this->isgeneric;
     }
 
     /**
-     * @param bool $isgeneric
+     * Set the rule as generic or not.
+     *
+     * @param bool $isgeneric true to set the rule as generic, false otherwise.
      */
     public function set_isgeneric($isgeneric): void {
         $this->isgeneric = $isgeneric;
     }
 
+    /**
+     * Evaluates the rule based on the provided context by checking conditions and exceptions.
+     *
+     * This method iterates over all conditions of the rule and evaluates them.
+     * If any condition evaluates to false, it sets a time trigger for re-evaluation and returns false.
+     * If all conditions pass, it then checks for exceptions in a similar manner.
+     * If no exceptions are triggered, it sets a time trigger for the rule to be executed and returns true.
+     *
+     * @param evaluationcontext $context The context in which the rule is being evaluated.
+     *
+     * @return bool True if all conditions are met and no exceptions are triggered, false otherwise.
+     */
     public function evaluate(evaluationcontext $context): bool {
         // Evaluate conditions.
         $conditions = $this->get_conditions_to_evaluate();
@@ -618,7 +852,7 @@ class rule {
             if ($result === true) {
                 $timetrigger = $exception->estimate_next_time($context);
                 // Keep record in trigger.
-                // Event driven conditions return a null timetrigger.
+                // Event driven exceptions return a null timetrigger.
                 if (!empty($timetrigger)) {
                     notificationsagent::set_time_trigger(
                         $this->get_id(),
@@ -632,14 +866,17 @@ class rule {
             }
         }
 
+        // Set a time trigger for the rule to be executed.
         notificationsagent::set_time_trigger(
             $this->get_id(),
             $context->get_triggercondition(),
             $context->get_userid(),
             $context->get_courseid(),
-            time() + $this->get_runtime()
+            time() + $this->get_runtime(),
+            time()
         );
 
+        // All conditions are met, and no exceptions are triggered.
         return true;
     }
 
@@ -653,14 +890,12 @@ class rule {
     }
 
     /**
-     * Replace place holders in the template with respective content.
+     * Replace placeholders with actual values in the given parameters.
      *
-     * @param object $context Evaluation Context
-     * @param null $parameters Action parameters
+     * @param evaluationcontext $context    The context object.
+     * @param string            $parameters JSON string containing the parameters.
      *
-     * @return mixed final template string.
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @return string The parameters with placeholders replaced by actual values.
      */
     public function replace_placeholders($context, $parameters) {
         $paramstoreplace = [];
@@ -797,15 +1032,19 @@ class rule {
     }
 
     /**
-     * @param $ruleid
-     * @param $userid
-     * @param $courseid
-     * @param $actionid
-     * @param $parameters
-     * @param $timeaccess
+     * Records a report entry in the database.
      *
-     * @return void
-     * @throws \dml_exception
+     * This method inserts a new record into the 'notificationsagent_report' table with details
+     * about a specific rule execution.
+     *
+     * @param int    $ruleid     The ID of the rule being reported.
+     * @param int    $userid     The ID of the user for whom the rule is reported.
+     * @param int    $courseid   The ID of the course related to the rule execution.
+     * @param int    $actionid   The ID of the action triggered by the rule.
+     * @param string $parameters JSON encoded string containing additional details about the action.
+     * @param int    $timeaccess The timestamp when the rule was executed.
+     *
+     * @throws \dml_exception If there is a problem executing the database operation.
      */
     public function record_report($ruleid, $userid, $courseid, $actionid, $parameters, $timeaccess) {
         global $DB;
@@ -820,6 +1059,15 @@ class rule {
         $DB->insert_record('notificationsagent_report', $params);
     }
 
+    /**
+     * Get assigned contexts for the rule.
+     *
+     * This function retrieves all related contexts from the database
+     * and organizes them into categories and courses based on their context type.
+     *
+     * @return array An associative array with keys 'category' and 'course',
+     *               each containing an array of respective object IDs.
+     */
     public function get_assignedcontext() {
         global $DB;
 
@@ -837,14 +1085,15 @@ class rule {
         return $data;
     }
 
+    /**
+     * Save the form data by creating or updating the rule, and processing conditions, actions, and exceptions.
+     *
+     * @param \stdClass $data Form data to be processed.
+     */
     public function save_form($data) {
         if ($this->is_new()) {
             $this->create($data);
-
         } else {
-            $this->delete_conditions();
-            $this->delete_actions();
-            notificationsagent::delete_triggers_by_ruleid($this->get_id());
             $this->update($data);
         }
 
@@ -861,30 +1110,53 @@ class rule {
         $this->save_form_actions($data, $data->{editrule_form::FORM_JSON_ACTION});
     }
 
+    /**
+     * Save form data related to the 'ac' subplugin condition.
+     *
+     * @param stdClass $data Form data containing the conditions.
+     */
     private function save_form_ac($data) {
         $subpluginac = notificationsbaseinfo::instance($this, notificationplugin::TYPE_CONDITION, ac::NAME);
-        $subpluginac->save(null, $data, notificationplugin::COMPLEMENTARY_CONDITION);
+        $action = $this->get_ac() ? editrule_form::FORM_JSON_ACTION_UPDATE : editrule_form::FORM_JSON_ACTION_INSERT;
+        $id = $this->get_ac() ? $this->get_ac()->id : null;
+        $subpluginac->save($action, $id, $data, notificationplugin::COMPLEMENTARY_CONDITION);
     }
 
+    /**
+     * Save form data related to conditions or exceptions based on provided JSON configuration.
+     *
+     * @param stdClass $data          Form data containing the conditions or exceptions.
+     * @param string   $json          JSON-encoded string representing conditions or exceptions configurations.
+     * @param string   $complementary A constant indicating whether it's a condition or an exception.
+     * @param array    $students      List of students related to the condition or exception.
+     */
     private function save_form_conditions_exceptions($data, $json, $complementary, $students) {
         $array = json_decode($json, true);
         $timer = 0;
         if (!empty($array)) {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
+                $action = $value["action"];
                 $subplugin = notificationsbaseinfo::instance($this, notificationplugin::TYPE_CONDITION, $pluginname);
-                $subplugin->save($idname, $data, $complementary, $students, $timer);
+                $subplugin->save($action, $idname, $data, $complementary, $students, $timer);
             }
         }
     }
 
+    /**
+     * Save form data related to actions based on the provided JSON configuration.
+     *
+     * @param \stdClass $data Form data containing the actions.
+     * @param string    $json JSON-encoded string representing actions configurations.
+     */
     private function save_form_actions($data, $json) {
         $array = json_decode($json, true);
         if (!empty($array)) {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
+                $action = $value["action"];
                 $subplugin = notificationsbaseinfo::instance($this, notificationplugin::TYPE_ACTION, $pluginname);
-                $subplugin->save($idname, $data);
+                $subplugin->save($action, $idname, $data);
             }
         }
     }
@@ -1016,7 +1288,7 @@ class rule {
         $record->type = self::TEMPLATE_TYPE;
         $record->courseid = SITEID;
 
-        $torule = self::create_instance();
+        $torule = new rule();
         $torule->create($record);
 
         $torule->clone_conditions($fromrule->get_id());
@@ -1224,13 +1496,12 @@ class rule {
     }
 
     /**
-     * Check if a rule is created from a template
+     * Check if a rule is created from a template based on the course and context
      *
-     * @param        $courseid
-     * @param object $context context object
+     * @param int               $courseid The course ID to check the rule against
+     * @param evaluationcontext $context  The context in which to check the capability
      *
-     * @return boolean $data Is it using a template
-     * @throws \coding_exception
+     * @return bool True if the rule uses a template, False otherwise
      */
     public function is_use_template($courseid, $context) {
         return
@@ -1380,4 +1651,3 @@ class rule {
         return $record;
     }
 }
-

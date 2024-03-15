@@ -33,27 +33,56 @@
 
 namespace local_notificationsagent;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . "/local/notificationsagent/classes/rule.php");
-require_once($CFG->dirroot . "/local/notificationsagent/classes/evaluationcontext.php");
-require_once($CFG->dirroot . "/local/notificationsagent/classes/notificationsagent.php");
-
 /**
+ * Testing rule class
+ *
  * @group notificationsagent
  */
 class notificationsagent_rule_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var \stdClass
+     */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $cmtest;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    /**
+     * Activity date start
+     */
     public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
+    /**
+     * Activity date end
+     */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * User first access to a course
+     */
     public const USER_FIRSTACCESS = 1704099600;
+    /**
+     * User last access to a course
+     */
     public const USER_LASTACCESS = 1706605200;
+    /**
+     *  Random id for activity
+     */
     public const CMID = 246000;
 
     final public function setUp(): void {
@@ -80,8 +109,18 @@ class notificationsagent_rule_test extends \advanced_testcase {
     }
 
     /**
+     * Testing evaluate function
+     *
      * @covers       \local_notificationsagent\rule::evaluate
      * @dataProvider dataprovider
+     *
+     * @param int   $date
+     * @param array $conditiondata
+     * @param array $exceptiondata
+     * @param bool  $expected
+     *
+     * @return void
+     * @throws \dml_exception
      */
     public function test_evaluate(int $date, array $conditiondata, array $exceptiondata, bool $expected) {
         global $DB, $USER;
@@ -144,6 +183,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Provider for evaluate
+     *
+     * @return array[]
+     */
     public static function dataprovider(): array {
         return [
             // Evaluate date, conditions, exceptions, expected.
@@ -213,6 +257,15 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::get_default_context
      *
      */
+
+    /**
+     * Testing rule create
+     *
+     * @covers \local_notificationsagent\rule::create
+     *
+     * @return void
+     * @throws \dml_exception
+     */
     public function test_create() {
         global $DB, $USER;
         $USER->id = self::$user->id;
@@ -267,6 +320,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
     }
 
     /**
+     * Testing rule update
+     *
+     * @param int  $timesfired
+     * @param bool $expected
+     *
      * @covers       \local_notificationsagent\rule::update
      * @covers       \local_notificationsagent\rule::get_timesfired
      * @covers       \local_notificationsagent\rule::get_runtime
@@ -306,6 +364,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Provider for update rule
+     *
+     * @return array[]
+     */
     public static function updateprovider(): array {
         return [
             [18, 18],
@@ -315,12 +378,15 @@ class notificationsagent_rule_test extends \advanced_testcase {
     }
 
     /**
+     * Testing delete rule
+     *
      * @covers \local_notificationsagent\rule::delete
      * @covers \local_notificationsagent\rule::before_delete
      * @covers \local_notificationsagent\rule::delete_conditions
      * @covers \local_notificationsagent\rule::delete_actions
      * @covers \local_notificationsagent\rule::delete_context
-     *
+     * @return void
+     * @throws \dml_exception
      */
     public function test_delete() {
         global $DB, $USER;
@@ -410,6 +476,171 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertFalse($trigger);
         $this->assertFalse($launched);
         $this->assertFalse($context);
+
+    }
+
+    /**
+     *  Testing get rules
+     *
+     * @param string $role
+     * @param int    $shared
+     * @param int    $siteid
+     *
+     * @covers       \local_notificationsagent\rule::get_rules
+     * @covers       \local_notificationsagent\rule::get_administrator_rules
+     * @covers       \local_notificationsagent\rule::get_shared_rules
+     * @covers       \local_notificationsagent\rule::set_shared
+     * @covers       \local_notificationsagent\rule::get_course_rules
+     * @covers       \local_notificationsagent\rule::get_site_rules
+     * @covers       \local_notificationsagent\rule::get_teacher_rules
+     * @covers       \local_notificationsagent\rule::get_student_rules
+     * @covers       \local_notificationsagent\rule::get_dataform
+     * @covers       \local_notificationsagent\rule::has_context
+     * @dataProvider dataprovider_get_rules
+     *
+     * @return void
+     * @throws \dml_exception
+     */
+    public function test_get_rules($role, $shared, $siteid) {
+        global $USER, $DB;
+        if (empty($role)) {
+            self::setAdminUser();
+        } else {
+            $user = self::getDataGenerator()->create_and_enrol(self::$course, $role);
+            $USER->id = $user->id;
+        }
+
+        $siteid === 0 ? $courseid = self::$course->id : $courseid = SITEID;
+
+        $context = \context_course::instance($courseid);
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test " . $role;
+        $dataform->type = 1;
+        $dataform->courseid = $courseid;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+
+        $ruleid = self::$rule->create($dataform);
+
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+
+        $defaultcontext = self::$rule->get_default_context();
+
+        $this->assertIsNumeric($defaultcontext);
+
+        $rulecontext = self::$rule->has_context();
+        $this->assertTrue($rulecontext);
+
+        $instance = rule::create_instance($ruleid);
+        $instance->set_shared($shared);
+        $rules = $instance::get_rules($context, $courseid);
+
+        $this->assertNotEmpty($rules);
+        $this->assertTrue($instance->has_context());
+
+        foreach ($rules as $ruleobj) {
+            $this->assertEquals($ruleid, $ruleobj->get_id());
+            $this->assertEquals("Rule Test " . $role, $ruleobj->get_name());
+            $this->assertEquals($courseid, $ruleobj->get_default_context());
+            $this->assertEquals("Rule Test " . $role, $ruleobj->get_dataform()['title']);
+            $this->assertEquals(2, $ruleobj->get_dataform()['timesfired']);
+            $this->assertTrue($ruleobj->has_context());
+            $this->assertEquals($shared, $instance->get_shared());
+        }
+
+    }
+
+    /**
+     * Set up the data to be used in the test execution.
+     *
+     * @return array
+     */
+    public static function dataprovider_get_rules(): array {
+        return [
+            'Admin' => [null, 1, 0],
+            'Admin shared rule' => [null, 0, 0],
+            'Admin siteid courses' => [null, 0, 1],
+            'Editingteacher' => ['editingteacher', 1, 0],
+            'Student' => ['student', 1, 0],
+
+        ];
+    }
+
+    /**
+     * Testing clone of rule
+     *
+     * @covers \local_notificationsagent\rule::clone
+     * @covers \local_notificationsagent\rule::clone_conditions
+     * @covers \local_notificationsagent\rule::clone_actions
+     *
+     * @return void
+     */
+    public function test_clone() {
+        global $DB, $USER;
+        $USER->id = self::$user->id;
+        // Simulate data from form.
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+
+        $ruleid = self::$rule->create($dataform);
+
+        // Conditions.
+        $conditionid = $DB->insert_record(
+            'notificationsagent_condition',
+            [
+                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                'parameters' => '{"time":300,"forum":3}',
+                'pluginname' => 'forumnoreply',
+            ],
+        );
+        // Actions.
+        $actionid = $DB->insert_record(
+            'notificationsagent_action',
+            [
+                'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
+                'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
+            ],
+        );
+
+        $instance = self::$rule::create_instance($ruleid);
+        $this->assertInstanceOf(rule::class, $instance);
+
+        $instance->clone($instance->get_id());
+
+        $clonedrule = $DB->get_records('notificationsagent_rule', null, 'id', '*', 1);
+        $ind = key($clonedrule);
+        $clonedcond = $DB->get_records('notificationsagent_condition', null, 'id', '*', 1);
+        $indcon = key($clonedcond);
+        $clonedact = $DB->get_records('notificationsagent_action', null, 'id', '*', 1);
+        $indact = key($clonedact);
+
+        $this->assertNotEquals($instance->get_id(), $clonedrule[$ind]->id);
+        $this->assertEquals($instance->get_name(), $clonedrule[$ind]->name);
+        $this->assertEquals($instance->get_status(), $clonedrule[$ind]->status);
+        $this->assertEquals($instance->get_shared(), $clonedrule[$ind]->shared);
+        $this->assertEquals($instance->get_defaultrule(), $clonedrule[$ind]->defaultrule);
+
+        $this->assertNotEquals($instance->get_conditions()[$conditionid]->get_id(), $clonedcond[$indcon]->id);
+        $this->assertEquals($instance->get_conditions()[$conditionid]->get_pluginname(), $clonedcond[$indcon]->pluginname);
+        $this->assertEquals($instance->get_conditions()[$conditionid]->get_type(), $clonedcond[$indcon]->type);
+        $this->assertEquals($instance->get_conditions()[$conditionid]->get_parameters(), $clonedcond[$indcon]->parameters);
+        $this->assertEquals($instance->get_conditions()[$conditionid]->get_iscomplementary(), $clonedcond[$indcon]->complementary);
+
+        $this->assertNotEquals($instance->get_actions()[$actionid]->get_id(), $clonedact[$indact]->id);
+        $this->assertEquals($instance->get_actions()[$actionid]->get_pluginname(), $clonedact[$indact]->pluginname);
+        $this->assertEquals($instance->get_actions()[$actionid]->get_type(), $clonedact[$indact]->type);
+        $this->assertEquals($instance->get_actions()[$actionid]->get_parameters(), $clonedact[$indact]->parameters);
 
     }
 

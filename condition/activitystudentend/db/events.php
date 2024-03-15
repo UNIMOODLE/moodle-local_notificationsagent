@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitystudentend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,7 +33,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 // This event will listen the user's first session in a course.
-
 
 global $observers, $DB;
 
@@ -44,7 +43,7 @@ $modules = $DB->get_records('modules');
 if ($modules) {
     foreach ($modules as $module) {
         // Create the event name dynamically based on the module name.
-        $eventname = '\mod_' . $module->name .'\event\course_module_viewed';
+        $eventname = '\mod_' . $module->name . '\event\course_module_viewed';
 
         // Add the observer with the dynamically generated event name.
         $observers[] = [

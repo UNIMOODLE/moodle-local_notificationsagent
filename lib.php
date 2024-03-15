@@ -214,9 +214,8 @@ function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
     $rulesidquery = "
                     SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid
                       FROM {notificationsagent_triggers} nt
-                      JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid
+                      JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
                      WHERE startdate
-                       AND nr.status = 0
                    BETWEEN :tasklastrunttime AND :timestarted
                      ";
 

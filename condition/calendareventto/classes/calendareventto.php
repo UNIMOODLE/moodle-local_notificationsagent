@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendareventto
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,26 +33,44 @@
 
 namespace notificationscondition_calendareventto;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../../../../calendar/lib.php');
-
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\notificationsagent;
 
+/**
+ * Calendarevetto class
+ */
 class calendareventto extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'calendareventto';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_calendareventto');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]', '[CCCC]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_calendareventto');
     }
@@ -90,28 +108,48 @@ class calendareventto extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     *  Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     *
+     * @return mixed|null
+     */
     public function estimate_next_time(evaluationcontext $context) {
         $timestart = null;
         $params = json_decode($context->get_params(), false);
-        $event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}]);
-        $timeaccess = $context->get_timeaccess();
-        $calendarstart = $event[$params->{self::UI_ACTIVITY}]->timestart;
-
-        if ($timeaccess <= $calendarstart - $params->{self::UI_TIME} && !$context->is_complementary()) {
-            $timestart = $calendarstart - $params->{self::UI_TIME};
-        }
-        if ($context->is_complementary()) {
-            if ($timeaccess < $calendarstart - $params->{self::UI_TIME}) {
-                $timestart = null;
-            } else if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess < $calendarstart) {
-                $timestart = $calendarstart;
+        
+        if($event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}])){
+            $timeaccess = $context->get_timeaccess();
+            $calendarstart = $event[$params->{self::UI_ACTIVITY}]->timestart;
+    
+            if ($timeaccess <= $calendarstart - $params->{self::UI_TIME} && !$context->is_complementary()) {
+                $timestart = $calendarstart - $params->{self::UI_TIME};
+            }
+            if ($context->is_complementary()) {
+                if ($timeaccess < $calendarstart - $params->{self::UI_TIME}) {
+                    $timestart = null;
+                } else if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess < $calendarstart) {
+                    $timestart = $calendarstart;
+                }
             }
         }
 
         return $timestart;
     }
 
+    /**
+     * Get the user interface of the subplugin
+     *
+     * @param editrule_form $mform
+     * @param int           $id
+     * @param int           $courseid
+     * @param string        $type
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         global $DB;
@@ -121,6 +159,9 @@ class calendareventto extends notificationconditionplugin {
         $events = [];
         foreach ($listevents as $event) {
             $events[$event->id] = $event->name;
+        }
+        if (empty($events)) {
+            $events['0'] = 'CCCC';
         }
 
         $element = $mform->createElement(
@@ -136,14 +177,28 @@ class calendareventto extends notificationconditionplugin {
         $mform->insertElementBefore($element, 'new' . $type . '_group');
     }
 
+    /**
+     * Checking capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     * @throws \coding_exception
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:calendareventto', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -161,6 +216,18 @@ class calendareventto extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -168,13 +235,26 @@ class calendareventto extends notificationconditionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a condition is generic or not
+     *
+     * @return true
+     */
     public function is_generic() {
         return true;
     }
 
+    /**
+     * Set the defalut values
+     *
+     * @param editrule_form $form
+     * @param int           $id
+     *
+     * @return void
+     */
     public function set_default($form, $id) {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);

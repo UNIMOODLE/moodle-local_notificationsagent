@@ -73,9 +73,22 @@ class delete_rule extends \external_api {
         $result = ['warnings' => []];
 
         $instance = rule::create_instance($ruleid);
+
         if (empty($instance)) {
-            throw new \moodle_exception('nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance'));
+            try {
+                throw new \moodle_exception(
+                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                );
+            } catch (\moodle_exception $e) {
+                $result['warnings'][] = [
+                    'item' => 'local_notificationsagent',
+                    'warningcode' => $e->errorcode,
+                    'message' => $e->getMessage(),
+                ];
+                return $result;
+            }
         }
+
         $context = \context_course::instance($instance->get_default_context());
 
         try {
@@ -99,7 +112,7 @@ class delete_rule extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return external_single_structure
+     * @return \external_single_structure
      */
     public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(

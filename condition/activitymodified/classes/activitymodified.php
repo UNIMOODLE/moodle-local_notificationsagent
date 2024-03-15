@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitymodified
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,22 +33,30 @@
 
 namespace notificationscondition_activitymodified;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
-
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
 
 class activitymodified extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'activitymodified';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_activitymodified');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[AAAA]'];
     }
@@ -73,12 +81,18 @@ class activitymodified extends notificationconditionplugin {
         $pluginname = $this->get_subtype();
         $timeaccess = $context->get_timeaccess();
         $conditionid = $this->get_id();
+        $cmid = (json_decode($context->get_params()))->{self::UI_ACTIVITY};
 
         $timelastsend = $DB->get_field(
             'notificationsagent_cache',
             'timestart',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
+
+        if (empty($timelastsend)) {
+            return self::get_any_new_content($cmid, $timeaccess);
+        }
+
         if (!empty($timelastsend)) {
             ($timeaccess >= $timelastsend) ? $meetcondition = true : $meetcondition = false;
         }
@@ -132,6 +146,18 @@ class activitymodified extends notificationconditionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -144,11 +170,42 @@ class activitymodified extends notificationconditionplugin {
 
         $humanvalue = str_replace($this->get_elements(), $activityname, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function is_generic() {
         return true;
     }
 
+    /**
+     * Checks if there has been new content in the activity 1 minute ago.
+     *
+     * @param int $cmid             The course module ID.
+     * @param int $eventtimecreated The event creation time.
+     *
+     * @return bool                   Is there any new content?
+     */
+    public static function get_any_new_content($cmid, $eventtimecreated) {
+        global $DB;
+
+        $sql = '
+            SELECT f.id, f.userid, f.timemodified
+            FROM {context} ctx
+            JOIN {files} f
+              ON ctx.id = f.contextid
+             AND ctx.instanceid = :cmid
+             AND ctx.contextlevel = :contextlevel
+           WHERE f.filesize <> 0
+             AND f.timemodified >= CAST(:time AS INTEGER) - CAST(:minuteago AS INTEGER)
+        ';
+
+        $params = [
+            'cmid' => $cmid,
+            'contextlevel' => CONTEXT_MODULE,
+            'time' => (int) $eventtimecreated,
+            'minuteago' => 60,
+        ];
+
+        return !empty($DB->get_record_sql($sql, $params));
+    }
 }

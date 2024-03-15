@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitylastsend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -45,16 +45,46 @@ use local_notificationsagent\rule;
  */
 class activitylastsend_test extends \advanced_testcase {
 
+    /**
+     * @var rule
+     */
     private static $rule;
     private static $subplugin;
+    /**
+     * @var \stdClass
+     */
     private static $coursetest;
+    /**
+     * @var string
+     */
     private static $subtype;
+    /**
+     * @var \stdClass
+     */
     private static $user;
+    /**
+     * @var evaluationcontext
+     */
     private static $context;
+    /**
+     * @var bool|\context|\context_course
+     */
     private static $coursecontext;
+    /**
+     * @var array|string[]
+     */
     private static $elements;
+    /**
+     * id for condition
+     */
     public const CONDITIONID = 1;
+    /**
+     * Date start for the course
+     */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
+    /**
+     * Date end for the course
+     */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
     public function setUp(): void {
@@ -296,5 +326,59 @@ class activitylastsend_test extends \advanced_testcase {
             isset($defaulttime[$uiseconds]) && $defaulttime[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE
         );
     }
-}
 
+    /**
+     * @return void
+     * @throws \coding_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
+     * @covers       \notificationscondition_activitylastsend\activitylastsend::get_cmidfiles
+     * @dataProvider dataprovidercmifiles
+     */
+    public function test_get_cmidfiles($fileuploadtime, $crontimestarted) {
+        $assgigngenerator = self::getDataGenerator()->get_plugin_generator('mod_assign');
+        $assigncm = $assgigngenerator->create_instance([
+            'course' => self::$coursetest->id,
+        ]);
+        $assigncontext = \context_module::instance($assigncm->cmid);
+
+        if (!is_null($fileuploadtime)) {
+            $fs = get_file_storage();
+            $filerecord = [
+                'contextid' => $assigncontext->id,
+                'component' => 'mod_assign',
+                'filearea' => 'content',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'user-test-file.txt',
+                'userid' => self::$user->id,
+                'timecreated' => $fileuploadtime,
+                'timemodified' => $fileuploadtime,
+            ];
+
+            $fs->create_file_from_string($filerecord, 'User upload');
+        }
+
+        $data = activitylastsend::get_cmidfiles(
+            $assigncm->cmid, self::$user->id, 86400, $crontimestarted
+        );
+
+        if (!is_null($fileuploadtime)) {
+            $this->assertEquals($fileuploadtime, $data->timemodified);
+            $this->assertEquals(self::$user->id, $data->userid);
+        } else {
+            $this->assertEmpty($data);
+        }
+
+    }
+
+    public static function dataprovidercmifiles(): array {
+        return [
+            'Testing a file that was not uploaded' => [null, time()],
+            'Testing a file that was uploaded 2 minutes ago' => [1709014050, 1709014170],
+            'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
+            'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
+        ];
+    }
+
+}

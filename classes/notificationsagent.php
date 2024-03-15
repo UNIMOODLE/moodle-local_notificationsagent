@@ -35,6 +35,9 @@ namespace local_notificationsagent;
 
 use stdClass;
 
+/**
+ * Notifications agent main class
+ */
 class notificationsagent {
 
     /** @var int All users are affected by the action/condition */
@@ -250,7 +253,7 @@ class notificationsagent {
 
         $data = [];
 
-        $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.pluginname
+        $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.pluginname
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
                              AND nr.status = 0 AND nr.template = 1
@@ -359,7 +362,9 @@ class notificationsagent {
     }
 
     /**
-     * @param $context
+     * Retrieves users by course from the database.
+     *
+     * @param mixed $context
      *
      * @return array
      */
@@ -370,7 +375,18 @@ class notificationsagent {
         );
     }
 
-    // Engine functions.
+    /**
+     * Set timer cache in the notifications agent cache table.
+     *
+     * @param int    $userid             The user ID.
+     * @param int    $courseid           The course ID.
+     * @param int    $timer              The timer value.
+     * @param string $pluginname         The name of the plugin.
+     * @param int    $conditionid        The condition ID.
+     * @param bool   $updatecacheifexist Whether to update the cache if it already exists.
+     *
+     * @return int|null The ID of the inserted or updated record, or null if no action was taken.
+     */
     public static function set_timer_cache($userid, $courseid, $timer, $pluginname, $conditionid, $updatecacheifexist) {
         global $DB;
         $exists = $DB->get_field(
@@ -400,7 +416,17 @@ class notificationsagent {
         return null;
     }
 
-    public static function set_time_trigger($ruleid, $conditionid, $userid, $courseid, $timer) {
+    /**
+     * Set a time trigger for a specific rule, condition, user, and course.
+     *
+     * @param int $ruleid      Rule id
+     * @param int $conditionid Condition id
+     * @param int $userid      User id
+     * @param int $courseid    Course id
+     * @param int $timer       Timer
+     * @param int $ruleoff     Is ruleoff
+     */
+    public static function set_time_trigger($ruleid, $conditionid, $userid, $courseid, $timer, $ruleoff = null) {
         global $DB;
         $exists = $DB->get_record(
             'notificationsagent_triggers',
@@ -417,7 +443,8 @@ class notificationsagent {
         $objdb->courseid = $courseid;
         $objdb->ruleid = $ruleid;
         $objdb->conditionid = $conditionid;
-        // TODO Add retroactive rules as setting.
+        $objdb->ruleoff = $ruleoff;
+        // ...TODO Add retroactive rules as setting.
         $objdb->startdate = $timer > time() ? $timer : time() + 120;
         if (!$exists) {
             $DB->insert_record('notificationsagent_triggers', $objdb);
@@ -458,11 +485,21 @@ class notificationsagent {
         $DB->delete_records('notificationsagent_triggers', ['ruleid' => $id]);
     }
 
+    /**
+     * Get course module dates by condition.
+     *
+     * @param int $cmid The course module ID
+     *
+     * @return stdClass The dates of the course module
+     */
     public static function notificationsagent_condition_get_cm_dates($cmid) {
         // Table :course modules.
         global $DB;
 
         $dates = new stdClass();
+        $dates->timestart = null;
+        $dates->timeend = null;
+
         $line = '';
         $starttimequery = "
                     SELECT mcm.id, instance, module, mm.name, mcm.course
@@ -470,40 +507,37 @@ class notificationsagent {
                       JOIN {modules} mm ON mm.id = mcm.module
                      WHERE mcm.id = :cmid";
 
-        $modtype = $DB->get_record_sql(
-            $starttimequery,
-            [
-                'cmid' => $cmid,
-            ]
-        );
+        if($modtype = $DB->get_record_sql($starttimequery, ['cmid' => $cmid])){
+            $config = get_config('local_notificationsagent', 'startdate');
+            $array = explode("\n", $config);
+    
+            foreach (preg_grep('/\b' . $modtype->name . '\b/i', $array) as $key => $value) {
+                $line = $value;
+            }
+    
+            if (!empty($line)) {
+                $datatables = explode("|", $line);
+                list($pluginname, $table, $timestart, $timeend) = $datatables;
+                $dates = "SELECT " . $timestart . " AS timestart, " . $timeend . "  as timeend
+                    FROM {" . $table . "}
+                    WHERE id = :instance";
+    
+                $dates = $DB->get_record_sql(
+                    $dates,
+                    [
+                        'instance' => $modtype->instance,
+                    ]
+                );
+            }
 
-        $config = get_config('local_notificationsagent', 'startdate');
-        $array = explode("\n", $config);
+            if (empty($dates->timestart)) {
+                $dates->timestart = get_course($modtype->course)->startdate;
+            }
+            
+            if (empty($dates->timeend)) {
+                $dates->timeend = null;
+            }
 
-        foreach (preg_grep('/\b' . $modtype->name . '\b/i', $array) as $key => $value) {
-            $line = $value;
-        }
-
-        if (!empty($line)) {
-            $datatables = explode("|", $line);
-            list($pluginname, $table, $timestart, $timeend) = $datatables;
-            $dates = "SELECT " . $timestart . " AS timestart, " . $timeend . "  as timeend
-                FROM {" . $table . "}
-                WHERE id = :instance";
-
-            $dates = $DB->get_record_sql(
-                $dates,
-                [
-                    'instance' => $modtype->instance,
-                ]
-            );
-        }
-
-        if (empty($dates->timestart)) {
-            $dates->timestart = get_course($modtype->course)->startdate;
-        }
-        if (empty($dates->timeend)) {
-            $dates->timeend = null;
         }
 
         return $dates;
@@ -535,6 +569,25 @@ class notificationsagent {
 
         return $waslaunched;
     }
+
+    /**
+     *  Is the rule off?
+     *
+     * @param int $ruleid Rule id
+     * @param int $userid User id
+     *
+     * @return bool
+     */
+    public static function is_ruleoff($ruleid, $userid) {
+        global $DB;
+        $ruleoff = $DB->get_field(
+            'notificationsagent_triggers', 'MAX(ruleoff)',
+            [
+                'ruleid' => $ruleid,
+                'userid' => $userid,
+            ]
+        );
+
+        return is_numeric($ruleoff);
+    }
 }
-
-

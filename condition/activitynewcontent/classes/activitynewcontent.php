@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_activitynewcontent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,24 +33,32 @@
 
 namespace notificationscondition_activitynewcontent;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
-
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
 
 class activitynewcontent extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'activitynewcontent';
     public const MODNAME = 'modname';
     public const UNUSED_TYPES = ['label'];
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_activitynewcontent');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[AAAA]'];
     }
@@ -61,7 +69,7 @@ class activitynewcontent extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -119,7 +127,7 @@ class activitynewcontent extends notificationconditionplugin {
             $listactivities
         );
 
-        $mform->insertElementBefore($element, 'new'.$type.'_group');
+        $mform->insertElementBefore($element, 'new' . $type . '_group');
     }
 
     public function check_capability($context) {
@@ -132,20 +140,32 @@ class activitynewcontent extends notificationconditionplugin {
      * @return mixed
      */
     protected function convert_parameters($id, $params) {
-        $params = (array)$params;
+        $params = (array) $params;
         $modname = $params[$this->get_name_ui($id, self::MODNAME)] ?? 0;
         $this->set_parameters(json_encode([self::MODNAME => $modname]));
         return $this->get_parameters();
     }
 
-    public function process_markups(&$content, $courseid, $options=null) {
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
+    public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
         $paramstoteplace = [$jsonparams->{self::MODNAME}];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
     public function is_generic() {

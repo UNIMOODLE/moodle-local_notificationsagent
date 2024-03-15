@@ -42,6 +42,9 @@ use core_reportbuilder\local\filters\user;
 use core_reportbuilder\local\helpers\format;
 use lang_string;
 
+/**
+ * Class of the entities of the rule.
+ */
 class rule extends base {
 
     /**
@@ -99,6 +102,11 @@ class rule extends base {
 
     }
 
+    /**
+     * Get all columns.
+     *
+     * @return array
+     */
     protected function get_all_columns(): array {
         $columns = [];
 
@@ -157,6 +165,11 @@ class rule extends base {
 
     }
 
+    /**
+     * Get all filters.
+     *
+     * @return array
+     */
     protected function get_all_filters(): array {
         $narralias = $this->get_table_alias('notificationsagent_report');
         $narrualias = $this->get_table_alias('notificationsagent_rule');
@@ -211,6 +224,11 @@ class rule extends base {
     }
 
 
+    /**
+     * Rule join.
+     *
+     * @return string
+     */
     public function rulejoin() {
         $rulealias = $this->get_table_alias('notificationsagent_rule');
         $rulesreportalias = $this->get_table_alias('notificationsagent_report');
@@ -218,6 +236,10 @@ class rule extends base {
                     ON {$rulesreportalias}.ruleid = {$rulealias}.id";
     }
 
+    /**
+     * Rule action join.
+     *
+     */
     public function actionjoin() {
         $actionalias = $this->get_table_alias('notificationsagent_action');
         $rulesreportalias = $this->get_table_alias('notificationsagent_report');

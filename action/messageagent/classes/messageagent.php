@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationsaction_messageagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -33,6 +33,7 @@
 
 namespace notificationsaction_messageagent;
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
 
@@ -83,10 +84,20 @@ class messageagent extends notificationactionplugin {
         return get_string('subtype', 'notificationsaction_messageagent');
     }
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('messageagent_action', 'notificationsaction_messageagent');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
         return ['[TTTT]', '[BBBB]'];
     }
@@ -109,6 +120,18 @@ class messageagent extends notificationactionplugin {
         return $this->get_parameters();
     }
 
+    /**
+     * Process and replace markups in the supplied content.
+     *
+     * This function should handle any markup logic specific to a notification plugin,
+     * such as replacing placeholders with dynamic data, formatting content, etc.
+     *
+     * @param array $content  The content to be processed, passed by reference.
+     * @param int   $courseid The ID of the course related to the content.
+     * @param mixed $options  Additional options if any, null by default.
+     *
+     * @return void Processed content with markups handled.
+     */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
@@ -119,9 +142,19 @@ class messageagent extends notificationactionplugin {
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
-        array_push($content, $humanvalue);
+        $content[] = $humanvalue;
     }
 
+    /**
+     * Sending a message
+     *
+     * @param evaluationcontext $context
+     * @param                   $params
+     *
+     * @return false|int|mixed
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
     public function execute_action($context, $params) {
         $placeholdershuman = json_decode($params);
         $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
@@ -137,10 +170,10 @@ class messageagent extends notificationactionplugin {
         $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
         $message->smallmessage = 'small message';
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
-        $message->contexturl = (new \moodle_url('/course//course/view.php?id=' . $context->get_courseid()))->out(
+        $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
             false
         ); // A relevant URL for the notification.
-        $message->contexturlname = 'Course'; // Link title explaining where users get to for the contexturl.
+        $message->contexturlname = get_string('course'); // Link title explaining where users get to for the contexturl.
 
         // The integer ID of the new message or false if there was a problem
         // ... (with submitted data or sending the message to the message processor).

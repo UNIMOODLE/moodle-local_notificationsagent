@@ -24,7 +24,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_calendareventto
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -34,8 +34,20 @@
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 
+/**
+ * Observer for calendareventto condition
+ */
 class notificationscondition_calendareventto_observer {
 
+    /**
+     * Listen calendar updated event
+     *
+     * @param \core\event\calendar_event_updated $event
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public static function calendar_updated(core\event\calendar_event_updated $event) {
         global $DB;
         if (!isloggedin() || $event->courseid == 1) {

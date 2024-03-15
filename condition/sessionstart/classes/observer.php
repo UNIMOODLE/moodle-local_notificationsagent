@@ -21,7 +21,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_sessionstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -32,10 +32,16 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 use notificationscondition_sessionstart\sessionstart;
 
+/**
+ * Observer for the notificationscondition_sessionstart plugin.
+ */
 class notificationscondition_sessionstart_observer {
 
+
     /**
-     * @throws \dml_exception
+     * A function to handle the course_viewed event.
+     *
+     * @param \core\event\course_viewed $event The course_viewed event object
      */
     public static function course_viewed(\core\event\course_viewed $event) {
         if ($event->courseid == 1 || !isloggedin()) {

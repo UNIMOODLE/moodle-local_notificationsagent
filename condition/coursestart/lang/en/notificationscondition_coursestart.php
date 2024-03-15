@@ -24,13 +24,12 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_coursestart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 $string['pluginname'] = 'Condition relative date to course start';
 $string['conditiontext'] = '[TTTT] has passed since the beginning of the course.';

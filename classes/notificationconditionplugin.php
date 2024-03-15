@@ -39,16 +39,43 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\evaluationcontext;
 
+/**
+ * Abstract class representing a notification condition plugin.
+ *
+ * This class should be extended to implement the necessary logic
+ * for evaluating conditions specific to notification plugins.
+ *
+ */
 abstract class notificationconditionplugin extends notificationplugin {
 
+    /**
+     * Get the type of the function.
+     *
+     * @return string
+     */
     public function get_type() {
         return parent::TYPE_CONDITION;
     }
 
+    /**
+     * Get the title of the condition.
+     *
+     * @return string The title of the condition.
+     */
     abstract public function get_title();
 
+    /**
+     * Get the elements of the condition.
+     *
+     * @return array The elements of the condition.
+     */
     abstract public function get_elements();
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     abstract public function get_subtype();
 
     /**
@@ -57,11 +84,20 @@ abstract class notificationconditionplugin extends notificationplugin {
      * @return int|null $cmid Course module id or null
      */
     public function get_cmid() {
-        return json_decode($this->get_parameters(), true)[self::UI_ACTIVITY] ?? null;
+        $cmid = null;
+        $parameters = $this->get_parameters();
+        if(!empty($parameters)){
+            $cmid = json_decode($this->get_parameters(), true)[self::UI_ACTIVITY]??null;
+        }
+        return $cmid;
     }
 
-    /*
-     * Check whether a user has capabilty to use a condition.
+    /**
+     * Checks whether the user has the capability to use the condition within a given context.
+     *
+     * @param \context $context The context to check the capability in.
+     *
+     * @return bool True if the user has the capability, false otherwise.
      */
     abstract public function check_capability($context);
 
@@ -74,9 +110,22 @@ abstract class notificationconditionplugin extends notificationplugin {
      */
     abstract public function evaluate(evaluationcontext $context): bool;
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     * Estimate the next time the condition will be true.
+     *
+     * @param evaluationcontext $context Context for the condition evaluation.
+     *
+     * @return mixed Estimated time as a Unix timestamp or null if cannot be estimated.
+     */
     abstract public function estimate_next_time(evaluationcontext $context);
 
+    /**
+     * Create subplugins from the given records.
+     *
+     * @param array $records The array of records to create subplugins from.
+     *
+     * @return array The array of created subplugins.
+     */
     public static function create_subplugins($records) {
         $subplugins = [];
         global $DB;
@@ -97,6 +146,13 @@ abstract class notificationconditionplugin extends notificationplugin {
         return $subplugins;
     }
 
+    /**
+     * Create a subplugin based on the given ID.
+     *
+     * @param int $id description
+     *
+     * @return array
+     */
     public static function create_subplugin($id) {
         global $DB;
         // Find type of subplugin.
@@ -105,8 +161,19 @@ abstract class notificationconditionplugin extends notificationplugin {
         return $subplugins[$id];
     }
 
-    public function save($idname, $data, $complementary, $students = [], &$timer = 0) {
-        global $DB;
+    /**
+     * Save data and set notifications for students.
+     *
+     * @param string    $action
+     * @param int       $idname
+     * @param \stdClass $data
+     * @param int       $complementary
+     * @param array     $students
+     * @param int       $timer
+     *
+     * @return void
+     */
+    public function save($action, $idname, $data, $complementary, $students = [], &$timer = 0) {
 
         $dataplugin = new \stdClass();
         $dataplugin->ruleid = $this->rule->get_id();
@@ -115,37 +182,35 @@ abstract class notificationconditionplugin extends notificationplugin {
         $dataplugin->complementary = $complementary;
         $dataplugin->parameters = $this->convert_parameters($idname, $data);
         $dataplugin->cmid = $this->get_cmid();
-        // Insert plugin.
-        if (!$dataplugin->id = $DB->insert_record('notificationsagent_condition', $dataplugin)) {
-            throw new moodle_exception('errorinserting_notificationsagent_condition');
-        }
-
-        $contextevaluation = new evaluationcontext();
-        $contextevaluation->set_courseid($data->courseid);
-        $contextevaluation->set_params($this->get_parameters());
-        $cache = $this->estimate_next_time($contextevaluation);
-
-        if (!$this->is_generic()) {
-            foreach ($students as $student) {
+        
+        if(parent::insert_update_delete($action, $idname, $dataplugin)){
+            $contextevaluation = new evaluationcontext();
+            $contextevaluation->set_courseid($data->courseid);
+            $contextevaluation->set_params($this->get_parameters());
+            $cache = $this->estimate_next_time($contextevaluation);
+    
+            if (!$this->is_generic()) {
+                foreach ($students as $student) {
+                    notificationsagent::set_timer_cache(
+                        $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+                    );
+                    if ($timer <= $cache) {
+                        $timer = $cache;
+                        notificationsagent::set_time_trigger(
+                            $dataplugin->ruleid, $dataplugin->id, $student->id, $data->courseid, $timer
+                        );
+                    }
+                }
+            } else {
                 notificationsagent::set_timer_cache(
-                    $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+                    notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
                 );
                 if ($timer <= $cache) {
                     $timer = $cache;
                     notificationsagent::set_time_trigger(
-                        $dataplugin->ruleid, $dataplugin->id, $student->id, $data->courseid, $timer
+                        $dataplugin->ruleid, $dataplugin->id, notificationsagent::GENERIC_USERID, $data->courseid, $timer
                     );
                 }
-            }
-        } else {
-            notificationsagent::set_timer_cache(
-                notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
-            );
-            if ($timer <= $cache) {
-                $timer = $cache;
-                notificationsagent::set_time_trigger(
-                    $dataplugin->ruleid, $dataplugin->id, notificationsagent::GENERIC_USERID, $data->courseid, $timer
-                );
             }
         }
     }

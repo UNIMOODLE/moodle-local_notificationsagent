@@ -153,6 +153,9 @@ $string['editrule_action_error'] = 'Heu d\'afegir almenys una acció';
 $string['rulecancelled'] = 'Regla cancel·lada';
 $string['rulesaved'] = 'Regla desada';
 
+// Rule errors
+$string['editrule_runtime_error'] = 'Si '.$string['editrule_timesfired'].' és > 0, ha d\'indicar un interval';
+
 // Card content.
 $string['cardif'] = 'Si:';
 $string['cardunless'] = 'Excepte si:';

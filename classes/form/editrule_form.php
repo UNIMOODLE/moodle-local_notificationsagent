@@ -35,6 +35,7 @@ namespace local_notificationsagent\form;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationplugin;
+use local_notificationsagent\rule;
 use notificationscondition_ac\mod_ac_availability_info;
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,37 +43,114 @@ global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once("$CFG->dirroot/local/notificationsagent/lib.php");
 
+/**
+ * Form for editing a notification rule.
+ */
 class editrule_form extends \moodleform {
 
+    /**
+     * Private variable for storing action buttons.
+     *
+     * @var array Array of action buttons.
+     */
     private $_actionbuttons = [];
 
     // JSON HIDDEN FIELDS.
+    /**
+     * JSON hidden field for availability conditions.
+     */
     public const FORM_JSON_AC = 'availabilityconditionsjson';
+
+    /**
+     * JSON hidden field for conditions.
+     */
     public const FORM_JSON_CONDITION = 'jsoncondition';
+
+    /**
+     * JSON hidden field for exceptions.
+     */
     public const FORM_JSON_EXCEPTION = 'jsonexception';
+
+    /**
+     * JSON hidden field for actions.
+     */
     public const FORM_JSON_ACTION = 'jsonaction';
 
     // SELECT BUTTONS.
+    /**
+     * Select button for adding a new condition.
+     */
     public const FORM_NEW_CONDITION_SELECT = 'newcondition_select';
+
+    /**
+     * Select button for adding a new exception.
+     */
     public const FORM_NEW_EXCEPTION_SELECT = 'newexception_select';
+
+    /**
+     * Select button for adding a new action.
+     */
     public const FORM_NEW_ACTION_SELECT = 'newaction_select';
 
     // ADD BUTTONS.
+    /**
+     * Button for adding a new condition.
+     */
     public const FORM_NEW_CONDITION_BUTTON = 'newcondition_button';
+
+    /**
+     * Button for adding a new exception.
+     */
     public const FORM_NEW_EXCEPTION_BUTTON = 'newexception_button';
+
+    /**
+     * Button for adding a new action.
+     */
     public const FORM_NEW_ACTION_BUTTON = 'newaction_button';
 
     // REMOVE BUTTONS.
+    /**
+     * Button for removing a condition.
+     */
     public const FORM_REMOVE_CONDITION_BUTTON = 'remove_condition_button';
+
+    /**
+     * Button for removing an exception.
+     */
     public const FORM_REMOVE_EXCEPTION_BUTTON = 'remove_exception_button';
+
+    /**
+     * Button for removing an action.
+     */
     public const FORM_REMOVE_ACTION_BUTTON = 'remove_action_button';
 
     // SPAN (CSS CLASSES).
+    /**
+     * Span (CSS class) for removing a condition.
+     */
     public const FORM_REMOVE_CONDITION_SPAN = 'remove-condition-span';
+
+    /**
+     * Span (CSS class) for removing an exception.
+     */
     public const FORM_REMOVE_EXCEPTION_SPAN = 'remove-exception-span';
+
+    /**
+     * Span (CSS class) for removing an action.
+     */
     public const FORM_REMOVE_ACTION_SPAN = 'remove-action-span';
 
-    // Add elements to form.
+    /**
+     * Action from json
+     */
+    public const FORM_JSON_ACTION_INSERT = 'insert';
+    public const FORM_JSON_ACTION_UPDATE = 'update';
+    public const FORM_JSON_ACTION_DELETE = 'delete';
+
+    /**
+     * Add elements to form.
+     *
+     */
     public function definition() {
         global $CFG;
 
@@ -169,6 +247,9 @@ class editrule_form extends \moodleform {
         $this->_actionbuttons = $buttonarray;
     }
 
+    /**
+     * Elements after data.
+     */
     public function definition_after_data() {
         parent::definition_after_data();
 
@@ -184,7 +265,10 @@ class editrule_form extends \moodleform {
     }
 
     /**
-     * Set JSON fields form with BBDD values
+     * Set the initial value of a JSON tab based on database data.
+     *
+     * @param array $fromdb  description of the fromdb parameter
+     * @param string $element description of the element parameter
      */
     private function setInitialJsonTabValue($fromdb, $element) {
         $mform = $this->_form;
@@ -234,7 +318,10 @@ class editrule_form extends \moodleform {
     }
 
     /**
-     * Add new plugin to JSON
+     * Add a JSON element to the form based on the type and plugin name.
+     *
+     * @param string $type       Subplugin type
+     * @param string $pluginname Subplugin name
      */
     private function addJson($type, $pluginname) {
         $mform = $this->_form;
@@ -249,14 +336,17 @@ class editrule_form extends \moodleform {
             $conditionvalue = json_decode($condition->getValue(), true);
         }
         $key = time();
-        $conditionvalue[$key] = ["pluginname" => $pluginname];
-        // Set default values for plugin
+        $conditionvalue[$key] = ["pluginname" => $pluginname, "action" => self::FORM_JSON_ACTION_INSERT];
+        // Set default values for plugin.
         content::set_default_plugin($this, $key, $pluginname, $type);
         $condition->setValue(json_encode($conditionvalue));
     }
 
     /**
-     * Remove plugin from JSON
+     * Remove a JSON element to the form based on the type and plugin name.
+     *
+     * @param string $type Subplugin type
+     * @param int    $id   Subplugin id
      */
     private function removeJson($type, $id) {
         $mform = $this->_form;
@@ -271,13 +361,20 @@ class editrule_form extends \moodleform {
             $conditionvalue = json_decode($condition->getValue(), true);
         }
         if (isset($conditionvalue[$id])) {
-            unset($conditionvalue[$id]);
+            // If insert, then only remove from json
+            if ($conditionvalue[$id]["action"] == self::FORM_JSON_ACTION_INSERT) {
+                unset($conditionvalue[$id]);
+            } else { // If edit, then remove delete from db
+                $conditionvalue[$id]["action"] = self::FORM_JSON_ACTION_DELETE;
+            }
         }
         $condition->setValue(json_encode($conditionvalue));
     }
 
     /**
-     * Load current JSON value and the UI from each plugin
+     * Load the JSON content.
+     *
+     * @param string $type Subplugin type
      */
     private function loadJsonContent($type) {
         $mform = $this->_form;
@@ -289,11 +386,19 @@ class editrule_form extends \moodleform {
         if (!empty($json)) {
             $json = json_decode($json, true);
             foreach ($json as $key => $value) {
-                content::get_plugin_ui($mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
+                // Load all plugins to insert or update
+                if($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE){
+                    content::get_plugin_ui($mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
+                }
             }
         }
     }
 
+    /**
+     * Load the tab content.
+     *
+     * @param string $tabtarget Tab element
+     */
     private function loadTabContent($tabtarget) {
         global $PAGE;
 
@@ -367,12 +472,29 @@ class editrule_form extends \moodleform {
         $mform->addGroup($this->_actionbuttons, 'buttonar', '', [' '], false);
     }
 
-    // Custom validation should be added here.
+    /**
+     * Custom validation should be added here.
+     *
+     * @param array $data data form
+     * @param mixed $files
+     *
+     * @return array
+     * @throws \coding_exception
+     */
     public function validation($data, $files) {
         $errors = [];
 
         // Use this code to validate the 'Restrict access' section.
         // FrontendCustom::report_validation_errors($data, $errors);.
+
+        // If timesfired > 1, runtime > 0.
+        if ($data["timesfired"] > 1) {
+            if (empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
+                && empty($data["runtime_group"]["runtime_minutes"])
+            ) {
+                $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
+            }
+        }
 
         // Count ac/conditions and actions > 0.
         $ac = $data[self::FORM_JSON_AC];
@@ -386,9 +508,42 @@ class editrule_form extends \moodleform {
             $errors["newaction_group"] = get_string('editrule_action_error', 'local_notificationsagent');
         }
 
+        // LOAD JSON.
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_CONDITION, $errors);
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_EXCEPTION, $errors);
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_ACTION, $errors);
+
         return $errors;
     }
 
+    /**
+     * Load JSON content for validation.
+     *
+     * @param string $type   Subplugin type
+     * @param array  $errors Erros
+     */
+    private function loadJsonContentForValidation($type, &$errors) {
+        $mform = $this->_form;
+        $name = $type == notificationplugin::TYPE_CONDITION
+            ? self::FORM_JSON_CONDITION
+            : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
+                : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
+        $json = $mform->getElementValue($name);
+        if (!empty($json)) {
+            $json = json_decode($json, true);
+            foreach ($json as $key => $value) {
+                content::get_validation_form_plugin(
+                    $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
+                );
+            }
+        }
+    }
+
+    /**
+     * Set the tab content for the given type.
+     *
+     * @param string $type Subplugin type
+     */
     private function settabcontent($type) {
         $mform = $this->_form; // Don't forget the underscore!
         $courseid = $this->_customdata["courseid"];
@@ -411,6 +566,9 @@ class editrule_form extends \moodleform {
         $mform->addGroup($newgroup, 'new' . $type . '_group', '', [' '], false);
     }
 
+    /**
+     * Sets the availability of tab content based on the global configuration and course context.
+     */
     private function settabcontentavailability() {
         global $CFG, $COURSE;
 
@@ -427,8 +585,19 @@ class editrule_form extends \moodleform {
     }
 }
 
+/**
+ * Content class, contains functions to display html content.
+ */
 class content {
 
+    /**
+     * Instance the subplugin.
+     *
+     * @param string $pluginname Subplugin name
+     * @param string $subtype    Subplugin type
+     *
+     * @return mixed
+     */
     private static function instance_subplugin($pluginname, $subtype) {
         $rule = new \stdClass();
         $rule->id = null;
@@ -441,27 +610,63 @@ class content {
         return false;
     }
 
+    /**
+     * Get the plugin UI.
+     *
+     * @param \moodleform $mform      Form
+     * @param int         $id         id
+     * @param int         $idcourse   course id
+     * @param string      $pluginname Subplugin name
+     * @param string      $subtype    Subplugin type
+     */
     public static function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype) {
         if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
             $pluginobj->get_ui($mform, $id, $idcourse, $subtype);
         }
     }
 
+    /**
+     * Set the default plugin for a form and id.
+     *
+     * @param \moodleform $form       Form
+     * @param int         $id         id
+     * @param string      $pluginname Subplugin name
+     * @param string      $subtype    Subplugin type
+     */
     public static function set_default_plugin($form, $id, $pluginname, $subtype) {
         if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
             $pluginobj->set_default($form, $id);
         }
     }
 
+    /**
+     * Get the validation form plugin.
+     *
+     * @param \moodleform $mform      Form
+     * @param int         $id         id
+     * @param int         $idcourse   course id
+     * @param string      $pluginname Subplugin name
+     * @param string      $subtype    Subplugin type
+     * @param array       $errors     description
+     */
+    public static function get_validation_form_plugin($mform, $id, $idcourse, $pluginname, $subtype, &$errors) {
+        if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
+            $pluginobj->validation_form($mform, $id, $idcourse, $errors);
+        }
+    }
+
 }
 
+/**
+ * Extends the core_availability\frontend class to handle custom frontend actions.
+ */
 class frontendCustom extends \core_availability\frontend {
     /**
      * Includes JavaScript for the main system and all plugins.
      *
-     * @param \stdClass     $course  Course object
-     * @param \cm_info      $cm      Course-module currently being edited (null if none)
-     * @param \section_info $section Section currently being edited (null if none)
+     * @param \stdClass          $course  Course object
+     * @param \cm_info|null      $cm      Course-module currently being edited (null if none)
+     * @param \section_info|null $section Section currently being edited (null if none)
      */
     public static function include_all_javascript($course, \cm_info $cm = null, \section_info $section = null) {
         global $PAGE;

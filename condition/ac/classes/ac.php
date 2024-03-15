@@ -21,7 +21,7 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -37,13 +37,25 @@ use local_notificationsagent\form\editrule_form;
 
 class ac extends notificationconditionplugin {
 
-    /** @var UI ELEMENTS */
+    /**
+     * Subplugin name
+     */
     public const NAME = 'ac';
 
+    /**
+     * Subplugin title
+     *
+     * @return \lang_string|string
+     */
     public function get_title() {
         return get_string('conditiontext', 'notificationscondition_ac');
     }
 
+    /**
+     *  Subplugins elements
+     *
+     * @return string[]
+     */
     public function get_elements() {
     }
 
@@ -131,12 +143,15 @@ class ac extends notificationconditionplugin {
         return [editrule_form::FORM_JSON_AC => $this->get_parameters()];
     }
 
-    public function save($idname, $data, $complementary, $students = [], &$timer = 0) {
+    public function save($action, $idname, $data, $complementary, $students = [], &$timer = 0) {
         // Get data from form.
         $this->convert_parameters($idname, $data);
-        // If availability json is filled.
-        if (!mod_ac_availability_info::is_empty($this->get_parameters())) {
-            parent::save($idname, $data, $complementary, $students, $timer);
+        // If availability json is empty and row exists (UPDATE) then $action = delete
+        if (mod_ac_availability_info::is_empty($this->get_parameters()) && $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
+            $action = editrule_form::FORM_JSON_ACTION_DELETE;
+            parent::save($action, $idname, $data, $complementary, $students, $timer);
+        }else if(!mod_ac_availability_info::is_empty($this->get_parameters())){
+            parent::save($action, $idname, $data, $complementary, $students, $timer);
         }
     }
 
