@@ -36,17 +36,17 @@ php admin/tool/phpunit/cli/init.php
 
 This command will run all the test in the plug-in and subplugin suites.
 ```sh
-vendor/bin/phpunit --testdox --group notificationsagent
+vendor/bin/phpunit --group notificationsagent
 ```
 
 If we only need to test one of the suites:
 ```sh
-vendor/bin/phpunit --testdox --testsuite local_notificationsagent_testsuite
+vendor/bin/phpunit --testsuite local_notificationsagent_testsuite
 ```
 
 Or one particular test:
 ```sh
-vendor/bin/phpunit --testdox local/notificationsagent/condition/weekend/tests/weekend_test.php
+vendor/bin/phpunit local/notificationsagent/condition/weekend/tests/weekend_test.php
 ```
 
 Some test use some uopz funcionality. Install it with the following commad:
