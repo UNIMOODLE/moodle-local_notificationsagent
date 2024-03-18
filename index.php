@@ -106,16 +106,21 @@ $addruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
 $addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
     'action' => 'add', 'type' => rule::TEMPLATE_TYPE,
 ]);
-$reporturl = new moodle_url("/local/notificationsagent/report.php", [
-    'courseid' => $courseid,
-]);
+if ($templatecontext['iscontextsite']) {
+    $reporturl = new moodle_url("/local/notificationsagent/report.php");
+} else {
+    $reporturl = new moodle_url("/local/notificationsagent/report.php", [
+        'courseid' => $courseid,
+    ]);
+}
+
 $templatecontext['url'] = [
     'addrule' => $addruleurl,
     'addtemplate' => $addtemplate,
     'reporturl' => $reporturl,
 ];
 
-$rules = rule::get_rules($context, $courseid, true);
+$rules = rule::get_rules($context, $courseid);
 $rulecontent = [];
 
 $conditionsarray = [];
@@ -199,7 +204,12 @@ foreach ($rules as $rule) {
             "/local/notificationsagent/editrule.php", ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
         ),
         'reporturl' => new moodle_url(
-            "/local/notificationsagent/report.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
+            "/local/notificationsagent/report.php", $templatecontext['iscontextsite']
+            ? ['ruleid' => $rule->get_id()]
+            : [
+                'courseid' => $courseid, 'ruleid' =>
+                    $rule->get_id(),
+            ],
         ),
         'exporturl' => new moodle_url(
             "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
