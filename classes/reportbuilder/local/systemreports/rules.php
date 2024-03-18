@@ -73,7 +73,7 @@ class rules extends system_report {
      * @return bool
      */
     protected function can_view(): bool {
-        return true;
+        return has_capability('local/notificationsagent:viewassistantreport', $this->get_context());
     }
 
     /**
