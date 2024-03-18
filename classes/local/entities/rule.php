@@ -174,6 +174,8 @@ class rule extends base {
         $narralias = $this->get_table_alias('notificationsagent_report');
         $narrualias = $this->get_table_alias('notificationsagent_rule');
         $coursealias = $this->get_table_alias('course');
+        $actionealias = $this->get_table_alias('notificationsagent_action');
+        $reportalias = $this->get_table_alias('notificationsagent_report');
         $rulejoin = $this->rulejoin();
 
         $filters[] = (new filter(
@@ -219,10 +221,18 @@ class rule extends base {
         ))
             ->add_joins($this->get_joins());
 
+        $filters[] = (new filter(
+            text::class,
+            'actiondetail',
+            new lang_string('actiondetail', 'local_notificationsagent'),
+            $this->get_entity_name(),
+            "{$reportalias}.actiondetail"
+        ))
+            ->add_joins($this->get_joins());
+
         return $filters;
 
     }
-
 
     /**
      * Rule join.
@@ -247,4 +257,3 @@ class rule extends base {
                     ON {$rulesreportalias}.actionid = {$actionalias}.id";
     }
 }
-

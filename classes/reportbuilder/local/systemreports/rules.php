@@ -107,6 +107,7 @@ class rules extends system_report {
             'rule:rulename',
             'course:courseselector',
             'user:fullname',
+            'rule:actiondetail',
             'rule:timestamp',
         ];
 
