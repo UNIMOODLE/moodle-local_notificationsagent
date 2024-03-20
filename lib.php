@@ -30,16 +30,31 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/**
+ * Trace for scheduled tasks. Only meant for debugging
+ * Disable in settings for producion environments.
+ *
+ * @param string $message
+ *
+ * @return void
+ */
 function custom_mtrace($message) {
-    $tracelog = get_config('notificationsagent', 'tracelog');
+    $tracelog = get_config('local_notificationsagent', 'tracelog');
     if ($tracelog) {
         mtrace($message);
     }
 }
 
 /**
- * @throws coding_exception
- * @throws moodle_exception
+ *
+ * Menu element
+ *
+ * @param navigation_node $parentnode
+ * @param stdClass        $course
+ * @param context_course  $context
+ *
+ * @return void
  */
 function local_notificationsagent_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $context) {
     if (get_config('local_notificationsagent', 'disable_user_use')) {
@@ -61,14 +76,14 @@ function local_notificationsagent_extend_navigation_course(navigation_node $pare
 }
 
 /**
+ *
  * Retrieve data for modal window
  *
- * @param $category
- * @param $ruleid
+ * @param core_course_category $category
+ * @param int                  $ruleid
  *
  * @return array
  */
-
 function build_category_array($category, $ruleid) {
     global $DB;
     $courses = $category->get_courses();
@@ -106,11 +121,10 @@ function build_category_array($category, $ruleid) {
 /**
  * Count courses under category parent
  *
- * @param $category
+ * @param core_course_category $category
  *
  * @return array
  */
-
 function count_category_courses($category) {
     $countcategorycourses = $category->coursecount;
 
@@ -125,12 +139,11 @@ function count_category_courses($category) {
 /**
  * Retrieve output for modal window
  *
- * @param     $arraycategories
- * @param int $categoryid
+ * @param array $arraycategories
+ * @param int   $categoryid
  *
  * @return string
  */
-
 function build_output_categories($arraycategories, $categoryid = 0) {
     $output = "";
     foreach ($arraycategories as $key => $category) {
@@ -213,6 +226,7 @@ function build_output_categories($arraycategories, $categoryid = 0) {
  * Returns seconds in human format
  *
  * @param integer $seconds Seconds
+ * @param bool    $toshow
  *
  * @return array|string $data Time in days, hours, minutes and seconds
  */
@@ -269,6 +283,8 @@ function to_seconds_format($time) {
 
 /**
  * Get the URL used to access the course that the instance is in.
+ *
+ * @param int $id
  *
  * @return moodle_url
  */

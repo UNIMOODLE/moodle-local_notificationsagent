@@ -76,7 +76,7 @@ mod_workshop|workshop|submissionstart|submissionend',
         $settingspage->add($settingstartdate);
 
         $settingstracelog = new admin_setting_configcheckbox(
-            'notificationsagent/tracelog',
+            'local_notificationsagent/tracelog',
             get_string('tracelog', 'local_notificationsagent'),
             get_string('tracelog_desc', 'local_notificationsagent'), false
         );
@@ -151,4 +151,3 @@ mod_workshop|workshop|submissionstart|submissionend',
     );
 
 }
-

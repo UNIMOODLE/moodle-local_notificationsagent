@@ -1,2 +1,6 @@
 *.bkp
 node_modules
+mockups/*
+tests/phpunit
+phpdoc/
+.phpdoc/
