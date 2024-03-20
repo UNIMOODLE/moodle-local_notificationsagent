@@ -114,23 +114,30 @@ class bootstrapnotifications_test extends \advanced_testcase {
      * @param string $param
      *
      * @covers       \notificationsaction_bootstrapnotifications\bootstrapnotifications::execute_action
+     * @covers       \notificationsaction_bootstrapnotifications\bootstrapmessages::get_records
      *
      * @dataProvider dataprovider
      */
     public function test_execute_action($param) {
-        global $SESSION, $USER;
+        global $USER;
         self::$context->set_params($param);
+        self::$context->set_rule(self::$rule);
         self::$context->set_userid(self::$user->id);
         self::$subplugin->set_id(self::CONDITIONID);
         $USER->id = self::$user->id;
         // Test action.
         self::$subplugin->execute_action(self::$context, $param);
 
-        $messagesent = $SESSION->notifications;
+        $messages = bootstrapmessages::get_records(
+            ['userid' => self::$context->get_userid(), 'courseid' => self::$context->get_courseid()]
+        );
+
         $params = self::$context->get_params();
         $test = json_decode($params, false);
-
-        $this->assertStringContainsString($test->message, $messagesent[0]->message);
+        //
+        $this->assertStringContainsString($test->message, $messages[0]->get('message'));
+        $this->assertEquals(self::$context->get_userid(), $messages[0]->get('userid'));
+        $this->assertEquals(self::$context->get_courseid(), $messages[0]->get('courseid'));
     }
 
     public static function dataprovider(): array {
@@ -198,14 +205,9 @@ class bootstrapnotifications_test extends \advanced_testcase {
      */
     public function test_getui() {
         $courseid = self::$coursetest->id;
-        $ruletype = rule::RULE_TYPE;
         $typeaction = "add";
         $customdata = [
-            'ruleid' => self::$rule->get_id(),
-            notificationplugin::TYPE_CONDITION => self::$rule->get_conditions(),
-            notificationplugin::TYPE_EXCEPTION => self::$rule->get_exceptions(),
-            notificationplugin::TYPE_ACTION => self::$rule->get_actions(),
-            'type' => $ruletype,
+            'rule' => self::$rule,
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,

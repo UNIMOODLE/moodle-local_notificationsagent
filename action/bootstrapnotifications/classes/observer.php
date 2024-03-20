@@ -13,9 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -31,8 +28,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+use notificationsaction_bootstrapnotifications\bootstrapmessages;
 
-$plugin->version = 2023101805;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationsaction_bootstrapnotifications';
+/**
+ * Observer for the notificationsaction_bootstrapnotifications plugin.
+ */
+class notificationsaction_bootstrapnotifications_observer {
+
+    /**
+     * A function to handle the course_viewed event.
+     *
+     * @param \core\event\course_viewed $event The course_viewed event object
+     *
+     * @return false|void
+     * @throws coding_exception
+     */
+    public static function course_viewed(\core\event\course_viewed $event) {
+        if ($event->courseid == SITEID) {
+            return false;
+        }
+
+        $messages = bootstrapmessages::get_records(['userid' => $event->userid, 'courseid' => $event->courseid]);
+
+        foreach ($messages as $message) {
+            \core\notification::success($message->get('message'));
+            $message->delete();
+        }
+
+    }
+}

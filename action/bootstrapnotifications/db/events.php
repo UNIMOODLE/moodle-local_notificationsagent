@@ -13,9 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -24,15 +21,15 @@
 /**
  * Version details
  *
- * @package    notificationsaction_bootstrapnotifications
+ * @package    notificationscondition_sessionstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2023101805;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationsaction_bootstrapnotifications';
+// This event will listen the user's first session in a course.
+$observers[] = [
+    'eventname' => '\core\event\course_viewed',
+    'callback' => 'notificationsaction_bootstrapnotifications_observer::course_viewed',
+];

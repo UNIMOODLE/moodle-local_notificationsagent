@@ -13,9 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
-//
+
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -31,8 +29,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace notificationsaction_bootstrapnotifications;
 
-$plugin->version = 2023101805;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationsaction_bootstrapnotifications';
+class bootstrapmessages extends \core\persistent {
+
+    /** Table name for the persistent. */
+    const TABLE = 'notificationsagent_bootstrap';
+
+    /**
+     * Return the definition of the properties of this model.
+     *
+     * @return array
+     */
+    protected static function define_properties() {
+        return array(
+            'userid' => array(
+                'type' => PARAM_INT,
+            ),
+            'courseid' => array(
+                'type' => PARAM_INT,
+            ),
+            'message' => array(
+                'type' => PARAM_RAW,
+            ),
+        );
+    }
+}

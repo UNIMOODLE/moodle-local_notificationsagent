@@ -35,6 +35,7 @@ namespace notificationsaction_bootstrapnotifications;
 
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
+use notificationsaction_bootstrapnotifications\bootstrapmessages;
 
 class bootstrapnotifications extends notificationactionplugin {
 
@@ -56,7 +57,9 @@ class bootstrapnotifications extends notificationactionplugin {
         $this->placeholders($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_TEXT);
-        $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), '- You must supply a value here.', 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+        );
     }
 
     /**
@@ -123,14 +126,15 @@ class bootstrapnotifications extends notificationactionplugin {
     }
 
     public function execute_action($context, $params) {
-        global $USER;
-
         $placeholdershuman = json_decode($params);
+        $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
 
-        if ($USER->id == $context->get_userid()) {
-            echo \core\notification::success(format_text($placeholdershuman->{self::UI_MESSAGE}));
-            return true;
-        }
+        $bootstrap = new bootstrapmessages();
+        $bootstrap->set('userid', $context->get_userid());
+        $bootstrap->set('courseid', $context->get_courseid());
+        $bootstrap->set('message', format_text($sendmessage));
+        $bootstrap->save();
+        return true;
     }
 
     public function is_generic() {
