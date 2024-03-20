@@ -35,7 +35,7 @@ namespace local_notificationsagent\task;
 
 use core\task\scheduled_task;
 use local_notificationsagent\engine\notificationsagent_engine;
-
+use local_notificationsagent\notificationsagent;
 
 /**
  * Class to define the task to trigger notifications agent.
@@ -54,7 +54,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
      * Execute the cron.
      */
     public function execute() {
-        global $CFG, $DB;
+        global $DB, $CFG;
         require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
         $timestarted = $this->get_timestarted();
         $classname = get_called_class();
@@ -74,7 +74,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $tasklastrunttime = reset($lastruntime)->timestart;
         custom_mtrace("Task started-> " . $timestarted);
         // Rules in the interval  $timestarted and $tasklastrunttime.
-        $triggers = get_rulesbytimeinterval($timestarted, $tasklastrunttime);
+        $triggers = notificationsagent::get_triggersbytimeinterval($timestarted, $tasklastrunttime);
         // Evalutate rules.
         foreach ($triggers as $trigger) {
             notificationsagent_engine::notificationsagent_engine_evaluate_rule(

@@ -24,26 +24,24 @@
 /**
  * Version details
  *
- * @package    notificationscondition_courseend
+ * @package    notificationscondition_activityend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_courseend;
+namespace notificationscondition_activityend\task;
 
-use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_courseend\task\courseend_crontask;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * @group notificationsagent
  */
-class courseend_crontask_test extends \advanced_testcase {
+class activityend_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -99,15 +97,15 @@ class courseend_crontask_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationscondition_courseend\task\courseend_crontask::execute
+     * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'courseend';
+        $pluginname = 'activityend';
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmtestcect = $quizgen->create_instance([
+        $cmtestacct = $quizgen->create_instance([
             'course' => self::$course->id,
             'timeopen' => self::CM_DATESTART,
             'timeclose' => self::CM_DATEEND,
@@ -128,23 +126,23 @@ class courseend_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestcect->cmid . '"}';
-        $objdb->cmid = $cmtestcect->id;
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestacct->cmid . '"}';
+        $objdb->cmid = $cmtestacct->id;
 
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $task = \core\task\manager::get_scheduled_task(courseend_crontask::class);
+        $task = \core\task\manager::get_scheduled_task(activityend_crontask::class);
         $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::COURSE_DATEEND - $date, $cache->timestart);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals(self::CM_DATEEND - $date, $cache->timestart);
+        $this->assertEquals(self::$user->id, $cache->userid);
 
     }
 
@@ -155,5 +153,3 @@ class courseend_crontask_test extends \advanced_testcase {
         ];
     }
 }
-
-

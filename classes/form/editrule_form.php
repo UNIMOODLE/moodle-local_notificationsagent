@@ -55,6 +55,13 @@ class editrule_form extends \moodleform {
      */
     private $_actionbuttons = [];
 
+    /**
+     * Private variable for $rule.
+     *
+     * @var rule Instance of rule
+     */
+    private $_rule;
+
     // JSON HIDDEN FIELDS.
     /**
      * JSON hidden field for availability conditions.
@@ -155,6 +162,7 @@ class editrule_form extends \moodleform {
         global $CFG;
 
         $mform = $this->_form; // Don't forget the underscore!
+        $rule = $this->_rule = $this->_customdata['rule'];
 
         $mform->addElement(
             'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
@@ -195,7 +203,7 @@ class editrule_form extends \moodleform {
 
         $mform->addElement('hidden', 'ruleid');
         $mform->setType('ruleid', PARAM_INT);
-        $mform->setDefault('ruleid', $this->_customdata["ruleid"]);
+        $mform->setDefault('ruleid', $rule->get_id());
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
         $mform->setDefault('courseid', $this->_customdata["courseid"]);
@@ -208,23 +216,23 @@ class editrule_form extends \moodleform {
 
         $mform->addElement('hidden', 'type', get_string('editrule_type', 'local_notificationsagent'));
         $mform->setType('type', PARAM_INT);
-        $mform->setDefault('type', $this->_customdata['type']);
+        $mform->setDefault('type', $rule->get_template());
 
         // JSON WITH SUBPLUGINS SELECTED.
         $mform->addElement('hidden', self::FORM_JSON_CONDITION);
         $mform->setType(self::FORM_JSON_CONDITION, PARAM_RAW);
         $this->setInitialJsonTabValue(
-            $this->_customdata[notificationplugin::TYPE_CONDITION], self::FORM_JSON_CONDITION
+            $rule->get_conditions(), self::FORM_JSON_CONDITION
         );// LOAD JSON FROM DB.
         $mform->addElement('hidden', self::FORM_JSON_EXCEPTION);
         $mform->setType(self::FORM_JSON_EXCEPTION, PARAM_RAW);
         $this->setInitialJsonTabValue(
-            $this->_customdata[notificationplugin::TYPE_EXCEPTION], self::FORM_JSON_EXCEPTION
+            $rule->get_exceptions(), self::FORM_JSON_EXCEPTION
         );// LOAD JSON FROM DB.
         $mform->addElement('hidden', self::FORM_JSON_ACTION);
         $mform->setType(self::FORM_JSON_ACTION, PARAM_RAW);
         $this->setInitialJsonTabValue(
-            $this->_customdata[notificationplugin::TYPE_ACTION], self::FORM_JSON_ACTION
+            $rule->get_actions(), self::FORM_JSON_ACTION
         );// LOAD JSON FROM DB.
 
         // ...registerNoSubmitButton for each tab.
@@ -338,7 +346,7 @@ class editrule_form extends \moodleform {
         $key = time();
         $conditionvalue[$key] = ["pluginname" => $pluginname, "action" => self::FORM_JSON_ACTION_INSERT];
         // Set default values for plugin.
-        content::set_default_plugin($this, $key, $pluginname, $type);
+        content::set_default_plugin($this->_rule, $this, $key, $pluginname, $type);
         $condition->setValue(json_encode($conditionvalue));
     }
 
@@ -388,7 +396,7 @@ class editrule_form extends \moodleform {
             foreach ($json as $key => $value) {
                 // Load all plugins to insert or update
                 if($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE){
-                    content::get_plugin_ui($mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
+                    content::get_plugin_ui($this->_rule, $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
                 }
             }
         }
@@ -533,7 +541,7 @@ class editrule_form extends \moodleform {
             $json = json_decode($json, true);
             foreach ($json as $key => $value) {
                 content::get_validation_form_plugin(
-                    $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
+                    $this->_rule, $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
                 );
             }
         }
@@ -593,14 +601,13 @@ class content {
     /**
      * Instance the subplugin.
      *
+     * @param rule $rule  rule
      * @param string $pluginname Subplugin name
      * @param string $subtype    Subplugin type
      *
      * @return mixed
      */
-    private static function instance_subplugin($pluginname, $subtype) {
-        $rule = new \stdClass();
-        $rule->id = null;
+    private static function instance_subplugin($rule, $pluginname, $subtype) {
         $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION
             : notificationplugin::TYPE_CONDITION);
         $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
@@ -613,14 +620,15 @@ class content {
     /**
      * Get the plugin UI.
      *
+     * @param rule $rule  rule
      * @param \moodleform $mform      Form
      * @param int         $id         id
      * @param int         $idcourse   course id
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
-    public static function get_plugin_ui($mform, $id, $idcourse, $pluginname, $subtype) {
-        if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
+    public static function get_plugin_ui($rule, $mform, $id, $idcourse, $pluginname, $subtype) {
+        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
             $pluginobj->get_ui($mform, $id, $idcourse, $subtype);
         }
     }
@@ -628,13 +636,14 @@ class content {
     /**
      * Set the default plugin for a form and id.
      *
+     * @param rule $rule  rule
      * @param \moodleform $form       Form
      * @param int         $id         id
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
-    public static function set_default_plugin($form, $id, $pluginname, $subtype) {
-        if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
+    public static function set_default_plugin($rule, $form, $id, $pluginname, $subtype) {
+        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
             $pluginobj->set_default($form, $id);
         }
     }
@@ -642,6 +651,7 @@ class content {
     /**
      * Get the validation form plugin.
      *
+     * @param rule $rule  rule
      * @param \moodleform $mform      Form
      * @param int         $id         id
      * @param int         $idcourse   course id
@@ -649,8 +659,8 @@ class content {
      * @param string      $subtype    Subplugin type
      * @param array       $errors     description
      */
-    public static function get_validation_form_plugin($mform, $id, $idcourse, $pluginname, $subtype, &$errors) {
-        if ($pluginobj = self::instance_subplugin($pluginname, $subtype)) {
+    public static function get_validation_form_plugin($rule, $mform, $id, $idcourse, $pluginname, $subtype, &$errors) {
+        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
             $pluginobj->validation_form($mform, $id, $idcourse, $errors);
         }
     }

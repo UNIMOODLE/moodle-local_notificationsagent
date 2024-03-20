@@ -31,15 +31,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activitylastsend;
+namespace notificationscondition_activitylastsend\task;
 
-use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_activitylastsend\task\activitylastsend_crontask;
-use notificationscondition_activitylastsend\activitylastsend;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * @group notificationsagent

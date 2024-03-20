@@ -166,6 +166,7 @@ $string['rulecancelled'] = 'Rule cancelled';
 $string['rulesaved'] = 'Rule saved';
 
 // Rule errors
+$string['editrule_required_error'] = 'Required field';
 $string['editrule_runtime_error'] = 'If '.$string['editrule_timesfired'].' is > 0, must indicate an interval';
 
 // Card content.

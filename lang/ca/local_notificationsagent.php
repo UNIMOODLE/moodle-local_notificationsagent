@@ -154,6 +154,7 @@ $string['rulecancelled'] = 'Regla cancel·lada';
 $string['rulesaved'] = 'Regla desada';
 
 // Rule errors
+$string['editrule_required_error'] = 'Camp requerit';
 $string['editrule_runtime_error'] = 'Si '.$string['editrule_timesfired'].' és > 0, ha d\'indicar un interval';
 
 // Card content.

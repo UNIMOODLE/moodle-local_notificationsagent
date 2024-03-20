@@ -76,6 +76,14 @@ abstract class notificationplugin {
     public const UI_ACTIVITY = 'cmid';
 
     /**
+     * User interface constants for forum jsons.
+     */
+    public const UI_TITLE = 'title';
+    public const UI_MESSAGE = 'message';
+    public const UI_MESSAGE_FORMAT = 'format';
+    public const UI_MESSAGE_ITEMID = 'itemid';
+
+    /**
      * User interface constant for time.
      */
     public const UI_TIME = 'time';
@@ -326,7 +334,7 @@ abstract class notificationplugin {
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
-        $mform->addGroupRule($this->get_name_ui($id, $this->get_subtype()), '- You must supply a value here.', 'required');
+        $mform->addGroupRule($this->get_name_ui($id, $this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     /**

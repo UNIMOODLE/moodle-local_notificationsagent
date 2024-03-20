@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -24,27 +24,25 @@
 /**
  * Version details
  *
- * @package    notificationscondition_weekend
+ * @package    notificationscondition_courseend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_weekend;
+namespace notificationscondition_courseend\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_weekend\task\weekend_crontask;
-use notificationscondition_weekend\weekend;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * @group notificationsagent
  */
-class weekend_crontask_test extends \advanced_testcase {
+class courseend_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -95,16 +93,25 @@ class weekend_crontask_test extends \advanced_testcase {
                 'enddate' => self::COURSE_DATEEND,
             ])
         );
+        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
+
     }
 
     /**
-     * @covers       \notificationscondition_weekend\task\weekend_crontask::execute
+     * @covers       \notificationscondition_courseend\task\courseend_crontask::execute
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'weekend';
-        \uopz_set_return('time', $date);
+        $pluginname = 'courseend';
+
+        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestcect = $quizgen->create_instance([
+            'course' => self::$course->id,
+            'timeopen' => self::CM_DATESTART,
+            'timeclose' => self::CM_DATEEND,
+        ]);
+
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -120,36 +127,30 @@ class weekend_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = null;
-        $objdb->cmid = 3;
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestcect->cmid . '"}';
+        $objdb->cmid = $cmtestcect->id;
+
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $task = \core\task\manager::get_scheduled_task(weekend_crontask::class);
-        $task->set_timestarted($date);
-        $result = $task->execute();
+        $task = \core\task\manager::get_scheduled_task(courseend_crontask::class);
+        $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
-        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
-        if (!weekend::is_weekend($date)) {
-            $this->assertNull($result);
-        } else {
-            $this->assertEquals(self::$course->id, $trigger->courseid);
-            $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
-        }
+        $this->assertEquals($pluginname, $cache->pluginname);
+        $this->assertEquals(self::$course->id, $cache->courseid);
+        $this->assertEquals(self::COURSE_DATEEND - $date, $cache->timestart);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
-        uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {
         return [
-            [1706182049],
-            [1705741200],
-            [1705827600],
+            [86400],
+            [86400 * 3],
         ];
     }
 }

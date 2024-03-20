@@ -35,6 +35,7 @@ namespace notificationscondition_activitymodified;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\rule;
 
 class activitymodified extends notificationconditionplugin {
 
@@ -113,9 +114,11 @@ class activitymodified extends notificationconditionplugin {
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
         }
-        if (empty($listactivities)) {
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
+        
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -128,6 +131,7 @@ class activitymodified extends notificationconditionplugin {
             $listactivities
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     public function check_capability($context) {
@@ -173,6 +177,11 @@ class activitymodified extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     *  Is subplugin generic
+     *
+     * @return true
+     */
     public function is_generic() {
         return true;
     }

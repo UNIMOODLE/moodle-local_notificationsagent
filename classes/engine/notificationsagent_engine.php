@@ -193,4 +193,3 @@ class notificationsagent_engine {
         }
     }
 }
-

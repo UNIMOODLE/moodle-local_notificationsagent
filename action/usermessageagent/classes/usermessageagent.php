@@ -94,9 +94,11 @@ class usermessageagent extends notificationactionplugin {
             );
         }
 
-        if (empty($listusers)) {
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listusers['0'] = 'UUUU';
         }
+
         asort($listusers);
 
         $user = $mform->createElement(
@@ -115,6 +117,7 @@ class usermessageagent extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->addRule($this->get_name_ui($id, self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     /**

@@ -152,6 +152,7 @@ $string['rulecancelled'] = 'Regra cancelada';
 $string['rulesaved'] = 'Gardouse a regra';
 
 // Rule errors
+$string['editrule_required_error'] = 'Campo obrigatorio';
 $string['editrule_runtime_error'] = 'Si '.$string['editrule_timesfired'].' é > 0, debe indicar un intervalo';
 
 // Contido da tarxeta.

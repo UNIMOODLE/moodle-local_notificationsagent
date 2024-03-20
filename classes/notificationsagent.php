@@ -507,21 +507,21 @@ class notificationsagent {
                       JOIN {modules} mm ON mm.id = mcm.module
                      WHERE mcm.id = :cmid";
 
-        if($modtype = $DB->get_record_sql($starttimequery, ['cmid' => $cmid])){
+        if ($modtype = $DB->get_record_sql($starttimequery, ['cmid' => $cmid])) {
             $config = get_config('local_notificationsagent', 'startdate');
             $array = explode("\n", $config);
-    
+
             foreach (preg_grep('/\b' . $modtype->name . '\b/i', $array) as $key => $value) {
                 $line = $value;
             }
-    
+
             if (!empty($line)) {
                 $datatables = explode("|", $line);
                 list($pluginname, $table, $timestart, $timeend) = $datatables;
                 $dates = "SELECT " . $timestart . " AS timestart, " . $timeend . "  as timeend
                     FROM {" . $table . "}
                     WHERE id = :instance";
-    
+
                 $dates = $DB->get_record_sql(
                     $dates,
                     [
@@ -533,9 +533,9 @@ class notificationsagent {
             if (empty($dates->timestart)) {
                 $dates->timestart = get_course($modtype->course)->startdate;
             }
-            
+
             if (empty($dates->timeend)) {
-                $dates->timeend = null;
+                $dates->timeend = get_course($modtype->course)->enddate;
             }
 
         }
@@ -589,5 +589,35 @@ class notificationsagent {
         );
 
         return is_numeric($ruleoff);
+    }
+
+    /**
+     * Get triggers to evaluate.
+     *
+     * @param $timestarted
+     * @param $tasklastrunttime
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public static function get_triggersbytimeinterval($timestarted, $tasklastrunttime) {
+        global $DB;
+        $rulesidquery = "
+                    SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid
+                      FROM {notificationsagent_triggers} nt
+                      JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
+                     WHERE startdate
+                   BETWEEN :tasklastrunttime AND :timestarted
+                       AND nt.courseid != :courseid
+                     ";
+
+        return $DB->get_records_sql(
+            $rulesidquery,
+            [
+                'tasklastrunttime' => $tasklastrunttime,
+                'timestarted' => $timestarted,
+                'courseid' => SITEID,
+            ]
+        );
     }
 }

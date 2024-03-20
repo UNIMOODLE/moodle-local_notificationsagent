@@ -159,6 +159,7 @@ $string['rulecancelled'] = 'Araua bertan behera utzi da';
 $string['rulesaved'] = 'Araua gorde da';
 
 // Rule errors
+$string['editrule_required_error'] = 'Beharrezko eremua';
 $string['editrule_runtime_error'] = 'Ez '.$string['editrule_timesfired'].' > 0 da, tarte bat adierazi behar du';
 
 // Txartelaren edukia.

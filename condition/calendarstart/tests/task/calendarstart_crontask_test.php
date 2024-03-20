@@ -24,26 +24,25 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activitysinceend
+ * @package    notificationscondition_calendarstart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activitysinceend;
+namespace notificationscondition_calendarstart\task;
 
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_activitysinceend\task\activitysinceend_crontask;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
-require_once(__DIR__ . '/../../../../../lib/completionlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * @group notificationsagent
  */
-class activitysinceend_crontask_test extends \advanced_testcase {
+class calendarstart_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -57,6 +56,7 @@ class activitysinceend_crontask_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
+    private static $calendarevent;
     /**
      * Date start for the course
      */
@@ -81,41 +81,47 @@ class activitysinceend_crontask_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
+    public const DURATION = 30 * 86400;
 
     final public function setUp(): void {
         parent::setUp();
-        global $CFG;
         $this->resetAfterTest();
-        $CFG->enablecompletion = COMPLETION_ENABLED;
         $rule = new rule();
         self::$rule = $rule;
-        self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
                 'startdate' => self::COURSE_DATESTART,
                 'enddate' => self::COURSE_DATEEND,
-                'enablecompletion' => true,
             ])
         );
-        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
+        $coursecontext = \context_course::instance(self::$course->id);
+        self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
+        self::setUser(self::$user);
+        self::$calendarevent = self::getDataGenerator()->create_event(
+            [
+                'timestart' => self::COURSE_DATESTART,
+                'timeduration' => self::DURATION,
+                'courseid' => self::$course->id,
+                'userid' => self::$user->id,
+            ]
+        );
 
     }
 
     /**
-     * @covers       \notificationscondition_activitysinceend\task\activitysinceend_crontask::execute
+     * @covers       \notificationscondition_calendarstart\task\calendarstart_crontask::execute
      * @dataProvider dataprovider
      */
-    public function test_execute($time, $date) {
+    public function test_execute($date, $radio) {
         global $DB, $USER;
-        \uopz_set_return('time', $date);
-        $pluginname = 'activitysinceend';
+        $pluginname = 'calendarstart';
 
-        $modinstance = self::getDataGenerator()->create_module('quiz', [
-            'course' => self::$course,
-            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestacct = $quizgen->create_instance([
+            'course' => self::$course->id,
+            'timeopen' => self::CM_DATESTART,
+            'timeclose' => self::CM_DATEEND,
         ]);
-
-        $cmtestasect = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -132,39 +138,39 @@ class activitysinceend_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestasect->id . '"}';
-        $objdb->cmid = 3;
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . self::$calendarevent->id . '", "radio":"' . $radio . '"}';
+        $objdb->cmid = $cmtestacct->id;
+
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $completion = new \completion_info(self::$course);
-        $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
-
-        $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
-        $result = $task->execute();
+        $task = \core\task\manager::get_scheduled_task(calendarstart_crontask::class);
+        $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
-        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
-        $this->assertEquals($pluginname, $cache->pluginname);
-        $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(time() + $date, $cache->timestart);
-        $this->assertEquals(self::$user->id, $cache->userid);
+        if ($radio === 1) {
+            $this->assertEquals($pluginname, $cache->pluginname);
+            $this->assertEquals(self::$course->id, $cache->courseid);
+            $this->assertEquals(self::$calendarevent->timestart + $date, $cache->timestart);
+            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        } else {
+            $this->assertEquals($pluginname, $cache->pluginname);
+            $this->assertEquals(self::$course->id, $cache->courseid);
+            $this->assertEquals(self::$calendarevent->timestart + $date + self::DURATION, $cache->timestart);
+            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        }
 
-        $this->assertEquals(self::$course->id, $trigger->courseid);
-        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(self::$user->id, $trigger->userid);
-        uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {
         return [
-            [1704445200, 86400],
-            [1706173200, 86400 * 3],
+            [86400, 1],
+            [86400 * 3, 1],
+            [86400, 0],
+            [86400 * 3, 0],
         ];
     }
 }
-
-

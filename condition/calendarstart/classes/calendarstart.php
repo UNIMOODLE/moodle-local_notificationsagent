@@ -40,6 +40,7 @@ require_once(__DIR__ . '/../../../../../calendar/lib.php');
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\rule;
 
 class calendarstart extends notificationconditionplugin {
 
@@ -146,6 +147,11 @@ class calendarstart extends notificationconditionplugin {
                 " - " . userdate($event->timestart + $event->timeduration);
         }
 
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+            $events['0'] = 'CCCC';
+        }
+
         $element = $mform->createElement(
             'select', $this->get_name_ui($id, self::UI_ACTIVITY),
             get_string(
@@ -176,6 +182,7 @@ class calendarstart extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
         $mform->insertElementBefore($radiogroup, 'new' . $type . '_group');
     }
 

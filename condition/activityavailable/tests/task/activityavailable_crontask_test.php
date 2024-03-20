@@ -31,13 +31,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activityavailable;
+namespace notificationscondition_activityavailable\task;
 
 use local_notificationsagent\rule;
-use notificationscondition_activityavailable\task\activityavailable_crontask;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * @group notificationsagent
@@ -156,5 +155,3 @@ class activityavailable_crontask_test extends \advanced_testcase {
     }
 
 }
-
-

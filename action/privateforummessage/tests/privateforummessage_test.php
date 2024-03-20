@@ -146,7 +146,7 @@ class privateforummessage_test extends \advanced_testcase {
                 'pluginname' => 'forumnoreply', 'cmid' => $cmtestapf->cmid,
             ],
         );
-        $actionparam = '{"title":"titulo", "message": "forumbody test", "cmid":' . $cmtestapf->cmid . '}';
+        $actionparam = '{"title":"titulo", "message":"forumbody test", "format":' . FORMAT_PLAIN . ', "cmid":' . $cmtestapf->cmid . '}';
 
         $DB->insert_record(
             'notificationsagent_action',
@@ -255,14 +255,9 @@ class privateforummessage_test extends \advanced_testcase {
      */
     public function test_getui() {
         $courseid = self::$coursetest->id;
-        $ruletype = rule::RULE_TYPE;
         $typeaction = "add";
         $customdata = [
-            'ruleid' => self::$rule->get_id(),
-            notificationplugin::TYPE_CONDITION => self::$rule->get_conditions(),
-            notificationplugin::TYPE_EXCEPTION => self::$rule->get_exceptions(),
-            notificationplugin::TYPE_ACTION => self::$rule->get_actions(),
-            'type' => $ruletype,
+            'rule' => self::$rule,
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -383,6 +378,7 @@ class privateforummessage_test extends \advanced_testcase {
         $obj->mailed = FORUM_MAILED_PENDING;
         $obj->subject = 'Post subject';
         $obj->message = 'Post message';
+        $obj->messageformat = 0;
         $obj->forum = $cmtestfap->id;
         $obj->course = self::$coursetest->id;
 

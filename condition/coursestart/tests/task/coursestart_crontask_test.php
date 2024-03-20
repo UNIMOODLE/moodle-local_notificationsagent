@@ -24,26 +24,23 @@
 /**
  * Version details
  *
- * @package    notificationscondition_calendareventto
+ * @package    notificationscondition_coursestart
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_calendareventto;
+namespace notificationscondition_coursestart\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_calendareventto\task\calendareventto_crontask;
-
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
 
 /**
- * @group notificationsagent
+ * @covers \notificationscondition_coursestart\task\coursestart_crontask
+ * @group  notificationsagent
  */
-class calendareventto_crontask_test extends \advanced_testcase {
+class coursestart_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -57,10 +54,6 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
-    /**
-     * @var \stdClass
-     */
-    private static $calendarevent;
     /**
      * Date start for the course
      */
@@ -85,40 +78,37 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
-    public const DURATION = 30 * 86400;
 
     final public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
         self::$rule = $rule;
+        self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
                 'startdate' => self::COURSE_DATESTART,
                 'enddate' => self::COURSE_DATEEND,
             ])
         );
-        $coursecontext = \context_course::instance(self::$course->id);
-        self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
-        self::setUser(self::$user);
-        self::$calendarevent = self::getDataGenerator()->create_event(
-            [
-                'timestart' => self::COURSE_DATESTART,
-                'timeduration' => self::DURATION,
-                'courseid' => self::$course->id,
-                'userid' => self::$user->id,
-            ]
-        );
+        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
 
     }
 
     /**
-     * @covers       \notificationscondition_calendareventto\task\calendareventto_crontask::execute
+     * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'calendareventto';
+        $pluginname = 'coursestart';
+
+        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestcsct = $quizgen->create_instance([
+            'course' => self::$course->id,
+            'timeopen' => self::CM_DATESTART,
+            'timeclose' => self::CM_DATEEND,
+        ]);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -135,30 +125,30 @@ class calendareventto_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . self::$calendarevent->id . '"}';
-        $objdb->cmid = self::$calendarevent->id;
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestcsct->cmid . '"}';
+        $objdb->cmid = $cmtestcsct->id;
 
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $task = \core\task\manager::get_scheduled_task(calendareventto_crontask::class);
+        $task = \core\task\manager::get_scheduled_task(coursestart_crontask::class);
         $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::$calendarevent->timestart - $date, $cache->timestart);
+        $this->assertEquals(self::COURSE_DATESTART + $date, $cache->timestart);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+
     }
 
     public static function dataprovider(): array {
         return [
-            [60 * 60 * 24 * 70],
+            [86400],
+            [86400 * 3],
         ];
     }
 }
-
-

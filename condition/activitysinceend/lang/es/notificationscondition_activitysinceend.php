@@ -32,14 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condición: fecha relativa desde el fin de la actividad';
-$string['conditiontext'] = 'Han pasado [TTTT] desde el logro del hito de la actividad [AAAA].';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde la marca de finalización de la actividad [AAAA].';
 $string['subtype'] = 'activitysinceend';
 $string['modname'] = 'activitysinceend';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['activitysinceend_crontask'] = 'activitysinceend cron task';
-

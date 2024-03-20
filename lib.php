@@ -209,26 +209,6 @@ function build_output_categories($arraycategories, $categoryid = 0) {
     return $output;
 }
 
-function get_rulesbytimeinterval($timestarted, $tasklastrunttime) {
-    global $DB;
-    $rulesidquery = "
-                    SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid
-                      FROM {notificationsagent_triggers} nt
-                      JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
-                     WHERE startdate
-                   BETWEEN :tasklastrunttime AND :timestarted
-                     ";
-
-    $rulesid = $DB->get_records_sql(
-        $rulesidquery,
-        [
-            'tasklastrunttime' => $tasklastrunttime,
-            'timestarted' => $timestarted,
-        ]
-    );
-    return $rulesid;
-}
-
 /**
  * Returns seconds in human format
  *

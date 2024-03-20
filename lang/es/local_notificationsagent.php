@@ -154,6 +154,7 @@ $string['rulecancelled'] = 'Regla cancelada';
 $string['rulesaved'] = 'Regla guardada';
 
 // Rule errors
+$string['editrule_required_error'] = 'Campo requerido';
 $string['editrule_runtime_error'] = 'Si '.$string['editrule_timesfired'].' es > 0, debe indicar un intervalo';
 
 // Card content.

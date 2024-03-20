@@ -36,6 +36,7 @@ namespace notificationscondition_forumnoreply;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\rule;
 
 /**
  * Forumnoreply subplugin class
@@ -125,7 +126,7 @@ class forumnoreply extends notificationconditionplugin {
     /**
      * UI of subplugin
      *
-     * @param \moodleform $mform
+     * @param \MoodleQuickForm $mform
      * @param int         $id
      * @param int         $courseid
      * @param string      $type
@@ -147,6 +148,11 @@ class forumnoreply extends notificationconditionplugin {
             }
         }
 
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+            $forums['0'] = 'FFFF';
+        }
+
         $element = $mform->createElement(
             'select',
             $this->get_name_ui($id, self::UI_ACTIVITY),
@@ -159,6 +165,7 @@ class forumnoreply extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     /**

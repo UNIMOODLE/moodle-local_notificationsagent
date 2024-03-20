@@ -121,7 +121,7 @@ class numberoftimes extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::N_TIMES), '- You must supply a value here.', 'required');
+        $mform->addRule($this->get_name_ui($id, self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     public function check_capability($context) {

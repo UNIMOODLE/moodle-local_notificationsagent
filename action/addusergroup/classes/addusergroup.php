@@ -39,6 +39,7 @@ global $CFG;
 require_once($CFG->dirroot . "/group/lib.php");
 
 use local_notificationsagent\notificationactionplugin;
+use local_notificationsagent\rule;
 
 class addusergroup extends notificationactionplugin {
 
@@ -57,10 +58,13 @@ class addusergroup extends notificationactionplugin {
                 $item->name, true
             );
         }
-        if (empty($listgroups)) {
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listgroups['0'] = 'GGGG';
         }
+
         asort($listgroups);
+        
         $group = $mform->createElement(
             'select', $this->get_name_ui($id, self::UI_ACTIVITY),
             get_string(
@@ -69,8 +73,10 @@ class addusergroup extends notificationactionplugin {
             ),
             $listgroups
         );
-
+        
         $mform->insertElementBefore($group, 'new' . $type . '_group');
+
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     /**

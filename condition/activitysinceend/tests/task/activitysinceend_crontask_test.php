@@ -24,25 +24,25 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activityend
+ * @package    notificationscondition_activitysinceend
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activityend;
+namespace notificationscondition_activitysinceend\task;
 
 use local_notificationsagent\rule;
-use notificationscondition_activityend\task\activityend_crontask;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
+require_once(__DIR__ . '/../../../../../../lib/completionlib.php');
 
 /**
  * @group notificationsagent
  */
-class activityend_crontask_test extends \advanced_testcase {
+class activitysinceend_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -83,7 +83,9 @@ class activityend_crontask_test extends \advanced_testcase {
 
     final public function setUp(): void {
         parent::setUp();
+        global $CFG;
         $this->resetAfterTest();
+        $CFG->enablecompletion = COMPLETION_ENABLED;
         $rule = new rule();
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
@@ -91,6 +93,7 @@ class activityend_crontask_test extends \advanced_testcase {
             ([
                 'startdate' => self::COURSE_DATESTART,
                 'enddate' => self::COURSE_DATEEND,
+                'enablecompletion' => true,
             ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
@@ -98,19 +101,20 @@ class activityend_crontask_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
+     * @covers       \notificationscondition_activitysinceend\task\activitysinceend_crontask::execute
      * @dataProvider dataprovider
      */
-    public function test_execute($date) {
+    public function test_execute($time, $date) {
         global $DB, $USER;
-        $pluginname = 'activityend';
+        \uopz_set_return('time', $date);
+        $pluginname = 'activitysinceend';
 
-        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmtestacct = $quizgen->create_instance([
-            'course' => self::$course->id,
-            'timeopen' => self::CM_DATESTART,
-            'timeclose' => self::CM_DATEEND,
+        $modinstance = self::getDataGenerator()->create_module('quiz', [
+            'course' => self::$course,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
+
+        $cmtestasect = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -127,32 +131,37 @@ class activityend_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestacct->cmid . '"}';
-        $objdb->cmid = $cmtestacct->id;
-
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestasect->id . '"}';
+        $objdb->cmid = 3;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $task = \core\task\manager::get_scheduled_task(activityend_crontask::class);
-        $task->execute();
+        $completion = new \completion_info(self::$course);
+        $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
+
+        $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
+        $result = $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
+        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::CM_DATEEND - $date, $cache->timestart);
+        $this->assertEquals(time() + $date, $cache->timestart);
         $this->assertEquals(self::$user->id, $cache->userid);
 
+        $this->assertEquals(self::$course->id, $trigger->courseid);
+        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+        $this->assertEquals(self::$user->id, $trigger->userid);
+        uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {
         return [
-            [86400],
-            [86400 * 3],
+            [1704445200, 86400],
+            [1706173200, 86400 * 3],
         ];
     }
 }
-
-

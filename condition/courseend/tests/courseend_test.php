@@ -268,14 +268,9 @@ class courseend_test extends \advanced_testcase {
      */
     public function test_getui() {
         $courseid = self::$coursetest->id;
-        $ruletype = rule::RULE_TYPE;
         $typeaction = "add";
         $customdata = [
-            'ruleid' => self::$rule->get_id(),
-            notificationplugin::TYPE_CONDITION => self::$rule->get_conditions(),
-            notificationplugin::TYPE_EXCEPTION => self::$rule->get_exceptions(),
-            notificationplugin::TYPE_ACTION => self::$rule->get_actions(),
-            'type' => $ruletype,
+            'rule' => self::$rule,
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -312,14 +307,9 @@ class courseend_test extends \advanced_testcase {
      */
     public function test_setdefault() {
         $courseid = self::$coursetest->id;
-        $ruletype = rule::RULE_TYPE;
         $typeaction = "add";
         $customdata = [
-            'ruleid' => self::$rule->get_id(),
-            notificationplugin::TYPE_CONDITION => self::$rule->get_conditions(),
-            notificationplugin::TYPE_EXCEPTION => self::$rule->get_exceptions(),
-            notificationplugin::TYPE_ACTION => self::$rule->get_actions(),
-            'type' => $ruletype,
+            'rule' => self::$rule,
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,

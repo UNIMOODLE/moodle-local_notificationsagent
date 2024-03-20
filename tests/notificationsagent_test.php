@@ -735,5 +735,65 @@ class notificationsagent_test extends \advanced_testcase {
             [null, false],
         ];
     }
-}
 
+    /**
+     * Testing get triggers bytimeinterval
+     *
+     * @param int  $date
+     * @param int  $timestarted
+     * @param int  $tasklastrunttime
+     * @param bool $emptyresult
+     *
+     * @return void
+     * @dataProvider datatriggers
+     * @covers       \local_notificationsagent\notificationsagent::get_triggersbytimeinterval
+     */
+    public function test_get_triggersbytimeinterval($date, $timestarted, $tasklastrunttime, $emptyresult) {
+        global $USER, $DB;
+        // Rule.
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+        $this->assertIsNumeric($ruleid);
+
+        $objdbtrigger = new \stdClass();
+        $objdbtrigger->ruleid = self::$rule->get_id();
+        $objdbtrigger->conditionid = 24900;
+        $objdbtrigger->courseid = self::$course->id;
+        $objdbtrigger->userid = self::$user->id;
+        $objdbtrigger->startdate = $date;
+
+        // Insert.
+        $trigger = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
+        $this->assertIsNumeric($trigger);
+
+        $triggers = notificationsagent::get_triggersbytimeinterval($timestarted, $tasklastrunttime);
+        if ($emptyresult) {
+            $this->assertEmpty($triggers);
+        } else {
+            $triggers = $triggers[key($triggers)];
+            $this->assertEquals($ruleid, $triggers->ruleid);
+            $this->assertEquals(24900, $triggers->conditionid);
+            $this->assertEquals(self::$course->id, $triggers->courseid);
+            $this->assertEquals(self::$user->id, $triggers->userid);
+        }
+    }
+
+    /**
+     * Data provider for triggerbyinterval
+     *
+     * @return array[]
+     */
+    public static function datatriggers() {
+        return [
+            'On dates' => [1704099600, 1704099600 + 60, 1704099600 - 60, false],
+            'Out of date' => [1704099600 - 84600, 1704099600 + 60, 1704099600 - 60, true],
+        ];
+
+    }
+}

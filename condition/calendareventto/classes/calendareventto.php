@@ -37,6 +37,7 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\notificationsagent;
+use local_notificationsagent\rule;
 
 /**
  * Calendarevetto class
@@ -141,7 +142,7 @@ class calendareventto extends notificationconditionplugin {
     /**
      * Get the user interface of the subplugin
      *
-     * @param editrule_form $mform
+     * @param \MoodleQuickForm $mform
      * @param int           $id
      * @param int           $courseid
      * @param string        $type
@@ -160,7 +161,9 @@ class calendareventto extends notificationconditionplugin {
         foreach ($listevents as $event) {
             $events[$event->id] = $event->name;
         }
-        if (empty($events)) {
+        
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $events['0'] = 'CCCC';
         }
 
@@ -175,6 +178,7 @@ class calendareventto extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     /**

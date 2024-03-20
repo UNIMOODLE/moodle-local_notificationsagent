@@ -155,35 +155,38 @@ class rule {
      *
      * @param int|null $id Optional ID of the rule to load from the database.
      */
-    public function __construct($id = null) {
+    public function __construct($id = null, $type = self::RULE_TYPE) {
         global $DB;
 
-        if (!is_null($id)) {
-            // Retrieve the rule record from the database based on the provided ID.
-            $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
-
-            // Set the properties of the rule object.
-            $this->set_id($rule->id);
-            $this->set_name($rule->name);
-            $this->set_description($rule->description);
-            $this->set_status($rule->status);
-            $this->set_createdby($rule->createdby);
-            $this->set_createdat($rule->createdat);
-            $this->set_shared($rule->shared);
-            $this->set_defaultrule($rule->defaultrule);
-            $this->set_template($rule->template);
-            $this->set_forced($rule->forced);
-            $this->set_timesfired($rule->timesfired);
-            $this->set_runtime($rule->runtime);
-
-            // Load additional rule details.
-            $this->load_ac(); // Load access control settings.
-            $this->load_conditions(); // Load rule conditions.
-            $this->load_exceptions(); // Load rule exceptions.
-            $this->load_actions(); // Load rule actions.
-            $this->is_generic(); // Check if the rule is generic.
-            $this->load_dataform(); // Load the data form associated with the rule.
+        if(is_null($id)){
+            $this->set_template($type);
+            return;
         }
+
+        // Retrieve the rule record from the database based on the provided ID.
+        $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
+
+        // Set the properties of the rule object.
+        $this->set_id($rule->id);
+        $this->set_name($rule->name);
+        $this->set_description($rule->description);
+        $this->set_status($rule->status);
+        $this->set_createdby($rule->createdby);
+        $this->set_createdat($rule->createdat);
+        $this->set_shared($rule->shared);
+        $this->set_defaultrule($rule->defaultrule);
+        $this->set_template($rule->template);
+        $this->set_forced($rule->forced);
+        $this->set_timesfired($rule->timesfired);
+        $this->set_runtime($rule->runtime);
+
+        // Load additional rule details.
+        $this->load_ac(); // Load access control settings.
+        $this->load_conditions(); // Load rule conditions.
+        $this->load_exceptions(); // Load rule exceptions.
+        $this->load_actions(); // Load rule actions.
+        $this->is_generic(); // Check if the rule is generic.
+        $this->load_dataform(); // Load the data form associated with the rule.
     }
 
     /**

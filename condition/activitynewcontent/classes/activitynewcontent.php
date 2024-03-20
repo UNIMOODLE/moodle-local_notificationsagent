@@ -35,6 +35,7 @@ namespace notificationscondition_activitynewcontent;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\rule;
 
 class activitynewcontent extends notificationconditionplugin {
 
@@ -112,9 +113,12 @@ class activitynewcontent extends notificationconditionplugin {
             }
             $listactivities[$key] = format_string($value);
         }
-        if (empty($listactivities)) {
+        
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
+
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -128,6 +132,7 @@ class activitynewcontent extends notificationconditionplugin {
         );
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     public function check_capability($context) {

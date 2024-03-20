@@ -44,8 +44,6 @@ use local_notificationsagent\notificationactionplugin;
 class forummessage extends notificationactionplugin {
     /** @var UI ELEMENTS */
     public const NAME = 'forummessage';
-    public const UI_MESSAGE = 'message';
-    public const UI_TITLE = 'title';
 
     /**
      * Subplugin title
@@ -96,11 +94,15 @@ class forummessage extends notificationactionplugin {
         foreach ($forumlist as $forum) {
             $forumname[$forum->id] = $forum->name;
         }
-        asort($forumname);
-        if (empty($forumname)) {
+        
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $forumname['0'] = 'FFFF';
             $forumname['-1'] = 'Announcements';
         }
+
+        asort($forumname);
+        
         $cm = $mform->createElement(
             'select',
             $this->get_name_ui($id, self::UI_ACTIVITY),
@@ -119,6 +121,7 @@ class forummessage extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
 
     }
 
@@ -192,7 +195,7 @@ class forummessage extends notificationactionplugin {
         // Post a message on a forum.
 
         $placeholdershuman = json_decode($params);
-        $postsubject = format_text($placeholdershuman->title, FORMAT_PLAIN);
+        $postsubject = format_text($placeholdershuman->{self::UI_TITLE}, FORMAT_PLAIN);
         $postmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
 
         $modinfo = get_fast_modinfo($context->get_courseid());

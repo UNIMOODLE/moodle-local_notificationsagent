@@ -36,6 +36,7 @@ namespace notificationscondition_activitylastsend;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\rule;
 
 class activitylastsend extends notificationconditionplugin {
 
@@ -109,9 +110,11 @@ class activitylastsend extends notificationconditionplugin {
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
         }
-        if (empty($listactivities)) {
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
+        
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -126,6 +129,7 @@ class activitylastsend extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
     }
 
     public function check_capability($context) {

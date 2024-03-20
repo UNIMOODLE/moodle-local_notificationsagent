@@ -46,8 +46,6 @@ class privateforummessage extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
     public const NAME = 'privateforummessage';
-    public const UI_MESSAGE = 'message';
-    public const UI_TITLE = 'title';
 
     /**
      * Subplugin title
@@ -99,11 +97,15 @@ class privateforummessage extends notificationactionplugin {
         foreach ($forumlist as $forum) {
             $forumname[$forum->id] = $forum->name;
         }
-        asort($forumname);
-        if (empty($forumname)) {
+        
+        // Only is template
+        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $forumname['0'] = 'FFFF';
             $forumname['-1'] = 'Announcements';
         }
+
+        asort($forumname);
+
         $cm = $mform->createElement(
             'select',
             $this->get_name_ui($id, self::UI_ACTIVITY),
@@ -123,6 +125,7 @@ class privateforummessage extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
 
     }
 
@@ -192,8 +195,8 @@ class privateforummessage extends notificationactionplugin {
 
         global $DB;
         $placeholdershuman = json_decode($params);
-        $postsubject = format_text($placeholdershuman->title, FORMAT_PLAIN);
-        $postmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->message);
+        $postsubject = format_text($placeholdershuman->{self::UI_TITLE}, FORMAT_PLAIN);
+        $postmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
         $time = 0;
         $modinfo = get_fast_modinfo($context->get_courseid(), -1);
         $forumid = $modinfo->get_cm($placeholdershuman->{self::UI_ACTIVITY})->instance;
@@ -247,6 +250,7 @@ class privateforummessage extends notificationactionplugin {
         $obj->mailed = FORUM_MAILED_PENDING;
         $obj->subject = $postsubject;
         $obj->message = $postmessage;
+        $obj->messageformat = $placeholdershuman->{self::UI_MESSAGE_FORMAT};
         $obj->forum = $forumid;
         $obj->course = $courseid;
 
@@ -298,6 +302,7 @@ class privateforummessage extends notificationactionplugin {
         $post->mailed = FORUM_MAILED_PENDING;
         $post->subject = $obj->subject;
         $post->message = $obj->message;
+        $post->messageformat = $obj->messageformat;
         $post->forum = $forum->id;
         $post->course = $forum->course;
 

@@ -167,7 +167,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param array             $params  An associative array of parameters for the action.
+     * @param string            $params  An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -187,8 +187,8 @@ abstract class notificationactionplugin extends notificationplugin {
     /**
      * Gets the message to send depending on the timesfired of the rule and the user
      *
-     * @param object $context Evaluation Context
-     * @param string $message Message
+     * @param evaluationcontext $context Evaluation Context
+     * @param string            $message Message
      *
      * @return string $result Message to sent
      */
