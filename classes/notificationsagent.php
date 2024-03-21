@@ -444,8 +444,7 @@ class notificationsagent {
         $objdb->ruleid = $ruleid;
         $objdb->conditionid = $conditionid;
         $objdb->ruleoff = $ruleoff;
-        // ...TODO Add retroactive rules as setting.
-        $objdb->startdate = $timer > time() ? $timer : time() + 120;
+        $objdb->startdate = $timer;
         if (!$exists) {
             $DB->insert_record('notificationsagent_triggers', $objdb);
         } else {
@@ -517,10 +516,15 @@ class notificationsagent {
 
             if (!empty($line)) {
                 $datatables = explode("|", $line);
-                list($pluginname, $table, $timestart, $timeend) = $datatables;
-                $dates = "SELECT " . $timestart . " AS timestart, " . $timeend . "  as timeend
-                    FROM {" . $table . "}
-                    WHERE id = :instance";
+                $joinarray = [];
+                $table = $datatables[1];
+                !empty($datatables[2]) ? $joinarray[] = $datatables[2] . " AS timestart " : '';
+                !empty($datatables[3]) ? $joinarray[] = $datatables[3] . " AS timeend " : '';
+
+                $joinarray = implode(',', $joinarray);
+                $dates = "SELECT " . $joinarray . " 
+                            FROM {" . $table . "}
+                           WHERE id = :instance";
 
                 $dates = $DB->get_record_sql(
                     $dates,
@@ -594,11 +598,10 @@ class notificationsagent {
     /**
      * Get triggers to evaluate.
      *
-     * @param $timestarted
-     * @param $tasklastrunttime
+     * @param int $timestarted
+     * @param int $tasklastrunttime
      *
      * @return array
-     * @throws dml_exception
      */
     public static function get_triggersbytimeinterval($timestarted, $tasklastrunttime) {
         global $DB;

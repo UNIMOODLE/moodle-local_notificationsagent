@@ -136,20 +136,26 @@ class notificationsagent_test extends \advanced_testcase {
         $course = self::getDataGenerator()->create_course();
         $manager = self::getDataGenerator()->create_and_enrol($course, 'manager');
         self::setUser($manager);
+
+        $options = [
+            'name' => 'Quiz unittest',
+            'course' => $course->id,
+            "{$fieldopen}" => $timeopen,
+        ];
+
+        !empty($fieldclose) ? $options[$fieldclose] = $timeclose : '';
+
         $cmtest = self::getDataGenerator()->create_module(
             "{$modname}",
-            [
-                'name' => 'Quiz unittest',
-                'course' => $course->id,
-                "{$fieldopen}" => $timeopen,
-                "{$fieldclose}" => $timeclose,
-            ],
+            $options
         );
 
         $result = notificationsagent::notificationsagent_condition_get_cm_dates($cmtest->cmid);
 
         $this->assertEquals($timeopen, $result->timestart);
-        $this->assertEquals($timeclose, $result->timeend);
+        if (!empty($fieldclose)) {
+            $this->assertEquals($timeclose, $result->timeend);
+        }
     }
 
     /**
@@ -157,15 +163,16 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704099600, 1705741200, 'assign', 'allowsubmissionsfromdate', 'duedate'],
-            [1704099600, 1705741200, 'choice', 'timeopen', 'timeclose'],
-            [1704099600, 1705741200, 'data', 'timeavailablefrom', 'timeavailableto'],
-            [1704099600, 1705741200, 'feedback', 'timeopen', 'timeclose'],
-            [1704099600, 1705741200, 'quiz', 'timeopen', 'timeclose'],
-            [1704099600, 1705741200, 'forum', 'duedate', 'cutoffdate'],
-            [1704099600, 1705741200, 'lesson', 'available', 'deadline'],
-            [1704099600, 1705741200, 'scorm', 'timeopen', 'timeclose'],
-            [1704099600, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
+            'assign' => [1704099600, 1705741200, 'assign', 'allowsubmissionsfromdate', 'duedate'],
+            'choice' => [1704099600, 1705741200, 'choice', 'timeopen', 'timeclose'],
+            'data' => [1704099600, 1705741200, 'data', 'timeavailablefrom', 'timeavailableto'],
+            'feedback' => [1704099600, 1705741200, 'feedback', 'timeopen', 'timeclose'],
+            'quiz' => [1704099600, 1705741200, 'quiz', 'timeopen', 'timeclose'],
+            'forum' => [1704099600, 1705741200, 'forum', 'duedate', 'cutoffdate'],
+            'lesson' => [1704099600, 1705741200, 'lesson', 'available', 'deadline'],
+            'scorm' => [1704099600, 1705741200, 'scorm', 'timeopen', 'timeclose'],
+            'workshop' => [1704099600, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
+            'chattime' => [1704099600, 0, 'chat', 'chattime', null],
         ];
     }
 
