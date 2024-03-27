@@ -34,6 +34,12 @@ use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_weekend\weekend;
 
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
+
+/**
+ * Weekend cron task
+ */
 class weekend_crontask extends scheduled_task {
 
     /**
