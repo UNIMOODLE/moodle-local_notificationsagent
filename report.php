@@ -29,7 +29,7 @@
  */
 
 require('../../config.php');
-global $PAGE, $CFG, $OUTPUT;
+global $PAGE, $CFG, $OUTPUT, $COURSE;
 require_once($CFG->libdir . '/adminlib.php');
 
 use core_reportbuilder\system_report_factory;
@@ -44,6 +44,8 @@ $ruleid = optional_param('ruleid', '', PARAM_INT);
 $courseid = optional_param('courseid', '', PARAM_INT);
 $filters = [];
 if ($courseid) {
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+    $PAGE->set_course($course);
     $context = context_course::instance($courseid);
     $coursefilter = get_course($courseid)->id;
     $filters['course:courseselector_operator'] = number::EQUAL_TO;
@@ -74,6 +76,30 @@ $PAGE->set_pagelayout('report');
 $title = get_string('report', 'local_notificationsagent');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
+$PAGE->navbar->ignore_active();
+if (!$courseid) {
+    $PAGE->navbar->add(
+        $SITE->fullname,
+        new moodle_url('/')
+    );
+    $PAGE->navbar->add(
+        'Notification Agent Admin',
+        new moodle_url('/local/notificationsagent/index.php')
+    );
+} else {
+    $PAGE->navbar->add(
+        $COURSE->fullname,
+        new moodle_url('/course/view.php', ['id' => $courseid])
+    );
+    $PAGE->navbar->add(
+        'Notification Agent',
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+    );
+}
+$PAGE->navbar->add(
+    get_string('editrule_reports', 'local_notificationsagent'),
+    new moodle_url('/local/notificationsagent/report.php', ['courseid' => $courseid])
+);
 
 $output = $PAGE->get_renderer('local_notificationsagent');
 

@@ -87,7 +87,7 @@ $PAGE->set_title(
 );
 
 $PAGE->set_heading(
-    ($typeaction == 'add'
+    ($typeaction == 'add' || $typeaction == 'clone'
         ? $heading
         : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
     get_string('heading', 'local_notificationsagent')
@@ -95,6 +95,30 @@ $PAGE->set_heading(
 $PAGE->navbar->add(
     get_string('editrule_newrule', 'local_notificationsagent') . " - " .
     get_string('heading', 'local_notificationsagent')
+);
+$PAGE->navbar->ignore_active();
+if ($isroleadmin && $courseid == SITEID) {
+    $PAGE->navbar->add(
+        $SITE->fullname,
+        new moodle_url('/')
+    );
+    $PAGE->navbar->add(
+        'Notification Agent Admin',
+        new moodle_url('/local/notificationsagent/index.php')
+    );
+} else {
+    $PAGE->navbar->add(
+        $COURSE->fullname,
+        new moodle_url('/course/view.php', ['id' => $courseid])
+    );
+    $PAGE->navbar->add(
+        'Notification Agent',
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+    );
+}
+$PAGE->navbar->add(
+    ($typeaction == 'add' || $typeaction == 'clone' ? $heading : get_string('editrule_editrule', 'local_notificationsagent')),
+    new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $courseid])
 );
 $PAGE->requires->js_call_amd('core/copy_to_clipboard');
 $PAGE->requires->js_call_amd(
@@ -122,7 +146,7 @@ $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule',
 // LOAD RULE.
 $ruleid = optional_param('ruleid', null, PARAM_INT);
 $ruleid = empty($ruleid) ? null : $ruleid;
-$rule = new rule($ruleid, $ruletype);
+$rule = new rule($ruleid, $ruletype, $typeaction);
 $customdata = [
     'rule' => $rule,
     'timesfired' => rule::MINIMUM_EXECUTION,

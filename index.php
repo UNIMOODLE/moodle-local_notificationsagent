@@ -79,11 +79,32 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('heading', 'local_notificationsagent'));
 $PAGE->set_heading(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
+$PAGE->navbar->ignore_active();
+if ($isroleadmin && $courseid == SITEID) {
+    $PAGE->navbar->add(
+        $SITE->fullname,
+        new moodle_url('/')
+    );
+    $PAGE->navbar->add(
+        'Notification Agent Admin',
+        new moodle_url('/local/notificationsagent/index.php')
+    );
+} else {
+    $PAGE->navbar->add(
+        $COURSE->fullname,
+        new moodle_url('/course/view.php', ['id' => $courseid])
+    );
+    $PAGE->navbar->add(
+        'Notification Agent',
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+    );
+}
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/update_status', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/delete', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/share', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/shareall', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/unshareall', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
@@ -100,8 +121,11 @@ if ($isroleadmin && $courseid == SITEID) {
 
 $importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
 $templatecontext['importruleurl'] = $importruleurl;
-$addruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
+$newruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
     'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
+]);
+$addruleurl = new moodle_url("/local/notificationsagent/assign.php", [
+    'courseid' => $courseid,
 ]);
 $addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
     'action' => 'add', 'type' => rule::TEMPLATE_TYPE,
@@ -115,12 +139,13 @@ if ($templatecontext['iscontextsite']) {
 }
 
 $templatecontext['url'] = [
+    'newrule' => $newruleurl,
     'addrule' => $addruleurl,
     'addtemplate' => $addtemplate,
     'reporturl' => $reporturl,
 ];
 
-$rules = rule::get_rules($context, $courseid);
+$rules = rule::get_rules_index($context, $courseid);
 $rulecontent = [];
 
 $conditionsarray = [];
