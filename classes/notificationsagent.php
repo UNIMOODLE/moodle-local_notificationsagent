@@ -44,6 +44,8 @@ class notificationsagent {
     public const GENERIC_USERID = -1;
     /** @var string Condition Availability type */
     private const CONDITION_AVAILABILITY = 'ac';
+    /** @var int Default CMID for news type forum */
+    public const FORUM_NEWS_CMID = -1;
 
     /**
      * Get the current conditions by plugin and course id
@@ -606,7 +608,7 @@ class notificationsagent {
     public static function get_triggersbytimeinterval($timestarted, $tasklastrunttime) {
         global $DB;
         $rulesidquery = "
-                    SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid
+                    SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid, nt.startdate
                       FROM {notificationsagent_triggers} nt
                       JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
                      WHERE startdate
@@ -623,4 +625,34 @@ class notificationsagent {
             ]
         );
     }
+
+    /**
+     * Get supported course modules .
+     *
+     * @param int $cmid The course module ID
+     *
+     * @return bool Whether the module is supported
+     */
+    public static function supported_cm($cmid) {
+        global $DB;
+        $supported = false;
+
+        $supportedcm = "
+                    SELECT mcm.id,mm.name
+                      FROM {course_modules} mcm
+                      JOIN {modules} mm ON mm.id = mcm.module
+                     WHERE mcm.id = :cmid";
+
+        if ($modtype = $DB->get_record_sql($supportedcm, ['cmid' => $cmid])) {
+            $config = get_config('local_notificationsagent', 'startdate');
+            $array = explode("\n", $config);
+
+            foreach (preg_grep('/\b' . $modtype->name . '\b/i', $array) as $value) {
+                $supported = true;
+            }
+        }
+
+        return $supported;
+    }
+
 }

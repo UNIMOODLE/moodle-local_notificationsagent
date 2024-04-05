@@ -42,3 +42,4 @@ $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
 $string['validation_editrule_form_dateend'] = 'Es necesario añadir una fecha de fin de actividad/curso';
+$string['validation_editrule_form_supported_cm'] = 'Tipo de actividad no soportado. Contacte con el admistrador del sitio.';

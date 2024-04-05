@@ -42,3 +42,5 @@ $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
 $string['validation_editrule_form_dateend'] = 'Beharrezkoa da jarduera/ikastaroaren amaiera data gehitzea';
+$string['validation_editrule_form_supported_cm']
+    = 'Jarduera mota ez da onartzen. Jarri harremanetan guneko administratzailearekin.';

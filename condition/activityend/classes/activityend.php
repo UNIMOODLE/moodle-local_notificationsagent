@@ -113,14 +113,20 @@ class activityend extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
         $cmidend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
 
-        if ($timeaccess <= $cmidend - $time && !$context->is_complementary()) {
-            $timeend = $cmidend - $time;
-        }
-        if ($context->is_complementary()) {
-            if ($timeaccess < $cmidend - $time) {
-                $timeend = null;
+        // Condition.
+        if (!$context->is_complementary()) {
+            if ($timeaccess <= $cmidend - $time) {
+                $timeend = $cmidend - $time;
             } else if ($timeaccess >= $cmidend - $time && $timeaccess < $cmidend) {
+                $timeend = time();
+            }
+        }
+        // Exception.
+        if ($context->is_complementary()) {
+            if ($timeaccess >= $cmidend - $time && $timeaccess < $cmidend) {
                 $timeend = $cmidend;
+            } else {
+                $timeend = time();
             }
         }
         return $timeend;
@@ -154,7 +160,10 @@ class activityend extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
     /**
@@ -169,23 +178,41 @@ class activityend extends notificationconditionplugin {
         global $COURSE;
 
         $uiactivity = $this->get_name_ui($id, self::UI_ACTIVITY);
-        if($mform->elementExists($uiactivity)){
+        if ($mform->elementExists($uiactivity)) {
             $cmid = $mform->getElementValue($uiactivity)[0];
             $timeend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend ?? $COURSE->enddate;
             if (empty($timeend)) {
                 $array[$uiactivity] = get_string('validation_editrule_form_dateend', 'notificationscondition_activityend');
             }
+            $supported = notificationsagent::supported_cm($cmid);
+            if (!$supported) {
+                $array[$uiactivity] = get_string('validation_editrule_form_supported_cm', 'notificationscondition_activityend');;
+            }
+
         }
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param evaluationcontext $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:activityend', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -220,9 +247,9 @@ class activityend extends notificationconditionplugin {
         // Check if activity is found in course, if is not, return [AAAA].
         $activityname = '[AAAA]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $mod = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $mod->name;
-        }
+
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
@@ -230,6 +257,11 @@ class activityend extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return true
+     */
     public function is_generic() {
         return true;
     }
