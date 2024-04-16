@@ -41,6 +41,8 @@ use notificationscondition_activitymodified\activitymodified;
 use local_notificationsagent\form\editrule_form;
 
 /**
+ * Tests for activitymodified.
+ *
  * @group notificationsagent
  */
 class activitymodified_test extends \advanced_testcase {
@@ -49,6 +51,10 @@ class activitymodified_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var activitymodified
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -74,6 +80,10 @@ class activitymodified_test extends \advanced_testcase {
      * @var array|string[]
      */
     private static $elements;
+
+    /**
+     * @var int
+     */
     private static $activity;
     /**
      * id for condition
@@ -88,6 +98,9 @@ class activitymodified_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -108,15 +121,15 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for evaluating the condition.
      *
-     * @param int  $timeaccess    Time access
-     * @param bool $usecache      Use cache?
-     * @param bool $useuploadfile Use an uploaded file?
-     * @param bool $expected      Expected result
-     *
-     * @covers       \notificationscondition_activitymodified\activitymodified::evaluate
+     * @param int  $timeaccess    timeaccess in timestamp
+     * @param bool $usecache      use cache or not
+     * @param bool $useuploadfile use upload file or not
+     * @param bool $expected      expected result
      *
      * @dataProvider dataprovider
+     * @covers       \notificationscondition_activitymodified\activitymodified::evaluate
      */
     public function test_evaluate($timeaccess, $usecache, $useuploadfile, $expected) {
         global $DB;
@@ -167,6 +180,9 @@ class activitymodified_test extends \advanced_testcase {
         uopz_unset_return('time');
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             'Testing evaluate with cache #0' => [1704445200, true, false, false],
@@ -178,6 +194,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for getting the subtype.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::get_subtype
      */
     public function test_getsubtype() {
@@ -185,6 +203,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for checking if the condition is generic.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::is_generic
      */
     public function test_isgeneric() {
@@ -192,6 +212,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for getting the elements.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::get_elements
      */
     public function test_getelements() {
@@ -199,6 +221,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for checking the capability.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::check_capability
      */
     public function test_checkcapability() {
@@ -209,6 +233,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for getting the title.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::get_title
      */
     public function test_gettitle() {
@@ -219,6 +245,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for estimating the next time.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::estimate_next_time
      */
     public function test_estimatenexttime() {
@@ -226,6 +254,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for converting the parameters.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::convert_parameters
      */
     public function test_convertparameters() {
@@ -239,6 +269,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for processing markups.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::process_markups
      */
     public function test_processmarkups() {
@@ -256,6 +288,8 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test for getting the UI.
+     *
      * @covers \notificationscondition_activitymodified\activitymodified::get_ui
      */
     public function test_getui() {
@@ -283,10 +317,13 @@ class activitymodified_test extends \advanced_testcase {
     }
 
     /**
+     * Test get any new content
+     *
+     * @param int  $fileuploadtime
+     * @param int  $eventtimecreation
+     * @param bool $expected
+     *
      * @return void
-     * @throws \coding_exception
-     * @throws \file_exception
-     * @throws \stored_file_creation_exception
      * @covers       \notificationscondition_activitymodified\activitymodified::get_any_new_content
      * @dataProvider dataprovider_getanynewcontent
      */
@@ -342,4 +379,3 @@ class activitymodified_test extends \advanced_testcase {
         ];
     }
 }
-

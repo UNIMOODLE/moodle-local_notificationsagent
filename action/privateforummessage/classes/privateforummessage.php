@@ -33,6 +33,7 @@
 
 namespace notificationsaction_privateforummessage;
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
 
@@ -65,7 +66,16 @@ class privateforummessage extends notificationactionplugin {
         return ['[FFFF]', '[TTTT]', '[BBBB]'];
     }
 
+    /**
+     * Get the elements for the privateforummessage plugin.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
+        $forumname = [];
         $this->get_ui_title($mform, $id, $type);
 
         // Title.
@@ -92,16 +102,13 @@ class privateforummessage extends notificationactionplugin {
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
         // Forum.
-        $forumname = [];
-        $forumlist = get_coursemodules_in_course('forum', $courseid);
-        foreach ($forumlist as $forum) {
-            $forumname[$forum->id] = $forum->name;
-        }
-        
-        // Only is template
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $forumname['0'] = 'FFFF';
-            $forumname['-1'] = 'Announcements';
+        } else {
+            $forumlist = get_coursemodules_in_course('forum', $courseid);
+            foreach ($forumlist as $forum) {
+                $forumname[$forum->id] = $forum->name;
+            }
         }
 
         asort($forumname);
@@ -117,7 +124,7 @@ class privateforummessage extends notificationactionplugin {
             $forumname
         );
 
-        $this->placeholders($mform, $id, $type);
+        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($cm, 'new' . $type . '_group');
@@ -125,14 +132,28 @@ class privateforummessage extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
 
     }
 
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "privateforummessage"
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_privateforummessage');
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:privateforummessage', $context)
             && has_capability('mod/forum:addnews', $context)
@@ -141,9 +162,15 @@ class privateforummessage extends notificationactionplugin {
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -174,9 +201,9 @@ class privateforummessage extends notificationactionplugin {
         // Check if activity is found, if is not, return [FFFF].
         $activityname = '[FFFF]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $forum = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $forum->name;
-        }
+
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
         $paramstoteplace = [
@@ -190,6 +217,14 @@ class privateforummessage extends notificationactionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Execute an action with the given parameters in the specified context.
+     *
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
+     *
+     * @return mixed The result of the action execution.
+     */
     public function execute_action($context, $params) {
         // Post a message on a forum.
 
@@ -250,7 +285,6 @@ class privateforummessage extends notificationactionplugin {
         $obj->mailed = FORUM_MAILED_PENDING;
         $obj->subject = $postsubject;
         $obj->message = $postmessage;
-        $obj->messageformat = $placeholdershuman->{self::UI_MESSAGE_FORMAT};
         $obj->forum = $forumid;
         $obj->course = $courseid;
 
@@ -258,6 +292,11 @@ class privateforummessage extends notificationactionplugin {
 
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return false;
     }
@@ -280,7 +319,7 @@ class privateforummessage extends notificationactionplugin {
     /**
      * Replying private to a post.
      *
-     * @param $obj
+     * @param \stdClass $obj
      *
      * @return bool|int
      * @throws \dml_exception
@@ -302,7 +341,6 @@ class privateforummessage extends notificationactionplugin {
         $post->mailed = FORUM_MAILED_PENDING;
         $post->subject = $obj->subject;
         $post->message = $obj->message;
-        $post->messageformat = $obj->messageformat;
         $post->forum = $forum->id;
         $post->course = $forum->course;
 

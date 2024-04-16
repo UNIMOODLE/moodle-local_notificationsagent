@@ -32,6 +32,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023101803;
+$plugin->version = 2023101804;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationscondition_activitystudentend';

@@ -38,13 +38,26 @@ use local_notificationsagent\rule;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationactionplugin;
 
+/**
+ * Class representing usermessageagent action plugin.
+ */
 class usermessageagent extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
     public const NAME = 'usermessageagent';
+    /** @var UI ELEMENTS */
     public const UI_MESSAGE = 'message';
+    /** @var UI ELEMENTS */
     public const UI_TITLE = 'title';
 
+    /**
+     * Get the elements for the usermessageagent plugin.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         global $USER;
@@ -109,7 +122,7 @@ class usermessageagent extends notificationactionplugin {
             ),
             $listusers
         );
-        $this->placeholders($mform, $id, $type);
+        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($user, 'new' . $type . '_group');
@@ -117,43 +130,59 @@ class usermessageagent extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
-        $mform->addRule($this->get_name_ui($id, self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+        );
     }
 
-    /**
-     * @return lang_string|string
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "usermessageagent"
      */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_usermessageagent');
     }
 
     /**
-     * Subplugin title
+     * Get the title of the notification action plugin.
      *
-     * @return \lang_string|string
+     * @return string Title of the plugin.
      */
     public function get_title() {
         return get_string('usermessageagent_action', 'notificationsaction_usermessageagent');
     }
 
     /**
-     *  Subplugins elements
+     * Get the elements for the notification action plugin.
      *
-     * @return string[]
+     * @return array elements as an associative array.
      */
     public function get_elements() {
         return ['[TTTT]', '[BBBB]', '[UUUU]'];
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:usermessageagent', $context)
             && has_capability('moodle/site:sendmessage', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -200,14 +229,12 @@ class usermessageagent extends notificationactionplugin {
     }
 
     /**
-     * Executing action for usermmessageagent
+     * Execute an action with the given parameters in the specified context.
      *
-     * @param evaluationcontext $context
-     * @param                   $params
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
      *
-     * @return false|int|mixed
-     * @throws \coding_exception
-     * @throws \moodle_exception
+     * @return mixed The result of the action execution.
      */
     public function execute_action($context, $params) {
         // Send notification to a particular user enrolled on the received course in the event.
@@ -234,6 +261,11 @@ class usermessageagent extends notificationactionplugin {
         return message_send($message);
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return false;
     }
@@ -262,5 +294,19 @@ class usermessageagent extends notificationactionplugin {
      */
     public function is_send_once($userid) {
         return true;
+    }
+
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
     }
 }

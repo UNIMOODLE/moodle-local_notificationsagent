@@ -41,11 +41,22 @@ require_once($CFG->dirroot . "/group/lib.php");
 use local_notificationsagent\notificationactionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * Class for removeusergroup.
+ */
 class removeusergroup extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
     public const NAME = 'removeusergroup';
 
+    /**
+     * Get the elements for the removeusergroup.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
 
@@ -58,12 +69,12 @@ class removeusergroup extends notificationactionplugin {
                 $item->name, true
             );
         }
-        
+
         // Only is template
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listgroups['0'] = 'GGGG';
         }
-        
+
         asort($listgroups);
 
         $group = $mform->createElement(
@@ -77,20 +88,24 @@ class removeusergroup extends notificationactionplugin {
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
-    /**
-     * @return lang_string|string
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "removeusergroup"
      */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_removeusergroup');
     }
 
     /**
-     * Subplugin title
+     * Get the title of removeusergroup.
      *
-     * @return \lang_string|string
+     * @return string Title of the plugin.
      */
     public function get_title() {
         return get_string('removeusergroup_action', 'notificationsaction_removeusergroup');
@@ -105,14 +120,27 @@ class removeusergroup extends notificationactionplugin {
         return ['[GGGG]'];
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:removeusergroup', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -145,6 +173,14 @@ class removeusergroup extends notificationactionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Execute an action with the given parameters in the specified context.
+     *
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
+     *
+     * @return mixed The result of the action execution.
+     */
     public function execute_action($context, $params) {
         // Add user to a specified group.
         $placeholdershuman = json_decode($params);
@@ -152,7 +188,53 @@ class removeusergroup extends notificationactionplugin {
         return groups_remove_member($placeholdershuman->{self::UI_ACTIVITY}, $user);
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
+    }
+
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        global $DB;
+
+        $oldgroupid = json_decode($this->get_parameters())->{self::UI_ACTIVITY};
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'group', $oldgroupid);
+
+        if (!$rec || !$rec->newitemid) {
+            // If we are on the same course (e.g. duplicate) then we can just
+            // use the existing one.
+            if ($DB->record_exists('groups', ['id' => $oldgroupid, 'course' => $courseid])) {
+                return false;
+            }
+            // Otherwise it's a warning.
+            $logger->process(
+                'Restored item (' . $this->get_pluginname() . ')
+                has groupid on action that was not restored',
+                \backup::LOG_WARNING
+            );
+        } else {
+            $newparameters = json_decode($this->get_parameters());
+            $newparameters->{self::UI_ACTIVITY} = $rec->newitemid;
+            $newparameters = json_encode($newparameters);
+
+            $record = new \stdClass();
+            $record->id = $this->get_id();
+            $record->parameters = $newparameters;
+
+            $DB->update_record('notificationsagent_action', $record);
+        }
     }
 }

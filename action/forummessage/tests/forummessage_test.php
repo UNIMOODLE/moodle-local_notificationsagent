@@ -36,12 +36,13 @@ namespace notificationsaction_forummessage;
 use Generator;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationsaction_forummessage\forummessage;
 
 /**
+ * Test for forummessage.
+ *
  * @group notificationsagent
  */
 class forummessage_test extends \advanced_testcase {
@@ -50,6 +51,10 @@ class forummessage_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var forummessage
+     */
     private static $subplugin;
 
     /**
@@ -89,6 +94,9 @@ class forummessage_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -108,14 +116,14 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
-     *
-     * @param int    $timeaccess
-     * @param string $param
-     * @param bool   $expected
-     *
-     * @covers       \notificationsaction_forummessage\forummessage::execute_action
+     * Test case for execute_action method.
      *
      * @dataProvider dataprovider
+     *
+     * @param string $param Parameter to be passed to the method
+     *
+     * @return void
+     * @covers       \notificationsaction_forummessage\forummessage::execute_action
      */
     public function test_execute_action($param) {
         global $DB;
@@ -141,6 +149,9 @@ class forummessage_test extends \advanced_testcase {
         $this->assertEquals($expected->name, $auxarray['title']);
     }
 
+    /**
+     * Data provider for test_execute_action.
+     */
     public static function dataprovider(): array {
         return [
             ['{"title":"TEST","message":"Message body"}'],
@@ -149,6 +160,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_subtype.
+     *
      * @covers \notificationsaction_forummessage\forummessage::get_subtype
      */
     public function test_getsubtype() {
@@ -156,6 +169,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic.
+     *
      * @covers \notificationsaction_forummessage\forummessage::is_generic
      */
     public function test_isgeneric() {
@@ -163,6 +178,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_elements.
+     *
      * @covers \notificationsaction_forummessage\forummessage::get_elements
      */
     public function test_getelements() {
@@ -170,6 +187,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test check_capability.
+     *
      * @covers \notificationsaction_forummessage\forummessage::check_capability
      */
     public function test_checkcapability() {
@@ -180,6 +199,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_title.
+     *
      * @covers \notificationsaction_forummessage\forummessage::get_title
      */
     public function test_gettitle() {
@@ -190,6 +211,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationsaction_forummessage\forummessage::convert_parameters
      */
     public function test_convert_parameters() {
@@ -204,6 +227,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationsaction_forummessage\forummessage::get_ui
      */
     public function test_getui() {
@@ -235,6 +260,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_send_once.
+     *
      * @covers \notificationsaction_forummessage\forummessage::is_send_once
      */
     public function test_is_send_once() {
@@ -242,6 +269,8 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test process_markups.
+     *
      * @covers \notificationsaction_forummessage\forummessage::process_markups
      */
     public function test_processmarkups() {
@@ -271,8 +300,13 @@ class forummessage_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationsaction_forummessage\forummessage::get_parameters_placeholders
      *
+     * This method tests the process_markups method of the forummessage class.
+     *
+     * @param mixed $param
+     *
+     * @return void
+     * @covers       \notificationsaction_forummessage\forummessage::get_parameters_placeholders
      * @dataProvider dataprovidergetparametersplaceholders
      */
     public function test_getparametersplaceholders($param) {
@@ -295,6 +329,9 @@ class forummessage_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
+    /**
+     * Data provider for get_parameters_placeholders.
+     */
     public static function dataprovidergetparametersplaceholders(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
@@ -303,5 +340,9 @@ class forummessage_test extends \advanced_testcase {
         $data['message']['text'] = 'Message body';
         yield [json_encode($data)];
     }
-}
 
+    public function test_showuserplaceholders() {
+        $this->assertFalse(self::$subplugin->show_user_placeholders());
+    }
+
+}

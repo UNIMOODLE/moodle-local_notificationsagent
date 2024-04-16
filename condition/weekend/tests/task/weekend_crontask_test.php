@@ -98,6 +98,7 @@ class weekend_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_weekend\task\weekend_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
@@ -150,5 +151,18 @@ class weekend_crontask_test extends \advanced_testcase {
             [1705741200],
             [1705827600],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_weekend\task\weekend_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(weekend_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

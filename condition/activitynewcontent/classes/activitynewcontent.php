@@ -37,13 +37,22 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * Activitynewcontent class
+ */
 class activitynewcontent extends notificationconditionplugin {
 
     /**
      * Subplugin name
      */
     public const NAME = 'activitynewcontent';
+    /**
+     * Subplugin modname
+     */
     public const MODNAME = 'modname';
+    /**
+     * Subplugin no used types
+     */
     public const UNUSED_TYPES = ['label'];
 
     /**
@@ -64,6 +73,12 @@ class activitynewcontent extends notificationconditionplugin {
         return ['[AAAA]'];
     }
 
+    /**
+     * Subtype of subplugin
+     *
+     * @return \lang_string|string
+     * @throws \coding_exception
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_activitynewcontent');
     }
@@ -96,24 +111,38 @@ class activitynewcontent extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     * Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     *
+     */
     public function estimate_next_time(evaluationcontext $context) {
         return null;
     }
 
+    /**
+     * User interface
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param string      $type
+     *
+     * @return void
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
 
         // Activity.
         $listactivities = [];
-        $modinfo = get_fast_modinfo($courseid);
-        foreach ($modinfo->get_used_module_names() as $key => $value) {
+        foreach (get_module_types_names() as $key => $value) {
             if (in_array($key, self::UNUSED_TYPES)) {
                 continue;
             }
             $listactivities[$key] = format_string($value);
         }
-        
+
         // Only is template
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
@@ -132,17 +161,32 @@ class activitynewcontent extends notificationconditionplugin {
         );
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+        );
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:activitynewcontent', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -173,8 +217,12 @@ class activitynewcontent extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
-
 }

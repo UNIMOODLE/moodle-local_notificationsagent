@@ -42,6 +42,8 @@ use local_notificationsagent\rule;
 use notificationsaction_removeusergroup\removeusergroup;
 
 /**
+ * Test for removeusergroup class.
+ *
  * @group notificationsagent
  */
 class removeusergroup_test extends \advanced_testcase {
@@ -50,6 +52,10 @@ class removeusergroup_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var removeusergroup
+     */
     private static $subplugin;
 
     /**
@@ -76,6 +82,10 @@ class removeusergroup_test extends \advanced_testcase {
      * @var array|string[]
      */
     private static $elements;
+
+    /**
+     * @var \stdClass
+     */
     private static $group;
     /**
      * id for condition
@@ -119,9 +129,9 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test for execute_action method.
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::execute_action
-     *
      */
     public function test_execute_action() {
         $auxarray['user'] = self::$user->id;
@@ -136,6 +146,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype method.
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_subtype
      */
     public function test_getsubtype() {
@@ -143,6 +155,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic method.
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::is_generic
      */
     public function test_isgeneric() {
@@ -150,6 +164,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements method.
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_elements
      */
     public function test_getelements() {
@@ -157,6 +173,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability method.
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::check_capability
      */
     public function test_checkcapability() {
@@ -167,6 +185,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::convert_parameters
      */
     public function test_convert_parameters() {
@@ -179,6 +199,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title method
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_title
      */
     public function test_gettitle() {
@@ -189,6 +211,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description method
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_description
      */
     public function test_getdescription() {
@@ -202,6 +226,8 @@ class removeusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers       \notificationsaction_removeusergroup\removeusergroup::get_ui
      *
      * @dataProvider dataprovidergetui
@@ -230,12 +256,17 @@ class removeusergroup_test extends \advanced_testcase {
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
 
+    /**
+     * Data provider for get ui.
+     */
     public static function dataprovidergetui(): Generator {
         yield ['create_group' => false];
         yield ['create_group' => true];
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationsaction_removeusergroup\removeusergroup::process_markups
      */
     public function test_processmarkups() {
@@ -248,4 +279,3 @@ class removeusergroup_test extends \advanced_testcase {
         $this->assertSame([$expected], $content);
     }
 }
-

@@ -40,6 +40,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Test for the calendareventto crontask condition plugin.
+ *
  * @group notificationsagent
  */
 class calendareventto_crontask_test extends \advanced_testcase {
@@ -84,6 +86,9 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
+    /**
+     * Duration of the activity.
+     */
     public const DURATION = 30 * 86400;
 
     final public function setUp(): void {
@@ -112,7 +117,10 @@ class calendareventto_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Test the execute method.
+     *
      * @covers       \notificationscondition_calendareventto\task\calendareventto_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
@@ -157,5 +165,18 @@ class calendareventto_crontask_test extends \advanced_testcase {
         return [
             [60 * 60 * 24 * 70],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_calendareventto\task\calendareventto_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(calendareventto_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

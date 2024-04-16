@@ -86,8 +86,8 @@ abstract class notificationconditionplugin extends notificationplugin {
     public function get_cmid() {
         $cmid = null;
         $parameters = $this->get_parameters();
-        if(!empty($parameters)){
-            $cmid = json_decode($this->get_parameters(), true)[self::UI_ACTIVITY]??null;
+        if (!empty($parameters)) {
+            $cmid = json_decode($this->get_parameters(), true)[self::UI_ACTIVITY] ?? null;
         }
         return $cmid;
     }
@@ -168,12 +168,13 @@ abstract class notificationconditionplugin extends notificationplugin {
      * @param int       $idname
      * @param \stdClass $data
      * @param int       $complementary
+     * @param array     $arraytimer
      * @param array     $students
-     * @param int       $timer
      *
      * @return void
      */
-    public function save($action, $idname, $data, $complementary, $students = [], &$timer = 0) {
+    public function save($action, $idname, $data, $complementary, &$arraytimer, $students = []) {
+        $courseid = $data->courseid;
 
         $dataplugin = new \stdClass();
         $dataplugin->ruleid = $this->rule->get_id();
@@ -182,37 +183,90 @@ abstract class notificationconditionplugin extends notificationplugin {
         $dataplugin->complementary = $complementary;
         $dataplugin->parameters = $this->convert_parameters($idname, $data);
         $dataplugin->cmid = $this->get_cmid();
-        
-        if(parent::insert_update_delete($action, $idname, $dataplugin)){
+
+        if (parent::insert_update_delete($action, $idname, $dataplugin)) {
             $contextevaluation = new evaluationcontext();
-            $contextevaluation->set_courseid($data->courseid);
+            $contextevaluation->set_courseid($courseid);
             $contextevaluation->set_params($this->get_parameters());
-            $cache = $this->estimate_next_time($contextevaluation);
-    
+            $contextevaluation->set_timeaccess(time());
+            $contextevaluation->set_complementary($complementary);
+
             if (!$this->is_generic()) {
                 foreach ($students as $student) {
+                    $contextevaluation->set_userid($student->id);
+                    $cache = $this->estimate_next_time($contextevaluation);
                     notificationsagent::set_timer_cache(
-                        $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+                        $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id
                     );
-                    if ($timer <= $cache) {
-                        $timer = $cache;
-                        notificationsagent::set_time_trigger(
-                            $dataplugin->ruleid, $dataplugin->id, $student->id, $data->courseid, $timer
-                        );
+                    if (isset($arraytimer[$student->id])) {
+                        if ($arraytimer[$student->id]['timer'] < $cache) {
+                            $arraytimer[$student->id]['timer'] = $cache;
+                            $arraytimer[$student->id]['conditionid'] = $dataplugin->id;
+                        }
+                        continue;
                     }
+                    $arraytimer[$student->id]['timer'] = $cache;
+                    $arraytimer[$student->id]['conditionid'] = $dataplugin->id;
                 }
             } else {
+                $cache = $this->estimate_next_time($contextevaluation);
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id, true
+                    notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id
                 );
-                if ($timer <= $cache) {
-                    $timer = $cache;
-                    notificationsagent::set_time_trigger(
-                        $dataplugin->ruleid, $dataplugin->id, notificationsagent::GENERIC_USERID, $data->courseid, $timer
-                    );
+                if (isset($arraytimer[notificationsagent::GENERIC_USERID])) {
+                    if ($arraytimer[notificationsagent::GENERIC_USERID]['timer'] < $cache) {
+                        $arraytimer[notificationsagent::GENERIC_USERID]['timer'] = $cache;
+                        $arraytimer[notificationsagent::GENERIC_USERID]['conditionid'] = $dataplugin->id;
+                    }
+                } else {
+                    $arraytimer[notificationsagent::GENERIC_USERID]['timer'] = $cache;
+                    $arraytimer[notificationsagent::GENERIC_USERID]['conditionid'] = $dataplugin->id;
                 }
             }
         }
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        global $DB;
+
+        $oldcmid = json_decode($this->get_parameters())->{self::UI_ACTIVITY};
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'course_module', $oldcmid);
+
+        if (!$rec || !$rec->newitemid) {
+            // If we are on the same course (e.g. duplicate) then we can just
+            // use the existing one.
+            if ($DB->record_exists('course_modules', ['id' => $oldcmid, 'course' => $courseid])) {
+                return false;
+            }
+            // Otherwise it's a warning.
+            $logger->process(
+                'Subplugin (' . $this->get_pluginname() . ')
+                has an item on condition that was not restored',
+                \backup::LOG_WARNING
+            );
+        } else {
+            $newparameters = json_decode($this->get_parameters());
+            $newparameters->{self::UI_ACTIVITY} = $rec->newitemid;
+            $newparameters = json_encode($newparameters);
+
+            $record = new \stdClass();
+            $record->id = $this->get_id();
+            if (!is_null($this->get_cmid())) {
+                $record->cmid = $rec->newitemid;
+            }
+            $record->parameters = $newparameters;
+
+            $DB->update_record('notificationsagent_condition', $record);
+        }
+    }
 }

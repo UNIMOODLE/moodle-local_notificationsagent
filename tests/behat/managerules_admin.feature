@@ -205,8 +205,16 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "2" seconds
     And I am on "testnotifagent" course homepage
     And I click on "More" if it exists otherwise "My assistant"
-    Then I should see "Testing rule1"
+    And I wait "1" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
+    And I click on "Select" "link"
+    And I set the following fields to these values:
+      | Title | rule1 ASSIGNED |
+    And I click on "Save changes" "button"
+    And I should see "Rule saved"
     And I should see "Active"
+    Then I should see "rule1 ASSIGNED"
     And I wait "2" seconds
 
   Scenario: Admin assign rule as forced in the plugin notification agent

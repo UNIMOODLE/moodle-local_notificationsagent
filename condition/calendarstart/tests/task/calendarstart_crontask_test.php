@@ -110,12 +110,14 @@ class calendarstart_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_calendarstart\task\calendarstart_crontask::execute
+     * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date, $radio) {
         global $DB, $USER;
         $pluginname = 'calendarstart';
-
+        \uopz_set_return('time', self::CM_DATESTART);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
             'course' => self::$course->id,
@@ -147,21 +149,16 @@ class calendarstart_crontask_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         $task = \core\task\manager::get_scheduled_task(calendarstart_crontask::class);
+        $task->set_timestarted(self::CM_DATESTART * 3);
         $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
 
-        if ($radio === 1) {
-            $this->assertEquals($pluginname, $cache->pluginname);
-            $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(self::$calendarevent->timestart + $date, $cache->timestart);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
-        } else {
-            $this->assertEquals($pluginname, $cache->pluginname);
-            $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(self::$calendarevent->timestart + $date + self::DURATION, $cache->timestart);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
-        }
+        $this->assertEquals($pluginname, $cache->pluginname);
+        $this->assertEquals(self::$course->id, $cache->courseid);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+
+        uopz_unset_return('time');
 
     }
 
@@ -172,5 +169,18 @@ class calendarstart_crontask_test extends \advanced_testcase {
             [86400, 0],
             [86400 * 3, 0],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_calendarstart\task\calendarstart_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(calendarstart_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

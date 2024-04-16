@@ -158,11 +158,11 @@ class activitynewcontent_observer_test extends \advanced_testcase {
         if ($expected) {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(self::$user->id, $cache->userid);
+            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(self::$user->id, $trigger->userid);
+            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
         } else {
             $this->assertFalse($cache);
             $this->assertFalse($trigger);

@@ -87,6 +87,9 @@ class activitynewcontent_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -106,6 +109,7 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test evaluate.
      *
      * @param int  $timeaccess
      * @param bool $usecache
@@ -143,7 +147,9 @@ class activitynewcontent_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
 
     }
-
+    /**
+     * Data provider for test_evaluate()
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, true, true],
@@ -156,6 +162,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_subtype
      */
     public function test_getsubtype() {
@@ -163,6 +171,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::is_generic
      */
     public function test_isgeneric() {
@@ -170,6 +180,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_elements
      */
     public function test_getelements() {
@@ -177,6 +189,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::check_capability
      */
     public function test_checkcapability() {
@@ -187,6 +201,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test estimate next time.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::estimate_next_time
      */
     public function test_estimatenexttime() {
@@ -195,6 +211,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_title
      */
     public function test_gettitle() {
@@ -205,6 +223,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_description
      */
     public function test_getdescription() {
@@ -218,6 +238,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::process_markups
      */
     public function test_processmarkups() {
@@ -236,6 +258,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_ui
      */
     public function test_getui() {
@@ -263,6 +287,8 @@ class activitynewcontent_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::convert_parameters
      */
     public function test_convertparameters() {

@@ -34,6 +34,7 @@
 namespace notificationscondition_activityavailable\task;
 
 use local_notificationsagent\rule;
+use local_notificationsagent\task\notificationsagent_trigger_cron;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
@@ -100,6 +101,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      *  Testing excute method from task.
      *
      * @covers       \notificationscondition_activityavailable\task\activityavailable_crontask::execute
+     * @covers       ::custom_trace
      *
      */
     public function test_execute() {
@@ -128,7 +130,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '';
+        $objdb->parameters = '{"cmid":' . $cmtestacct->cmid . '}';
         $objdb->cmid = $cmtestacct->id;
 
         // Insert.
@@ -151,7 +153,19 @@ class activityavailable_crontask_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$user->id, $trigger->userid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertIsNumeric(self::$user->id, $trigger->startdate);
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_activityavailable\task\activityavailable_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(activityavailable_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 
 }

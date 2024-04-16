@@ -40,7 +40,11 @@ use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
 use notificationscondition_sessionend\sessionend;
 
+use local_notificationsagent\helper\test\mock_base_logger;
+
 /**
+ * Test for the notificationscondition_sessionend plugin.
+ *
  * @group notificationsagent
  */
 class sessionend_test extends \advanced_testcase {
@@ -49,6 +53,10 @@ class sessionend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var sessionend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -91,6 +99,9 @@ class sessionend_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1706605200;
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -111,15 +122,20 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test case.
      *
-     * @param int    $timeaccess
-     * @param int    $timestart
-     * @param string $param
-     * @param bool   $expected
+     * @dataProvider dataprovider
+     *
+     * @param int    $timeaccess    The timeaccess param.
+     * @param bool   $usecache      The usecache param.
+     * @param bool   $uselastacces  The uselastacces param.
+     * @param string $param         The param param.
+     * @param bool   $complementary The complementary param.
+     * @param bool   $expected      The expected value.
      *
      * @covers       \notificationscondition_sessionend\sessionend::evaluate
      *
-     * @dataProvider dataprovider
+     * @return void
      */
     public function test_evaluate($timeaccess, $usecache, $uselastacces, $param, $complementary, $expected) {
         self::$context->set_params($param);
@@ -151,6 +167,9 @@ class sessionend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -162,6 +181,7 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
      *
      * @covers \notificationscondition_sessionend\sessionend::get_subtype
      */
@@ -170,6 +190,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_sessionend\sessionend::is_generic
      */
     public function test_isgeneric() {
@@ -177,6 +199,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_sessionend\sessionend::get_elements
      */
     public function test_getelements() {
@@ -184,6 +208,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_sessionend\sessionend::check_capability
      */
     public function test_checkcapability() {
@@ -194,14 +220,58 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_sessionend\sessionend::estimate_next_time
+     * Test for estimate next time.
+     *
+     * @param int   $timeaccess     The timeaccess param.
+     * @param int   $userlastaccess The userlastaccess param.
+     * @param bool  $complementary  The complementary param.
+     * @param mixed $params         The params param.
+     *
+     * @covers       \notificationscondition_sessionend\sessionend::estimate_next_time
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime() {
-        // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+    public function test_estimatenexttime($timeaccess, $userlastaccess, $complementary, $params) {
+        \uopz_set_return('time', $timeaccess);
+        self::$context->set_params($params);
+        self::$context->set_userid(self::$user->id);
+        self::$context->set_courseid(self::$coursetest->id);
+        self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
+
+        if ($userlastaccess) {
+            self::getDataGenerator()->create_user_course_lastaccess(
+                self::$user,
+                self::$coursetest,
+                $userlastaccess
+            );
+
+        }
+
+        if ($userlastaccess && !self::$context->is_complementary()) {
+            $this->assertEquals($userlastaccess + 864000, self::$subplugin->estimate_next_time(self::$context));
+        } else {
+            // No lastaccess setted.
+            $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        }
+        uopz_unset_return('time');
     }
 
     /**
+     * Data provider for estimate
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            'condition' => [1704099600, 1704099600, 0, '{"time":864000}'],
+            'condition no lastaccess' => [1704099600, 0, 0, '{"time":864000}'],
+            'exception' => [1706605200, 1704099600, 1, '{"time":864000}'],
+        ];
+    }
+
+    /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_sessionend\sessionend::get_cmid
      */
     public function test_getcmid() {
@@ -209,6 +279,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_sessionend\sessionend::get_title
      */
     public function test_gettitle() {
@@ -219,6 +291,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_sessionend\sessionend::get_description
      */
     public function test_getdescription() {
@@ -232,6 +306,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_sessionend\sessionend::process_markups
      */
     public function test_processmarkups() {
@@ -246,6 +322,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_sessionend\sessionend::get_ui
      */
     public function test_getui() {
@@ -285,6 +363,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_sessionend\sessionend::set_default
      */
     public function test_setdefault() {
@@ -331,6 +411,8 @@ class sessionend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_sessionend\sessionend::convert_parameters
      */
     public function test_convertparameters() {
@@ -344,5 +426,16 @@ class sessionend_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, 5, $params);
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_sessionend\sessionend::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 }

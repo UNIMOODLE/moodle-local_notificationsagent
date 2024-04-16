@@ -39,8 +39,11 @@ use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
 use notificationscondition_numberoftimes\numberoftimes;
+use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
+ * Tests for numberoftimes.
+ *
  * @covers \notificationscondition_numberoftimes\numberoftimes
  * @group  notificationsagent
  */
@@ -50,6 +53,9 @@ class numberoftimes_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var numberoftimes
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -86,8 +92,11 @@ class numberoftimes_test extends \advanced_testcase {
     /**
      * Date end for the course
      */
-    public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00.
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -108,6 +117,7 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     *  Test evaluate.
      *
      * @param int    $timeaccess
      * @param string $param
@@ -141,6 +151,9 @@ class numberoftimes_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1705741810, 1704445200, 5, '{"time":864000, "times":4}', false, true],
@@ -152,6 +165,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_subtype
      */
     public function test_getsubtype() {
@@ -159,6 +174,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::is_generic
      */
     public function test_isgeneric() {
@@ -166,6 +183,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_elements
      */
     public function test_getelements() {
@@ -173,6 +192,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::check_capability
      */
     public function test_checkcapability() {
@@ -183,6 +204,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_cmid
      */
     public function test_getcmid() {
@@ -190,6 +213,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test estimate next time.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::estimate_next_time
      */
     public function test_estimatenexttime() {
@@ -198,6 +223,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_title
      */
     public function test_gettitle() {
@@ -208,6 +235,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_description
      */
     public function test_getdescription() {
@@ -221,6 +250,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::process_markups
      */
     public function test_processmarkups() {
@@ -238,6 +269,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::convert_parameters
      */
     public function test_convertparameters() {
@@ -255,6 +288,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_ui
      */
     public function test_getui() {
@@ -296,6 +331,8 @@ class numberoftimes_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_numberoftimes\numberoftimes::set_default
      */
     public function test_setdefault() {
@@ -340,5 +377,15 @@ class numberoftimes_test extends \advanced_testcase {
             isset($defaulttime[$uiseconds]) && $defaulttime[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE
         );
     }
-}
 
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_numberoftimes\numberoftimes::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
+    }
+}

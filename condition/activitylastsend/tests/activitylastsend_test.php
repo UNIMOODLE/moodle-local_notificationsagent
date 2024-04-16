@@ -49,6 +49,9 @@ class activitylastsend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activitylastsend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -75,6 +78,10 @@ class activitylastsend_test extends \advanced_testcase {
      */
     private static $elements;
     /**
+     * @var \stdClass
+     */
+    private static $cmtestls;
+    /**
      * id for condition
      */
     public const CONDITIONID = 1;
@@ -86,7 +93,14 @@ class activitylastsend_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    /**
+     * Date submission
+     */
+    public const USER_LASTSEND = 1704445200; // 05/01/2024.
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -103,9 +117,17 @@ class activitylastsend_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'activitylastsend';
         self::$elements = ['[TTTT]', '[AAAA]'];
+        self::$cmtestls = self::getDataGenerator()->create_module(
+            "assign",
+            [
+                'name' => 'Assign unittest',
+                'course' => self::$coursetest->id,
+            ],
+        );
     }
 
     /**
+     *  Test evaluate.
      *
      * @param int    $timeaccess
      * @param string $param
@@ -136,6 +158,9 @@ class activitylastsend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Data provider for test_evaluate().
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, '{"time":864000}', false],
@@ -145,6 +170,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_subtype.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_subtype
      */
     public function test_getsubtype() {
@@ -152,6 +179,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::is_generic
      */
     public function test_isgeneric() {
@@ -159,6 +188,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_elements
      */
     public function test_getelements() {
@@ -166,6 +197,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::check_capability
      */
     public function test_checkcapability() {
@@ -176,13 +209,79 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_activitylastsend\activitylastsend::estimate_next_time
+     * Test estimate next time.
+     *
+     * @covers       \notificationscondition_activitylastsend\activitylastsend::estimate_next_time
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime() {
-        self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
+        global $DB;
+        \uopz_set_return('time', 1704099600);
+        // Test estimate next time.
+        self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
+        self::$subplugin->set_id(self::CONDITIONID);
+        // $cm = get_coursemodule_from_instance('assign', self::$cmtestls->id, self::$coursetest->id);
+        $assgigngenerator = self::getDataGenerator()->get_plugin_generator('mod_assign');
+        $assigncm = $assgigngenerator->create_instance([
+            'course' => self::$coursetest->id,
+        ]);
+        $assigncontext = \context_module::instance($assigncm->cmid);
+        if ($completion) {
+            $fs = get_file_storage();
+            $filerecord = [
+                'contextid' => $assigncontext->id,
+                'component' => 'mod_assign',
+                'filearea' => 'content',
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'user-test-file.txt',
+                'userid' => self::$user->id,
+                'timecreated' => self::USER_LASTSEND,
+                'timemodified' => self::USER_LASTSEND,
+            ];
+
+            $fs->create_file_from_string($filerecord, 'User upload');
+        }
+
+        self::$context->set_params(json_encode(['time' => $param, 'cmid' => $assigncm->cmid]));
+        // Test estimate next time.
+        if (!$completion) {
+            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+        } else {
+            if (self::$context->is_complementary()) {
+                if ($timeaccess >= self::USER_LASTSEND && $timeaccess <= self::USER_LASTSEND + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                } else if ($timeaccess > self::USER_LASTSEND + $param) {
+                    self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                }
+            } else {
+                if ($timeaccess >= self::USER_LASTSEND && $timeaccess <= self::USER_LASTSEND + $param) {
+                    self::assertEquals(self::USER_LASTSEND + $param, self::$subplugin->estimate_next_time(self::$context));
+                } else if ($timeaccess > self::USER_LASTSEND + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                }
+            }
+        }
+        uopz_unset_return('time');
+    }
+    /**
+     * Data provider for test_estimatenexttime
+     */
+    public static function dataestimate() {
+        return [
+            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+        ];
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_title
      */
     public function test_gettitle() {
@@ -193,6 +292,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::convert_parameters
      */
     public function test_convertparameters() {
@@ -211,6 +312,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::process_markups
      */
     public function test_processmarkups() {
@@ -231,6 +334,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_ui
      */
     public function test_getui() {
@@ -272,6 +377,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_activitylastsend\activitylastsend::set_default
      */
     public function test_setdefault() {
@@ -318,6 +425,8 @@ class activitylastsend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cm id files.
+     *
      * @return void
      * @throws \coding_exception
      * @throws \file_exception
@@ -362,6 +471,9 @@ class activitylastsend_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for test_get_cmidfiles().
+     */
     public static function dataprovidercmifiles(): array {
         return [
             'Testing a file that was not uploaded' => [null, time()],

@@ -35,6 +35,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Agent de notificacions';
+
+$string['admin_breadcrumb'] = 'Agent de notificacions Admin';
+$string['course_breadcrumb'] = 'Agent de notificacions';
+
 // Settings.
 $string['settings'] = 'Ajustaments';
 $string['disable_user_use'] = 'Deshabiliteu per a l\'usuari';
@@ -94,6 +98,7 @@ $string['condition_minutes'] = 'Minuts';
 $string['condition_seconds'] = 'Segons';
 
 // EditRule.
+$string['editrule_clonerule'] = 'Afegir regla';
 $string['editrule_newrule'] = 'Nova regla';
 $string['editrule_reports'] = 'Informes';
 $string['editrule_activaterule'] = 'Activa';
@@ -107,7 +112,8 @@ $string['editrule_type'] = 'Tipus de regla';
 $string['editrule_usetemplate'] = 'Selecciona';
 $string['editrule_sharerule'] = 'Compartir';
 $string['editrule_unsharerule'] = 'Descompartir';
-$string['editrule_shareallrule'] = 'Compartir tots';
+$string['editrule_shareallrule'] = 'Compartir';
+$string['editrule_unshareallrule'] = 'Descompartir';
 $string['editrule_sharedallrule'] = 'Compartit';
 $string['editrule_timesfired'] = 'Nombre de vegades execució';
 $string['editrule_runtime'] = 'Periocitat';
@@ -201,10 +207,15 @@ $string['unsharetitle'] = 'Descompartir la regla {$a->title}';
 $string['unsharecontent'] = 'S\'ha de descompartir la regla {$a->title} amb l\'administrador, voleu continuar?';
 $string['shareaccept'] = 'Regla compartida';
 $string['unshareaccept'] = 'Regla descompartida';
+$string['sharereject'] = 'Regla rebutjada';
 
 // Share all modal.
-$string['sharealltitle'] = 'Aprobar la compartición de la regla {$a->title}';
-$string['shareallcontent'] = 'Se va a aprobar la compartición de la regla {$a->title}, ¿desea continuar?';
+$string['sharealltitle'] = 'Aprobar la compartició de la regla {$a->title}';
+$string['shareallcontent'] = 'S\'aprovarà la compartició de la regla {$a->title}, voleu continuar?';
+
+// Unshare all modal.
+$string['unsharealltitle'] = 'Rebutjar la compartició de la regla {$a->title}';
+$string['unshareallcontent'] = 'Es rebutjarà la compartició de la regla {$a->title}, voleu continuar?';
 
 // Capabilities.
 $string['notificationsagent:createrule'] = 'Crear una regla';
@@ -218,6 +229,7 @@ $string['notificationsagent:assignrule'] = 'Assignar una regla';
 $string['notificationsagent:forcerule'] = 'Forçar una regla';
 $string['notificationsagent:updateruleshare'] = 'Actualitzar l\'estat de compartició d\'una regla';
 $string['notificationsagent:shareruleall'] = 'Aprovar la compartició d\'una regla';
+$string['notificationsagent:unshareruleall'] = 'Rebutjar la compartició d\'una regla';
 $string['notificationsagent:managesiterule'] = 'Gestiona les regles a nivell de lloc';
 $string['notificationsagent:managecourserule'] = 'Gestiona les regles a nivell de curs';
 $string['notificationsagent:manageownrule'] = 'Gestionar les regles pròpies en el curs';

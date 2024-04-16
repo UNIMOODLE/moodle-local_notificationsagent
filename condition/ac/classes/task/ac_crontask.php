@@ -34,8 +34,8 @@
 namespace notificationscondition_ac\task;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;

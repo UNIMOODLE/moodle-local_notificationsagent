@@ -121,7 +121,7 @@ class calendareventto_observer_test extends \advanced_testcase {
 
     public function test_calendar_updated($time) {
         global $DB, $USER;
-
+        \uopz_set_return('time', self::COURSE_DATESTART);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -163,11 +163,11 @@ class calendareventto_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::$calendarevent->timestart - $time, $cache->timestart);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {

@@ -49,6 +49,9 @@ class activityavailable_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activityavailable
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -91,6 +94,9 @@ class activityavailable_test extends \advanced_testcase {
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -111,6 +117,7 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test evaluate.
      *
      * @param string $conditionjson
      * @param bool   $expected
@@ -137,7 +144,9 @@ class activityavailable_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
 
     }
-
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [
@@ -150,6 +159,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::get_subtype
      */
     public function test_getsubtype() {
@@ -157,6 +168,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::is_generic
      */
     public function test_isgeneric() {
@@ -164,6 +177,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::get_elements
      */
     public function test_getelements() {
@@ -171,6 +186,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::check_capability
      */
     public function test_checkcapability() {
@@ -181,14 +198,66 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_activityavailable\activityavailable::estimate_next_time
+     * Test estimate next time
+     *
+     * @covers       \notificationscondition_activityavailable\activityavailable::estimate_next_time
+     * @dataProvider dataestimate
+     *
+     * @param string   $conditionjson
+     * @param int      $complementary
+     * @param int|null $expected
+     *
+     * @return void
+     * @throws \coding_exception
      */
-    public function test_estimatenexttime() {
-        // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+    public function test_estimatenexttime($conditionjson, $complementary, $expected) {
+        \uopz_set_return('time', 1704099600);
+        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestent = $quizgen->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            'availability' => $conditionjson,
+        ]);
+
+        self::$context->set_params(json_encode(['cmid' => $cmtestent->cmid]));
+        self::$context->set_complementary($complementary);
+
+        $result = self::$subplugin->estimate_next_time(self::$context);
+
+        $this->assertEquals($expected, $result);
+
+        uopz_unset_return('time');
     }
 
     /**
+     * Data provider for test_estimatenexttime
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            'condition. available' => [
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
+                notificationplugin::COMPLEMENTARY_CONDITION, 1704099600,
+            ],
+            'condition. not available' => [
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
+                notificationplugin::COMPLEMENTARY_CONDITION, null,
+            ],
+            'exception. available' => [
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
+                notificationplugin::COMPLEMENTARY_EXCEPTION, null,
+            ],
+            'exception. not available' => [
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
+                notificationplugin::COMPLEMENTARY_EXCEPTION, 1704099600,
+            ],
+        ];
+    }
+
+    /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::get_title
      */
     public function test_gettitle() {
@@ -199,6 +268,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::get_description
      */
     public function test_getdescription() {
@@ -212,6 +283,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::convert_parameters
      */
     public function test_convertparameters() {
@@ -226,6 +299,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::process_markups
      */
     public function test_processmarkups() {
@@ -244,6 +319,8 @@ class activityavailable_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activityavailable\activityavailable::get_ui
      */
     public function test_getui() {
@@ -270,4 +347,3 @@ class activityavailable_test extends \advanced_testcase {
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
 }
-

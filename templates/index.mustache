@@ -53,8 +53,11 @@
         <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
     {{/capabilities.import}}
     {{#capabilities.create}}
-        <a href="{{{url.addrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
+        {{^ iscontextsite}}
+            <a href="{{{url.addrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_clonerule, local_notificationsagent{{/str}}</a>
+        {{/ iscontextsite}}
         {{# iscontextsite}}
+            <a href="{{{url.newrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
             <a href="{{{url.addtemplate}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newtemplate, local_notificationsagent{{/str}}</a>
         {{/ iscontextsite}}
     {{/capabilities.create}}
@@ -199,9 +202,23 @@
                     {{#capabilities.delete}}
                         {{# candelete}}
                             {{# iscontextsite}}
-                                <a data-toggle="modal" id="delete-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
-                                    <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
-                                </a>
+                                {{# isrule}}
+                                    {{# shared}}
+                                        <a data-toggle="modal" id="delete-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                            <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                        </a>
+                                    {{/ shared}}
+                                    {{^ shared}}
+                                        <a data-toggle="modal" id="unshare-all-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                            <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unshareallrule, local_notificationsagent{{/str}}
+                                        </a>
+                                    {{/ shared}}
+                                {{/ isrule}}
+                                {{^ isrule}}
+                                    <a data-toggle="modal" id="delete-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-type="{{{ type_lang }}}" href="#">
+                                        <i class="fa fa-trash mr-2"></i>{{#str}}editrule_deleterule, local_notificationsagent{{/str}}
+                                    </a>
+                                {{/ isrule}}
                             {{/ iscontextsite}}
                             {{^ iscontextsite}}
                                 {{# isrule}}

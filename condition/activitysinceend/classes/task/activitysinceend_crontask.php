@@ -34,12 +34,14 @@
 namespace notificationscondition_activitysinceend\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activitysinceend\activitysinceend;
+use local_notificationsagent\evaluationcontext;
 
 class activitysinceend_crontask extends scheduled_task {
 
@@ -65,30 +67,37 @@ class activitysinceend_crontask extends scheduled_task {
             $courseid = $condition->courseid;
             $context = \context_course::instance($courseid);
             $enrolledusers = notificationsagent::get_usersbycourse($context);
-            $condtionid = $condition->id;
-            $decode = $condition->parameters;
-            $param = json_decode($decode, true);
-            $cmid = $param[notificationplugin::UI_ACTIVITY];
-            foreach ($enrolledusers as $user) {
-                $completion = activitysinceend::get_cm_endtime($cmid, $user->id);
+            $conditionid = $condition->id;
 
-                if (isset($completion->userid)) {
-                    if (!notificationsagent::was_launched_indicated_times(
-                            $condition->ruleid, $condition->ruletimesfired, $courseid, $completion->userid
-                        )
-                        && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
-                    ) {
-                        $cache = $completion->timemodified + $param[notificationplugin::UI_TIME];
-                        notificationsagent::set_timer_cache
-                        (
-                            $completion->userid, $courseid, $cache, $pluginname, $condtionid, true
-                        );
-                        notificationsagent::set_time_trigger
-                        (
-                            $condition->ruleid, $condtionid, $completion->userid, $courseid, $cache
-                        );
-                    }
+            $subplugin = new activitysinceend(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($courseid);
+
+            foreach ($enrolledusers as $user) {
+                $context->set_userid($user->id);
+                $cache = $subplugin->estimate_next_time($context);
+                if (empty($cache)) {
+                    continue;
                 }
+
+                if (!notificationsagent::was_launched_indicated_times(
+                        $condition->ruleid, $condition->ruletimesfired, $courseid, $user->id
+                    )
+                    && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
+                ) {
+                    notificationsagent::set_timer_cache
+                    (
+                        $user->id, $courseid, $cache, $pluginname, $conditionid
+                    );
+                    notificationsagent::set_time_trigger
+                    (
+                        $condition->ruleid, $conditionid, $user->id, $courseid, $cache
+                    );
+                }
+
             }
         }
 

@@ -34,7 +34,8 @@
 namespace notificationscondition_forumnoreply\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
@@ -68,7 +69,7 @@ class forumnoreply_crontask extends scheduled_task {
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $condtionid = $condition->id;
+            $conditionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
             $timenow = $this->get_timestarted();
@@ -109,9 +110,9 @@ class forumnoreply_crontask extends scheduled_task {
                 ) {
                     notificationsagent::set_timer_cache(
                         $thread->userid, $courseid, $thread->timemodified + $param[notificationplugin::UI_TIME], $pluginname,
-                        $condtionid, true
+                        $conditionid
                     );
-                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $thread->userid, $courseid, $timenow);
+                    notificationsagent::set_time_trigger($condition->ruleid, $conditionid, $thread->userid, $courseid, $timenow);
                 }
             }
         }

@@ -486,16 +486,17 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @param int    $shared
      * @param int    $siteid
      *
-     * @covers       \local_notificationsagent\rule::get_rules
+     * @covers       \local_notificationsagent\rule::get_rules_index
      * @covers       \local_notificationsagent\rule::get_administrator_rules
      * @covers       \local_notificationsagent\rule::get_shared_rules
      * @covers       \local_notificationsagent\rule::set_shared
      * @covers       \local_notificationsagent\rule::get_course_rules
      * @covers       \local_notificationsagent\rule::get_site_rules
-     * @covers       \local_notificationsagent\rule::get_teacher_rules
-     * @covers       \local_notificationsagent\rule::get_student_rules
      * @covers       \local_notificationsagent\rule::get_dataform
      * @covers       \local_notificationsagent\rule::has_context
+     * @covers       \local_notificationsagent\rule::get_teacher_rules_assign
+     * @covers       \local_notificationsagent\rule::get_teacher_rules_index
+     * @covers       \local_notificationsagent\rule::get_owner_rules_by_course
      * @dataProvider dataprovider_get_rules
      *
      * @return void
@@ -540,7 +541,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
         $instance = rule::create_instance($ruleid);
         $instance->set_shared($shared);
-        $rules = $instance::get_rules($context, $courseid);
+        $rules = $instance::get_rules_index($context, $courseid);
 
         $this->assertNotEmpty($rules);
         $this->assertTrue($instance->has_context());

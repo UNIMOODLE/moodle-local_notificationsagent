@@ -34,12 +34,14 @@
 namespace notificationscondition_activitylastsend\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 use notificationscondition_activitylastsend\activitylastsend;
+use local_notificationsagent\evaluationcontext;
 
 class activitylastsend_crontask extends scheduled_task {
 
@@ -80,14 +82,20 @@ class activitylastsend_crontask extends scheduled_task {
                     )
                     && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
                 ) {
-                    $cache = $data->timemodified + $param[notificationplugin::UI_TIME];
+                    $subplugin = new activitylastsend(null, $condition->id);
+                    $context = new evaluationcontext();
+                    $context->set_params($subplugin->get_parameters());
+                    $context->set_complementary($subplugin->get_iscomplementary());
+                    $context->set_timeaccess($this->get_timestarted());
+                    $context->set_userid($user->id);
+                    $cache = $subplugin->estimate_next_time($context);
+
                     notificationsagent::set_timer_cache(
                         $user->id,
                         $condition->courseid,
                         $cache,
                         $pluginname,
-                        $condition->id,
-                        true
+                        $condition->id
                     );
                     notificationsagent::set_time_trigger(
                         $condition->ruleid,

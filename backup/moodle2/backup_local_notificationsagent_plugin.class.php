@@ -32,8 +32,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ *  Plugin backup class
+ */
 class backup_local_notificationsagent_plugin extends backup_local_plugin {
 
+    /**
+     * Define plugin structure
+     *
+     * @return backup_plugin_element
+     */
     protected function define_course_plugin_structure() {
         $plugin = $this->get_plugin_element(null);
 
@@ -77,84 +85,94 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
         ]);
         $launcheds->add_child($launched);
 
-        if (backup::VAR_COURSEID != SITEID) {
-            // Rule source.
-            $rule->set_source_sql('
-                SELECT nr.*
-                  FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = ?
-                 WHERE nctx.objectid = ?
-            ', [
+        // Rule source.
+        $rule->set_source_sql(
+            '
+            SELECT nr.*
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = ?
+             WHERE nctx.objectid = ?
+        ',  [
                 backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
-            ]);
+            ]
+        );
 
-            // If it's the site context, we need to back up rules with course and category context.
-            if ($this->task->get_courseid() == SITEID) {
-                // Context source.
-                $context->set_source_sql('
-                    SELECT nctx.*
-                      FROM {notificationsagent_rule} nr
-                      JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                     WHERE nr.id = ?
-                ', [
+        // If it's the site context, we need to back up rules with course and category context.
+        if ($this->task->get_courseid() == SITEID) {
+            // Context source.
+            $context->set_source_sql(
+                '
+                SELECT nctx.*
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                 WHERE nr.id = ?
+            ',  [
                     backup::VAR_PARENTID,
-                ]);
-            } else {
-                // Context source.
-                $context->set_source_sql('
-                    SELECT nctx.*
-                      FROM {notificationsagent_rule} nr
-                      JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                       AND nctx.contextid = ?
-                     WHERE nctx.objectid = ?
-                       AND nr.id = ?
-                ', [
+                ]
+            );
+        } else {
+            // Context source.
+            $context->set_source_sql(
+                '
+                SELECT nctx.*
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nctx.contextid = ?
+                 WHERE nctx.objectid = ?
+                   AND nr.id = ?
+            ',  [
                     backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
-                ]);
-            }
+                ]
+            );
+        }
 
-            // Condition source.
-            $condition->set_source_sql('
-                SELECT nc.*
-                  FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = ?
-                  JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                 WHERE nctx.objectid = ?
-                   AND nr.id = ?
-            ', [
+        // Condition source.
+        $condition->set_source_sql(
+            '
+            SELECT nc.*
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = ?
+              JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
+             WHERE nctx.objectid = ?
+               AND nr.id = ?
+        ',  [
                 backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
-            ]);
+            ]
+        );
 
-            // Action source.
-            $action->set_source_sql('
-                SELECT na.*
-                  FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = ?
-                  JOIN {notificationsagent_action} na ON nr.id = na.ruleid
-                 WHERE nctx.objectid = ?
-                   AND nr.id = ?
-            ', [
+        // Action source.
+        $action->set_source_sql(
+            '
+            SELECT na.*
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = ?
+              JOIN {notificationsagent_action} na ON nr.id = na.ruleid
+             WHERE nctx.objectid = ?
+               AND nr.id = ?
+        ',  [
                 backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
-            ]);
+            ]
+        );
 
-            // Launched source.
-            $launched->set_source_sql('
-                SELECT nl.*
-                  FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = ?
-                  JOIN {notificationsagent_launched} nl ON nr.id = nl.ruleid
-                   AND nl.courseid = ?
-                 WHERE nctx.objectid = ?
-                   AND nr.id = ?
-            ', [
+        // Launched source.
+        $launched->set_source_sql(
+            '
+            SELECT nl.*
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = ?
+              JOIN {notificationsagent_launched} nl ON nr.id = nl.ruleid
+               AND nl.courseid = ?
+             WHERE nctx.objectid = ?
+               AND nr.id = ?
+        ',  [
                 backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
                 backup::VAR_COURSEID, backup::VAR_PARENTID,
-            ]);
-        }
+            ]
+        );
 
         return $plugin;
     }

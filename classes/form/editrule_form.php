@@ -148,10 +148,16 @@ class editrule_form extends \moodleform {
     public const FORM_REMOVE_ACTION_SPAN = 'remove-action-span';
 
     /**
-     * Action from json
+     * Insert action from json
      */
     public const FORM_JSON_ACTION_INSERT = 'insert';
+    /**
+     * Update action from json
+     */
     public const FORM_JSON_ACTION_UPDATE = 'update';
+    /**
+     * Delete action from json
+     */
     public const FORM_JSON_ACTION_DELETE = 'delete';
 
     /**
@@ -221,19 +227,10 @@ class editrule_form extends \moodleform {
         // JSON WITH SUBPLUGINS SELECTED.
         $mform->addElement('hidden', self::FORM_JSON_CONDITION);
         $mform->setType(self::FORM_JSON_CONDITION, PARAM_RAW);
-        $this->setInitialJsonTabValue(
-            $rule->get_conditions(), self::FORM_JSON_CONDITION
-        );// LOAD JSON FROM DB.
         $mform->addElement('hidden', self::FORM_JSON_EXCEPTION);
         $mform->setType(self::FORM_JSON_EXCEPTION, PARAM_RAW);
-        $this->setInitialJsonTabValue(
-            $rule->get_exceptions(), self::FORM_JSON_EXCEPTION
-        );// LOAD JSON FROM DB.
         $mform->addElement('hidden', self::FORM_JSON_ACTION);
         $mform->setType(self::FORM_JSON_ACTION, PARAM_RAW);
-        $this->setInitialJsonTabValue(
-            $rule->get_actions(), self::FORM_JSON_ACTION
-        );// LOAD JSON FROM DB.
 
         // ...registerNoSubmitButton for each tab.
         $mform->registerNoSubmitButton(self::FORM_NEW_CONDITION_BUTTON);
@@ -270,27 +267,6 @@ class editrule_form extends \moodleform {
         $this->loadJsonContent(notificationplugin::TYPE_CONDITION);
         $this->loadJsonContent(notificationplugin::TYPE_EXCEPTION);
         $this->loadJsonContent(notificationplugin::TYPE_ACTION);
-    }
-
-    /**
-     * Set the initial value of a JSON tab based on database data.
-     *
-     * @param array $fromdb  description of the fromdb parameter
-     * @param string $element description of the element parameter
-     */
-    private function setInitialJsonTabValue($fromdb, $element) {
-        $mform = $this->_form;
-
-        if (!is_null($fromdb)) {
-            $array = [];
-            foreach ($fromdb as $condition) {
-                $condition->set_ui($array);
-            }
-
-            if (!empty($array)) {
-                $mform->setDefault($element, json_encode($array));
-            }
-        }
     }
 
     /**
@@ -395,7 +371,7 @@ class editrule_form extends \moodleform {
             $json = json_decode($json, true);
             foreach ($json as $key => $value) {
                 // Load all plugins to insert or update
-                if($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE){
+                if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
                     content::get_plugin_ui($this->_rule, $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
                 }
             }
@@ -601,7 +577,7 @@ class content {
     /**
      * Instance the subplugin.
      *
-     * @param rule $rule  rule
+     * @param rule   $rule       rule
      * @param string $pluginname Subplugin name
      * @param string $subtype    Subplugin type
      *
@@ -620,7 +596,7 @@ class content {
     /**
      * Get the plugin UI.
      *
-     * @param rule $rule  rule
+     * @param rule        $rule       rule
      * @param \moodleform $mform      Form
      * @param int         $id         id
      * @param int         $idcourse   course id
@@ -636,7 +612,7 @@ class content {
     /**
      * Set the default plugin for a form and id.
      *
-     * @param rule $rule  rule
+     * @param rule        $rule       rule
      * @param \moodleform $form       Form
      * @param int         $id         id
      * @param string      $pluginname Subplugin name
@@ -651,7 +627,7 @@ class content {
     /**
      * Get the validation form plugin.
      *
-     * @param rule $rule  rule
+     * @param rule        $rule       rule
      * @param \moodleform $mform      Form
      * @param int         $id         id
      * @param int         $idcourse   course id

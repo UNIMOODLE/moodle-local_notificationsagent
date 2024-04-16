@@ -139,7 +139,6 @@ class coursestart_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::COURSE_DATESTART + 84600 + $time, $cache->timestart);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);

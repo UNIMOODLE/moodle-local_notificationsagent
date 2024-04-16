@@ -389,7 +389,7 @@ class notificationsagent {
      *
      * @return int|null The ID of the inserted or updated record, or null if no action was taken.
      */
-    public static function set_timer_cache($userid, $courseid, $timer, $pluginname, $conditionid, $updatecacheifexist) {
+    public static function set_timer_cache($userid, $courseid, $timer, $pluginname, $conditionid) {
         global $DB;
         $exists = $DB->get_field(
             'notificationsagent_cache', 'id',
@@ -411,11 +411,9 @@ class notificationsagent {
             return $DB->insert_record('notificationsagent_cache', $objdb);
         }
         // Update.
-        if ($updatecacheifexist) {
-            $objdb->id = $exists;
-            return $DB->update_record('notificationsagent_cache', $objdb);
-        }
-        return null;
+        $objdb->id = $exists;
+        return $DB->update_record('notificationsagent_cache', $objdb);
+
     }
 
     /**

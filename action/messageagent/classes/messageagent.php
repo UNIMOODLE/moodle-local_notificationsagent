@@ -37,11 +37,22 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
 
+/**
+ * Class representing a messageagent action plugin.
+ */
 class messageagent extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
     public const NAME = 'messageagent';
 
+    /**
+     * Get the elements for the messageagent plugin.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
 
@@ -66,7 +77,7 @@ class messageagent extends notificationactionplugin {
             ),
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
-        $this->placeholders($mform, $id, $type);
+        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui($id, self::UI_TITLE), PARAM_TEXT);
@@ -75,8 +86,9 @@ class messageagent extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
     }
 
-    /**
-     * @return lang_string|string
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "messageagent"
      */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_messageagent');
@@ -100,15 +112,28 @@ class messageagent extends notificationactionplugin {
         return ['[TTTT]', '[BBBB]'];
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:messageagent', $context)
             && has_capability('moodle/site:sendmessage', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -144,14 +169,12 @@ class messageagent extends notificationactionplugin {
     }
 
     /**
-     * Sending a message
+     * Execute an action with the given parameters in the specified context.
      *
-     * @param evaluationcontext $context
-     * @param                   $params
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
      *
-     * @return false|int|mixed
-     * @throws \coding_exception
-     * @throws \moodle_exception
+     * @return mixed The result of the action execution.
      */
     public function execute_action($context, $params) {
         $placeholdershuman = json_decode($params);
@@ -178,6 +201,11 @@ class messageagent extends notificationactionplugin {
         return message_send($message);
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
@@ -194,5 +222,19 @@ class messageagent extends notificationactionplugin {
             'title' => $parameters->{self::UI_TITLE},
             'message' => $parameters->{self::UI_MESSAGE}->text,
         ]);
+    }
+
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
     }
 }

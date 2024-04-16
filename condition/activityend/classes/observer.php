@@ -31,7 +31,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_activityend\activityend;
 
 class notificationscondition_activityend_observer {
 
@@ -39,29 +41,35 @@ class notificationscondition_activityend_observer {
         $courseid = $event->courseid;
         $cmid = $event->objectid;
 
-        $timeend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
-
         $pluginname = 'activityend';
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
-        $context = context_course::instance($courseid);
-        $enrolledusers = notificationsagent::get_usersbycourse($context);
 
         foreach ($conditions as $condition) {
-            $decode = $condition->parameters;
-            $pluginname = $condition->pluginname;
-            $condtionid = $condition->id;
-            $param = json_decode($decode, true);
-            $cache = $timeend;
-            foreach ($enrolledusers as $enrolleduser) {
-                if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
+            $conditionid = $condition->id;
+
+            $subplugin = new activityend(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($event->timecreated);
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
+            }
+            if (!notificationsagent::was_launched_indicated_times(
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
                 )
-                ) {
-                    // Update every time a module is updated.
-                    notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $enrolleduser->id, $courseid, $cache);
-                }
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
+            ) {
+                // Update every time a module is updated.
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
+                );
+                notificationsagent::set_time_trigger(
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                );
             }
         }
     }

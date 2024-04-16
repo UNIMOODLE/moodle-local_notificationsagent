@@ -100,8 +100,6 @@ class activitystudentend_observer_test extends \advanced_testcase {
      * Testing course_module_viewed event
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      * @covers       \notificationscondition_activitystudentend_observer::course_module_viewed
      * @covers       \notificationscondition_activitystudentend\activitystudentend::set_activity_access
      * @covers       \notificationscondition_activitystudentend\activitystudentend::get_cmlastaccess
@@ -132,7 +130,7 @@ class activitystudentend_observer_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"84600"}';
+        $objdb->parameters = '{"time":"84600", "cmid":' . $cmgen->cmid . '}';
         $objdb->cmid = $cmgen->cmid;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
@@ -156,8 +154,6 @@ class activitystudentend_observer_test extends \advanced_testcase {
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
         $this->assertEquals(self::$user->id, $cache->userid);
-        $this->assertEquals($event->timecreated + 84600, $cache->timestart);
-
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);

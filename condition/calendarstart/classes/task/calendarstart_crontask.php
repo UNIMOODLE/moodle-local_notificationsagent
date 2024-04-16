@@ -34,13 +34,15 @@
 namespace notificationscondition_calendarstart\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 require_once(__DIR__ . '/../../../../../../calendar/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_calendarstart\calendarstart;
+use local_notificationsagent\evaluationcontext;
 
 class calendarstart_crontask extends scheduled_task {
 
@@ -63,19 +65,30 @@ class calendarstart_crontask extends scheduled_task {
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $decode = $condition->parameters;
-            $param = json_decode($decode, false);
 
-            $condtionid = $condition->id;
+            $conditionid = $condition->id;
 
-            $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
-            if ($param->{calendarstart::UI_RADIO} == 1) {
-                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart
-                    + $param->{notificationplugin::UI_TIME};
-            } else {
-                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart +
-                    $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timeduration + $param->{notificationplugin::UI_TIME};
+            $subplugin = new calendarstart(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($courseid);
+
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
             }
+
+            // $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
+            // if ($param->{calendarstart::UI_RADIO} == 1) {
+            //     $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart
+            //         + $param->{notificationplugin::UI_TIME};
+            // } else {
+            //     $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart +
+            //         $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timeduration + $param->{notificationplugin::UI_TIME};
+            // }
 
             if (!notificationsagent::was_launched_indicated_times(
                     $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
@@ -83,10 +96,10 @@ class calendarstart_crontask extends scheduled_task {
                 && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
             ) {
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
                 );
                 notificationsagent::set_time_trigger(
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
 

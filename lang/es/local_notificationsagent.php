@@ -35,6 +35,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Agente de notificaciones';
+
+$string['admin_breadcrumb'] = 'Agente de notificaciones Admin';
+$string['course_breadcrumb'] = 'Agente de notificaciones';
+
 // Settings.
 $string['settings'] = 'Ajustes';
 $string['disable_user_use'] = 'Deshabilitar para el usuario';
@@ -94,6 +98,7 @@ $string['condition_minutes'] = 'Minutos';
 $string['condition_seconds'] = 'Segundos';
 
 // EditRule.
+$string['editrule_clonerule'] = 'Añadir regla';
 $string['editrule_newrule'] = 'Nueva regla';
 $string['editrule_reports'] = 'Informes';
 $string['editrule_activaterule'] = 'Activar';
@@ -107,7 +112,8 @@ $string['editrule_type'] = 'Tipo de regla';
 $string['editrule_usetemplate'] = 'Seleccionar';
 $string['editrule_sharerule'] = 'Compartir';
 $string['editrule_unsharerule'] = 'Descompartir';
-$string['editrule_shareallrule'] = 'Compartir todos';
+$string['editrule_shareallrule'] = 'Compartir';
+$string['editrule_unshareallrule'] = 'Descompartir';
 $string['editrule_sharedallrule'] = 'Compartido';
 $string['editrule_timesfired'] = 'Nº de veces ejecución';
 $string['editrule_runtime'] = 'Periocidad';
@@ -201,10 +207,15 @@ $string['unsharetitle'] = 'Descompartir la regla {$a->title}';
 $string['unsharecontent'] = 'Se va a descompartir la regla {$a->title} con el administrador, ¿desea continuar?';
 $string['shareaccept'] = 'Regla compartida';
 $string['unshareaccept'] = 'Regla descompartida';
+$string['sharereject'] = 'Regla rechazada';
 
 // Share all modal.
 $string['sharealltitle'] = 'Aprobar la compartición de la regla {$a->title}';
 $string['shareallcontent'] = 'Se va a aprobar la compartición de la regla {$a->title}, ¿desea continuar?';
+
+// Unshare all modal.
+$string['unsharealltitle'] = 'Rechazar la compartición de la regla {$a->title}';
+$string['unshareallcontent'] = 'Se va a rechazar la compartición de la regla {$a->title}, ¿desea continuar?';
 
 // Capabilities.
 $string['notificationsagent:createrule'] = 'Crear una regla';
@@ -218,6 +229,7 @@ $string['notificationsagent:assignrule'] = 'Asignar una regla';
 $string['notificationsagent:forcerule'] = 'Forzar una regla';
 $string['notificationsagent:updateruleshare'] = 'Actualizar el estado de compartición de una regla';
 $string['notificationsagent:shareruleall'] = 'Aprobar la compartición de una regla';
+$string['notificationsagent:unshareruleall'] = 'Rechazar la compartición de una regla';
 $string['notificationsagent:managesiterule'] = 'Gestionar las reglas a nivel de sitio';
 $string['notificationsagent:managecourserule'] = 'Gestionar las reglas a nivel de curso';
 $string['notificationsagent:manageownrule'] = 'Gestionar tus propias reglas en el curso';

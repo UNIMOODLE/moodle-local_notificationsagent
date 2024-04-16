@@ -37,7 +37,7 @@ $tasks = [
     [
         'classname' => 'notificationscondition_activityavailable\task\activityavailable_crontask',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '0',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',

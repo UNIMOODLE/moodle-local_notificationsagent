@@ -41,6 +41,8 @@ use local_notificationsagent\rule;
 use notificationscondition_activitystudentend\activitystudentend;
 
 /**
+ * Test for activitystudentend.
+ *
  * @group notificationsagent
  */
 class activitystudentend_test extends \advanced_testcase {
@@ -49,6 +51,9 @@ class activitystudentend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activitystudentend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -74,6 +79,8 @@ class activitystudentend_test extends \advanced_testcase {
      * @var array|string[]
      */
     private static $elements;
+
+    private static $cmtestse;
     /**
      * id for condition
      */
@@ -95,8 +102,11 @@ class activitystudentend_test extends \advanced_testcase {
      * Activity date end
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
-    public const USER_ACTIVITY_FIRSTACCESS = 1704445200; // 05/01/2024.
+    public const USER_ACTIVITY_LASTACCESS = 1704445200; // 05/01/2024.
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -113,9 +123,21 @@ class activitystudentend_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'activitystudentend';
         self::$elements = ['[TTTT]', '[AAAA]'];
+
+        self::$cmtestse = self::getDataGenerator()->create_module(
+            "quiz",
+            [
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
+            ],
+        );
+
     }
 
     /**
+     * Test evaluate.
      *
      * @param int    $timeaccess
      * @param string $param
@@ -132,7 +154,7 @@ class activitystudentend_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        $cmtestase = self::getDataGenerator()->create_module(
+        $cmtestse = self::getDataGenerator()->create_module(
             "quiz",
             [
                 'name' => 'Quiz unittest',
@@ -142,13 +164,13 @@ class activitystudentend_test extends \advanced_testcase {
             ],
         );
 
-        $cmtestase->cmid = self::CMID;
+        $cmtestse->cmid = self::CMID;
 
         $firstaccedobj = new \stdClass();
-        $firstaccedobj->idactivity = $cmtestase->cmid;
+        $firstaccedobj->idactivity = $cmtestse->cmid;
         $firstaccedobj->userid = self::$user->id;
         $firstaccedobj->courseid = self::$coursetest->id;
-        $firstaccedobj->firstaccess = self::USER_ACTIVITY_FIRSTACCESS;
+        $firstaccedobj->firstaccess = self::USER_ACTIVITY_LASTACCESS;
 
         $DB->insert_record('notificationsagent_cmview', $firstaccedobj);
 
@@ -158,7 +180,7 @@ class activitystudentend_test extends \advanced_testcase {
             $objdb = new \stdClass();
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
-            $objdb->timestart = self::USER_ACTIVITY_FIRSTACCESS + $params['time'];
+            $objdb->timestart = self::USER_ACTIVITY_LASTACCESS + $params['time'];
             $objdb->pluginname = self::$subtype;
             $objdb->conditionid = self::CONDITIONID;
             // Insert.
@@ -171,6 +193,9 @@ class activitystudentend_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -182,6 +207,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_subtype.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_subtype
      */
     public function test_getsubtype() {
@@ -189,6 +216,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::is_generic
      */
     public function test_isgeneric() {
@@ -196,6 +225,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_elements
      */
     public function test_getelements() {
@@ -203,6 +234,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::check_capability
      */
     public function test_checkcapability() {
@@ -213,14 +246,72 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_activitystudentend\activitystudentend::estimate_next_time
+     *
+     * Test estimate next time
+     *
+     * @covers       \notificationscondition_activitystudentend\activitystudentend::estimate_next_time
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime() {
+    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
+        global $DB;
+        \uopz_set_return('time', $timeaccess);
         // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
+        self::$subplugin->set_id(self::CONDITIONID);
+
+        if ($completion) {
+            $lastaccedobj = new \stdClass();
+            $lastaccedobj->idactivity = self::$cmtestse->cmid;
+            $lastaccedobj->userid = self::$user->id;
+            $lastaccedobj->courseid = self::$coursetest->id;
+            $lastaccedobj->firstaccess = self::USER_ACTIVITY_LASTACCESS;
+            $DB->insert_record('notificationsagent_cmview', $lastaccedobj);
+        }
+
+        self::$context->set_params(json_encode(['time' => $param, 'cmid' => self::$cmtestse->cmid]));
+        // Test estimate next time.
+        if (!$completion) {
+            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+        } else {
+            if (self::$context->is_complementary()) {
+                if ($timeaccess >= self::USER_ACTIVITY_LASTACCESS && $timeaccess <= self::USER_ACTIVITY_LASTACCESS + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                } else if ($timeaccess > self::USER_ACTIVITY_LASTACCESS + $param) {
+                    self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                }
+            } else {
+                if ($timeaccess >= self::USER_ACTIVITY_LASTACCESS && $timeaccess <= self::USER_ACTIVITY_LASTACCESS + $param) {
+                    self::assertEquals(
+                        self::USER_ACTIVITY_LASTACCESS + $param, self::$subplugin->estimate_next_time(self::$context)
+                    );
+                } else if ($timeaccess > self::USER_ACTIVITY_LASTACCESS + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                }
+            }
+        }
+        uopz_unset_return('time');
+    }
+    /**
+     * Data provider for test_estimatenexttime.
+     */
+    public static function dataestimate() {
+        return [
+            'no lastaccess' => [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
+            'out of interval' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            'interval' => [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            'exception out' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            'exception in' => [
+                self::USER_ACTIVITY_LASTACCESS + 864000 - 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,
+                true
+            ],
+        ];
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_title
      */
     public function test_gettitle() {
@@ -231,6 +322,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_description
      */
     public function test_getdescription() {
@@ -244,6 +337,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::process_markups
      */
     public function test_processmarkups() {
@@ -264,6 +359,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_ui
      */
     public function test_getui() {
@@ -305,6 +402,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::set_default
      */
     public function test_setdefault() {
@@ -351,6 +450,8 @@ class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activitystudentend\activitystudentend::convert_parameters
      */
     public function test_convertparameters() {
@@ -367,4 +468,3 @@ class activitystudentend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 }
-

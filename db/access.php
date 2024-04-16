@@ -142,12 +142,19 @@ $capabilities = [
             'student' => CAP_PROHIBIT,
         ],
     ],
-    'local/notificationsagent:viewassistantreport' => [
+    'local/notificationsagent:unshareruleall' => [
         'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_PROHIBIT,
+            'student' => CAP_PROHIBIT,
+        ],
+    ],
+    'local/notificationsagent:viewassistantreport' => [
+        'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
             'editingteacher' => CAP_ALLOW,
         ],
     ],
 ];
-

@@ -30,7 +30,9 @@
  */
 
 namespace notificationsaction_bootstrapnotifications;
-
+/**
+ * Class representing a bootstrapmessages action plugin.
+ */
 class bootstrapmessages extends \core\persistent {
 
     /** Table name for the persistent. */

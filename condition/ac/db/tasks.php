@@ -37,7 +37,7 @@ $tasks = [
     [
         'classname' => 'notificationscondition_ac\task\ac_crontask',
         'blocking' => 0,
-        'minute' => '0',
+        'minute' => '15',
         'hour' => '*/6',
         'day' => '*',
         'dayofweek' => '*',

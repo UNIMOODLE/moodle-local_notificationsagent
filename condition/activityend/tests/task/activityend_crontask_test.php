@@ -34,6 +34,8 @@
 namespace notificationscondition_activityend\task;
 
 use local_notificationsagent\rule;
+use notificationscondition_activityavailable\task\activityavailable_crontask;
+use local_notificationsagent\notificationsagent;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
@@ -98,6 +100,7 @@ class activityend_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
@@ -142,7 +145,7 @@ class activityend_crontask_test extends \advanced_testcase {
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
         $this->assertEquals(self::CM_DATEEND - $date, $cache->timestart);
-        $this->assertEquals(self::$user->id, $cache->userid);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
     }
 
@@ -151,5 +154,18 @@ class activityend_crontask_test extends \advanced_testcase {
             [86400],
             [86400 * 3],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_activityend\task\activityend_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(activityend_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

@@ -43,7 +43,7 @@ class notificationscondition extends notificationsbaseinfo {
     /**
      * Return uninstall allowed.
      *
-     * @return true
+     * @return bool
      */
     public function is_uninstall_allowed() {
         return true;

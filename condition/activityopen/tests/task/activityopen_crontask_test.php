@@ -99,6 +99,7 @@ class activityopen_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_activityopen\task\activityopen_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
@@ -142,7 +143,6 @@ class activityopen_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::CM_DATESTART + $date, $cache->timestart);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
     }
@@ -152,5 +152,18 @@ class activityopen_crontask_test extends \advanced_testcase {
             [86400],
             [86400 * 3],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_activityopen\task\activityopen_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(activityopen_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

@@ -163,6 +163,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
         $context->set_userid($userid);
         $context->set_courseid($courseid);
         $context->set_timeaccess($date);
+        $context->set_startdate($date);
 
         foreach ($conditiondata as $condition) {
             // Conditions.
@@ -221,7 +222,8 @@ class notificationsagent_engine_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-            [self::$rule->get_id()], $date, $userid, self::$course->id, $context->get_triggercondition()
+            [self::$rule->get_id()], $date, $userid, self::$course->id, $context->get_triggercondition(),
+            $context->get_startdate()
         );
         $results = $DB->get_records('notificationsagent_report');
         if ($expected) {

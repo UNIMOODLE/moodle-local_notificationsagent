@@ -42,6 +42,8 @@ use local_notificationsagent\rule;
 use notificationsaction_addusergroup\addusergroup;
 
 /**
+ * Test for addusergroup.
+ *
  * @group notificationsagent
  */
 class addusergroup_test extends \advanced_testcase {
@@ -50,6 +52,10 @@ class addusergroup_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var addusergroup
+     */
     private static $subplugin;
 
     /**
@@ -76,6 +82,10 @@ class addusergroup_test extends \advanced_testcase {
      * @var array|string[]
      */
     private static $elements;
+
+    /**
+     * @var array
+     */
     private static $group;
     /**
      * id for condition
@@ -90,6 +100,9 @@ class addusergroup_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
 
@@ -120,6 +133,7 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test execute action.
      *
      * @covers \notificationsaction_addusergroup\addusergroup::execute_action
      *
@@ -137,6 +151,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::get_subtype
      */
     public function test_getsubtype() {
@@ -144,6 +160,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::is_generic
      */
     public function test_isgeneric() {
@@ -151,6 +169,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::get_elements
      */
     public function test_getelements() {
@@ -158,6 +178,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::check_capability
      */
     public function test_checkcapability() {
@@ -168,6 +190,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::convert_parameters
      */
     public function test_convert_parameters() {
@@ -180,6 +204,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::get_title
      */
     public function test_gettitle() {
@@ -190,6 +216,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::get_description
      */
     public function test_getdescription() {
@@ -203,6 +231,8 @@ class addusergroup_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers       \notificationsaction_addusergroup\addusergroup::get_ui
      *
      * @dataProvider dataprovidergetui
@@ -230,13 +260,17 @@ class addusergroup_test extends \advanced_testcase {
 
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
-
+    /**
+     * Data provider for get ui.
+     */
     public static function dataprovidergetui(): Generator {
         yield ['creategroup' => false];
         yield ['creategroup' => true];
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationsaction_addusergroup\addusergroup::process_markups
      */
     public function test_processmarkups() {

@@ -31,8 +31,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
+use notificationscondition_activityopen\activityopen;
 
 class notificationscondition_activityopen_observer {
 
@@ -40,26 +42,32 @@ class notificationscondition_activityopen_observer {
         $courseid = $event->courseid;
         $cmid = $event->objectid;
 
-        $timestart = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
-
         $pluginname = 'activityopen';
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         foreach ($conditions as $condition) {
-            $decode = $condition->parameters;
-            $pluginname = $condition->pluginname;
-            $condtionid = $condition->id;
-            $param = json_decode($decode, true);
-            $cache = $timestart + $param[notificationplugin::UI_TIME];
+            $conditionid = $condition->id;
+            $subplugin = new activityopen(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($event->timecreated);
+            $context->set_courseid($courseid);
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
+            }
+
             if (!notificationsagent::was_launched_indicated_times(
                 $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
             )
             ) {
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
                 );
                 notificationsagent::set_time_trigger(
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }

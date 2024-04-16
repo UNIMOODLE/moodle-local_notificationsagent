@@ -125,25 +125,13 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
      * @return void
      * @dataProvider dataprovider_cron
      * @covers       \local_notificationsagent\task\notificationsagent_trigger_cron::execute
+     * @covers       ::custom_trace
      */
 
     public function test_execute(
         int $date, array $conditiondata, array $exceptiondata, array $actiondata, bool $genericuser, bool $expected
     ) {
         global $DB, $USER;
-        $objcron = new \stdClass();
-        $objcron->classname = 'local_notificationsagent\task\notificationsagent_trigger_cron';
-        $objcron->component = 'local_notificationsagent';
-        $objcron->type = 0;
-        $objcron->userid = 0;
-        $objcron->timestart = 9;
-        $objcron->timeend = 13;
-        $objcron->dbreads = 0;
-        $objcron->dbwrites = 0;
-        $objcron->result = 0;
-        $objcron->output = 'taks ouput';
-
-        $DB->insert_record('task_log', $objcron);
 
         $conditions = [];
         $conditionid = 1;
@@ -390,5 +378,17 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
         ];
     }
 
-}
+    /**
+     * Get name test
+     *
+     * @covers \local_notificationsagent\task\notificationsagent_trigger_cron::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(notificationsagent_trigger_cron::class);
 
+        $this->assertIsString($task->get_name());
+
+    }
+
+}

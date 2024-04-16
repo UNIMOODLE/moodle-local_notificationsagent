@@ -102,14 +102,12 @@ class activityopen_observer_test extends \advanced_testcase {
      * Testing course module updated
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      * @covers       \notificationscondition_activityopen_observer::course_module_updated
      */
 
     public function test_course_module_updated() {
         global $DB, $USER;
-
+        uopz_set_return('time', self::COURSE_DATESTART);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
             'course' => self::$course->id,
@@ -132,7 +130,7 @@ class activityopen_observer_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"86400"}';
+        $objdb->parameters = '{"time":"86400", "cmid":' . $cmgen->cmid . '}';
         $objdb->cmid = $cmgen->cmid;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
@@ -164,5 +162,6 @@ class activityopen_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        uopz_unset_return('time');
     }
 }

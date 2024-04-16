@@ -69,11 +69,6 @@ class evaluationcontext {
     private $usertimesfired;
 
     /**
-     * @var mixed The object ID.
-     */
-    private $objectid;
-
-    /**
      * @var string The trigger condition.
      */
     private $triggercondition;
@@ -92,6 +87,10 @@ class evaluationcontext {
      * @var array List of exceptions.
      */
     private $exceptions = [];
+    /**
+     * @var int Trigger setted timestamp.
+     */
+    private $startdate;
 
     /**
      * Get the user ID.
@@ -238,24 +237,6 @@ class evaluationcontext {
     }
 
     /**
-     * Get the object ID.
-     *
-     * @return int
-     */
-    public function get_objectid(): int {
-        return $this->objectid;
-    }
-
-    /**
-     * Set the object id.
-     *
-     * @param int $objectid The object id to set.
-     */
-    public function set_objectid(int $objectid): void {
-        $this->objectid = $objectid;
-    }
-
-    /**
      * Get the trigger condition.
      *
      * @return int
@@ -308,4 +289,23 @@ class evaluationcontext {
 
         return $isevaluate;
     }
+
+    /**
+     * Get trigger setted time
+     *
+     * @return int
+     */
+    public function get_startdate(): int {
+        return $this->startdate;
+    }
+
+    /**
+     * Set trigger setted time
+     *
+     * @param int $startdate
+     */
+    public function set_startdate(int $startdate): void {
+        $this->startdate = $startdate;
+    }
+
 }

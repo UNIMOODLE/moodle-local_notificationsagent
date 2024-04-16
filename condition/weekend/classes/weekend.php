@@ -34,12 +34,18 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 
+/**
+ * Weekend supluging class
+ */
 class weekend extends notificationconditionplugin {
 
     /**
      * Subplugin name
      */
     public const NAME = 'weekend';
+    /**
+     * User interface description
+     */
     public const UI_DESCRIPTION = 'description';
 
     /**
@@ -61,14 +67,16 @@ class weekend extends notificationconditionplugin {
     }
 
     /**
+     * Subtype of subplugine
+     *
      * @return \lang_string|string
-     * @throws \coding_exception
      */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_weekend');
     }
 
-    /** Evaluates this condition using the context variables or the system's state and the complementary flag.
+    /**
+     * Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
@@ -79,20 +87,59 @@ class weekend extends notificationconditionplugin {
         return self::is_weekend($context->get_timeaccess());
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     * Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     *
+     * @return false|int|mixed|null
+     */
     public function estimate_next_time(evaluationcontext $context) {
-        return null;
+        global $CFG;
+        $weekendconfig = get_config('core', 'calendar_weekend');
+        $calendar = type_factory::get_calendar_instance();
+        [
+            'year' => $year,
+            'mon' => $month,
+            'mday' => $day,
+            'wday' => $dayofweek,
+            'hours' => $hour,
+            'minutes' => $minute,
+        ]
+            = usergetdate($context->get_timeaccess(), $CFG->timezone);
+        // Condición.
+        if (!$context->is_complementary()) {
+            if (self::is_weekend($context->get_timeaccess())) {
+                return time();
+            }
+            $day += 1;
+
+            while (!($weekendconfig & (1 << (++$dayofweek % $calendar->get_num_weekdays())))) {
+                $day++;
+            }
+            // Exception.
+        } else {
+            if (!self::is_weekend($context->get_timeaccess())) {
+                return time();
+            }
+            $day += 1;
+
+            while (($weekendconfig & (1 << (++$dayofweek % $calendar->get_num_weekdays())))) {
+                $day++;
+            }
+        }
+        return make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone);
     }
 
     /**
-     * @param $mform
-     * @param $id
-     * @param $courseid
-     * @param $type
+     * Weekend UI
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param string      $type
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
@@ -117,19 +164,26 @@ class weekend extends notificationconditionplugin {
     }
 
     /**
-     * @param $context
+     * Capability for subplugin
+     *
+     * @param \context $context
      *
      * @return bool
-     * @throws \coding_exception
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:weekend', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         return null;
@@ -151,28 +205,49 @@ class weekend extends notificationconditionplugin {
         $content[] = $this->get_title();
     }
 
+    /**
+     * Whether a subplugins is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
 
     /**
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * Determine if is weekend given a time.
+     *
+     * @param int $time
+     *
+     * @return bool
      */
     public static function is_weekend($time): bool {
         $isweekend = false;
-        $today = date('l', $time);
+        $today = date("w", $time);
         // Get weekend core configuration.
-        $weekendconfig = get_config(null, 'calendar_weekend');
+        $weekendconfig = get_config('core', 'calendar_weekend');
         $calendar = type_factory::get_calendar_instance();
 
         $params = $calendar->get_weekdays();
         foreach ($params as $key => $value) {
-            if (($weekendconfig & (1 << $key)) && $value['fullname'] === $today) {
+            if (($weekendconfig & (1 << $key)) && $key == $today) {
                 $isweekend = true;
             }
         }
         return $isweekend;
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

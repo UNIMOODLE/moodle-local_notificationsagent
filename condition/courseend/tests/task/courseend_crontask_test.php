@@ -99,6 +99,7 @@ class courseend_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_courseend\task\courseend_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
@@ -152,5 +153,18 @@ class courseend_crontask_test extends \advanced_testcase {
             [86400],
             [86400 * 3],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_courseend\task\courseend_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(courseend_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

@@ -33,6 +33,7 @@
 
 namespace local_notificationsagent\task;
 
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
@@ -68,7 +69,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
         // Evalutate rules.
         foreach ($triggers as $trigger) {
             notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid
+                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid, $trigger->startdate
             );
         }
         custom_mtrace("Task finished-> " . time());

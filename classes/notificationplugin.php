@@ -76,11 +76,20 @@ abstract class notificationplugin {
     public const UI_ACTIVITY = 'cmid';
 
     /**
-     * User interface constants for forum jsons.
+     * User interface constants for jsons.
      */
     public const UI_TITLE = 'title';
+    /**
+     * User interface constants for jsons.
+     */
     public const UI_MESSAGE = 'message';
+    /**
+     * User interface constants for jsons.
+     */
     public const UI_MESSAGE_FORMAT = 'format';
+    /**
+     * User interface constants for jsons.
+     */
     public const UI_MESSAGE_ITEMID = 'itemid';
 
     /**
@@ -186,12 +195,37 @@ abstract class notificationplugin {
     private $iscomplementary = 0;
 
     /**
+     * cmid of course moduule in conditions if any.
+     *
+     * @var int
+     */
+    private $cmid;
+
+    /**
      * Constructor for the class.
      *
-     * @param rule $rule Description of the rule parameter
+     * @param rule $rule
+     * @param int  $id
+     *
      */
-    public function __construct($rule) {
+    public function __construct($rule, $id = null) {
         $this->rule = $rule;
+
+        if (!empty($id)) {
+            global $DB;
+            $subplugin = $DB->get_record('notificationsagent_condition', ['id' => $id]);
+
+            $this->set_id($id);
+            $this->set_pluginname($subplugin->pluginname);
+            $this->set_ruleid($subplugin->ruleid);
+            $this->set_type($subplugin->type);
+            $this->set_parameters($subplugin->parameters);
+            $this->set_cmid($subplugin->cmid);
+            $this->set_iscomplementary($subplugin->complementary);
+            $this->rule = new rule($subplugin->ruleid);
+
+        }
+
     }
 
     /**
@@ -334,7 +368,10 @@ abstract class notificationplugin {
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
-        $mform->addGroupRule($this->get_name_ui($id, $this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addGroupRule(
+            $this->get_name_ui($id, $this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
     /**
@@ -371,14 +408,13 @@ abstract class notificationplugin {
      *
      * @return void
      */
-    public function validation_form($mform, $id, $courseid, &$array) {
-    }
+    public function validation_form($mform, $id, $courseid, &$array) {}
 
     /**
      * Save data (insert/update/delete)
      *
-     * @param string $action
-     * @param integer $idname
+     * @param string    $action
+     * @param integer   $idname
      * @param \stdClass $dataplugin
      *
      * @return bool
@@ -395,20 +431,25 @@ abstract class notificationplugin {
             }
             return true;
 
-        // Update plugin.
-        } elseif ($action == editrule_form::FORM_JSON_ACTION_UPDATE) {
+            // Update plugin.
+        } else if ($action == editrule_form::FORM_JSON_ACTION_UPDATE) {
             $dataplugin->id = $idname;
             if (!$DB->update_record($table, $dataplugin)) {
                 throw new moodle_exception('errorupdating', 'notificationplugin');
             }
+            if ($this->get_type() != self::TYPE_ACTION) {
+                if (!$DB->delete_records('notificationsagent_triggers', ['conditionid' => $idname])) {
+                    throw new moodle_exception('errordeletingtriggers', 'notificationplugin');
+                }
+            }
             return true;
 
-        // Delete plugin.
-        } elseif ($action == editrule_form::FORM_JSON_ACTION_DELETE) {
+            // Delete plugin.
+        } else if ($action == editrule_form::FORM_JSON_ACTION_DELETE) {
             if (!$DB->delete_records($table, ['id' => $idname])) {
                 throw new moodle_exception('errordeleting', 'notificationplugin');
             }
-            if ($this->get_type() != self::TYPE_ACTION){
+            if ($this->get_type() != self::TYPE_ACTION) {
                 if (!$DB->delete_records('notificationsagent_cache', ['conditionid' => $idname])) {
                     throw new moodle_exception('errordeletingcache', 'notificationplugin');
                 }
@@ -418,7 +459,7 @@ abstract class notificationplugin {
             }
             return false;
 
-        } else{
+        } else {
             throw new moodle_exception('errorinsertupdatedelete', 'notificationplugin');
         }
 
@@ -595,7 +636,7 @@ abstract class notificationplugin {
     public function load_dataform() {
         $return = [];
         $parameters = $this->get_parameters();
-        if(!empty($parameters)){
+        if (!empty($parameters)) {
             $array = json_decode($parameters, true);
             if (!empty($array)) {
                 foreach ($array as $key => $value) {
@@ -622,7 +663,19 @@ abstract class notificationplugin {
      *
      * @return void
      */
-    public function set_default($form, $id) {
-    }
+    public function set_default($form, $id) {}
 
+    // /**
+    //  * @return int
+    //  */
+    // public function get_cmid(): int {
+    //     return $this->cmid;
+    // }
+
+    /**
+     * @param int|null $cmid
+     */
+    public function set_cmid($cmid): void {
+        $this->cmid = $cmid;
+    }
 }

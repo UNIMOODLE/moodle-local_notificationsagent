@@ -34,8 +34,18 @@
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activitynewcontent\activitynewcontent;
 
+/**
+ * Activitynewcontent observer
+ */
 class notificationscondition_activitynewcontent_observer {
 
+    /**
+     * Module created listener
+     *
+     * @param \core\event\course_module_created $event
+     *
+     * @return void
+     */
     public static function course_module_created(\core\event\course_module_created $event) {
         $other = $event->other;
         $namemodule = $other["modulename"];
@@ -47,28 +57,27 @@ class notificationscondition_activitynewcontent_observer {
         $pluginname = 'activitynewcontent';
 
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-        $context = context_course::instance($courseid);
-        $enrolledusers = notificationsagent::get_usersbycourse($context);
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
-            $condtionid = $condition->id;
+            $conditionid = $condition->id;
             $param = json_decode($decode, true);
             $modname = $param[activitynewcontent::MODNAME];
             if ($namemodule == $modname) {
-                foreach ($enrolledusers as $enrolleduser) {
-                    if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
-                    )
-                    ) {
-                        // Update every time a module is updated.
-                        notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                        notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $enrolleduser->id, $courseid, $cache);
-                    }
+                if (!notificationsagent::was_launched_indicated_times(
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                ) {
+                    // Update every time a module is updated.
+                    notificationsagent::set_timer_cache(
+                        notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
+                    );
+                    notificationsagent::set_time_trigger(
+                        $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    );
                 }
             }
-
         }
     }
 }

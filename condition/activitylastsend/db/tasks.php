@@ -37,7 +37,7 @@ $tasks = [
     [
         'classname' => 'notificationscondition_activitylastsend\task\activitylastsend_crontask',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '45',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',

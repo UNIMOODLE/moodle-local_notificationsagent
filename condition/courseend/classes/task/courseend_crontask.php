@@ -34,11 +34,14 @@
 namespace notificationscondition_courseend\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_courseend\courseend;
+use local_notificationsagent\evaluationcontext;
 
 class courseend_crontask extends scheduled_task {
 
@@ -63,10 +66,15 @@ class courseend_crontask extends scheduled_task {
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $enddate = get_course($courseid)->enddate;
-            $condtionid = $condition->id;
-            $param = json_decode($condition->parameters, true);
-            $cache = $enddate - $param[notificationplugin::UI_TIME];
+            $conditionid = $condition->id;
+
+            $subplugin = new courseend(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($courseid);
+            $cache = $subplugin->estimate_next_time($context);
 
             if (!notificationsagent::was_launched_indicated_times(
                     $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
@@ -74,11 +82,11 @@ class courseend_crontask extends scheduled_task {
                 && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
             ) {
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, false
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
                 );
 
                 notificationsagent::set_time_trigger(
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }

@@ -133,8 +133,21 @@ class sessionstart extends notificationconditionplugin {
      * @return mixed Estimated time as a Unix timestamp or null if cannot be estimated.
      */
     public function estimate_next_time(evaluationcontext $context) {
-        // No devolvemos fecha en los subplugins que responden a un evento core de moodle.
-        return null;
+        // Condition
+        $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
+        $params = json_decode($context->get_params(), false);
+        $firstacces = self::get_first_course_access($userid, $courseid);
+        // The student never has view the course.
+        if (empty($firstacces)) {
+            //Return null as we cannot provide a estimated date.
+            return null;
+        }
+        if ($context->is_complementary() && $context->get_timeaccess() >= $firstacces + $params->{self::UI_TIME}) {
+            return null;
+        }
+
+        return max(time(), $firstacces + $params->{self::UI_TIME});
     }
 
     /**
@@ -234,7 +247,7 @@ class sessionstart extends notificationconditionplugin {
             $objdb->userid = $userid;
             $objdb->courseid = $courseid;
             $objdb->firstaccess = $timeaccess;
-            $DB->insert_record('notificationsagent_crseview', $objdb);
+            $exists = $DB->insert_record('notificationsagent_crseview', $objdb);
         }
 
         return $exists;
@@ -282,4 +295,17 @@ class sessionstart extends notificationconditionplugin {
         return $firstacces;
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

@@ -104,9 +104,43 @@ class activitystudentend extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     *  Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     *
+     * @return int|mixed|null
+     */
     public function estimate_next_time(evaluationcontext $context) {
-        return null;
+        $timereturn = null;
+        $userid = $context->get_userid();
+        $courseid = $context->get_courseid();
+        $params = json_decode($context->get_params(), false);
+        $lastaccess = self::get_cmlastaccess($userid, $courseid, $params->{self::UI_ACTIVITY});
+        $timeaccess = $context->get_timeaccess();
+
+        if (empty($lastaccess)) {
+            return null;
+        }
+
+        // Condition.
+        if (!$context->is_complementary()) {
+            if ($timeaccess >= $lastaccess && $timeaccess <= $lastaccess + $params->{self::UI_TIME}) {
+                $timereturn = $lastaccess + $params->{self::UI_TIME};
+            } else if ($timeaccess > $lastaccess + $params->{self::UI_TIME}) {
+                $timereturn = time();
+            }
+        }
+
+        //Exception.
+        if ($timeaccess >= $lastaccess
+            && $timeaccess <= $lastaccess + $params->{self::UI_TIME}
+            && $context->is_complementary()
+        ) {
+            $timereturn = time();
+        }
+
+        return $timereturn;
     }
 
     public function get_ui($mform, $id, $courseid, $type) {
@@ -117,12 +151,12 @@ class activitystudentend extends notificationconditionplugin {
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
         }
-        
+
         // Only is template
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
-        
+
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -137,17 +171,33 @@ class activitystudentend extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:activitystudentend', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -182,9 +232,8 @@ class activitystudentend extends notificationconditionplugin {
         // Check if activity is found in course, if is not, return [AAAA].
         $activityname = '[AAAA]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $mod = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $mod->name;
-        }
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
@@ -192,6 +241,11 @@ class activitystudentend extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return false;
     }
@@ -292,5 +346,4 @@ class activitystudentend extends notificationconditionplugin {
 
         return $lastaccess;
     }
-
 }

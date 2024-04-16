@@ -42,14 +42,26 @@ use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * Class representing the calendarstart condition plugin.
+ */
 class calendarstart extends notificationconditionplugin {
 
     /**
      * Subplugin name
      */
     public const NAME = 'calendarstart';
+    /**
+     * Constant for the UI.
+     */
     public const UI_RADIO_GROUP = 'radiogroup';
+    /**
+     * Constant for the UI.
+     */
     public const UI_RADIO = 'radio';
+    /**
+     * Constant for the UI.
+     */
     public const UI_RADIO_DEFAULT_VALUE = 1;
 
     /**
@@ -70,6 +82,11 @@ class calendarstart extends notificationconditionplugin {
         return ['[TTTT]', '[CCCC]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_calendarstart');
     }
@@ -115,25 +132,69 @@ class calendarstart extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /** Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context Context for the condition evaluation.
+     */
     public function estimate_next_time(evaluationcontext $context) {
-        $params = json_decode($context->get_params());
+        $timereturn = null;
+        $params = json_decode($context->get_params(), false);
+        $event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}]);
+        $timeevent = $event[$params->{self::UI_ACTIVITY}]->timestart;
+        $timeduration = $event[$params->{self::UI_ACTIVITY}]->timeduration;
+        $timeaccess = $context->get_timeaccess();
 
-        $timestart = null;
-        if ($event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}])) {
-            if (!$context->is_complementary()) {
-                if ($params->{self::UI_RADIO} == 1) {
-                    $timestart = $event[$params->{self::UI_ACTIVITY}]->timestart + $params->{self::UI_TIME};
-                } else {
-                    $timestart = $event[$params->{self::UI_ACTIVITY}]->timestart
-                        + $event[$params->{self::UI_ACTIVITY}]->timeduration + $params->{self::UI_TIME};
+        if (empty($timeevent)) {
+            return null;
+        }
+
+        // Condition.
+        if (!$context->is_complementary()) {
+            if ($params->{self::UI_RADIO} == 1) {
+                if ($timeaccess >= $timeevent && $timeaccess <= $timeevent + $params->{self::UI_TIME}) {
+                    $timereturn = $timeevent + $params->{self::UI_TIME};
+                } else if ($timeaccess > $timeevent + $params->{self::UI_TIME}) {
+                    $timereturn = time();
+                }
+
+            } else {
+                if ($timeaccess >= $timeevent + $timeduration
+                    && $timeaccess <= $timeevent + $timeduration + $params->{self::UI_TIME}
+                ) {
+                    $timereturn = $timeevent + $timeduration + $params->{self::UI_TIME};
+                } else if ($timeaccess > $timeevent + $timeduration + $params->{self::UI_TIME}) {
+                    $timereturn = time();
+                }
+
+            }
+        }
+
+        //Exception.
+        if ($context->is_complementary()) {
+            if ($params->{self::UI_RADIO} == 1) {
+                if ($timeaccess >= $timeevent && $timeaccess < $timeevent + $params->{self::UI_TIME}) {
+                    $timereturn = time();
+                }
+            } else {
+                if ($timeaccess >= $timeevent + $timeduration
+                    && $timeaccess < $timeevent + $timeduration + $params->{self::UI_TIME}
+                ) {
+                    $timereturn = time();
                 }
             }
         }
 
-        return $timestart;
+        return $timereturn;
     }
 
+    /**
+     * Get the UI of the condition.
+     *
+     * @param mform $mform
+     * @param int   $id
+     * @param int   $courseid
+     * @param int   $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         global $DB;
@@ -182,18 +243,27 @@ class calendarstart extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
         $mform->insertElementBefore($radiogroup, 'new' . $type . '_group');
     }
 
+    /**
+     * Check capability.
+     *
+     * @param \context $context
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:calendarstart', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters.
      *
-     * @return mixed
+     * @param int   $id
+     * @param array $params
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -235,6 +305,9 @@ class calendarstart extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Check if the plugin is generic
+     */
     public function is_generic() {
         return true;
     }
@@ -253,4 +326,45 @@ class calendarstart extends notificationconditionplugin {
         $form->set_data($params);
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        global $DB;
+
+        $oldeventid = json_decode($this->get_parameters())->{self::UI_ACTIVITY};
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'event', $oldeventid);
+
+        if (!$rec || !$rec->newitemid) {
+            // If we are on the same course (e.g. duplicate) then we can just
+            // use the existing one.
+            if ($DB->record_exists('event', ['id' => $oldeventid, 'courseid' => $courseid])) {
+                return false;
+            }
+            // Otherwise it's a warning.
+            $logger->process(
+                'Restored item (' . $this->get_pluginname() . ')
+                has eventid on action that was not restored',
+                \backup::LOG_WARNING
+            );
+        } else {
+            $newparameters = json_decode($this->get_parameters());
+            $newparameters->{self::UI_ACTIVITY} = $rec->newitemid;
+            $newparameters = json_encode($newparameters);
+
+            $record = new \stdClass();
+            $record->id = $this->get_id();
+            $record->parameters = $newparameters;
+            $record->cmid = $rec->newitemid;
+
+            $DB->update_record('notificationsagent_condition', $record);
+        }
+    }
 }

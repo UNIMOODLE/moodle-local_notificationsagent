@@ -37,7 +37,7 @@ $tasks = [
     [
         'classname' => 'notificationscondition_activitysinceend\task\activitysinceend_crontask',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '30',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',

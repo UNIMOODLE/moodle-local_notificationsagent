@@ -37,6 +37,9 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
+/**
+ * Class representing the sessionend condition plugin.
+ */
 class sessionend extends notificationconditionplugin {
 
     /**
@@ -62,6 +65,11 @@ class sessionend extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_sessionend');
     }
@@ -104,10 +112,33 @@ class sessionend extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /** Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     */
     public function estimate_next_time(evaluationcontext $context) {
-        // No devolvemos fecha en los subplugins que responden a un evento core de moodle.
-        return null;
+        global $DB;
+
+        // Condition.
+        $courseid = $context->get_courseid();
+        $userid = $context->get_userid();
+        $params = json_decode($context->get_params(), false);
+
+        $lastaccess = $DB->get_field(
+            'user_lastaccess',
+            'timeaccess', ['courseid' => $courseid, 'userid' => $userid],
+        );
+
+        // The student never has view the course.
+        if (empty($lastaccess)) {
+            //Return null as we cannot provide a estimated date.
+            return null;
+        }
+        if ($context->is_complementary() && $context->get_timeaccess() >= $lastaccess + $params->{self::UI_TIME}) {
+            return null;
+        }
+
+        return max(time(), $lastaccess + $params->{self::UI_TIME});
     }
 
     public function get_ui($mform, $id, $courseid, $type) {
@@ -115,14 +146,27 @@ class sessionend extends notificationconditionplugin {
         $this->get_ui_select_date($mform, $id, $type);
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:sessionend', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -160,6 +204,11 @@ class sessionend extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return false;
     }
@@ -177,4 +226,17 @@ class sessionend extends notificationconditionplugin {
         $form->set_data($params);
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

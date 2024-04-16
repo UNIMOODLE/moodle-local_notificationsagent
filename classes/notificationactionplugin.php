@@ -91,7 +91,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * @param string $id    the id of the form
      * @param string $type  the type of the form
      */
-    public function placeholders($mform, $id, $type) {
+    public function placeholders($mform, $id, $type, $showuserplaceholders) {
         $placeholders = \html_writer::start_tag(
             'div', ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
         );
@@ -99,7 +99,7 @@ abstract class notificationactionplugin extends notificationplugin {
         $placeholders .= \html_writer::start_tag(
             'div', ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
         );
-        foreach (rule::get_placeholders() as $option) {
+        foreach (rule::get_placeholders($showuserplaceholders) as $option) {
             $clipboardtarget = "#notificationvars_" . $id . "_" . $type . "_" . $option;
             $placeholders .= \html_writer::start_tag(
                 'a', [
@@ -234,5 +234,70 @@ abstract class notificationactionplugin extends notificationplugin {
      */
     public function get_parameters_placeholders() {
         return $this->get_parameters();
+    }
+
+    /**
+     * Get the news forum for a given course.
+     *
+     * @param int $course The course ID.
+     *
+     * @return int  The forum ID.
+     */
+    public static function get_news_forum($course) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        return (forum_get_course_forum($course, 'news'))->id;
+    }
+
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        global $DB;
+
+        $oldcmid = json_decode($this->get_parameters())->{self::UI_ACTIVITY};
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'course_module', $oldcmid);
+
+        if (!$rec || !$rec->newitemid) {
+            // If we are on the same course (e.g. duplicate) then we can just
+            // use the existing one.
+            if ($DB->record_exists('course_modules', ['id' => $oldcmid, 'course' => $courseid])) {
+                return false;
+            }
+            // Otherwise it's a warning.
+            $logger->process(
+                'Subplugin (' . $this->get_pluginname() . ')
+                has an item on action that was not restored',
+                \backup::LOG_WARNING
+            );
+        } else {
+            $newparameters = json_decode($this->get_parameters());
+            $newparameters->{self::UI_ACTIVITY} = $rec->newitemid;
+            $newparameters = json_encode($newparameters);
+
+            $record = new \stdClass();
+            $record->id = $this->get_id();
+            $record->parameters = $newparameters;
+
+            $DB->update_record('notificationsagent_action', $record);
+        }
+    }
+
+    /**
+     *  Show placeholders relatives to user fields.
+     *
+     * @return bool
+     */
+    public function show_user_placeholders() {
+        return true;
     }
 }

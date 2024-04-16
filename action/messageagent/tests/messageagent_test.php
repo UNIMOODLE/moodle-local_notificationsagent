@@ -39,9 +39,12 @@ use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
+use local_notificationsagent\helper\test\mock_base_logger;
 use notificationsaction_messageagent\messageagent;
 
 /**
+ * Test for messageagent.
+ *
  * @group notificationsagent
  */
 class messageagent_test extends \advanced_testcase {
@@ -50,6 +53,10 @@ class messageagent_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var messageagent
+     */
     private static $subplugin;
 
     /**
@@ -90,6 +97,9 @@ class messageagent_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -109,6 +119,7 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test execute_action method.
      *
      * @param string $param
      *
@@ -133,6 +144,9 @@ class messageagent_test extends \advanced_testcase {
         $this->assertStringContainsString($auxarray['message'], $messages[0]->body);
     }
 
+    /**
+     * Data provider for test_execute_action.
+     */
     public static function dataprovider(): array {
         return [
             ['{"title":"TEST","message":"Message body"}'],
@@ -140,6 +154,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_subtype method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::get_subtype
      */
     public function test_getsubtype() {
@@ -147,6 +163,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::is_generic
      */
     public function test_isgeneric() {
@@ -154,6 +172,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_elements method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::get_elements
      */
     public function test_getelements() {
@@ -161,6 +181,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test check_capability method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::check_capability
      */
     public function test_checkcapability() {
@@ -171,6 +193,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert_parameters method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::convert_parameters
      */
     public function test_convert_parameters() {
@@ -182,6 +206,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_title method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::get_title
      */
     public function test_gettitle() {
@@ -192,6 +218,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_description method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::get_description
      */
     public function test_getdescription() {
@@ -205,6 +233,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_ui method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::get_ui
      */
     public function test_getui() {
@@ -234,6 +264,8 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test process_markups method.
+     *
      * @covers \notificationsaction_messageagent\messageagent::process_markups
      */
     public function test_processmarkups() {
@@ -256,8 +288,12 @@ class messageagent_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationsaction_messageagent\messageagent::get_parameters_placeholders
+     * Test to verify that get_parameters_placeholders returns a json string with the
+     * correct keys and values.
      *
+     * @param string $param
+     *
+     * @covers       \notificationsaction_messageagent\messageagent::get_parameters_placeholders
      * @dataProvider dataprovidergetparametersplaceholders
      */
     public function test_getparametersplaceholders($param) {
@@ -272,6 +308,9 @@ class messageagent_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
+    /**
+     * Data provider for get_parameters_placeholders method.
+     */
     public static function dataprovidergetparametersplaceholders(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
@@ -280,5 +319,15 @@ class messageagent_test extends \advanced_testcase {
         $data['message']['text'] = 'Message body';
         yield [json_encode($data)];
     }
-}
 
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationsaction_messageagent\messageagent::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
+    }
+}

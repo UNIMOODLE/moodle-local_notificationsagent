@@ -41,6 +41,8 @@ use local_notificationsagent\rule;
 use notificationscondition_activityend\activityend;
 
 /**
+ * Test for activityend.
+ *
  * @group notificationsagent
  */
 class activityend_test extends \advanced_testcase {
@@ -49,6 +51,9 @@ class activityend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activityend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -98,7 +103,14 @@ class activityend_test extends \advanced_testcase {
      * Activity date end
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * Course module id
+     */
+    public const CMID = 246000;
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -161,7 +173,9 @@ class activityend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
 
     }
-
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -180,6 +194,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_activityend\activityend::get_subtype
      */
     public function test_getsubtype() {
@@ -187,6 +203,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_activityend\activityend::is_generic
      */
     public function test_isgeneric() {
@@ -194,6 +212,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activityend\activityend::get_elements
      */
     public function test_getelements() {
@@ -201,6 +221,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activityend\activityend::check_capability
      */
     public function test_checkcapability() {
@@ -211,10 +233,13 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test estimate next time.
+     *
      * @covers       \notificationscondition_activityend\activityend::estimate_next_time
      * @dataProvider dataprovider
      */
     public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+        \uopz_set_return('time', $timeaccess);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
@@ -223,24 +248,27 @@ class activityend_test extends \advanced_testcase {
         // Test estimate next time.
         if (self::$context->is_complementary()) {
             if ($timeaccess < self::CM_DATEEND - $param) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess >= self::CM_DATEEND - $param && $timeaccess <= self::CM_DATEEND) {
                 self::assertEquals(self::CM_DATEEND, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::CM_DATEEND) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             }
         } else {
             if ($timeaccess < self::CM_DATEEND - $param) {
                 self::assertEquals(self::CM_DATEEND - $param, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess >= self::CM_DATEEND - $param && $timeaccess <= self::CM_DATEEND) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::CM_DATEEND) {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
+        uopz_unset_return('time');
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activityend\activityend::get_title
      */
     public function test_gettitle() {
@@ -251,6 +279,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_activityend\activityend::get_description
      */
     public function test_getdescription() {
@@ -264,6 +294,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activityend\activityend::convert_parameters
      */
     public function test_convertparameters() {
@@ -281,6 +313,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activityend\activityend::process_markups
      */
     public function test_processmarkups() {
@@ -301,6 +335,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activityend\activityend::get_ui
      */
     public function test_getui() {
@@ -342,6 +378,8 @@ class activityend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default
+     *
      * @covers \notificationscondition_activityend\activityend::set_default
      */
     public function test_setdefault() {
@@ -388,4 +426,3 @@ class activityend_test extends \advanced_testcase {
     }
 
 }
-

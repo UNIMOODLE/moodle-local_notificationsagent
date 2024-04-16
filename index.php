@@ -86,7 +86,7 @@ if ($isroleadmin && $courseid == SITEID) {
         new moodle_url('/')
     );
     $PAGE->navbar->add(
-        'Notification Agent Admin',
+        get_string('admin_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
@@ -95,7 +95,7 @@ if ($isroleadmin && $courseid == SITEID) {
         new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-        'Notification Agent',
+        get_string('course_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }

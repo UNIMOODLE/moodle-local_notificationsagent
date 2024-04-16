@@ -49,6 +49,9 @@ class activityopen_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activityopen
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -101,6 +104,9 @@ class activityopen_test extends \advanced_testcase {
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -127,6 +133,7 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test evaluate.
      *
      * @param int  $timeaccess
      * @param int  $param
@@ -163,6 +170,9 @@ class activityopen_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -174,6 +184,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_subtype.
+     *
      * @covers \notificationscondition_activityopen\activityopen::get_subtype
      */
     public function test_getsubtype() {
@@ -181,6 +193,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic.
+     *
      * @covers \notificationscondition_activityopen\activityopen::is_generic
      */
     public function test_isgeneric() {
@@ -188,6 +202,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_elements.
+     *
      * @covers \notificationscondition_activityopen\activityopen::get_elements
      */
     public function test_getelements() {
@@ -195,6 +211,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test check_capability.
+     *
      * @covers \notificationscondition_activityopen\activityopen::check_capability
      */
     public function test_checkcapability() {
@@ -205,22 +223,61 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test estimate next time.
+     *
      * @covers       \notificationscondition_activityopen\activityopen::estimate_next_time
-     * @dataProvider dataprovider
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_estimatenexttime($timeaccess, $param, $complementary) {
         self::$context->set_complementary($complementary);
+        self::$context->set_params($param);
+        self::$context->set_timeaccess($timeaccess);
         $cm = get_coursemodule_from_instance('quiz', self::$cmtestao->id, self::$coursetest->id);
         self::$context->set_params(json_encode(['time' => $param, 'cmid' => $cm->id]));
-        // Test estimate next time.
-        if (self::$context->is_complementary()) {
-            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
-        } else {
-            self::assertSame(self::CM_DATESTART + $param, self::$subplugin->estimate_next_time(self::$context));
+        $params = json_decode(self::$context->get_params(), false);
+        // Condition.
+        if (!self::$context->is_complementary()) {
+            if ($timeaccess >= self::CM_DATESTART
+                && ($timeaccess <= self::CM_DATESTART +
+                    $params->{notificationplugin::UI_TIME})
+            ) {
+                self::assertEquals(
+                    self::CM_DATESTART + $params->{notificationplugin::UI_TIME},
+                    self::$subplugin->estimate_next_time(self::$context)
+                );
+            } else {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            }
         }
+        // Exception.
+        if (self::$context->is_complementary()) {
+            if ($timeaccess >= self::CM_DATESTART
+                && $timeaccess <= self::CM_DATESTART +
+                $params->{notificationplugin::UI_TIME}
+            ) {
+                $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+
+            } else {
+                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+            }
+        }
+    }
+    /**
+     * Data provider for test_estimatenexttime.
+     */
+    public static function dataestimate(): array {
+        return [
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_CONDITION],
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            [1705050000, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            [1705050000, 864000, notificationplugin::COMPLEMENTARY_CONDITION],
+
+        ];
     }
 
     /**
+     * Test get_title.
+     *
      * @covers \notificationscondition_activityopen\activityopen::get_title
      */
     public function test_gettitle() {
@@ -231,6 +288,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_description.
+     *
      * @covers \notificationscondition_activityopen\activityopen::get_description
      */
     public function test_getdescription() {
@@ -244,6 +303,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activityopen\activityopen::convert_parameters
      */
     public function test_convertparameters() {
@@ -261,6 +322,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test process_markups.
+     *
      * @covers \notificationscondition_activityopen\activityopen::process_markups
      */
     public function test_processmarkups() {
@@ -281,6 +344,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_ui.
+     *
      * @covers \notificationscondition_activityopen\activityopen::get_ui
      */
     public function test_getui() {
@@ -322,6 +387,8 @@ class activityopen_test extends \advanced_testcase {
     }
 
     /**
+     * Test set_default.
+     *
      * @covers \notificationscondition_activityopen\activityopen::set_default
      */
     public function test_setdefault() {
@@ -367,4 +434,3 @@ class activityopen_test extends \advanced_testcase {
         );
     }
 }
-

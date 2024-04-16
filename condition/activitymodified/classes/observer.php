@@ -50,8 +50,7 @@ class notificationscondition_activitymodified_observer {
                         $event->courseid,
                         $event->timecreated,
                         $pluginname,
-                        $condition->id,
-                        true
+                        $condition->id
                     );
                     notificationsagent::set_time_trigger(
                         $condition->ruleid,

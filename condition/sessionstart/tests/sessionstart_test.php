@@ -41,6 +41,8 @@ use local_notificationsagent\rule;
 use notificationscondition_sessionstart\sessionstart;
 
 /**
+ * Test for the notificationscondition_sessionstart plugin.
+ *
  * @group notificationsagent
  */
 class sessionstart_test extends \advanced_testcase {
@@ -49,6 +51,10 @@ class sessionstart_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var sessionstart
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -91,6 +97,9 @@ class sessionstart_test extends \advanced_testcase {
      */
     public const USER_FIRSTACCESS = 1704099600;
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -112,6 +121,7 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test sessionstart evaluate
      *
      * @param int    $timeaccess
      * @param        $usecache
@@ -120,7 +130,6 @@ class sessionstart_test extends \advanced_testcase {
      * @param        $complementary
      * @param bool   $expected
      *
-     * @throws \dml_exception
      * @covers       \notificationscondition_sessionstart\sessionstart::evaluate
      * @covers       \notificationscondition_sessionstart\sessionstart::set_first_course_access
      * @covers       \notificationscondition_sessionstart\sessionstart::get_first_course_access
@@ -158,6 +167,9 @@ class sessionstart_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Data provider for test_evaluate
+     */
     public static function dataprovider(): array {
         return [
             [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -169,6 +181,7 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     *  Test get subtype.
      *
      * @covers \notificationscondition_sessionstart\sessionstart::get_subtype
      */
@@ -177,6 +190,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::is_generic
      */
     public function test_isgeneric() {
@@ -184,6 +199,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::get_elements
      */
     public function test_getelements() {
@@ -191,6 +208,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::check_capability
      */
     public function test_checkcapability() {
@@ -201,6 +220,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::get_cmid
      */
     public function test_getcmid() {
@@ -208,14 +229,55 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_sessionstart\sessionstart::estimate_next_time
+     * Test for estimate next time.
+     *
+     * @param int    $timeaccess    Time access for test.
+     * @param bool   $usecache      Use cache in test.
+     * @param bool   $complementary Complementary in test.
+     * @param string $param         Param in test.
+     *
+     * @covers       \notificationscondition_sessionstart\sessionstart::estimate_next_time
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime() {
-        // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+    public function test_estimatenexttime($timeaccess, $usecache, $complementary, $param) {
+        \uopz_set_return('time', $timeaccess);
+        self::$context->set_complementary($complementary);
+        self::$context->set_params($param);
+        self::$context->set_timeaccess(self::COURSE_DATEEND);
+        $params = json_decode(self::$context->get_params());
+        $time = $params->{notificationplugin::UI_TIME};
+        if ($usecache && !self::$context->is_complementary()) {
+            self::$subplugin::set_first_course_access(self::$user->id, self::$coursetest->id, self::USER_FIRSTACCESS);
+            $estimate = self::$subplugin->estimate_next_time(self::$context);
+            $this->assertEquals($time + self::USER_FIRSTACCESS, $estimate);
+        } else {
+            $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        }
+
+        if (self::$context->is_complementary()) {
+            self::$subplugin::set_first_course_access(self::$user->id, self::$coursetest->id, self::USER_FIRSTACCESS);
+
+            $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        }
+        uopz_unset_return('time');
     }
 
     /**
+     * Test estimate next time.
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            'condition user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'condition no cache' => [1704099600, false, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'exception user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+        ];
+    }
+
+    /**
+     * Test get title.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::get_title
      */
     public function test_gettitle() {
@@ -226,6 +288,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::get_description
      */
     public function test_getdescription() {
@@ -239,6 +303,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::convert_parameters
      */
     public function test_convertparameters() {
@@ -256,6 +322,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::process_markups
      */
     public function test_processmarkups() {
@@ -270,6 +338,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::get_ui
      */
     public function test_getui() {
@@ -309,6 +379,8 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_sessionstart\sessionstart::set_default
      */
     public function test_setdefault() {

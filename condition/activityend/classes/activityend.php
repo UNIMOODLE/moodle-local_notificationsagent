@@ -195,7 +195,7 @@ class activityend extends notificationconditionplugin {
     /**
      * Sublugin capability
      *
-     * @param evaluationcontext $context
+     * @param \context $context
      *
      * @return bool
      */
@@ -260,7 +260,7 @@ class activityend extends notificationconditionplugin {
     /**
      * Whether a subluplugin is generic
      *
-     * @return true
+     * @return bool
      */
     public function is_generic() {
         return true;
@@ -278,5 +278,4 @@ class activityend extends notificationconditionplugin {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);
     }
-
 }

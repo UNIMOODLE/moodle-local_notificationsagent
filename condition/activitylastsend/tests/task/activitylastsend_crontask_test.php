@@ -34,6 +34,7 @@
 namespace notificationscondition_activitylastsend\task;
 
 use local_notificationsagent\rule;
+use notificationscondition_activityend\task\activityend_crontask;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
@@ -90,6 +91,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      * @param int $crontimestarted Cron task time
      *
      * @covers       \notificationscondition_activitylastsend\task\activitylastsend_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($fileuploadtime, $crontimestarted) {
@@ -175,5 +177,18 @@ class activitylastsend_crontask_test extends \advanced_testcase {
             'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
             'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_activitylastsend\task\activitylastsend_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(activitylastsend_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

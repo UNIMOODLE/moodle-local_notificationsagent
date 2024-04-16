@@ -107,6 +107,24 @@ const shareAllRule = (ruleid) => {
     return Ajax.call([request])[0];
 };
 
+/**
+ * Reject the sharing of a rule
+ *
+ * @param {Number} ruleid The rule ID.
+ * @returns {object} jQuery promise
+ */
+const unshareAllRule = (ruleid) => {
+    const request = {
+        methodname: 'local_notificationsagent_unshare_rule_all',
+        args: {
+            ruleid,
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
 export default {
-    updateRuleStatus, deleteRule, updateRuleShare, shareAllRule, checkRuleContext
+    updateRuleStatus, deleteRule, updateRuleShare, 
+    shareAllRule, unshareAllRule, 
+    checkRuleContext
 }

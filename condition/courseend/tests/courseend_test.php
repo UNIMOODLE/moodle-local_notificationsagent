@@ -35,10 +35,10 @@ namespace notificationscondition_courseend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
+use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_courseend\courseend;
 
 /**
  * @group notificationsagent
@@ -49,6 +49,9 @@ class courseend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var courseend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -87,6 +90,9 @@ class courseend_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -141,6 +147,9 @@ class courseend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -159,6 +168,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_courseend\courseend::get_subtype
      */
     public function test_getsubtype() {
@@ -166,6 +177,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_courseend\courseend::is_generic
      */
     public function test_isgeneric() {
@@ -173,6 +186,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_courseend\courseend::get_elements
      */
     public function test_getelements() {
@@ -180,6 +195,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_courseend\courseend::check_capability
      */
     public function test_checkcapability() {
@@ -190,6 +207,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_courseend\courseend::get_cmid
      */
     public function test_getcmid() {
@@ -197,36 +216,69 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test estimate next time.
+     *
      * @covers       \notificationscondition_courseend\courseend::estimate_next_time
-     * @dataProvider dataprovider
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_estimatenexttime($timeaccess, $param, $complementary) {
+        \uopz_set_return('time', $timeaccess);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
         $params = json_decode(self::$context->get_params(), true);
+
+        self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
+        self::$subplugin->set_id(self::CONDITIONID);
+        self::$context->set_params(json_encode(['time' => $param]));
         // Test estimate next time.
         if (self::$context->is_complementary()) {
-            if ($timeaccess < self::COURSE_DATEEND - $params['time']) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
-            } else if ($timeaccess >= self::COURSE_DATEEND - $params['time'] && $timeaccess <= self::COURSE_DATEEND) {
+            if ($timeaccess < self::COURSE_DATEEND - $param) {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            } else if ($timeaccess >= self::COURSE_DATEEND - $param && $timeaccess <= self::COURSE_DATEEND) {
                 self::assertEquals(self::COURSE_DATEEND, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATEEND) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             }
         } else {
-            if ($timeaccess < self::COURSE_DATEEND - $params['time']) {
-                self::assertEquals(self::COURSE_DATEEND - $params['time'], self::$subplugin->estimate_next_time(self::$context));
-            } else if ($timeaccess >= self::COURSE_DATEEND - $params['time'] && $timeaccess <= self::COURSE_DATEEND) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+            if ($timeaccess < self::COURSE_DATEEND - $param) {
+                self::assertEquals(self::COURSE_DATEEND - $param, self::$subplugin->estimate_next_time(self::$context));
+            } else if ($timeaccess >= self::COURSE_DATEEND - $param && $timeaccess <= self::COURSE_DATEEND) {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATEEND) {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
+        uopz_unset_return('time');
     }
 
     /**
+     * Data for estimate next time.
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1706173200, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1707123600, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1706173200, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1707123600, 864000, notificationplugin::COMPLEMENTARY_CONDITION,],
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+            [1706173200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+            [1707123600, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+            [1704445200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+            [1706173200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+            [1707123600, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,],
+        ];
+    }
+
+    /**
+     * Test get title.
+     *
      * @covers \notificationscondition_courseend\courseend::get_title
      */
     public function test_gettitle() {
@@ -237,6 +289,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_courseend\courseend::get_description
      */
     public function test_getdescription() {
@@ -250,6 +304,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_courseend\courseend::process_markups
      */
     public function test_processmarkups() {
@@ -264,6 +320,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_courseend\courseend::get_ui
      */
     public function test_getui() {
@@ -303,6 +361,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_courseend\courseend::set_default
      */
     public function test_setdefault() {
@@ -349,6 +409,8 @@ class courseend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_courseend\courseend::convert_parameters
      */
     public function test_convertparameters() {
@@ -362,5 +424,16 @@ class courseend_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, 5, $params);
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_courseend\courseend::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 }

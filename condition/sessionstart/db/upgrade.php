@@ -37,5 +37,28 @@
  * @return bool
  */
 function xmldb_notificationscondition_sessionstart_upgrade($oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2023101804) {
+        // Define key fk_userid (foreign) to be added to notificationsagent_crseview.
+        $table = new xmldb_table('notificationsagent_crseview');
+        $key = new xmldb_key('fk_userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch add key fk_userid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_courseid (foreign) to be added to notificationsagent_crseview.
+        $table = new xmldb_table('notificationsagent_crseview');
+        $key = new xmldb_key('fk_courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+
+        // Launch add key fk_courseid.
+        $dbman->add_key($table, $key);
+
+        // Sessionstart savepoint reached.
+        upgrade_plugin_savepoint(true, 2023101804, 'notificationscondition', 'sessionstart');
+    }
+
     return true;
 }

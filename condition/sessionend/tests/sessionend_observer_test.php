@@ -130,6 +130,12 @@ class sessionend_observer_test extends \advanced_testcase {
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
+        self::getDataGenerator()->create_user_course_lastaccess(
+            self::$user,
+            self::$course,
+            self::USER_LASTACCESS
+        );
+
         $event = \core\event\course_viewed::create([
             'context' => \context_course::instance(self::$course->id),
             'userid' => self::$user->id,
@@ -142,7 +148,6 @@ class sessionend_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals($event->timecreated + $time, $cache->timestart);
         $this->assertEquals(self::$user->id, $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);

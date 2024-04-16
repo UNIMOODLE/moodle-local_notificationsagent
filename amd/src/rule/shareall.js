@@ -102,7 +102,7 @@ const showModal = async (shareAllItem) => {
 };
 
 /**
- * Approves the sharing status for a given rule
+ * Approves the sharing for a given rule.
  * 
  * @param {integer} id Rule id.
  * @returns {Promise<void>}

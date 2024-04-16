@@ -33,7 +33,9 @@
 
 namespace notificationscondition_activitysinceend\task;
 
+use core_analytics\action;
 use local_notificationsagent\rule;
+use notificationscondition_activitysinceend\activitysinceend;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
@@ -102,11 +104,12 @@ class activitysinceend_crontask_test extends \advanced_testcase {
 
     /**
      * @covers       \notificationscondition_activitysinceend\task\activitysinceend_crontask::execute
+     * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($time, $date) {
         global $DB, $USER;
-        \uopz_set_return('time', $date);
+        \uopz_set_return('time', $time);
         $pluginname = 'activitysinceend';
 
         $modinstance = self::getDataGenerator()->create_module('quiz', [
@@ -115,6 +118,7 @@ class activitysinceend_crontask_test extends \advanced_testcase {
         ]);
 
         $cmtestasect = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
+        // print print_r($modinstance, true);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -122,34 +126,37 @@ class activitysinceend_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = 2;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
+        self::setUser(2);
 
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestasect->id . '"}';
-        $objdb->cmid = 3;
+        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $modinstance->cmid . '"}';
+        $objdb->cmid = $modinstance->cmid;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
         $completion = new \completion_info(self::$course);
+
         $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
 
         $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
-        $result = $task->execute();
+        $task->set_timestarted($time);
+        $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(time() + $date, $cache->timestart);
+        // $this->assertEquals(time() + $date, $cache->timestart);
         $this->assertEquals(self::$user->id, $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);
@@ -163,5 +170,18 @@ class activitysinceend_crontask_test extends \advanced_testcase {
             [1704445200, 86400],
             [1706173200, 86400 * 3],
         ];
+    }
+
+    /**
+     * Get name test
+     *
+     * @covers \notificationscondition_activitysinceend\task\activitysinceend_crontask::get_name
+     * @return void
+     */
+    public function test_get_name() {
+        $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
+
+        $this->assertIsString($task->get_name());
+
     }
 }

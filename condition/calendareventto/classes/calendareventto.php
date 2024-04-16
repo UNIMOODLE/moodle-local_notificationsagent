@@ -119,21 +119,27 @@ class calendareventto extends notificationconditionplugin {
     public function estimate_next_time(evaluationcontext $context) {
         $timestart = null;
         $params = json_decode($context->get_params(), false);
-        
-        if($event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}])){
+
+        if ($event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}])) {
             $timeaccess = $context->get_timeaccess();
             $calendarstart = $event[$params->{self::UI_ACTIVITY}]->timestart;
-    
-            if ($timeaccess <= $calendarstart - $params->{self::UI_TIME} && !$context->is_complementary()) {
-                $timestart = $calendarstart - $params->{self::UI_TIME};
-            }
-            if ($context->is_complementary()) {
+            // Condition.
+            if (!$context->is_complementary()) {
                 if ($timeaccess < $calendarstart - $params->{self::UI_TIME}) {
-                    $timestart = null;
-                } else if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess < $calendarstart) {
-                    $timestart = $calendarstart;
+                    $timestart = $calendarstart - $params->{self::UI_TIME};
+                } else if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess <= $calendarstart) {
+                    $timestart = time();
                 }
             }
+            // Exception.
+            if ($context->is_complementary()) {
+                if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess < $calendarstart) {
+                    $timestart = $calendarstart;
+                } else {
+                    $timestart = time();
+                }
+            }
+
         }
 
         return $timestart;
@@ -143,9 +149,9 @@ class calendareventto extends notificationconditionplugin {
      * Get the user interface of the subplugin
      *
      * @param \MoodleQuickForm $mform
-     * @param int           $id
-     * @param int           $courseid
-     * @param string        $type
+     * @param int              $id
+     * @param int              $courseid
+     * @param string           $type
      *
      * @return void
      * @throws \coding_exception
@@ -161,7 +167,7 @@ class calendareventto extends notificationconditionplugin {
         foreach ($listevents as $event) {
             $events[$event->id] = $event->name;
         }
-        
+
         // Only is template
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $events['0'] = 'CCCC';
@@ -178,16 +184,18 @@ class calendareventto extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
     /**
-     * Checking capability
+     * Sublugin capability
      *
      * @param \context $context
      *
      * @return bool
-     * @throws \coding_exception
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:calendareventto', $context);
@@ -245,7 +253,7 @@ class calendareventto extends notificationconditionplugin {
     /**
      * Whether a condition is generic or not
      *
-     * @return true
+     * @return bool
      */
     public function is_generic() {
         return true;
@@ -264,4 +272,45 @@ class calendareventto extends notificationconditionplugin {
         $form->set_data($params);
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        global $DB;
+
+        $oldeventid = json_decode($this->get_parameters())->{self::UI_ACTIVITY};
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'event', $oldeventid);
+
+        if (!$rec || !$rec->newitemid) {
+            // If we are on the same course (e.g. duplicate) then we can just
+            // use the existing one.
+            if ($DB->record_exists('event', ['id' => $oldeventid, 'courseid' => $courseid])) {
+                return false;
+            }
+            // Otherwise it's a warning.
+            $logger->process(
+                'Restored item (' . $this->get_pluginname() . ')
+                has eventid on action that was not restored',
+                \backup::LOG_WARNING
+            );
+        } else {
+            $newparameters = json_decode($this->get_parameters());
+            $newparameters->{self::UI_ACTIVITY} = $rec->newitemid;
+            $newparameters = json_encode($newparameters);
+
+            $record = new \stdClass();
+            $record->id = $this->get_id();
+            $record->parameters = $newparameters;
+            $record->cmid = $rec->newitemid;
+
+            $DB->update_record('notificationsagent_condition', $record);
+        }
+    }
 }

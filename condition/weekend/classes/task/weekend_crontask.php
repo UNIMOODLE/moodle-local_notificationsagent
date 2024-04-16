@@ -34,6 +34,7 @@ use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_weekend\weekend;
 
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
@@ -66,7 +67,7 @@ class weekend_crontask extends scheduled_task {
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $condtionid = $condition->id;
+            $conditionid = $condition->id;
 
             if (!notificationsagent::was_launched_indicated_times(
                     $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
@@ -75,7 +76,7 @@ class weekend_crontask extends scheduled_task {
             ) {
                 notificationsagent::set_time_trigger
                 (
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $currenttime
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $currenttime
                 );
             }
         }

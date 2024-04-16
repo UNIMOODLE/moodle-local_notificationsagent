@@ -109,7 +109,7 @@ class activityend_observer_test extends \advanced_testcase {
 
     public function test_course_module_updated() {
         global $DB, $USER;
-
+        \uopz_set_return('time', self::COURSE_DATEEND - 120);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
             'course' => self::$course->id,
@@ -132,7 +132,7 @@ class activityend_observer_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"86400"}';
+        $objdb->parameters = '{"cmid":' . $cmgen->cmid . ',"time":"86400"}';
         $objdb->cmid = $cmgen->cmid;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
@@ -152,6 +152,7 @@ class activityend_observer_test extends \advanced_testcase {
                 'name' => $cmgen->name,
             ],
         ]);
+
         $event->trigger();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -159,10 +160,12 @@ class activityend_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::$user->id, $cache->userid);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(self::$user->id, $trigger->userid);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+
+        uopz_unset_return('time');
     }
 }

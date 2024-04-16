@@ -35,12 +35,15 @@ namespace notificationscondition_coursestart;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_coursestart\coursestart;
+
+use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
+ * Test for the notificationscondition_coursestart plugin.
+ *
  * @group notificationsagent
  */
 class coursestart_test extends \advanced_testcase {
@@ -49,6 +52,10 @@ class coursestart_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var coursestart
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -87,6 +94,9 @@ class coursestart_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -107,14 +117,17 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
-     *
-     * @param int    $timeaccess
-     * @param string $param
-     * @param bool   $expected
-     *
-     * @covers       \notificationscondition_coursestart\coursestart::evaluate
+     * Test evaluate function.
      *
      * @dataProvider dataprovider
+     *
+     * @param int    $timeaccess    The access time.
+     * @param bool   $usecache      Whether to use cache or not.
+     * @param string $param         The parameters.
+     * @param array  $complementary The complementary array.
+     * @param bool   $expected      The expected result.
+     *
+     * @return void
      */
     public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
         self::$context->set_params($param);
@@ -154,6 +167,7 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     *  Test get subtype function.
      *
      * @covers \notificationscondition_coursestart\coursestart::get_subtype
      */
@@ -162,6 +176,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::is_generic
      */
     public function test_isgeneric() {
@@ -169,6 +185,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::get_elements
      */
     public function test_getelements() {
@@ -176,6 +194,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::check_capability
      */
     public function test_checkcapability() {
@@ -186,6 +206,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_coursestart\coursestart::get_cmid
      */
     public function test_getcmid() {
@@ -193,22 +215,70 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_coursestart\coursestart::estimate_next_time
+     * Test the estimate_next_time function.
+     *
+     * @param int    $timeaccess    The access time.
+     * @param array  $complementary The complementary array.
+     * @param string $param         The parameters.
+     *
+     * @covers       \notificationscondition_coursestart\coursestart::estimate_next_time
+     * @dataProvider dataprovider
      */
-    public function test_estimatenexttime() {
-        $param = '{"time":864000}';
-        self::$context->set_params($param);
-        $time = json_decode($param, true);
+    public function test_estimatenexttime($timeaccess, $complementary, $param) {
+        \uopz_set_return('time', time());
 
-        // Test estimate next time.
-        if (self::$context->is_complementary()) {
-            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
-        } else {
-            self::assertSame(self::COURSE_DATESTART + $time['time'], self::$subplugin->estimate_next_time(self::$context));
+        self::$context->set_params($param);
+        self::$context->set_complementary($complementary);
+        self::$context->set_timeaccess($timeaccess);
+        $params = json_decode(self::$context->get_params(), false);
+        // Condition.
+        if (!self::$context->is_complementary()) {
+            if ($timeaccess >= self::COURSE_DATESTART
+                && ($timeaccess <= self::COURSE_DATESTART +
+                    $params->{notificationplugin::UI_TIME})
+            ) {
+                self::assertEquals(
+                    self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME},
+                    self::$subplugin->estimate_next_time(self::$context)
+                );
+            } else {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            }
+
         }
+        // Exception.
+        if (self::$context->is_complementary()) {
+            if ($timeaccess >= self::COURSE_DATESTART
+                && $timeaccess <= self::COURSE_DATESTART +
+                $params->{notificationplugin::UI_TIME}
+            ) {
+                $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+
+            } else {
+                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+            }
+        }
+
+        uopz_unset_return('time');
     }
 
     /**
+     * Data provider for test_estimatenexttime.
+     *
+     * @covers \notificationscondition_coursestart\coursestart::datacourse
+     */
+    public static function datacourse() {
+        return [
+            'condition false 5' => [1704445200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'condition true 20' => [1705741200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'Exception false 5' => [1704445200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+            'Exception true 20' => [1705741200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+        ];
+    }
+
+    /**
+     * Test get title function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::get_title
      */
     public function test_gettitle() {
@@ -219,6 +289,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::get_description
      */
     public function test_getdescription() {
@@ -232,6 +304,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::process_markups
      */
     public function test_processmarkups() {
@@ -246,6 +320,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::get_ui
      */
     public function test_getui() {
@@ -285,6 +361,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::set_default
      */
     public function test_setdefault() {
@@ -331,6 +409,8 @@ class coursestart_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters function.
+     *
      * @covers \notificationscondition_coursestart\coursestart::convert_parameters
      */
     public function test_convertparameters() {
@@ -344,5 +424,16 @@ class coursestart_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, 5, $params);
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_coursestart\coursestart::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 }

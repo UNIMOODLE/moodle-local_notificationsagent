@@ -40,8 +40,11 @@ use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
 use notificationsaction_usermessageagent\usermessageagent;
+use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
+ * Test for usermessageagent.
+ *
  * @group notificationsagent
  */
 class usermessageagent_test extends \advanced_testcase {
@@ -50,6 +53,10 @@ class usermessageagent_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var usermessageagent
+     */
     private static $subplugin;
 
     /**
@@ -89,6 +96,10 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test fixture.
+     * This method is called before a test is executed.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -108,6 +119,7 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for execute_action method.
      *
      * @param string $param
      *
@@ -134,6 +146,10 @@ class usermessageagent_test extends \advanced_testcase {
         $this->assertStringContainsString($auxarray['message'], $messages[0]->body);
     }
 
+    /**
+     * Data provider for test_execute_action.
+     *
+     */
     public static function dataprovider(): array {
         return [
             ['{"title":"TEST","message":"Message body"}'],
@@ -141,6 +157,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_subtype method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_subtype
      */
     public function test_getsubtype() {
@@ -148,6 +166,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for is_generic method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::is_generic
      */
     public function test_isgeneric() {
@@ -155,6 +175,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_elements method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_elements
      */
     public function test_getelements() {
@@ -162,6 +184,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for check_capability method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::check_capability
      */
     public function test_checkcapability() {
@@ -172,6 +196,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for convert_parameters method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::convert_parameters
      */
     public function test_convert_parameters() {
@@ -186,6 +212,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_title method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_title
      */
     public function test_gettitle() {
@@ -196,6 +224,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_description method
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_description
      */
     public function test_getdescription() {
@@ -209,6 +239,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_ui method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_ui
      */
     public function test_getui() {
@@ -240,9 +272,12 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationsaction_usermessageagent\usermessageagent::get_parameters_placeholders
+     * Test for the get_parameters_placeholders method.
      *
      * @dataProvider dataprovidergetparametersplaceholders
+     * @covers       \notificationsaction_usermessageagent\usermessageagent::get_parameters_placeholders
+     *
+     * @param string $param JSON encoded parameters.
      */
     public function test_getparametersplaceholders($param) {
         $auxarray = json_decode($param, true);
@@ -259,6 +294,9 @@ class usermessageagent_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
+    /**
+     * Data provider for test_getparametersplaceholders method.
+     */
     public static function dataprovidergetparametersplaceholders(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
@@ -269,6 +307,8 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for process_markups method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::process_markups
      *
      */
@@ -295,10 +335,23 @@ class usermessageagent_test extends \advanced_testcase {
     }
 
     /**
+     * Test for is_send_once method.
+     *
      * @covers \notificationsaction_usermessageagent\usermessageagent::is_send_once
      */
     public function test_issendonce() {
         $this->assertTrue(self::$subplugin->is_send_once(self::$user->id));
     }
-}
 
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationsaction_usermessageagent\usermessageagent::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
+    }
+
+}

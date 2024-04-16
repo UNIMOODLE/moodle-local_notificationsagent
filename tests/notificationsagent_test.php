@@ -151,8 +151,12 @@ class notificationsagent_test extends \advanced_testcase {
         );
 
         $result = notificationsagent::notificationsagent_condition_get_cm_dates($cmtest->cmid);
+        if (empty($timeopen)) {
+            $this->assertEquals($course->startdate, $result->timestart);
+        } else {
+            $this->assertEquals($timeopen, $result->timestart);
+        }
 
-        $this->assertEquals($timeopen, $result->timestart);
         if (!empty($fieldclose)) {
             $this->assertEquals($timeclose, $result->timeend);
         }
@@ -172,6 +176,7 @@ class notificationsagent_test extends \advanced_testcase {
             'lesson' => [1704099600, 1705741200, 'lesson', 'available', 'deadline'],
             'scorm' => [1704099600, 1705741200, 'scorm', 'timeopen', 'timeclose'],
             'workshop' => [1704099600, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
+            'no datestart' => [null, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
             'chattime' => [1704099600, 0, 'chat', 'chattime', null],
         ];
     }
@@ -338,8 +343,7 @@ class notificationsagent_test extends \advanced_testcase {
             self::$course->id,
             self::CM_DATESTART,
             'sessionend',
-            self::CMID,
-            true
+            self::CMID
         );
 
         $cache = $DB->get_record(
@@ -360,8 +364,7 @@ class notificationsagent_test extends \advanced_testcase {
             self::$course->id,
             self::CM_DATESTART + 86400,
             'sessionend',
-            self::CMID,
-            true
+            self::CMID
         );
 
         $cacheupdated = $DB->get_record(
@@ -376,22 +379,6 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::$user->id, $cacheupdated->userid);
         $this->assertEquals(self::$course->id, $cacheupdated->courseid);
         $this->assertEquals(self::CM_DATESTART + 86400, $cacheupdated->timestart);
-
-        $result = notificationsagent::set_timer_cache(
-            self::$user->id,
-            self::$course->id,
-            self::CM_DATESTART + 86400 * 2,
-            'sessionend',
-            self::CMID,
-            false
-        );
-
-        $this->assertNull($result);
-        $cachenoupdated = $DB->get_record('notificationsagent_cache', ['conditionid' => self::CMID]);
-        $this->assertIsNumeric($cachenoupdated->id);
-        $this->assertEquals(self::$user->id, $cachenoupdated->userid);
-        $this->assertEquals(self::$course->id, $cachenoupdated->courseid);
-        $this->assertEquals(self::CM_DATESTART + 86400, $cachenoupdated->timestart);
 
     }
 
@@ -802,5 +789,61 @@ class notificationsagent_test extends \advanced_testcase {
             'Out of date' => [1704099600 - 84600, 1704099600 + 60, 1704099600 - 60, true],
         ];
 
+    }
+
+    /**
+     *  * Testing notificationsagent_condition_get_cm_dates.
+     *
+     * @covers       \local_notificationsagent\notificationsagent::supported_cm
+     * @dataProvider datasupported
+     *
+     * @param int    $timeopen
+     * @param int    $timeclose
+     * @param string $modname
+     * @param string $fieldopen
+     * @param string $fieldclose
+     *
+     * @return void
+     */
+    public function test_supportedcm($expected, string $modname) {
+        $this->resetAfterTest();
+        $course = self::getDataGenerator()->create_course();
+        $manager = self::getDataGenerator()->create_and_enrol($course, 'manager');
+        self::setUser($manager);
+
+        $options = [
+            'name' => 'Quiz unittest',
+            'course' => $course->id,
+        ];
+
+        $cmtest = self::getDataGenerator()->create_module(
+            "{$modname}",
+            $options
+        );
+
+        $result = notificationsagent::supported_cm($cmtest->cmid);
+
+        $this->assertEquals($expected, $result);
+
+    }
+
+    /**
+     * Dataprovider for condition_get_cm_dates
+     */
+    public static function datasupported(): array {
+        return [
+            'assign' => [true, 'assign'],
+            'choice' => [true, 'choice'],
+            'data' => [true, 'data'],
+            'feedback' => [true, 'feedback'],
+            'quiz' => [true, 'quiz'],
+            'forum' => [true, 'forum'],
+            'lesson' => [true, 'lesson'],
+            'scorm' => [true, 'scorm'],
+            'workshop' => [true, 'workshop'],
+            'no datestart' => [true, 'workshop'],
+            'chattime' => [true, 'chat'],
+            'no supported cm' => [false, 'book'],
+        ];
     }
 }

@@ -34,11 +34,13 @@
 namespace notificationscondition_activityend\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
-use local_notificationsagent\notificationplugin;
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_activityend\activityend;
 
 class activityend_crontask extends scheduled_task {
 
@@ -55,32 +57,40 @@ class activityend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Activity open start");
+        custom_mtrace("Activityend start");
 
-        $pluginname = get_string('subtype', 'notificationscondition_activityend');
+        $pluginname = 'activityend';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-            $context = \context_course::instance($courseid);
-            $enrolledusers = notificationsagent::get_usersbycourse($context);
-            $condtionid = $condition->id;
-            $param = json_decode($condition->parameters, true);
-            $cmid = $param[notificationplugin::UI_ACTIVITY];
-            $timeend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
-            $cache = $timeend - $param[notificationplugin::UI_TIME];
-            foreach ($enrolledusers as $enrolleduser) {
-                if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
-                    )
-                    && !notificationsagent::is_ruleoff($condition->ruleid, $enrolleduser->id)
-                ) {
-                    notificationsagent::set_timer_cache($enrolleduser->id, $courseid, $cache, $pluginname, $condtionid, true);
-                    notificationsagent::set_time_trigger($condition->ruleid, $condtionid, $enrolleduser->id, $courseid, $cache);
-                }
-            }
-        }
+            $conditionid = $condition->id;
 
-        custom_mtrace("Activity open end ");
+            $subplugin = new activityend(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
+            }
+
+            if (!notificationsagent::was_launched_indicated_times(
+                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
+                )
+                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
+            ) {
+                notificationsagent::set_timer_cache(
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
+                );
+                notificationsagent::set_time_trigger(
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                );
+            }
+
+        }
+        custom_mtrace("Activityend end ");
     }
 }

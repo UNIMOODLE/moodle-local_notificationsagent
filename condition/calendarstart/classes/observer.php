@@ -30,35 +30,33 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../calendar/lib.php');
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
-use local_notificationsagent\notificationplugin;
+use notificationscondition_calendarstart\calendarstart;
 
 class notificationscondition_calendarstart_observer {
 
     public static function calendar_updated(\core\event\calendar_event_updated $event) {
         $courseid = $event->courseid;
 
-        $pluginname = get_string('subtype', 'notificationscondition_calendarstart');
+        $pluginname = 'calendarstart';
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
 
         foreach ($conditions as $condition) {
-            $decode = $condition->parameters;
-            $pluginname = $condition->pluginname;
-            $condtionid = $condition->id;
-            $param = json_decode($decode, false);
-            $radio = $param->radio;
+            $conditionid = $condition->id;
 
-            $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
+            $subplugin = new calendarstart(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($event->timecreated);
+            $context->set_courseid($courseid);
 
-            if ($radio == 1) {
-                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart
-                    + $param->{notificationplugin::UI_TIME};
-            } else {
-                $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart +
-                    $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timeduration + $param->{notificationplugin::UI_TIME};
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
             }
 
             if (!notificationsagent::was_launched_indicated_times(
@@ -66,10 +64,10 @@ class notificationscondition_calendarstart_observer {
             )
             ) {
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
                 );
                 notificationsagent::set_time_trigger(
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }

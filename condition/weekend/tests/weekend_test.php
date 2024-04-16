@@ -35,12 +35,14 @@ namespace notificationscondition_weekend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
+use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_weekend\weekend;
 
 /**
+ * Tests for the weekend condition.
+ *
  * @group notificationsagent
  */
 class weekend_test extends \advanced_testcase {
@@ -49,6 +51,9 @@ class weekend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var weekend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -87,6 +92,9 @@ class weekend_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -137,9 +145,11 @@ class weekend_test extends \advanced_testcase {
         $result = self::$subplugin->evaluate(self::$context);
 
         $this->assertSame($expected, $result);
-        self::assertNull(self::$subplugin->estimate_next_time(self::$context));
     }
 
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, true],
@@ -152,6 +162,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_weekend\weekend::get_subtype
      */
     public function test_getsubtype() {
@@ -159,6 +171,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_weekend\weekend::is_generic
      */
     public function test_isgeneric() {
@@ -166,6 +180,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.s
+     *
      * @covers \notificationscondition_weekend\weekend::get_elements
      */
     public function test_getelements() {
@@ -173,6 +189,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_weekend\weekend::check_capability
      */
     public function test_checkcapability() {
@@ -183,14 +201,52 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_weekend\weekend::estimate_next_time
+     * Test weeekend estimate next time
+     *
+     * @covers       \notificationscondition_weekend\weekend::estimate_next_time
+     * @dataProvider dataweekend
+     *
+     * @param int $timeaccess
+     * @param int $expected
+     * @param int $complementary
+     *
+     * @return void
      */
-    public function test_estimatenexttime() {
+    public function test_estimatenexttime($timeaccess, $expected, $complementary) {
+        \uopz_set_return('time', $timeaccess);
+        // Saturday, Sunday configuration.
+        self::$context->set_complementary($complementary);
+        set_config('calendar_weekend', 65);
+        date_default_timezone_set('Europe/Madrid');
+        self::$context->set_timeaccess($timeaccess);
         // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+
+        $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
+        uopz_unset_return('time');
+
     }
 
     /**
+     * Dataprovider for estimatenext time
+     *
+     * @return array[]
+     */
+    public static function dataweekend() {
+        return [
+            'Condition Monday -> Saturday' => [1704074700, 1704506700, 0],
+            'Condition Friday -> Saturday' => [1704470400, 1704470400, 0],
+            'Condition Saturday -> NOW' => [1704495600, 1704495600, 0],
+            'Condition Sunday -> NOW' => [1704582000, 1704582000, 0],
+            'Exception Saturday -> Monday' => [1704495600, 1704668400, 1],
+            'Exception Sunday -> Monday' => [1704495600, 1704668400, 1],
+            'Exception Thu -> NOW' => [1704927600, 1704927600, 1],
+            'Exception Friday-> NOW' => [1705014000, 1705014000, 1],
+        ];
+    }
+
+    /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_weekend\weekend::get_cmid
      */
     public function test_getcmid() {
@@ -199,6 +255,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_weekend\weekend::get_title
      */
     public function test_gettitle() {
@@ -209,6 +267,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_weekend\weekend::get_description
      */
     public function test_getdescription() {
@@ -222,6 +282,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_weekend\weekend::convert_parameters
      */
     public function test_convertparameters() {
@@ -235,6 +297,8 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_weekend\weekend::process_markups
      */
     public function test_processmarkups() {
@@ -244,26 +308,33 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * Test whether is weekend
+     *
      * @covers       \notificationscondition_weekend\weekend::is_weekend()
      * @dataProvider dataproviderwe
      */
     final public function test_isweekend(int $time, bool $expected) {
+        set_config('calendar_weekend', 65);
         $this->assertSame($expected, weekend::is_weekend($time));
 
     }
 
+    /**
+     * Dataprovider for is weekend.
+     */
     public static function dataproviderwe(): array {
         // Only valid for a saturday, sunday configuration.
         return [
-            [1706182049, false],
-            [1705741200, true],
-            [1705827600, true],
+            'Wednesday' => [1712741508, false],
+            'Thursday' => [1706182049, false],
+            'Saturday' => [1705741200, true],
+            'Sunday' => [1705827600, true],
         ];
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_weekend\weekend::get_ui
      */
     public function test_getui() {
@@ -288,6 +359,17 @@ class weekend_test extends \advanced_testcase {
         $uidescriptionname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DESCRIPTION);
 
         $this->assertTrue($mform->elementExists($uidescriptionname));
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_weekend\weekend::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 
 }

@@ -37,6 +37,9 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * Class representing the activitymodified condition plugin.
+ */
 class activitymodified extends notificationconditionplugin {
 
     /**
@@ -62,6 +65,11 @@ class activitymodified extends notificationconditionplugin {
         return ['[AAAA]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_activitymodified');
     }
@@ -118,7 +126,7 @@ class activitymodified extends notificationconditionplugin {
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
-        
+
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -131,17 +139,33 @@ class activitymodified extends notificationconditionplugin {
             $listactivities
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:activitymodified', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -168,9 +192,8 @@ class activitymodified extends notificationconditionplugin {
         // Check if activity is found in course, if is not, return [AAAA].
         $activityname = '[AAAA]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $mod = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $mod->name;
-        }
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $humanvalue = str_replace($this->get_elements(), $activityname, $this->get_title());
 
@@ -180,7 +203,7 @@ class activitymodified extends notificationconditionplugin {
     /**
      *  Is subplugin generic
      *
-     * @return true
+     * @return bool
      */
     public function is_generic() {
         return true;

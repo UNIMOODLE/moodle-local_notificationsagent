@@ -34,10 +34,13 @@
 namespace notificationscondition_activityavailable\task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_activityavailable\activityavailable;
 
 class activityavailable_crontask extends scheduled_task {
 
@@ -55,12 +58,20 @@ class activityavailable_crontask extends scheduled_task {
      */
     public function execute() {
         custom_mtrace("Activityavailable start");
-        $timer = $this->get_timestarted();
         $pluginname = 'activityavailable';
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
+
+            $subplugin = new activityavailable(null, $condition->id);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($courseid);
+            $cache = $subplugin->estimate_next_time($context);
+
             $context = \context_course::instance($courseid);
             $enrolledusers = notificationsagent::get_usersbycourse($context);
             foreach ($enrolledusers as $enrolleduser) {
@@ -69,7 +80,7 @@ class activityavailable_crontask extends scheduled_task {
                     )
                     && !notificationsagent::is_ruleoff($condition->ruleid, $enrolleduser->id)
                 ) {
-                    notificationsagent::set_time_trigger($condition->ruleid, $condition->id, $enrolleduser->id, $courseid, $timer);
+                    notificationsagent::set_time_trigger($condition->ruleid, $condition->id, $enrolleduser->id, $courseid, $cache);
                 }
             }
         }

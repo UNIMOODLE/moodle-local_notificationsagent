@@ -39,8 +39,12 @@ global $CFG;
 require_once($CFG->dirroot . "/mod/forum/externallib.php");
 
 use local_notificationsagent\rule;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationactionplugin;
 
+/**
+ * Class representing the forummessage action plugin.
+ */
 class forummessage extends notificationactionplugin {
     /** @var UI ELEMENTS */
     public const NAME = 'forummessage';
@@ -63,6 +67,14 @@ class forummessage extends notificationactionplugin {
         return ['[FFFF]', '[TTTT]', '[BBBB]'];
     }
 
+    /**
+     * Get the elements for the forummessage plugin.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         // Title.
@@ -90,19 +102,22 @@ class forummessage extends notificationactionplugin {
         );
         // Forum.
         $forumname = [];
-        $forumlist = get_coursemodules_in_course('forum', $courseid);
-        foreach ($forumlist as $forum) {
-            $forumname[$forum->id] = $forum->name;
-        }
-        
-        // Only is template
+
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $forumname['0'] = 'FFFF';
-            $forumname['-1'] = 'Announcements';
+        } else {
+            if ($courseid == SITEID) {
+                $forumname[notificationsagent::FORUM_NEWS_CMID] = get_string('frontpagenews');
+            } else {
+                $forumlist = get_coursemodules_in_course('forum', $courseid);
+                foreach ($forumlist as $forum) {
+                    $forumname[$forum->id] = $forum->name;
+                }
+            }
         }
 
         asort($forumname);
-        
+
         $cm = $mform->createElement(
             'select',
             $this->get_name_ui($id, self::UI_ACTIVITY),
@@ -113,7 +128,7 @@ class forummessage extends notificationactionplugin {
             ),
             $forumname
         );
-        $this->placeholders($mform, $id, $type);
+        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($cm, 'new' . $type . '_group');
@@ -121,14 +136,28 @@ class forummessage extends notificationactionplugin {
         $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
 
     }
 
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "messageagent"
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_forummessage');
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:forummessage', $context)
             && has_capability('mod/forum:addnews', $context)
@@ -137,9 +166,15 @@ class forummessage extends notificationactionplugin {
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -170,10 +205,11 @@ class forummessage extends notificationactionplugin {
         // Check if activity is found, if is not, return [FFFF].
         $activityname = '[FFFF]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid == -1) {
-            $activityname = 'Announcements';
-        } else if ($cmid && $forum = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $forum->name;
+        if ($cmid == notificationsagent::FORUM_NEWS_CMID) {
+            $activityname = get_string('frontpagenews');
+        } else {
+            $fastmodinfo = get_fast_modinfo($courseid);
+            $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
         }
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
@@ -189,7 +225,12 @@ class forummessage extends notificationactionplugin {
     }
 
     /**
-     * @throws \moodle_exception
+     * Execute an action with the given parameters in the specified context.
+     *
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
+     *
+     * @return mixed The result of the action execution.
      */
     public function execute_action($context, $params) {
         // Post a message on a forum.
@@ -200,8 +241,14 @@ class forummessage extends notificationactionplugin {
 
         $modinfo = get_fast_modinfo($context->get_courseid());
 
+        if ($placeholdershuman->{self::UI_ACTIVITY} == notificationsagent::FORUM_NEWS_CMID) {
+            $forumid = notificationactionplugin::get_news_forum($context->get_courseid());
+        } else {
+            $forumid = $modinfo->get_cm($placeholdershuman->{self::UI_ACTIVITY})->instance;
+        }
+
         $discussion = new \stdClass();
-        $discussion->forum = $modinfo->get_cm($placeholdershuman->{self::UI_ACTIVITY})->instance;
+        $discussion->forum = $forumid;
         $discussion->course = $context->get_courseid();
         $discussion->name = $postsubject;
         $discussion->message = format_text($postmessage);
@@ -221,6 +268,11 @@ class forummessage extends notificationactionplugin {
         return $discussion->id;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
@@ -249,5 +301,14 @@ class forummessage extends notificationactionplugin {
             'message' => $parameters->{self::UI_MESSAGE}->text,
             'cmid' => $parameters->{self::UI_ACTIVITY},
         ]);
+    }
+
+    /**
+     *  Show placeholders relatives to user fields.
+     *
+     * @return bool
+     */
+    public function show_user_placeholders() {
+        return false;
     }
 }

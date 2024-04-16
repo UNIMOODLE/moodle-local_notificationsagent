@@ -20,12 +20,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/url'], function(str, URL) {
+import {get_string as getString} from 'core/str';
+import Url from 'core/url';
+
+export const init = () => {
+
     /**
-     * Types of rule type
-     * 
-     * @type {{RULE_TYPE: boolean}}
-     */
+ * Types of rule type
+ * 
+ * @type {{RULE_TYPE: boolean}}
+ */
     const RULE_TYPE = [
         'rule',
         'template'
@@ -38,182 +42,165 @@ define(['core/str', 'core/url'], function(str, URL) {
 
     const RULE_FORCED_TYPE = {
         FORCED: 0,
-        NONFORCED: 1, 
-    } 
+        NONFORCED: 1,
+    }
 
-    return {
+    var idtemplate;
+    $('#assignTemplateModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        idtemplate = button.data('idtemplate');
+        var isRuleForced;
+        var htmlRuleForced;
 
-        init: function() {
-            var module = this;
-            var idtemplate;
-            $('#assignTemplateModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                idtemplate = button.data('idtemplate');
-                var isRuleForced;
-                var htmlRuleForced;
-
-                let ruleCard = $('div[id="card-' + idtemplate + '"]');
-                $('#assignTemplateModal #forced-content').empty();
-                if (ruleCard.data('type') === RULE_TYPE[0]) {
-                    isRuleForced = ruleCard.data('forced');
-                    str.get_string('assignforced', 'local_notificationsagent').then(forcedRule => {
-                        htmlRuleForced = '<div class="custom-control custom-checkbox mr-1">';
-                            htmlRuleForced += '<input id="forced" type="checkbox" class="custom-control-input">';
-                            htmlRuleForced += '<label class="custom-control-label" for="forced">'+forcedRule+'</label>';
-                        htmlRuleForced += '</div>';
-                        $('#assignTemplateModal #forced-content').append(htmlRuleForced);
-                        if (!isRuleForced) {
-                            $('#assignTemplateModal #forced-content #forced').prop('checked', true);
-                        }
-                    });
+        let ruleCard = $('div[id="card-' + idtemplate + '"]');
+        $('#assignTemplateModal #forced-content').empty();
+        if (ruleCard.data('type') === RULE_TYPE[0]) {
+            isRuleForced = ruleCard.data('forced');
+            getString('assignforced', 'local_notificationsagent').then(forcedRule => {
+                htmlRuleForced = '<div class="custom-control custom-checkbox mr-1">';
+                htmlRuleForced += '<input id="forced" type="checkbox" class="custom-control-input">';
+                htmlRuleForced += '<label class="custom-control-label" for="forced">' + forcedRule + '</label>';
+                htmlRuleForced += '</div>';
+                $('#assignTemplateModal #forced-content').append(htmlRuleForced);
+                if (!isRuleForced) {
+                    $('#assignTemplateModal #forced-content #forced').prop('checked', true);
                 }
-    
-                var modal = $(this);
-                modal.find('.modal-title > span').text($('#card-'+idtemplate+' .badge-type').text());
-                modal.find('.badge').text($('#card-'+idtemplate+' .badge-type').text());
-                modal.find('.badge').attr('class', 'mr-2 '+$('#card-'+idtemplate+' .badge-type').attr('class'));
-                
-                modal.find('.modal-body .name').text($('#card-'+idtemplate+' .name').text());
-
-                /* Rellenar cursos asignados */
-                $.ajax({
-                    type: "POST",
-                    url: URL.relativeUrl('/local/notificationsagent/assignrule.php'),
-                    data: {
-                        ruleid: idtemplate,
-                        action: ACTION[0]
-                    },
-                    success: function(data) {
-                        data['category'].forEach((categoryid) => {
-                            let category = $('#assignTemplateModal .category-listing input#checkboxcategory-' + categoryid);
-                            if (category.length) {
-                                category.prop('checked', true);
-                                $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
-                                $('#listitem-category-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
-                            }
-                        });
-
-                        data['course'].forEach((courseid) => {
-                            let course = $('#assignTemplateModal .category-listing input#checkboxcourse-' + courseid);
-                            if (course.length) {
-                                course.prop('checked', true);
-                            }
-                        });
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                        console.log("Status: " + textStatus); 
-                        console.log(errorThrown); 
-                    },
-                    dataType: 'json'
-                });
             });
-            $('#assignTemplateModal').on('hide.bs.modal', function () {
-                $('#assignTemplateModal .custom-control-input').prop('checked', false);
-            });
-            $('#assignTemplateModal .collapse').on('show.bs.collapse', function () {
-                $(this).parents('.listitem-category').removeClass('collapsed');
-            });
-            $('#assignTemplateModal .collapse').on('hide.bs.collapse', function () {
-                $(this).parents('.listitem-category').addClass('collapsed');
-            });
-
-            /* checkbox */
-            $('#assignTemplateModal #course-category-select-all').on('click', function(){
-                var checkassign = $('#assignTemplateModal .category-listing .custom-control-input');
-                checkassign.prop('checked', $(this).prop('checked'));
-            });
-            $('#assignTemplateModal .category-listing').on('change', 'input[type=checkbox]', function () {
-                var checkssubcategoriescourses = '#category-listing-content-'+$(this).attr("id").replace('checkboxcategory-', '')+' .custom-control-input';
-                $('#assignTemplateModal .category-listing '+checkssubcategoriescourses).prop('checked', $(this).prop('checked'));
-            });
-
-            $('#assignTemplateModal #saveassignTemplateModal').on('click', function() {
-                var data = {};
-                data['category'] = [];
-                data['course'] = [];
-                var allCategories = [];
-
-                forced = RULE_FORCED_TYPE.NONFORCED;
-                if ($('#assignTemplateModal #forced').prop('checked')) {
-                    forced = RULE_FORCED_TYPE.FORCED;
-                }
-
-                let mainCategories = $('#assignTemplateModal #category-listing-content-0 > li[id^="listitem-category-"]').has('input[id^="checkboxcategory-"]:checked');
-
-                mainCategories.each(function() {
-                    let items = $('#' + this.id + ' input[id^="checkboxcategory-"]:checked').map(function() {
-                        let id = $(this).attr('id').replace('checkboxcategory-', '');
-                        let parent = $(this).data('parent').replace('#category-listing-content-', '');
-
-                        if ($.inArray(id, allCategories) === -1) {
-                            allCategories.push(id);
-                        }
-                        
-                        return {id: id, parent: parent};
-                    }).get();
-
-                    var parents = $.map(items, function(item) {
-                        return item.id;
-                    });
-
-                    $.grep(items, function(item) {
-                        if ($.inArray(item.parent, parents) === -1) {
-                            data['category'].push(item.id);
-                        }
-                    });
-                });
-
-                let courses = $('#assignTemplateModal .category-listing input[id^="checkboxcourse-"]:checked').map(function() {
-                    let id = $(this).attr('id').replace('checkboxcourse-', '');
-                    let category = $(this).data('parent').replace('#category-listing-content-', '');
-                    
-                    return {id: id, category: category};
-                }).get();
-
-                if ($.isEmptyObject(data['category'])) {
-                    $.each(courses, function(index, course) {
-                        data['course'].push(course.id);
-                    });
-                } else {
-                    $.grep(courses, function(course) {
-                        if ($.inArray(course.category, allCategories) === -1) {
-                            data['course'].push(course.id);
-                        }
-                    });
-                }
-
-                $.ajax({
-                    type: "POST",
-                    url: URL.relativeUrl('/local/notificationsagent/assignrule.php'),
-                    data: {
-                        ruleid: idtemplate,
-                        category: data['category'],
-                        course: data['course'],
-                        forced: forced,
-                        action: ACTION[1]
-                    },
-                    success: function() {
-                        window.location.reload();  
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                        console.log("Status: " + textStatus); 
-                        console.log(errorThrown); 
-                    },
-                    dataType: 'json'
-                });
-                   
-            });
-        },
-        loopatfirstparent: function(idparent, arrayParents = []){
-            var module = this;
-            
-            if(idparent != '#category-listing-content-0'){
-                arrayParents.push(idparent.replace('#category-listing-content-', ''));
-                var dataparent = $('#assignTemplateModal .category-listing #listitem-category-'+idparent.replace('#category-listing-content-', '')+' > .category-listing-header .custom-control-input').attr('data-parent');
-                return module.loopatfirstparent(dataparent, arrayParents);
-            }else{
-                return arrayParents;
-            }
         }
-    };
-});
+
+        var modal = $(this);
+        modal.find('.modal-title > span').text($('#card-' + idtemplate + ' .badge-type').text());
+        modal.find('.badge').text($('#card-' + idtemplate + ' .badge-type').text());
+        modal.find('.badge').attr('class', 'mr-2 ' + $('#card-' + idtemplate + ' .badge-type').attr('class'));
+
+        modal.find('.modal-body .name').text($('#card-' + idtemplate + ' .name').text());
+
+        /* Rellenar cursos asignados */
+        $.ajax({
+            type: "POST",
+            url: Url.relativeUrl('/local/notificationsagent/assignrule.php'),
+            data: {
+                ruleid: idtemplate,
+                action: ACTION[0]
+            },
+            success: function (data) {
+                data['category'].forEach((categoryid) => {
+                    let category = $('#assignTemplateModal .category-listing input#checkboxcategory-' + categoryid);
+                    if (category.length) {
+                        category.prop('checked', true);
+                        $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
+                        $('#listitem-category-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
+                    }
+                });
+
+                data['course'].forEach((courseid) => {
+                    let course = $('#assignTemplateModal .category-listing input#checkboxcourse-' + courseid);
+                    if (course.length) {
+                        course.prop('checked', true);
+                    }
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Status: " + textStatus);
+                console.log(errorThrown);
+            },
+            dataType: 'json'
+        });
+    });
+    $('#assignTemplateModal').on('hide.bs.modal', function () {
+        $('#assignTemplateModal .custom-control-input').prop('checked', false);
+    });
+    $('#assignTemplateModal .collapse').on('show.bs.collapse', function () {
+        $(this).parents('.listitem-category').removeClass('collapsed');
+    });
+    $('#assignTemplateModal .collapse').on('hide.bs.collapse', function () {
+        $(this).parents('.listitem-category').addClass('collapsed');
+    });
+
+    /* checkbox */
+    $('#assignTemplateModal #course-category-select-all').on('click', function () {
+        var checkassign = $('#assignTemplateModal .category-listing .custom-control-input');
+        checkassign.prop('checked', $(this).prop('checked'));
+    });
+    $('#assignTemplateModal .category-listing').on('change', 'input[type=checkbox]', function () {
+        var checkssubcategoriescourses = '#category-listing-content-' + $(this).attr("id").replace('checkboxcategory-', '') + ' .custom-control-input';
+        $('#assignTemplateModal .category-listing ' + checkssubcategoriescourses).prop('checked', $(this).prop('checked'));
+    });
+
+    $('#assignTemplateModal #saveassignTemplateModal').on('click', function () {
+        var data = {};
+        data['category'] = [];
+        data['course'] = [];
+        var allCategories = [];
+
+        forced = RULE_FORCED_TYPE.NONFORCED;
+        if ($('#assignTemplateModal #forced').prop('checked')) {
+            forced = RULE_FORCED_TYPE.FORCED;
+        }
+
+        let mainCategories = $('#assignTemplateModal #category-listing-content-0 > li[id^="listitem-category-"]').has('input[id^="checkboxcategory-"]:checked');
+
+        mainCategories.each(function () {
+            let items = $('#' + this.id + ' input[id^="checkboxcategory-"]:checked').map(function () {
+                let id = $(this).attr('id').replace('checkboxcategory-', '');
+                let parent = $(this).data('parent').replace('#category-listing-content-', '');
+
+                if ($.inArray(id, allCategories) === -1) {
+                    allCategories.push(id);
+                }
+
+                return { id: id, parent: parent };
+            }).get();
+
+            var parents = $.map(items, function (item) {
+                return item.id;
+            });
+
+            $.grep(items, function (item) {
+                if ($.inArray(item.parent, parents) === -1) {
+                    data['category'].push(item.id);
+                }
+            });
+        });
+
+        let courses = $('#assignTemplateModal .category-listing input[id^="checkboxcourse-"]:checked').map(function () {
+            let id = $(this).attr('id').replace('checkboxcourse-', '');
+            let category = $(this).data('parent').replace('#category-listing-content-', '');
+
+            return { id: id, category: category };
+        }).get();
+
+        if ($.isEmptyObject(data['category'])) {
+            $.each(courses, function (index, course) {
+                data['course'].push(course.id);
+            });
+        } else {
+            $.grep(courses, function (course) {
+                if ($.inArray(course.category, allCategories) === -1) {
+                    data['course'].push(course.id);
+                }
+            });
+        }
+
+        $.ajax({
+            type: "POST",
+            url: Url.relativeUrl('/local/notificationsagent/assignrule.php'),
+            data: {
+                ruleid: idtemplate,
+                category: data['category'],
+                course: data['course'],
+                forced: forced,
+                action: ACTION[1]
+            },
+            success: function () {
+                window.location.reload();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Status: " + textStatus);
+                console.log(errorThrown);
+            },
+            dataType: 'json'
+        });
+
+    });
+}

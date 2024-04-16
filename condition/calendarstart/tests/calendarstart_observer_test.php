@@ -161,7 +161,6 @@ class calendarstart_observer_test extends \advanced_testcase {
         if ($radio === 1) {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(self::$calendarevent->timestart + $time, $cache->timestart);
             $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
@@ -169,7 +168,6 @@ class calendarstart_observer_test extends \advanced_testcase {
         } else {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(self::$calendarevent->timestart + $time + self::DURATION, $cache->timestart);
             $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);

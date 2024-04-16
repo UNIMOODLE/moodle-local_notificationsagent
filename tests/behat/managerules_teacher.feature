@@ -25,6 +25,8 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "1" seconds
     And I click on "More" if it exists otherwise "My assistant"
     And I wait "1" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
     And I click on "New rule" "link"
     And I set the following fields to these values:
       | Title | Testing rule1 |
@@ -51,6 +53,8 @@ Feature: Testing rules management in notifications agent plugin
     Given I am on "testnotifagent" course homepage
     And I wait "1" seconds
     And I click on "More" if it exists otherwise "My assistant"
+    And I wait "1" seconds
+    And I click on "Add rule" "link"
     And I wait "1" seconds
     And I click on "New rule" "link"
     And I set the following fields to these values:
@@ -89,6 +93,8 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "1" seconds
     And I click on "More" if it exists otherwise "My assistant"
     And I wait "1" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
     And I click on "New rule" "link"
     And I set the following fields to these values:
       | Title | Testing rule1 |
@@ -103,7 +109,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newaction_button" "button"
     And I set the following fields to these values:
       | Title [TTTT]:  | New notification |
-      | Message [BBBB] | Hi {User_Username}, your last session in the course was 3 days ago. |
+      | Message [BBBB] | Hi {User_Username}, if you don't log in to the course, you're going to be suspended. |
     And I click on "Save changes" "button"
     And I wait "1" seconds
     And I should see "Rule saved"
@@ -126,6 +132,8 @@ Feature: Testing rules management in notifications agent plugin
     Given I am on "testnotifagent" course homepage
     And I wait "1" seconds
     And I click on "More" if it exists otherwise "My assistant"
+    And I wait "1" seconds
+    And I click on "Add rule" "link"
     And I wait "1" seconds
     And I click on "New rule" "link"
     And I set the following fields to these values:
@@ -163,4 +171,43 @@ Feature: Testing rules management in notifications agent plugin
     And I should see "Rule activated"
     And I should see "Active"
     And I should not see "Paused"
+    And I wait "2" seconds
+
+  Scenario: Teacher clone rule for plugin notification agent
+    Given I am on "testnotifagent" course homepage
+    And I wait "1" seconds
+    And I click on "More" if it exists otherwise "My assistant"
+    And I wait "1" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
+    And I click on "New rule" "link"
+    And I set the following fields to these values:
+      | Title | Testing rule1 |
+    And I select "[TTTT] has passed since the user last session in the course." from the "id_newcondition_select" singleselect
+    And I click on "newcondition_button" "button"
+    And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
+    And I press the left key
+    And I press the delete key
+    And I type "3"
+    And I click on "Actions" "link"
+    And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
+    And I click on "newaction_button" "button"
+    And I set the following fields to these values:
+      | Title [TTTT]:  | New notification |
+      | Message [BBBB] | Hi {User_Username}, your last session in the course was 3 days ago. |
+    And I click on "Save changes" "button"
+    And I wait "1" seconds
+    And I should see "Rule saved"
+    And I should see "Testing rule1"
+    And I should see "Active"
+    And I wait "2" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
+    And I click on "Select" "link"
+    And I set the following fields to these values:
+      | Title | rule1 CLONED |
+    And I click on "Save changes" "button"
+    And I should see "Rule saved"
+    And I should see "Active"
+    Then I should see "rule1 CLONED"
     And I wait "2" seconds

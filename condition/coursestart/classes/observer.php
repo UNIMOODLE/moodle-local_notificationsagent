@@ -33,6 +33,8 @@
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
+use notificationscondition_coursestart\coursestart;
+use local_notificationsagent\evaluationcontext;
 
 class notificationscondition_coursestart_observer {
 
@@ -43,7 +45,7 @@ class notificationscondition_coursestart_observer {
 
         $courseid = $event->courseid;
         $other = $event->other;
-        // If stardate is not set in other array then the startdate setting has not been modified.
+        // If startdate is not set in other array then the startdate setting has not been modified.
         if (isset($other["updatedfields"]["startdate"])) {
             $startdate = $other["updatedfields"]["startdate"];
         } else {
@@ -54,20 +56,30 @@ class notificationscondition_coursestart_observer {
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
 
         foreach ($conditions as $condition) {
-            $decode = $condition->parameters;
             $pluginname = $condition->pluginname;
-            $condtionid = $condition->id;
-            $param = json_decode($decode, true);
-            $cache = $startdate + $param[notificationplugin::UI_TIME];
+            $conditionid = $condition->id;
+
+            $subplugin = new coursestart(null, $conditionid);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($event->timecreated);
+            $context->set_courseid($courseid);
+            $cache = $subplugin->estimate_next_time($context);
+
+            if (empty($cache)) {
+                continue;
+            }
+
             if (!notificationsagent::was_launched_indicated_times(
                 $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
             )
             ) {
                 notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $condtionid, true
+                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
                 );
                 notificationsagent::set_time_trigger(
-                    $condition->ruleid, $condtionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
                 );
             }
         }

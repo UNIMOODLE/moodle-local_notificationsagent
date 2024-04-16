@@ -33,6 +33,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023101805;
+$plugin->version = 2023101806;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationsaction_bootstrapnotifications';

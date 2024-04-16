@@ -1,0 +1,128 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+    Project implemented by the \"Recovery, Transformation and Resilience Plan.
+    Funded by the European Union - Next GenerationEU\".
+
+    Produced by the UNIMOODLE University Group: Universities of
+    Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+    Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+    Version details
+
+    @package    local_notificationsagent
+    @copyright  2023 Proyecto UNIMOODLE
+    @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+    @author     ISYC <soporte@isyc.com>
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+}}
+{{!
+    @template local_notificationsagent/index
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * All data attributes are required
+
+    Context variables required for this template:
+    * userid The logged in user id
+    * urls The URLs for the popover
+
+    Example context (json):
+    {}
+
+}}
+
+<div class="d-flex mb-4">
+    {{#capabilities.create}}
+        <a href="{{{url.addrule}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_newrule, local_notificationsagent{{/str}}</a>
+    {{/capabilities.create}}
+</div>
+
+<div class="d-flex flex-wrap">
+    {{#rulecontent}}
+        <div id="card-{{{ id }}}" class="card card-{{{ type }}}{{^ forced}} card-required{{/ forced}}" data-type="{{{ type }}}" data-forced="{{{ forced }}}">
+            <div class="card-header bg-transparent mx-3 px-0">
+                <div class="d-flex justify-content-between">
+                    <span class="badge badge-type badge-{{{ type }}}">{{{ type_lang }}}</span>
+                    {{#isrule}}
+                        <div class="d-flex">
+                            {{# canshare}}
+                                {{^ isallshared}}
+                                    <span class="badge badge-shared"><i class="fa fa-star mr-2"></i><span>{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</span></span>
+                                {{/ isallshared}}
+                            {{/ canshare}}
+                            <span class="badge badge-status{{^ forced }} badge-required{{/ forced}}{{# forced }} badge-{{# status }}paused{{/ status }}{{^ status }}active{{/ status }}{{/forced}}"><i class="fa fa-circle mr-2"></i><span>{{{ status_lang }}}</span></span>
+                        </div>
+                    {{/isrule}}
+                </div>
+                <h5 class="name mt-4">{{{ name }}}</h5>
+            </div>
+            <div class="card-body d-flex flex-column mx-3 my-2 p-0">
+                <div class="card-content">
+                    {{#conditions}}
+                        {{#hascontent}}
+                            <div class="conditions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardif, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-clock-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/conditions}}
+                    {{#exceptions}}
+                        {{#hascontent}}
+                            <div class="exceptions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardunless, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-check-square-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/exceptions}}
+                    {{#actions}}
+                        {{#hascontent}}
+                            <div class="actions-content">
+                                <span class="d-block font-weight-bold mb-1">{{#str}}cardthen, local_notificationsagent{{/str}}</span>
+                                {{#content}}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-bell-o mr-3"></i>
+                                        {{.}}
+                                    </div>
+                                {{/content}}
+                            </div>
+                        {{/hascontent}}
+                    {{/actions}}
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="card-assignment d-flex justify-content-between align-items-center">
+                    {{#capabilities.create}}
+                        <a href="{{{editurl}}}"><i class="fa fa-pencil mr-2"></i>{{#str}}editrule_usetemplate, local_notificationsagent{{/str}}</a>
+                    {{/capabilities.create}}
+                </div>
+            </div>
+        </div>
+    {{/rulecontent}}
+</div>

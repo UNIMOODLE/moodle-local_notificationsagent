@@ -37,12 +37,18 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
+/**
+ * Class representing the numberoftimes condition plugin.
+ */
 class numberoftimes extends notificationconditionplugin {
 
     /**
      * Subplugin name
      */
     public const NAME = 'numberoftimes';
+    /**
+     * Number of times string.
+     */
     public const N_TIMES = 'times';
 
     /**
@@ -63,6 +69,11 @@ class numberoftimes extends notificationconditionplugin {
         return ['[TTTT]', '[N]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_numberoftimes');
     }
@@ -121,17 +132,32 @@ class numberoftimes extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+        );
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:numberoftimes', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -170,6 +196,11 @@ class numberoftimes extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return false;
     }
@@ -187,4 +218,17 @@ class numberoftimes extends notificationconditionplugin {
         $form->set_data($params);
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

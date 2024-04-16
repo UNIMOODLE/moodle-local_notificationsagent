@@ -35,6 +35,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Jakinarazpen-agentea';
+
+$string['admin_breadcrumb'] = 'Jakinarazpen-agentea Admin';
+$string['course_breadcrumb'] = 'Jakinarazpen-agentea';
+
 // Ezarpenak.
 $string['settings'] = 'Ezarpenak';
 $string['disable_user_use'] = 'Desgaitu erabiltzailearentzat';
@@ -94,6 +98,7 @@ $string['condition_minutes'] = 'Minututuak';
 $string['condition_seconds'] = 'Segunduak';
 
 // Editatu Araua.
+$string['editrule_clonerule'] = 'Gehitu araua';
 $string['editrule_newrule'] = 'Arau berria';
 $string['editrule_reports'] = 'Txostenak';
 $string['editrule_activaterule'] = 'Aktibatu';
@@ -107,7 +112,8 @@ $string['editrule_type'] = 'Arau mota';
 $string['editrule_usetemplate'] = 'Hautatu';
 $string['editrule_sharerule'] = 'Partekatu';
 $string['editrule_unsharerule'] = 'Ez partekatu';
-$string['editrule_shareallrule'] = 'Dena partekatu';
+$string['editrule_shareallrule'] = 'Partekatu';
+$string['editrule_unshareallrule'] = 'Partekatu gabe';
 $string['editrule_sharedallrule'] = 'Partekatua';
 $string['editrule_timesfired'] = 'Tiro kopurua';
 $string['editrule_runtime'] = 'Aldikotasuna';
@@ -207,10 +213,15 @@ $string['unsharetitle'] = 'Ez partekatu araua {$a->title}';
 $string['unsharecontent'] = '{$a->title} araua administratzailearekin partekatzear dago, jarraitu nahi duzu?';
 $string['shareaccept'] = 'Arau partekatua';
 $string['unshareaccept'] = 'Partekatu gabeko araua';
+$string['sharereject'] = 'Araudia baztertua';
 
 // Partekatu modal guztiak.
 $string['sharealltitle'] = 'Onartu {$a->title} partekatze-araua';
 $string['shareallcontent'] = '{$a->title} partekatzeko araua onartzear dago, jarraitu nahi duzu?';
+
+// Unshare all modal.
+$string['unsharealltitle'] = 'Ukatu {$a->title} partekatzeko araua';
+$string['unshareallcontent'] = '{$a->title} partekatzeko araua baztertzen ari da, jarraitu nahi duzu?';
 
 // Capabilities.
 $string['notificationsagent:createrule'] = 'Sortu arau bat';
@@ -224,6 +235,7 @@ $string['notificationsagent:assignrule'] = 'Esleitu arau bat';
 $string['notificationsagent:forcerule'] = 'Behartu arau bat';
 $string['notificationsagent:updateruleshare'] = 'Eguneratu arau baten partekatze-egoera';
 $string['notificationsagent:shareruleall'] = 'Onartu arau bat partekatzea';
+$string['notificationsagent:unshareruleall'] = 'Ukatu arau bat partekatzea';
 $string['notificationsagent:managesiterule'] = 'Kudeatu gune-mailako arauak';
 $string['notificationsagent:managecourserule'] = 'Kudeatu arauak kurtso mailan';
 $string['notificationsagent:manageownrule'] = 'Kudeatu zure arauak ikastaroan';

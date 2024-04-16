@@ -49,6 +49,10 @@ class activitysinceend_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var activitysinceend
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -75,9 +79,16 @@ class activitysinceend_test extends \advanced_testcase {
      */
     private static $elements;
     /**
+     * @var \stdClass
+     */
+    private static $cmtestase;
+    /**
      * id for condition
      */
     public const CONDITIONID = 1;
+    /**
+     * Course module id
+     */
     public const CMID = 246000;
     /**
      * Date start for the course
@@ -97,6 +108,9 @@ class activitysinceend_test extends \advanced_testcase {
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
     public const USER_ACTIVITY_END = 1704445200; // 05/01/2024.
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -113,9 +127,21 @@ class activitysinceend_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'activitysinceend';
         self::$elements = ['[TTTT]', '[AAAA]'];
+
+        self::$cmtestase = self::getDataGenerator()->create_module(
+            "quiz",
+            [
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
+            ],
+        );
+
     }
 
     /**
+     * Test evaluate.
      *
      * @param int    $timeaccess
      * @param string $param
@@ -132,19 +158,10 @@ class activitysinceend_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        $cmtestase = self::getDataGenerator()->create_module(
-            "quiz",
-            [
-                'name' => 'Quiz unittest',
-                'course' => self::$coursetest->id,
-                "timeopen" => self::CM_DATESTART,
-                "timeclose" => self::CM_DATEEND,
-            ],
-        );
-        $cmtestase->cmid = self::CMID;
+        self::$cmtestase->cmid = self::CMID;
 
         $cmcompleted = new \stdClass();
-        $cmcompleted->coursemoduleid = $cmtestase->cmid;
+        $cmcompleted->coursemoduleid = self::$cmtestase->cmid;
         $cmcompleted->userid = self::$user->id;
         $cmcompleted->completionstate = 1;
         $cmcompleted->timemodified = self::USER_ACTIVITY_END;
@@ -169,7 +186,9 @@ class activitysinceend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
         // Test estimate next time.
     }
-
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704186000, true, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -180,6 +199,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * test get subtype
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_subtype
      */
     public function test_getsubtype() {
@@ -187,6 +208,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::is_generic
      */
     public function test_isgeneric() {
@@ -194,6 +217,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_elements
      */
     public function test_getelements() {
@@ -201,6 +226,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::check_capability
      */
     public function test_checkcapability() {
@@ -211,14 +238,65 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_activitysinceend\activitysinceend::estimate_next_time
+     * Test estimate next time.
+     *
+     * @covers       \notificationscondition_activitysinceend\activitysinceend::estimate_next_time
+     * @dataProvider dataestimate
      */
-    public function test_estimatenexttime() {
+    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
+        global $DB;
+        \uopz_set_return('time', 1704099600);
         // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
+        self::$subplugin->set_id(self::CONDITIONID);
+        $cm = get_coursemodule_from_instance('quiz', self::$cmtestase->id, self::$coursetest->id);
+
+        $cmcompleted = new \stdClass();
+        $cmcompleted->coursemoduleid = self::$cmtestase->cmid;
+        $cmcompleted->userid = self::$user->id;
+        $cmcompleted->completionstate = 1;
+        $cmcompleted->timemodified = $completion ? self::USER_ACTIVITY_END : 0;
+        $DB->insert_record('course_modules_completion', $cmcompleted);
+
+        self::$context->set_params(json_encode(['time' => $param, 'cmid' => $cm->id]));
+        // Test estimate next time.
+        if (!$completion) {
+            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+        } else {
+            if (self::$context->is_complementary()) {
+                if ($timeaccess >= self::USER_ACTIVITY_END && $timeaccess <= self::USER_ACTIVITY_END + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                } else if ($timeaccess > self::USER_ACTIVITY_END + $param) {
+                    self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                }
+            } else {
+                if ($timeaccess >= self::USER_ACTIVITY_END && $timeaccess <= self::USER_ACTIVITY_END + $param) {
+                    self::assertEquals(self::USER_ACTIVITY_END + $param, self::$subplugin->estimate_next_time(self::$context));
+                } else if ($timeaccess > self::USER_ACTIVITY_END + $param) {
+                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                }
+            }
+        }
+        uopz_unset_return('time');
+    }
+    /**
+     * Data provider for test_estimatenexttime.
+     */
+    public static function dataestimate() {
+        return [
+            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [self::USER_ACTIVITY_END + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [self::USER_ACTIVITY_END + 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+        ];
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_title
      */
     public function test_gettitle() {
@@ -229,6 +307,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_description
      */
     public function test_getdescription() {
@@ -242,6 +322,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::convert_parameters
      */
     public function test_convertparameters() {
@@ -259,6 +341,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::process_markups
      */
     public function test_processmarkups() {
@@ -279,6 +363,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_ui
      */
     public function test_getui() {
@@ -320,6 +406,8 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_activitysinceend\activitysinceend::set_default
      */
     public function test_setdefault() {
@@ -366,20 +454,22 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
     /**
-     * @covers \notificationscondition_activitysinceend\activitysinceend::get_cm_endtime
+     * Test get time completion.
+     *
+     * @covers \notificationscondition_activitysinceend\activitysinceend::get_timecompletion
      */
-    public function test_get_cm_endtime() {
+    public function test_get_timecompletion() {
         \uopz_set_return('time', time());
         $modinstance = self::getDataGenerator()->create_module('quiz', [
             'course' => self::$coursetest,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
 
-        $cmtestase = get_coursemodule_from_instance('quiz', $modinstance->id, self::$coursetest->id, false, MUST_EXIST);
+        self::$cmtestase = get_coursemodule_from_instance('quiz', $modinstance->id, self::$coursetest->id, false, MUST_EXIST);
         $completion = new \completion_info(self::$coursetest);
-        $completion->update_state($cmtestase, COMPLETION_COMPLETE, self::$user->id, false);
+        $completion->update_state(self::$cmtestase, COMPLETION_COMPLETE, self::$user->id, false);
 
-        $completion = self::$subplugin::get_cm_endtime($cmtestase->id, self::$user->id);
+        $completion = self::$subplugin::get_timecompletion(self::$cmtestase->id, self::$user->id);
 
         $this->assertEquals(time(), $completion->timemodified);
         $this->assertEquals(self::$user->id, $completion->userid);
@@ -387,4 +477,3 @@ class activitysinceend_test extends \advanced_testcase {
     }
 
 }
-

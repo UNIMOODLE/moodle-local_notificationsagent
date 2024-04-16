@@ -35,10 +35,9 @@ namespace notificationscondition_calendarstart;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_calendarstart\calendarstart;
 
 /**
  * @group notificationsagent
@@ -49,6 +48,10 @@ class calendarstart_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var calendarstart
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -92,6 +95,9 @@ class calendarstart_test extends \advanced_testcase {
      */
     private static $caledarevent;
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -121,14 +127,17 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test the evaluation function.
      *
-     * @param int    $timeaccess
-     * @param string $param
-     * @param bool   $expected
-     *
-     * @covers       \notificationscondition_calendarstart\calendarstart::evaluate
+     * @param int    $timeaccess    The access time.
+     * @param bool   $usecache      Whether to use cache or not.
+     * @param string $param         The parameters.
+     * @param array  $complementary The complementary array.
+     * @param bool   $expected      The expected result.
      *
      * @dataProvider dataprovider
+     * @covers       \notificationscondition_calendarstart\calendarstart::evaluate
+     *
      */
     public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
         $auxarray = json_decode($param, true);
@@ -164,6 +173,9 @@ class calendarstart_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Data provider for test_evaluate().
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -180,6 +192,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_subtype.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_subtype
      */
     public function test_getsubtype() {
@@ -187,6 +201,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for is_generic.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::is_generic
      */
     public function test_isgeneric() {
@@ -194,6 +210,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_elements.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_elements
      */
     public function test_getelements() {
@@ -201,6 +219,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for check_capability.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::check_capability
      */
     public function test_checkcapability() {
@@ -211,6 +231,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_cmid.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_cmid
      */
     public function test_getcmid() {
@@ -218,10 +240,19 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test the estimate next time function.
+     *
+     * @param int      $timeaccess    The access time.
+     * @param bool     $usecache      Whether to use cache or not.
+     * @param string   $param         The parameters.
+     * @param array    $complementary The complementary array.
+     * @param null|int $expected      The expected result.
+     *
      * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time
-     * @dataProvider dataprovider
+     * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+        \uopz_set_return('time', $timeaccess);
         $auxarray = json_decode($param, true);
         $auxarray['cmid'] = self::$caledarevent->id;
         $param = json_encode($auxarray);
@@ -230,24 +261,110 @@ class calendarstart_test extends \advanced_testcase {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
+        $params = json_decode(self::$context->get_params(), false);
 
-        $params = json_decode(self::$context->get_params(), true);
+        $event = calendar_get_events_by_id([$params->{notificationplugin::UI_ACTIVITY}]);
+        $timeevent = $event[$params->{notificationplugin::UI_ACTIVITY}]->timestart;
+        $timeduration = $event[$params->{notificationplugin::UI_ACTIVITY}]->timeduration;
+
         // Test estimate next time.
+        // Exception.
         if (self::$context->is_complementary()) {
-            self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+            // After beggining of event
+            if ($params->{calendarstart::UI_RADIO} == 1) {
+                if ($timeaccess >= $timeevent && $timeaccess <= $timeevent + $params->{notificationplugin::UI_TIME}) {
+                    self::assertSame(
+                        time(),
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME}) {
+                    self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                }
+                // Radio 0.
+            } else if ($params->{calendarstart::UI_RADIO} == 0) {
+                if ($timeaccess >= $timeevent + $timeduration
+                    && $timeaccess <= $timeevent +
+                    $params->{notificationplugin::UI_TIME} + $timeduration
+                ) {
+                    self::assertSame(
+                        time(),
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME} + $timeduration) {
+                    self::assertNull(
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                }
+            }
+
+            // Condition.
         } else {
-            if ($params['radio'] == 1) {
-                self::assertSame(self::COURSE_DATESTART + $params['time'], self::$subplugin->estimate_next_time(self::$context));
-            } else {
-                self::assertSame(
-                    self::COURSE_DATESTART + $params['time'] + self::DURATION,
-                    self::$subplugin->estimate_next_time(self::$context)
-                );
+            // After beggining of event
+            if ($params->{calendarstart::UI_RADIO} == 1) {
+                if ($timeaccess >= $timeevent && $timeaccess <= $timeevent + $params->{notificationplugin::UI_TIME}) {
+                    self::assertSame(
+                        self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME},
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME}) {
+                    self::assertSame(
+                        time(),
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                }
+                // Radio 0.
+            } else if ($params->{calendarstart::UI_RADIO} == 0) {
+                if ($timeaccess >= $timeevent + $timeduration
+                    && $timeaccess <= $timeevent +
+                    $params->{notificationplugin::UI_TIME} + $timeduration
+                ) {
+                    self::assertSame(
+                        self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME} + $timeduration,
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME} + $timeduration) {
+                    self::assertSame(
+                        time(),
+                        self::$subplugin->estimate_next_time(self::$context)
+                    );
+                }
             }
         }
+        uopz_unset_return('time');
     }
 
     /**
+     * Dataprovider for estimate next time
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            [1704445200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1706173200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1704445200, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1706173200, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1707987600, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [
+                self::COURSE_DATESTART + self::DURATION + 1, false, '{"time":864000, "radio":0}',
+                notificationplugin::COMPLEMENTARY_CONDITION, true,
+            ],
+
+            [1704445200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
+            [1706173200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [1704445200, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
+            [1706173200, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
+            [1707987600, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [
+                self::COURSE_DATESTART + self::DURATION + 1, false, '{"time":864000, "radio":0}',
+                notificationplugin::COMPLEMENTARY_EXCEPTION, true,
+            ],
+        ];
+    }
+
+    /**
+     * Test for get_title.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_title
      */
     public function test_gettitle() {
@@ -258,6 +375,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_description.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_description
      */
     public function test_getdescription() {
@@ -271,6 +390,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for process_markups.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::process_markups
      */
     public function test_processmarkups() {
@@ -285,6 +406,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for get_ui.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::get_ui
      */
     public function test_getui() {
@@ -333,6 +456,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for set_default.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::set_default
      */
     public function test_setdefault() {
@@ -381,6 +506,8 @@ class calendarstart_test extends \advanced_testcase {
     }
 
     /**
+     * Test for convert_parameters.
+     *
      * @covers \notificationscondition_calendarstart\calendarstart::convert_parameters
      */
     public function test_convertparameters() {

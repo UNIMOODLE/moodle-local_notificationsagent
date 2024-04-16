@@ -37,12 +37,24 @@ use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
 use notificationsaction_bootstrapnotifications\bootstrapmessages;
 
+/**
+ * Class representing a bootstrapnotifications action plugin.
+ */
 class bootstrapnotifications extends notificationactionplugin {
 
     /** @var UI ELEMENTS */
     public const NAME = 'bootstrapnotifications';
+    /** @var UI ELEMENTS */
     public const UI_MESSAGE = 'message';
 
+    /**
+     * Get the elements for the bootstrapnotifications plugin.
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param int         $type
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
 
@@ -54,7 +66,7 @@ class bootstrapnotifications extends notificationactionplugin {
             ), ['size' => '64']
         );
 
-        $this->placeholders($mform, $id, $type);
+        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_TEXT);
         $mform->addRule(
@@ -62,39 +74,53 @@ class bootstrapnotifications extends notificationactionplugin {
         );
     }
 
-    /**
-     * @return lang_string|string
+    /** Returns subtype string for building classnames, filenames, modulenames, etc.
+     *
+     * @return string subplugin type. "bootrstrapnotifications"
      */
     public function get_subtype() {
         return get_string('subtype', 'notificationsaction_bootstrapnotifications');
     }
 
     /**
-     * Subplugin title
+     * Get the title of the notification action plugin.
      *
-     * @return \lang_string|string
+     * @return string Title of the plugin.
      */
     public function get_title() {
         return get_string('bootstrapnotifications_action', 'notificationsaction_bootstrapnotifications');
     }
 
     /**
-     *  Subplugins elements
+     * Get the elements for the notification action plugin.
      *
-     * @return string[]
+     * @return array elements as an associative array.
      */
     public function get_elements() {
         return ['[TTTT]'];
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:bootstrapnotifications', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -125,6 +151,14 @@ class bootstrapnotifications extends notificationactionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Execute an action with the given parameters in the specified context.
+     *
+     * @param evaluationcontext $context The context in which the action is executed.
+     * @param string            $params  An associative array of parameters for the action.
+     *
+     * @return mixed The result of the action execution.
+     */
     public function execute_action($context, $params) {
         $placeholdershuman = json_decode($params);
         $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
@@ -137,7 +171,26 @@ class bootstrapnotifications extends notificationactionplugin {
         return true;
     }
 
+    /**
+     * Check if the action is generic or not.
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
+    }
+
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
     }
 }

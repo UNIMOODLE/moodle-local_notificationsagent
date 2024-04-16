@@ -103,6 +103,9 @@ class calendareventto_test extends \advanced_testcase {
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
     public const DURATION = 30 * 86400;
 
+    /**
+     * Set up the test environment.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -131,6 +134,7 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     *  Test evaluate.
      *
      * @param int    $timeaccess
      * @param string $param
@@ -167,7 +171,9 @@ class calendareventto_test extends \advanced_testcase {
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
     }
-
+    /**
+     * Data provider for test_evaluate.
+     */
     public static function dataprovider(): array {
         return [
             [1704445200, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
@@ -183,6 +189,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_subtype
      */
     public function test_getsubtype() {
@@ -190,6 +198,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::is_generic
      */
     public function test_isgeneric() {
@@ -197,6 +207,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_elements
      */
     public function test_getelements() {
@@ -204,6 +216,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::check_capability
      */
     public function test_checkcapability() {
@@ -214,6 +228,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test get cmid.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_cmid
      */
     public function test_getcmid() {
@@ -222,10 +238,13 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test for estimate next time
+     *
      * @covers       \notificationscondition_calendareventto\calendareventto::estimate_next_time
-     * @dataProvider dataprovider
+     * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+        \uopz_set_return('time', $timeaccess);
         $auxarray = json_decode($param, true);
         $auxarray['cmid'] = self::$caledarevent->id;
         $param = json_encode($auxarray);
@@ -235,28 +254,57 @@ class calendareventto_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        $params = json_decode(self::$context->get_params(), true);
+        $params = json_decode(self::$context->get_params(), false);
         // Test estimate next time.
         if (self::$context->is_complementary()) {
-            if ($timeaccess < self::COURSE_DATESTART - $params['time']) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
-            } else if ($timeaccess >= self::COURSE_DATESTART - $params['time'] && $timeaccess <= self::COURSE_DATESTART) {
+            if ($timeaccess < self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}) {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            } else if ($timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
+                && $timeaccess <= self::COURSE_DATESTART
+            ) {
                 self::assertEquals(self::COURSE_DATESTART, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATESTART) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             }
         } else {
-            if ($timeaccess < self::COURSE_DATESTART - $params['time']) {
-                self::assertEquals(self::COURSE_DATESTART - $params['time'], self::$subplugin->estimate_next_time(self::$context));
-            } else if ($timeaccess >= self::COURSE_DATESTART - $params['time'] && $timeaccess <= self::COURSE_DATESTART) {
-                self::assertNull(self::$subplugin->estimate_next_time(self::$context));
+            if ($timeaccess < self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}) {
+                self::assertEquals(
+                    self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME},
+                    self::$subplugin->estimate_next_time(self::$context)
+                );
+            } else if ($timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
+                && $timeaccess <= self::COURSE_DATESTART
+            ) {
+                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATESTART) {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
+        uopz_unset_return('time');
     }
 
     /**
+     * Data provider for test_estimatenexttime.
+     *
+     * @return array[]
+     */
+    public static function dataestimate(): array {
+        return [
+            [1704445200, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1701766800, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1703494800, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1704445200, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
+            [1701766800, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
+            [1703494800, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [1703926800, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+            [1703926800, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+
+        ];
+    }
+
+    /**
+     * test get title.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_title
      */
     public function test_gettitle() {
@@ -267,6 +315,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test get description.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_description
      */
     public function test_getdescription() {
@@ -280,6 +330,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::process_markups
      */
     public function test_processmarkups() {
@@ -294,6 +346,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::get_ui
      */
     public function test_getui() {
@@ -335,6 +389,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test set default.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::set_default
      */
     public function test_setdefault() {
@@ -381,6 +437,8 @@ class calendareventto_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationscondition_calendareventto\calendareventto::convert_parameters
      */
     public function test_convertparameters() {

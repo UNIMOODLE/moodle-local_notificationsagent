@@ -65,5 +65,25 @@ function xmldb_notificationsaction_bootstrapnotifications_upgrade($oldversion) {
         // Bootstrapnotifications savepoint reached.
         upgrade_plugin_savepoint(true, 2023101805, 'notificationsaction', 'bootstrapnotifications');
     }
+
+    if ($oldversion < 2023101806) {
+        // Define key fk_userid (foreign) to be added to notificationsagent_bootstrap.
+        $table = new xmldb_table('notificationsagent_bootstrap');
+        $key = new xmldb_key('fk_userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch add key fk_userid.
+        $dbman->add_key($table, $key);
+
+        // Bootstrapnotifications savepoint reached.
+        upgrade_plugin_savepoint(true, 2023101806, 'notificationsaction', 'bootstrapnotifications');
+
+        // Define key fk_courseid (foreign) to be added to notificationsagent_bootstrap.
+        $table = new xmldb_table('notificationsagent_bootstrap');
+        $key = new xmldb_key('fk_courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+
+        // Launch add key fk_courseid.
+        $dbman->add_key($table, $key);
+    }
+
     return true;
 }

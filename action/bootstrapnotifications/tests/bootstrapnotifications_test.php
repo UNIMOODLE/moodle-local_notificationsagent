@@ -39,6 +39,7 @@ use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
 use notificationsaction_bootstrapnotifications\bootstrapnotifications;
+use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
  * Test boostrapnotificationss
@@ -51,6 +52,10 @@ class bootstrapnotifications_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var bootstrapnotifications
+     */
     private static $subplugin;
 
     /**
@@ -91,6 +96,12 @@ class bootstrapnotifications_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test fixture.
+     * This method is called before a test is executed.
+     *
+     * @return void
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -110,6 +121,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test execute action.
      *
      * @param string $param
      *
@@ -140,6 +152,9 @@ class bootstrapnotifications_test extends \advanced_testcase {
         $this->assertEquals(self::$context->get_courseid(), $messages[0]->get('courseid'));
     }
 
+    /**
+     * Data provider for get ui.
+     */
     public static function dataprovider(): array {
         return [
             ['{"message":"TEST"}'],
@@ -148,6 +163,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test get subtype.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_subtype
      */
     public function test_getsubtype() {
@@ -155,6 +172,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test is generic.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::is_generic
      */
     public function test_isgeneric() {
@@ -162,6 +181,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test get elements.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_elements
      */
     public function test_getelements() {
@@ -169,6 +190,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test check capability.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::check_capability
      */
     public function test_checkcapability() {
@@ -179,6 +202,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test get title.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_title
      */
     public function test_gettitle() {
@@ -189,6 +214,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::convert_parameters
      */
     public function test_convert_parameters() {
@@ -201,6 +228,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test get ui.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_ui
      */
     public function test_getui() {
@@ -228,6 +257,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
     }
 
     /**
+     * Test process markups.
+     *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::process_markups
      */
     public function test_processmarkups() {
@@ -242,5 +273,16 @@ class bootstrapnotifications_test extends \advanced_testcase {
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
         $this->assertSame([$expected], $content);
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 }

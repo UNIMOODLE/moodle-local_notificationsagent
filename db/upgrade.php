@@ -144,5 +144,52 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024020602, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024020604) {
+        // Define key fk_ruleid (foreign) to be added to notificationsagent_triggers.
+        $table = new xmldb_table('notificationsagent_triggers');
+        $key = new xmldb_key('fk_ruleid', XMLDB_KEY_FOREIGN, ['ruleid'], 'notificationsagent_rule', ['id']);
+
+        // Launch add key fk_ruleid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_conditionid (foreign) to be added to notificationsagent_cache.
+        $table = new xmldb_table('notificationsagent_cache');
+        $key = new xmldb_key('fk_conditionid', XMLDB_KEY_FOREIGN, ['conditionid'], 'notificationsagent_condition', ['id']);
+
+        // Launch add key fk_conditionid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_ruleid (foreign) to be added to notificationsagent_report.
+        $table = new xmldb_table('notificationsagent_report');
+        $key = new xmldb_key('fk_ruleid', XMLDB_KEY_FOREIGN, ['ruleid'], 'notificationsagent_rule', ['id']);
+
+        // Launch add key fk_ruleid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_actionid (foreign) to be added to notificationsagent_report.
+        $table = new xmldb_table('notificationsagent_report');
+        $key = new xmldb_key('fk_actionid', XMLDB_KEY_FOREIGN, ['actionid'], 'notificationsagent_action', ['id']);
+
+        // Launch add key fk_actionid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_ruleid (foreign) to be added to notificationsagent_context.
+        $table = new xmldb_table('notificationsagent_context');
+        $key = new xmldb_key('fk_ruleid', XMLDB_KEY_FOREIGN, ['ruleid'], 'notificationsagent_rule', ['id']);
+
+        // Launch add key fk_ruleid.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_ruleid (foreign) to be added to notificationsagent_launched.
+        $table = new xmldb_table('notificationsagent_launched');
+        $key = new xmldb_key('fk_ruleid', XMLDB_KEY_FOREIGN, ['ruleid'], 'notificationsagent_rule', ['id']);
+
+        // Launch add key fk_ruleid.
+        $dbman->add_key($table, $key);
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024020604, 'local', 'notificationsagent');
+    }
+
     return true;
 }

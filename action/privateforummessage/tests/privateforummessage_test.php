@@ -42,6 +42,8 @@ use local_notificationsagent\rule;
 use notificationsaction_privateforummessage\privateforummessage;
 
 /**
+ * Test class for privateforummessage action plugin.
+ *
  * @group notificationsagent
  */
 class privateforummessage_test extends \advanced_testcase {
@@ -50,6 +52,10 @@ class privateforummessage_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var privateforummessage
+     */
     private static $subplugin;
 
     /**
@@ -89,6 +95,10 @@ class privateforummessage_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test fixture.
+     * This method is called before a test is executed.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -108,12 +118,14 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
-     *
-     * @param string $param
-     *
-     * @covers       \notificationsaction_privateforummessage\privateforummessage::execute_action
+     * Test case for execute_action method.
      *
      * @dataProvider dataprovider
+     *
+     * @param mixed $param            the parameter for execute_action method.
+     * @param bool  $creatediscussion create a discussion or not.
+     *
+     * @covers       \notificationsaction_privateforummessage\privateforummessage::execute_action
      */
     public function test_execute_action($param, $creatediscussion) {
         global $DB;
@@ -146,7 +158,8 @@ class privateforummessage_test extends \advanced_testcase {
                 'pluginname' => 'forumnoreply', 'cmid' => $cmtestapf->cmid,
             ],
         );
-        $actionparam = '{"title":"titulo", "message":"forumbody test", "format":' . FORMAT_PLAIN . ', "cmid":' . $cmtestapf->cmid . '}';
+        $actionparam = '{"title":"titulo", "message":"forumbody test", "format":' . FORMAT_PLAIN . ', "cmid":' . $cmtestapf->cmid
+            . '}';
 
         $DB->insert_record(
             'notificationsagent_action',
@@ -190,12 +203,18 @@ class privateforummessage_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * Data provider for test_execute_action.
+     *
+     */
     public static function dataprovider(): Generator {
         yield ['{"title":"TEST","message":"Message body {user_name}"}', true];
         yield ['{"title":"TEST","message":"Message body {user_name}"}', false];
     }
 
     /**
+     * Test get_subtype method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::get_subtype
      */
     public function test_getsubtype() {
@@ -203,6 +222,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test is_generic method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::is_generic
      */
     public function test_isgeneric() {
@@ -210,6 +231,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_elements method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::get_elements
      */
     public function test_getelements() {
@@ -217,6 +240,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_title method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::get_title
      */
     public function test_gettitle() {
@@ -227,6 +252,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test check_capability method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::check_capability
      */
     public function test_checkcapability() {
@@ -237,6 +264,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert_parameters method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::convert_parameters
      */
     public function test_convert_parameters() {
@@ -251,6 +280,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_ui method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::get_ui
      */
     public function test_getui() {
@@ -282,9 +313,12 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationsaction_privateforummessage\privateforummessage::get_parameters_placeholders
+     * Test function for get_parameters_placeholders method.
+     *
+     * @param string $param JSON string with parameters.
      *
      * @dataProvider dataprovider2
+     * @covers       \notificationsaction_privateforummessage\privateforummessage::get_parameters_placeholders
      */
     public function test_getparametersplaceholders($param) {
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
@@ -306,6 +340,10 @@ class privateforummessage_test extends \advanced_testcase {
         $this->assertSame(json_encode($auxarray), $actual);
     }
 
+    /**
+     * Data provider for test_getparametersplaceholders.
+     *
+     */
     public static function dataprovider2(): Generator {
         $data['title'] = 'TEST';
         $data['message']['text'] = 'Message body';
@@ -316,6 +354,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test process_markups method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::process_markups
      *
      */
@@ -346,6 +386,8 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
     /**
+     * Test forum_add_post method.
+     *
      * @covers \notificationsaction_privateforummessage\privateforummessage::forum_add_post
      * @return void
      */
@@ -387,4 +429,3 @@ class privateforummessage_test extends \advanced_testcase {
     }
 
 }
-

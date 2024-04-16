@@ -134,10 +134,6 @@ Feature: Testing templates management in notifications agent plugin
       | Title | Testing template1 |
     And I select "[TTTT] has passed since the user last session in the course." from the "id_newcondition_select" singleselect
     And I click on "newcondition_button" "button"
-    And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
-    And I press the left key
-    And I press the delete key
-    And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
     And I click on "newaction_button" "button"
@@ -156,8 +152,20 @@ Feature: Testing templates management in notifications agent plugin
     And I wait "2" seconds
     And I am on "testnotifagent" course homepage
     And I click on "More" if it exists otherwise "My assistant"
-    Then I should see "Testing template1"
-    And I should see "template"
+    And I wait "1" seconds
+    And I click on "Add rule" "link"
+    And I wait "1" seconds
+    And I click on "Select" "link"
+    And I set the following fields to these values:
+      | Title | template1 ASSIGNED |
+    And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
+    And I press the left key
+    And I press the delete key
+    And I type "3"
+    And I click on "Save changes" "button"
+    And I should see "saved"
+    And I should see "Active"
+    Then I should see "template1 ASSIGNED"
     And I wait "2" seconds
 
   Scenario: Export template for plugin notification agent

@@ -54,11 +54,13 @@ class notificationsagent_engine {
      * @param int   $userid           The user id for whom the rules are being evaluated
      * @param int   $courseid         The course id for which the rules are being evaluated
      * @param int   $triggercondition The trigger condition for rule evaluation
+     * @param int   $startdate        The trigger start date
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
-    public static function notificationsagent_engine_evaluate_rule($ruleids, $timeaccess, $userid, $courseid, $triggercondition) {
+    public static function notificationsagent_engine_evaluate_rule(
+        $ruleids, $timeaccess, $userid, $courseid, $triggercondition,
+        $startdate
+    ) {
         foreach ($ruleids as $ruleid) {
             $rule = rule::create_instance($ruleid);
             $context = new evaluationcontext();
@@ -67,6 +69,7 @@ class notificationsagent_engine {
             $context->set_userid($userid);
             $context->set_rule($rule);
             $context->set_triggercondition($triggercondition);
+            $context->set_startdate($startdate);
 
             if ($userid == notificationsagent::GENERIC_USERID && !$rule->get_isgeneric()) {
                 $coursecontext = \context_course::instance($context->get_courseid());

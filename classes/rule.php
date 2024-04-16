@@ -44,6 +44,7 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\form\editrule_form;
 use notificationscondition_ac\ac;
+use stdClass;
 
 /**
  * Class rule manages the rules for notifications in the notifications agent system.
@@ -82,7 +83,7 @@ class rule {
     /** @var int $assigned Flag indicating if the rule is assigned, default is 1 */
     private $assigned = 1;
 
-    /** @var int $timesfired Number of times the rule has been fired, default is 1 */
+    /** @var int $timesfired Number of times the rule has to be fired, default is 1 */
     private $timesfired = 1;
 
     /** @var int $runtime Execution runtime in seconds, default is 86400 */
@@ -106,14 +107,23 @@ class rule {
     /** @var mixed $dataform Data form associated with the rule */
     private $dataform;
 
+    /** @var int $action Flag indicating the action add, edit, clone */
+    private $ruleaction = self::RULE_ADD;
+
     /** @var string Separator for placeholders */
     public const SEPARATOR = '______________________';
 
     /** @var string[] List of allowed placeholders in rule templates */
     private const PLACEHOLDERS
         = [
-            'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address', 'Course_FullName', 'Course_Url',
-            'Teacher_FirstName', 'Teacher_LastName', 'Teacher_Email', 'Teacher_Username', 'Teacher_Address', 'Current_time',
+            'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
+        ];
+
+    /** @var string[] List of allowed placeholders in rule templates */
+    private const PLACEHOLDERS_GEN
+        = [
+            'Course_FullName', 'Course_Url', 'Teacher_FirstName', 'Teacher_LastName', 'Teacher_Email', 'Teacher_Username',
+            'Teacher_Address', 'Current_time',
             self::SEPARATOR, 'Follow_Link',
         ];
 
@@ -127,6 +137,13 @@ class rule {
     public const TEMPLATE_TYPE = 0;
     /** @var int Rule type identifier */
     public const RULE_TYPE = 1;
+
+    /** @var string Rule type identifier */
+    public const RULE_ADD = 'add';
+    /** @var string Rule type identifier */
+    public const RULE_EDIT = 'edit';
+    /** @var string Rule type identifier */
+    public const RULE_CLONE = 'clone';
 
     /** @var int Status of a rule that is enabled */
     public const RESUME_RULE = 0;
@@ -154,31 +171,39 @@ class rule {
      * exceptions, and actions associated with the rule.
      *
      * @param int|null $id Optional ID of the rule to load from the database.
+     * @param int      $type
+     * @param string   $ruleaction
+     *
      */
-    public function __construct($id = null, $type = self::RULE_TYPE) {
+    public function __construct($id = null, $type = self::RULE_TYPE, $ruleaction = self::RULE_ADD) {
         global $DB;
 
-        if(is_null($id)){
+        if (is_null($id)) {
             $this->set_template($type);
             return;
         }
 
+        $this->ruleaction = $ruleaction;
+
         // Retrieve the rule record from the database based on the provided ID.
         $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
-
-        // Set the properties of the rule object.
         $this->set_id($rule->id);
-        $this->set_name($rule->name);
-        $this->set_description($rule->description);
-        $this->set_status($rule->status);
-        $this->set_createdby($rule->createdby);
-        $this->set_createdat($rule->createdat);
-        $this->set_shared($rule->shared);
-        $this->set_defaultrule($rule->defaultrule);
-        $this->set_template($rule->template);
-        $this->set_forced($rule->forced);
-        $this->set_timesfired($rule->timesfired);
-        $this->set_runtime($rule->runtime);
+
+        // Only set all properties if ruleaction is add or edit
+        if ($this->ruleaction != self::RULE_CLONE) {
+            // Set the properties of the rule object.
+            $this->set_name($rule->name);
+            $this->set_description($rule->description);
+            $this->set_status($rule->status);
+            $this->set_createdby($rule->createdby);
+            $this->set_createdat($rule->createdat);
+            $this->set_shared($rule->shared);
+            $this->set_defaultrule($rule->defaultrule);
+            $this->set_template($rule->template);
+            $this->set_forced($rule->forced);
+            $this->set_timesfired($rule->timesfired);
+            $this->set_runtime($rule->runtime);
+        }
 
         // Load additional rule details.
         $this->load_ac(); // Load access control settings.
@@ -233,25 +258,52 @@ class rule {
     }
 
     /**
-     * Get the rules
+     * Get the rules from index view
      *
      * @param context $context  context object
      * @param integer $courseid course id
      *
      * @return array $instances Rule object
      */
-    public static function get_rules($context, $courseid) {
+    public static function get_rules_index($context, $courseid) {
         $rules = [];
         $instances = [];
 
-        if (has_capability('local/notificationsagent:managesiterule', $context)) {
-            $rules = self::get_administrator_rules($courseid);
-        } else if ($courseid != SITEID) {
-            if (has_capability('local/notificationsagent:managecourserule', $context)) {
-                $rules = self::get_teacher_rules($courseid);
-            } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
-                $rules = self::get_student_rules($courseid);
+        if ($courseid == SITEID) {
+            if (has_capability('local/notificationsagent:managesiterule', $context)) {
+                $rules = self::get_administrator_rules($courseid);
             }
+        } else {
+            if (has_capability('local/notificationsagent:managecourserule', $context)) {
+                $rules = self::get_teacher_rules_index($courseid);
+            } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
+                $rules = self::get_owner_rules_by_course($courseid);
+            }
+        }
+
+        if (!empty($rules)) {
+            foreach ($rules as $rule) {
+                $instances[] = self::create_instance($rule->id);
+            }
+        }
+
+        return $instances;
+    }
+
+    /**
+     * Get the rules from assign view
+     *
+     * @param context $context  context object
+     * @param integer $courseid course id
+     *
+     * @return array $instances Rule object
+     */
+    public static function get_rules_assign($context, $courseid) {
+        $rules = [];
+        $instances = [];
+
+        if ($courseid != SITEID && has_capability('local/notificationsagent:managecourserule', $context)) {
+            $rules = self::get_teacher_rules_assign($courseid);
         }
 
         if (!empty($rules)) {
@@ -278,7 +330,7 @@ class rule {
      * @return bool
      */
     private function is_new() {
-        return is_null($this->id);
+        return is_null($this->id) || $this->ruleaction == self::RULE_CLONE;
     }
 
     /**
@@ -312,6 +364,9 @@ class rule {
      * load array data for form
      */
     public function load_dataform(): void {
+        $ruleaction = $this->ruleaction == self::RULE_CLONE ? editrule_form::FORM_JSON_ACTION_INSERT
+            : editrule_form::FORM_JSON_ACTION_UPDATE;
+
         $data = [];
         $data["title"] = $this->get_name();
         $data["timesfired"] = $this->get_timesfired();
@@ -325,18 +380,30 @@ class rule {
             $dataformac = $this->get_ac()->load_dataform();
             $this->dataform = array_merge($this->dataform, $dataformac);
         }
+
+        $jsoncondition = [];
         foreach ($this->get_conditions() as $condition) {
             $dataformconditions = $condition->load_dataform();
             $this->dataform = array_merge($this->dataform, $dataformconditions);
+            $jsoncondition[$condition->get_id()] = ["pluginname" => $condition->get_subtype(), "action" => $ruleaction];
         }
+        $this->dataform = array_merge($this->dataform, [editrule_form::FORM_JSON_CONDITION => json_encode($jsoncondition)]);
+
+        $jsonexception = [];
         foreach ($this->get_exceptions() as $exception) {
             $dataformexceptions = $exception->load_dataform();
             $this->dataform = array_merge($this->dataform, $dataformexceptions);
+            $jsonexception[$exception->get_id()] = ["pluginname" => $exception->get_subtype(), "action" => $ruleaction];
         }
+        $this->dataform = array_merge($this->dataform, [editrule_form::FORM_JSON_EXCEPTION => json_encode($jsonexception)]);
+
+        $jsonactions = [];
         foreach ($this->get_actions() as $action) {
             $dataformactions = $action->load_dataform();
             $this->dataform = array_merge($this->dataform, $dataformactions);
+            $jsonactions[$action->get_id()] = ["pluginname" => $action->get_subtype(), "action" => $ruleaction];
         }
+        $this->dataform = array_merge($this->dataform, [editrule_form::FORM_JSON_ACTION => json_encode($jsonactions)]);
 
     }
 
@@ -886,10 +953,16 @@ class rule {
     /**
      * Return list of placeholders.
      *
+     * @param bool $generic
+     *
      * @return array
      */
-    public static function get_placeholders(): array {
-        return self::PLACEHOLDERS;
+    public static function get_placeholders($generic): array {
+        if ($generic) {
+            return array_merge(self::PLACEHOLDERS, self::PLACEHOLDERS_GEN);
+        }
+
+        return self::PLACEHOLDERS_GEN;
     }
 
     /**
@@ -903,7 +976,7 @@ class rule {
     public function replace_placeholders($context, $parameters) {
         $paramstoreplace = [];
         $placeholderstoreplace = [];
-        $placeholders = self::get_placeholders();
+        $placeholders = self::get_placeholders(true);
         $idcreatedby = $context->get_rule()->get_createdby();
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
@@ -989,7 +1062,7 @@ class rule {
                             break;
 
                         case 'Current_time':
-                            $paramstoreplace[] = date('d-m-Y h:i:s', time());
+                            $paramstoreplace[] = date('d-m-Y h:i:s', $context->get_startdate() ?? time());
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
                             break;
 
@@ -1091,7 +1164,7 @@ class rule {
     /**
      * Save the form data by creating or updating the rule, and processing conditions, actions, and exceptions.
      *
-     * @param \stdClass $data Form data to be processed.
+     * @param stdClass $data Form data to be processed.
      */
     public function save_form($data) {
         if ($this->is_new()) {
@@ -1100,16 +1173,8 @@ class rule {
             $this->update($data);
         }
 
-        $context = context_course::instance($data->courseid);
-        $students = notificationsagent::get_usersbycourse($context);
-
         $this->save_form_ac($data);
-        $this->save_form_conditions_exceptions(
-            $data, $data->{editrule_form::FORM_JSON_CONDITION}, notificationplugin::COMPLEMENTARY_CONDITION, $students
-        );
-        $this->save_form_conditions_exceptions(
-            $data, $data->{editrule_form::FORM_JSON_EXCEPTION}, notificationplugin::COMPLEMENTARY_EXCEPTION, $students
-        );
+        $this->save_form_conditions_exceptions($data);
         $this->save_form_actions($data, $data->{editrule_form::FORM_JSON_ACTION});
     }
 
@@ -1128,20 +1193,56 @@ class rule {
     /**
      * Save form data related to conditions or exceptions based on provided JSON configuration.
      *
-     * @param stdClass $data          Form data containing the conditions or exceptions.
-     * @param string   $json          JSON-encoded string representing conditions or exceptions configurations.
-     * @param string   $complementary A constant indicating whether it's a condition or an exception.
-     * @param array    $students      List of students related to the condition or exception.
+     * @param stdClass $data Form data containing the conditions or exceptions.
      */
-    private function save_form_conditions_exceptions($data, $json, $complementary, $students) {
-        $array = json_decode($json, true);
-        $timer = 0;
+    private function save_form_conditions_exceptions($data) {
+        $courseid = $data->courseid;
+        $context = context_course::instance($courseid);
+        $students = notificationsagent::get_usersbycourse($context);
+
+        $conditions = $data->{editrule_form::FORM_JSON_CONDITION};
+        $exceptions = $data->{editrule_form::FORM_JSON_EXCEPTION};
+
+        $array = json_decode($conditions, true);
+        $arraytimer = [];
         if (!empty($array)) {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 $subplugin = notificationsbaseinfo::instance($this, notificationplugin::TYPE_CONDITION, $pluginname);
-                $subplugin->save($action, $idname, $data, $complementary, $students, $timer);
+                $subplugin->save(
+                    $action, $idname, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer,
+                    $students
+                );
+            }
+        }
+
+        $array = json_decode($exceptions, true);
+        if (!empty($array)) {
+            foreach ($array as $idname => $value) {
+                $pluginname = $value["pluginname"];
+                $action = $value["action"];
+                $subplugin = notificationsbaseinfo::instance($this, notificationplugin::TYPE_CONDITION, $pluginname);
+                $subplugin->save($action, $idname, $data, notificationplugin::COMPLEMENTARY_EXCEPTION, $arraytimer, $students);
+            }
+        }
+
+        if (!empty($arraytimer)) {
+            $generictimer = $arraytimer[notificationsagent::GENERIC_USERID]["timer"] ?? null;
+            $genericconditionid = $arraytimer[notificationsagent::GENERIC_USERID]["conditionid"] ?? null;
+            unset($arraytimer[notificationsagent::GENERIC_USERID]);
+            if (count($arraytimer) > 0) {
+                foreach ($arraytimer as $studentid => $value) {
+                    $timer = $generictimer > $value["timer"] ? $generictimer : $value["timer"];
+                    $conditionid = $generictimer > $value["timer"] ? $genericconditionid : $value["conditionid"];
+                    notificationsagent::set_time_trigger(
+                        $this->get_id(), $conditionid, $studentid, $courseid, $timer
+                    );
+                }
+            } else {
+                notificationsagent::set_time_trigger(
+                    $this->get_id(), $genericconditionid, notificationsagent::GENERIC_USERID, $courseid, $generictimer
+                );
             }
         }
     }
@@ -1149,8 +1250,8 @@ class rule {
     /**
      * Save form data related to actions based on the provided JSON configuration.
      *
-     * @param \stdClass $data Form data containing the actions.
-     * @param string    $json JSON-encoded string representing actions configurations.
+     * @param stdClass $data Form data containing the actions.
+     * @param string   $json JSON-encoded string representing actions configurations.
      */
     private function save_form_actions($data, $json) {
         $array = json_decode($json, true);
@@ -1218,7 +1319,7 @@ class rule {
     public function set_default_context($courseid) {
         global $DB;
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->ruleid = $this->get_id();
         $record->contextid = CONTEXT_COURSE;
         $record->objectid = $courseid;
@@ -1261,7 +1362,7 @@ class rule {
         }
         $this->set_runtime(self::get_runtime_database_format($data->runtime_group));
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->id = $this->get_id();
         $record->name = $this->get_name();
         $record->timesfired = $this->get_timesfired();
@@ -1281,12 +1382,12 @@ class rule {
         global $DB;
 
         $fromrule = self::create_instance($id);
-        $request = new \stdClass();
+        $request = new stdClass();
         $request->id = $fromrule->get_id();
         $request->defaultrule = self::TEMPLATE_TYPE;
         $DB->update_record('notificationsagent_rule', $request);
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->title = $fromrule->get_name();
         $record->type = self::TEMPLATE_TYPE;
         $record->courseid = SITEID;
@@ -1313,7 +1414,7 @@ class rule {
             ['ruleid' => $id], '', 'pluginname, type, parameters, complementary'
         );
         foreach ($conditions as $condition) {
-            $data = new \stdClass();
+            $data = new stdClass();
             $data->ruleid = $this->get_id();
             $data->pluginname = $condition->pluginname;
             $data->type = $condition->type;
@@ -1338,7 +1439,7 @@ class rule {
             ['ruleid' => $id], '', 'pluginname, type, parameters'
         );
         foreach ($actions as $action) {
-            $data = new \stdClass();
+            $data = new stdClass();
             $data->ruleid = $this->get_id();
             $data->pluginname = $action->pluginname;
             $data->type = $action->type;
@@ -1354,16 +1455,10 @@ class rule {
      *
      * @return array $data rules
      */
-    private static function get_administrator_rules($courseid) {
-        $data = [];
-        if ($courseid == SITEID) {
-            $siterules = self::get_site_rules();
-            $sharedrules = self::get_shared_rules();
-            $data = array_unique(array_merge($siterules, $sharedrules), SORT_REGULAR);
-        } else {
-            $courserules = self::get_course_rules($courseid);
-            $data = array_unique($courserules, SORT_REGULAR);
-        }
+    private static function get_administrator_rules() {
+        $siterules = self::get_site_rules();
+        $sharedrules = self::get_shared_rules();
+        $data = array_unique([...$siterules, ...$sharedrules], SORT_REGULAR);
 
         return $data;
     }
@@ -1392,7 +1487,7 @@ class rule {
     }
 
     /**
-     * Get the shared rules
+     * Get all shared rules
      *
      * @return array $data rules
      */
@@ -1411,7 +1506,7 @@ class rule {
     }
 
     /**
-     * Get the rules related to a given course
+     * Get all rules related to a given course
      *
      * @param integer $courseid Course id
      *
@@ -1448,28 +1543,80 @@ class rule {
     }
 
     /**
-     * Get the teacher rules
+     * Get the rules forced related to a given course
      *
      * @param integer $courseid Course id
      *
      * @return array $data rules
      */
-    private static function get_teacher_rules($courseid) {
+    private static function get_course_rules_forced($courseid, $forced = 0) {
+        global $DB;
+
         $data = [];
 
-        $data = self::get_course_rules($courseid);
+        $sql = 'SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nctx.contextid = :coursecontextid
+                 WHERE nctx.objectid = :coursecontext
+                   AND nr.forced = :forcedcourse
+                 UNION
+                SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nctx.contextid = :categorycontextid
+                  JOIN {course_categories} cc ON nctx.objectid = cc.id
+                  JOIN {course} c ON cc.id = c.category
+                 WHERE c.id = :categorycontext
+                   AND nr.forced = :forcedcat
+        ';
+
+        $data = $DB->get_records_sql($sql, [
+            'coursecontextid' => CONTEXT_COURSE,
+            'coursecontext' => $courseid,
+            'categorycontextid' => CONTEXT_COURSECAT,
+            'categorycontext' => $courseid,
+            'forcedcourse' => $forced,
+            'forcedcat' => $forced,
+        ]);
 
         return $data;
     }
 
     /**
-     * Get the student rules
+     * Get the teacher rules in index view
      *
      * @param integer $courseid Course id
      *
      * @return array $data rules
      */
-    private static function get_student_rules($courseid) {
+    private static function get_teacher_rules_index($courseid) {
+        $ownerrulesbycourse = self::get_owner_rules_by_course($courseid);
+        $courserulesforced = self::get_course_rules_forced($courseid);//only assign and forced
+        return array_unique([...$ownerrulesbycourse, ...$courserulesforced], SORT_REGULAR);
+    }
+
+    /**
+     * Get the teacher rules in assign view
+     *
+     * @param integer $courseid Course id
+     *
+     * @return array $data rules
+     */
+    private static function get_teacher_rules_assign($courseid) {
+        $ownerrules = self::get_owner_rules();
+        $course_rules = self::get_course_rules_forced($courseid, 1);//only assign, not forced
+        return array_unique([...$ownerrules, ...$course_rules], SORT_REGULAR);
+    }
+
+    /**
+     * Get the owner rules in a course
+     *
+     * @param integer $courseid Course id
+     *
+     * @return array $data rules
+     */
+    private static function get_owner_rules_by_course($courseid) {
         global $DB, $USER;
 
         $data = [];
@@ -1490,6 +1637,29 @@ class rule {
     }
 
     /**
+     * Get all owner rules
+     *
+     * @param integer $courseid Course id
+     *
+     * @return array $data rules
+     */
+    private static function get_owner_rules() {
+        global $DB, $USER;
+
+        $data = [];
+
+        $sql = 'SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                 WHERE nr.createdby = :createdby
+        ';
+        $data = $DB->get_records_sql($sql, [
+            'createdby' => $USER->id,
+        ]);
+
+        return $data;
+    }
+
+    /**
      * Get if the record is of rule or template type
      *
      * @return string $data Rule or template
@@ -1501,8 +1671,8 @@ class rule {
     /**
      * Check if a rule is created from a template based on the course and context
      *
-     * @param int               $courseid The course ID to check the rule against
-     * @param evaluationcontext $context  The context in which to check the capability
+     * @param int     $courseid The course ID to check the rule against
+     * @param context $context  The context in which to check the capability
      *
      * @return bool True if the rule uses a template, False otherwise
      */
@@ -1622,7 +1792,7 @@ class rule {
             $record->timemodified = time();
             $DB->update_record('notificationsagent_launched', $record);
         } else {
-            $record = new \stdClass();
+            $record = new stdClass();
             $record->ruleid = $this->get_id();
             $record->courseid = $context->get_courseid();
             $record->userid = $context->get_userid();
@@ -1652,5 +1822,23 @@ class rule {
         ], 'timesfired');
 
         return $record;
+    }
+
+    /**
+     * Rejects the request to share a rule to all
+     *
+     * @param int $id Rule ID
+     *
+     * @return void
+     */
+    public function reject_share_rule($id) {
+        global $DB;
+
+        $request = new \stdClass();
+
+        $request->id = $id;
+        $request->shared = self::UNSHARED_RULE;
+        $request->defaultrule = self::RULE_TYPE;
+        $DB->update_record('notificationsagent_rule', $request);
     }
 }

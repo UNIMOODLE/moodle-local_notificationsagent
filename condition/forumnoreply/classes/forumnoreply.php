@@ -127,9 +127,9 @@ class forumnoreply extends notificationconditionplugin {
      * UI of subplugin
      *
      * @param \MoodleQuickForm $mform
-     * @param int         $id
-     * @param int         $courseid
-     * @param string      $type
+     * @param int              $id
+     * @param int              $courseid
+     * @param string           $type
      *
      * @return void
      */
@@ -165,7 +165,10 @@ class forumnoreply extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
     /**
@@ -180,12 +183,15 @@ class forumnoreply extends notificationconditionplugin {
     }
 
     /**
-     * Convert parameters for UI
+     * Convert parameters for the notification plugin.
      *
-     * @param int   $id
-     * @param array $params
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
      *
-     * @return array|mixed
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -221,9 +227,8 @@ class forumnoreply extends notificationconditionplugin {
         // Check if activity is found, if is not, return [FFFF].
         $activityname = '[FFFF]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $forum = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $forum->name;
-        }
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $paramstoteplace = [$activityname, to_human_format($jsonparams->{self::UI_TIME}, true)];
 
@@ -253,5 +258,4 @@ class forumnoreply extends notificationconditionplugin {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);
     }
-
 }

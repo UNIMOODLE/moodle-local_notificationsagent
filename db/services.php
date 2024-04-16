@@ -75,4 +75,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/notificationsagent:shareruleall',
     ],
+    'local_notificationsagent_unshare_rule_all' => [
+        'classname' => \local_notificationsagent\external\unshare_rule_all::class,
+        'method' => 'unshare_rule_all',
+        'description' => 'Reject the sharing of a rule',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/notificationsagent:unshareruleall',
+    ],
 ];

@@ -35,6 +35,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Notifications Agent';
+
+$string['admin_breadcrumb'] = 'Notifications Agent Admin';
+$string['course_breadcrumb'] = 'Notifications Agent';
+
 // Settings.
 $string['settings'] = 'Settings';
 $string['disable_user_use'] = 'Disable user use';
@@ -94,10 +98,15 @@ $string['unsharetitle'] = 'Unshare rule {$a->title}';
 $string['unsharecontent'] = 'You are going to stop sharing the rule {$a->title} with the administrator, do you want to continue?';
 $string['shareaccept'] = 'Rule shared';
 $string['unshareaccept'] = 'Rule unshared';
+$string['sharereject'] = 'Rule rejected';
 
 // Share all modal.
 $string['sharealltitle'] = 'Approve the shared rule {$a->title}';
 $string['shareallcontent'] = 'You are going to approve the shared rule {$a->title}, do you want to continue?';
+
+// Unshare all modal.
+$string['unsharealltitle'] = 'Reject the shared rule {$a->title}';
+$string['unshareallcontent'] = 'You are going to reject the shared rule {$a->title}, do you want to continue?';
 
 // Condition plugins.
 $string['condition_days'] = 'Days';
@@ -106,6 +115,7 @@ $string['condition_minutes'] = 'Minutes';
 $string['condition_seconds'] = 'Seconds';
 
 // EditRule.
+$string['editrule_clonerule'] = 'Add rule';
 $string['editrule_newrule'] = 'New rule';
 $string['editrule_reports'] = 'Reports';
 $string['editrule_activaterule'] = 'Activate';
@@ -119,7 +129,8 @@ $string['editrule_type'] = 'Rule type';
 $string['editrule_usetemplate'] = 'Select';
 $string['editrule_sharerule'] = 'Share';
 $string['editrule_unsharerule'] = 'Unshare';
-$string['editrule_shareallrule'] = 'Share All';
+$string['editrule_shareallrule'] = 'Share';
+$string['editrule_unshareallrule'] = 'Unshare';
 $string['editrule_sharedallrule'] = 'Shared';
 $string['editrule_timesfired'] = 'No. of executions';
 $string['editrule_runtime'] = 'Interval';
@@ -218,6 +229,7 @@ $string['notificationsagent:assignrule'] = 'Assign a rule';
 $string['notificationsagent:forcerule'] = 'Force a rule';
 $string['notificationsagent:updateruleshare'] = 'Update the sharing state of a rule';
 $string['notificationsagent:shareruleall'] = 'Approve the sharing of a rule';
+$string['notificationsagent:unshareruleall'] = 'Reject the sharing of a rule';
 $string['notificationsagent:managesiterule'] = 'Manage rules at site level';
 $string['notificationsagent:managecourserule'] = 'Manage rules at course level';
 $string['notificationsagent:manageownrule'] = 'Manage your own course rules';

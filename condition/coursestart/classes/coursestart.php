@@ -37,6 +37,9 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 
+/**
+ * Class representing the coursestart condition plugin.
+ */
 class coursestart extends notificationconditionplugin {
 
     /**
@@ -62,6 +65,11 @@ class coursestart extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
+    /**
+     * Get the subtype of the condition.
+     *
+     * @return string The subtype of the condition.
+     */
     public function get_subtype() {
         return get_string('subtype', 'notificationscondition_coursestart');
     }
@@ -100,32 +108,72 @@ class coursestart extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
-
+    /**
+     * Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context
+     *
+     * @return int|mixed|null
+     */
     public function estimate_next_time(evaluationcontext $context) {
         $timestart = null;
+        $params = json_decode($context->get_params());
+        $courseid = $context->get_courseid();
+        $course = get_course($courseid);
+        $timeaccess = $context->get_timeaccess();
+        // Condition.
         if (!$context->is_complementary()) {
-            $params = json_decode($context->get_params());
-            $courseid = $context->get_courseid();
-            $course = get_course($courseid);
-            $timestart = $course->startdate + $params->{self::UI_TIME};
+            if ($timeaccess <= $course->startdate + $params->{self::UI_TIME} && $timeaccess >= $course->startdate) {
+                $timestart = $course->startdate + $params->{self::UI_TIME};
+            } else {
+                return time();
+            }
+        }
+        // Exception.
+        if (($timeaccess <= $course->startdate + $params->{self::UI_TIME} && $timeaccess >= $course->startdate)
+            && $context->is_complementary()
+        ) {
+            return time();
         }
         return $timestart;
     }
 
+    /**
+     * User interface
+     *
+     * @param \moodleform $mform
+     * @param int         $id
+     * @param int         $courseid
+     * @param string      $type
+     *
+     * @return void
+     */
     public function get_ui($mform, $id, $courseid, $type) {
         $this->get_ui_title($mform, $id, $type);
         $this->get_ui_select_date($mform, $id, $type);
     }
 
+    /**
+     *  Check subplugin capability
+     *
+     * @param $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:coursestart', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -163,6 +211,11 @@ class coursestart extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Wether a subplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
@@ -180,4 +233,17 @@ class coursestart extends notificationconditionplugin {
         $form->set_data($params);
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool|void False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

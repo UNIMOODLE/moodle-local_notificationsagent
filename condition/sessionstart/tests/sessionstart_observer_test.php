@@ -95,24 +95,19 @@ class sessionstart_observer_test extends \advanced_testcase {
     }
 
     /**
+     * Test course view function.
+     *
      * @param $time
+     * @param $firstaccess
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      * @covers       \notificationscondition_sessionstart_observer::course_viewed
      *
      * @dataProvider dataprovider
      */
 
-    public function test_course_viewed($time) {
+    public function test_course_viewed($time, $firstaccess) {
         global $DB, $USER;
-
-        $objdb = new \StdClass();
-        $objdb->userid = self::$user->id;
-        $objdb->courseid = self::$course->id;
-        $objdb->firstaccess = self::USER_FIRSTACCESS;;
-        $DB->insert_record('notificationsagent_crseview', $objdb);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -137,6 +132,12 @@ class sessionstart_observer_test extends \advanced_testcase {
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
+
+        if ($firstaccess) {
+            $setaccess = sessionstart::set_first_course_access(self::$user->id, self::$course->id, self::USER_FIRSTACCESS);
+            $this->assertIsInt($setaccess);
+        }
+
         $event = \core\event\course_viewed::create([
             'context' => \context_course::instance(self::$course->id),
             'userid' => self::$user->id,
@@ -144,29 +145,34 @@ class sessionstart_observer_test extends \advanced_testcase {
         ]);
         $event->trigger();
 
-        sessionstart::set_first_course_access(self::$user->id, self::$course->id, self::USER_FIRSTACCESS);
-
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
-        $this->assertEquals($pluginname, $cache->pluginname);
-        $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::USER_FIRSTACCESS + $time, $cache->timestart);
-        $this->assertEquals(self::$user->id, $cache->userid);
+        if (!$firstaccess) {
+            $this->assertEquals($pluginname, $cache->pluginname);
+            $this->assertEquals(self::$course->id, $cache->courseid);
+            $this->assertEquals(self::$user->id, $cache->userid);
 
-        $this->assertEquals(self::$course->id, $trigger->courseid);
-        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(self::$user->id, $trigger->userid);
+            $this->assertEquals(self::$course->id, $trigger->courseid);
+            $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+            $this->assertEquals(self::$user->id, $trigger->userid);
 
-        $firstacces = sessionstart::get_first_course_access(self::$user->id, self::$course->id);
-        $this->assertEquals(self::USER_FIRSTACCESS, $firstacces);
+            $getaccess = sessionstart::get_first_course_access(self::$user->id, self::$course->id);
+
+            $this->assertEquals($event->timecreated, $getaccess);
+        } else {
+            $this->assertEmpty($cache);
+            $this->assertEmpty($trigger);
+        }
 
     }
 
     public static function dataprovider(): array {
         return [
-            [86400],
-            [86400 * 3],
+            [86400, true],
+            [86400, false],
+            [86400 * 3, false],
+
         ];
     }
 

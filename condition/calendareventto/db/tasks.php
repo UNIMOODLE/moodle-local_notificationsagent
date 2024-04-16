@@ -37,9 +37,9 @@ $tasks = [
     [
         'classname' => 'notificationscondition_calendareventto\task\calendareventto_crontask',
         'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
-        'day' => '*',
+        'minute' => '30',
+        'hour' => '0',
+        'day' => '30',
         'dayofweek' => '*',
         'month' => '*',
     ],

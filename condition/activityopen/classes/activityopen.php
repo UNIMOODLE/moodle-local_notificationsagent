@@ -105,14 +105,26 @@ class activityopen extends notificationconditionplugin {
     /** Estimate next time when this condition will be true. */
     public function estimate_next_time(evaluationcontext $context) {
         // Get activity from context.
+        $timestart = null;
         $params = json_decode($context->get_params());
         $cmid = $params->{self::UI_ACTIVITY};
-        $time = $params->{self::UI_TIME};
-        $starttime = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
-        if ($context->is_complementary()) {
-            return null;
+        $timeaccess = $context->get_timeaccess();
+        $cmstarttime = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timestart;
+        // Condition.
+        if (!$context->is_complementary()) {
+            if ($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime) {
+                $timestart = $cmstarttime + $params->{self::UI_TIME};
+            } else {
+                return time();
+            }
         }
-        return $starttime + $time;
+        // Exception.
+        if (($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime)
+            && $context->is_complementary()
+        ) {
+            return time();
+        }
+        return $timestart;
     }
 
     public function get_ui($mform, $id, $courseid, $type) {
@@ -128,7 +140,7 @@ class activityopen extends notificationconditionplugin {
         if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
-        
+
         asort($listactivities);
 
         $element = $mform->createElement(
@@ -143,17 +155,33 @@ class activityopen extends notificationconditionplugin {
 
         $this->get_ui_select_date($mform, $id, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->addRule($this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required');
+        $mform->addRule(
+            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
+        );
     }
 
+    /**
+     * Sublugin capability
+     *
+     * @param \context $context
+     *
+     * @return bool
+     */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:activityopen', $context);
     }
 
     /**
-     * @param array $params
+     * Convert parameters for the notification plugin.
      *
-     * @return mixed
+     * This method should take an identifier and parameters for a notification
+     * and convert them into a format suitable for use by the plugin.
+     *
+     * @param int   $id     The identifier for the notification.
+     * @param mixed $params The parameters associated with the notification.
+     *
+     * @return mixed The converted parameters.
      */
     protected function convert_parameters($id, $params) {
         $params = (array) $params;
@@ -188,9 +216,8 @@ class activityopen extends notificationconditionplugin {
         // Check if activity is found in course, if is not, return [AAAA].
         $activityname = '[AAAA]';
         $cmid = $jsonparams->{self::UI_ACTIVITY};
-        if ($cmid && $mod = get_fast_modinfo($courseid)->get_cm($cmid)) {
-            $activityname = $mod->name;
-        }
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
@@ -198,6 +225,11 @@ class activityopen extends notificationconditionplugin {
         $content[] = $humanvalue;
     }
 
+    /**
+     * Whether a subluplugin is generic
+     *
+     * @return bool
+     */
     public function is_generic() {
         return true;
     }
@@ -214,5 +246,4 @@ class activityopen extends notificationconditionplugin {
         $params = $this->set_default_select_date($id);
         $form->set_data($params);
     }
-
 }

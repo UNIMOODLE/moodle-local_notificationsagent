@@ -52,6 +52,10 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+
+    /**
+     * @var bootstrapnotifications
+     */
     private static $subplugin;
 
     /**
@@ -92,6 +96,10 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
 
+    /**
+     * Set up the test fixture.
+     * This method is called before a test is executed.
+     */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -111,16 +119,16 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
     }
 
     /**
-     * Test course viewed event
-     *
-     * @param $message
-     * @param $course
-     *
-     * @throws \coding_exception
-     * @covers       notificationsaction_bootstrapnotifications_observer::course_viewed
-     * @covers       \notificationsaction_bootstrapnotifications\bootstrapmessages::define_properties
+     * Test case for the course_viewed observer event.
      *
      * @dataProvider dataprovider
+     *
+     * @param string $message Message to create a bootstrap notification.
+     * @param int    $course  Course ID, SITEID for front page.
+     *
+     * @covers       \notificationsaction_bootstrapnotifications_observer::course_viewed
+     * @covers       \notificationsaction_bootstrapnotifications\bootstrapmessages::get_records
+     *
      */
     public function test_course_viewed($message, $course) {
         global $SESSION;
@@ -156,6 +164,10 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for the test_course_viewed test.
+     *
+     */
     public static function dataprovider(): array {
         return [
             'siteid' => ['{"message":"TEST"}', 1],
