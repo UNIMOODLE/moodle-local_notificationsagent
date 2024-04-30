@@ -38,6 +38,7 @@ use local_notificationsagent\rule;
 use notificationscondition_activitystudentend\activitystudentend;
 
 /**
+ * Class for testing activitystudentend observer
  * @group notificationsagent
  */
 class activitystudentend_observer_test extends \advanced_testcase {
@@ -124,7 +125,7 @@ class activitystudentend_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'activitystudentend';
+        $pluginname = activitystudentend::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;

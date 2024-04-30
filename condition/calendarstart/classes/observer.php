@@ -31,43 +31,68 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\event\calendar_event_deleted;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationsagent;
+use local_notificationsagent\rule;
 use notificationscondition_calendarstart\calendarstart;
 
+/**
+ * Class notificationscondition_calendarstart_observer
+ */
 class notificationscondition_calendarstart_observer {
 
+    /**
+     * Updates the calendar when a calendar event is updated.
+     *
+     * @param \core\event\calendar_event_updated $event The calendar event update event.
+     */
     public static function calendar_updated(\core\event\calendar_event_updated $event) {
+        $pluginname = calendarstart::NAME;
+        $cmid = $event->objectid;
         $courseid = $event->courseid;
 
-        $pluginname = 'calendarstart';
-        $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-
+        $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         foreach ($conditions as $condition) {
-            $conditionid = $condition->id;
-
-            $subplugin = new calendarstart(null, $conditionid);
+            $subplugin = new calendarstart($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($event->timecreated);
             $context->set_courseid($courseid);
 
-            $cache = $subplugin->estimate_next_time($context);
+            notificationsagent::generate_cache_triggers($subplugin, $context);
+        }
+    }
 
-            if (empty($cache)) {
-                continue;
-            }
+    /**
+     * A function to handle the calendar_event_deleted event.
+     *
+     * @param calendar_event_deleted $event The course module event object
+     */
+    public static function calendar_event_deleted(calendar_event_deleted $event) {
+        global $DB;
 
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+        $cmid = $event->objectid;
+
+        //Get rules with conditions with cmid
+        $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid, mnc.pluginname
+                  FROM {notificationsagent_condition} mnc
+                 WHERE mnc.pluginname = :name
+                   AND mnc.cmid = :cmid';
+
+        $dataobj = $DB->get_records_sql($sql, [
+            'name' => calendarstart::NAME,
+            'cmid' => $cmid,
+        ]);
+
+        foreach ($dataobj as $data) {
+            $subplugin = new calendarstart($data->ruleid, $data->id);
+            $result = $subplugin->validation($event->courseid);
+            if (!$result) {
+                update_rule_status::execute(
+                    $data->ruleid, rule::PAUSE_RULE,
                 );
             }
         }

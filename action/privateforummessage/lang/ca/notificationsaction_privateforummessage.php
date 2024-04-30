@@ -40,4 +40,5 @@ $string['editrule_action_element_title'] = 'Títol {$a->typeelement}:';
 $string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Fòrum {$a->typeelement}';
 $string['subtype'] = 'privateforummessage';
-$string['privateforummessage_replyerror'] = 'No es va poder publicar el post probablement pel fet que la condició forumnoreply no es va executar.';
+$string['privateforummessage_replyerror']
+    = 'No es va poder publicar el post probablement pel fet que la condició forumnoreply no es va executar.';

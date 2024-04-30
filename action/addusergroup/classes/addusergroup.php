@@ -54,12 +54,11 @@ class addusergroup extends notificationactionplugin {
      * Get the elements for the addusergroup plugin.
      *
      * @param \moodleform $mform
-     * @param int         $id
      * @param int         $courseid
      * @param int         $type
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         // Groups.
         $groups = groups_get_all_groups($courseid, null, null, 'id, name');
@@ -70,15 +69,15 @@ class addusergroup extends notificationactionplugin {
                 $item->name, true
             );
         }
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $listgroups['0'] = 'GGGG';
         }
 
         asort($listgroups);
 
         $group = $mform->createElement(
-            'select', $this->get_name_ui($id, self::UI_ACTIVITY),
+            'select', $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_action_element_group', 'notificationsaction_addusergroup',
                 ['typeelement' => '[GGGG]']
@@ -89,20 +88,9 @@ class addusergroup extends notificationactionplugin {
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
-    }
-
-    /**
-     * Checks whether a user has the capability to use an action within a given context.
-     *
-     * @param \context $context The context to check the capability in.
-     *
-     * @return bool True if the user has the capability, false otherwise.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationsaction_addusergroup');
     }
 
     /**
@@ -140,14 +128,13 @@ class addusergroup extends notificationactionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $group = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $group = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $this->set_parameters(json_encode([self::UI_ACTIVITY => $group]));
         return $this->get_parameters();
     }
@@ -198,6 +185,46 @@ class addusergroup extends notificationactionplugin {
      */
     public function is_generic() {
         return true;
+    }
+
+    /**
+     * Validates the subplugin
+     * Do not call to parent::validation, not necessary
+     *
+     * @param int        $courseid The ID of the course.
+     * @param array      $array    The array to store validation errors.
+     */
+    public function validation($courseid, &$array = null) {
+        $validation = true;
+
+        $data = json_decode($this->get_parameters(), true);
+
+        if (!groups_group_exists($data[self::UI_ACTIVITY])) {
+            $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string('editrule_required_error', 'local_notificationsagent');
+            return $validation = false;
+        }
+
+        return $validation;
+    }
+
+    /**
+     * Check event observer
+     *
+     * @param array $params
+     *
+     * @return bool
+     */
+    public function check_event_observer($params) {
+        $check = false;
+
+        $groupid = $params[self::UI_ACTIVITY];
+        $data = json_decode($this->get_parameters(), true);
+        $datagroupid = $data[self::UI_ACTIVITY] ?? 0;
+        if ($datagroupid == $groupid) {
+            $check = true;
+        }
+
+        return $check;
     }
 
     /**

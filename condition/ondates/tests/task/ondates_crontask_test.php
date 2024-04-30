@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -24,27 +24,26 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activitysinceend
+ * @package    notificationscondition_ondates
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activitysinceend\task;
+namespace notificationscondition_ondates\task;
 
-use core_analytics\action;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_activitysinceend\activitysinceend;
+use notificationscondition_ondates\ondates;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-require_once(__DIR__ . '/../../../../../../lib/completionlib.php');
 
 /**
  * @group notificationsagent
  */
-class activitysinceend_crontask_test extends \advanced_testcase {
+class ondates_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -85,9 +84,7 @@ class activitysinceend_crontask_test extends \advanced_testcase {
 
     final public function setUp(): void {
         parent::setUp();
-        global $CFG;
         $this->resetAfterTest();
-        $CFG->enablecompletion = COMPLETION_ENABLED;
         $rule = new rule();
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
@@ -95,91 +92,76 @@ class activitysinceend_crontask_test extends \advanced_testcase {
             ([
                 'startdate' => self::COURSE_DATESTART,
                 'enddate' => self::COURSE_DATEEND,
-                'enablecompletion' => true,
             ])
         );
-        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
-     * @covers       \notificationscondition_activitysinceend\task\activitysinceend_crontask::execute
-     * @covers       ::custom_trace
+     * Test execute.
+     *
+     * @covers       \notificationscondition_ondates\task\ondates_crontask::execute
      * @dataProvider dataprovider
      */
-    public function test_execute($time, $date) {
+    public function test_execute($date) {
         global $DB, $USER;
-        \uopz_set_return('time', $time);
-        $pluginname = 'activitysinceend';
-
-        $modinstance = self::getDataGenerator()->create_module('quiz', [
-            'course' => self::$course,
-            'completion' => COMPLETION_TRACKING_AUTOMATIC,
-        ]);
-
-        $cmtestasect = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
-        // print print_r($modinstance, true);
-
+        $pluginname = ondates::NAME;
+        \uopz_set_return('time', $date);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = 2;
+        $USER->id = self::$user->id;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
-        self::setUser(2);
 
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $modinstance->cmid . '"}';
-        $objdb->cmid = $modinstance->cmid;
+        $objdb->parameters = null;
+        $objdb->cmid = 3;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $completion = new \completion_info(self::$course);
-
-        $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
-
-        $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
-        $task->set_timestarted($time);
-        $task->execute();
+        $task = \core\task\manager::get_scheduled_task(ondates_crontask::class);
+        $task->set_timestarted($date);
+        $result = $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
-        $this->assertEquals($pluginname, $cache->pluginname);
-        $this->assertEquals(self::$course->id, $cache->courseid);
-        // $this->assertEquals(time() + $date, $cache->timestart);
-        $this->assertEquals(self::$user->id, $cache->userid);
+        if (!ondates::is_ondates($date)) {
+            $this->assertNull($result);
+        } else {
+            $this->assertEquals(self::$course->id, $trigger->courseid);
+            $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        }
 
-        $this->assertEquals(self::$course->id, $trigger->courseid);
-        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(self::$user->id, $trigger->userid);
         uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {
         return [
-            [1704445200, 86400],
-            [1706173200, 86400 * 3],
+            [1706182049],
+            [1705741200],
+            [1705827600],
         ];
     }
 
     /**
      * Get name test
      *
-     * @covers \notificationscondition_activitysinceend\task\activitysinceend_crontask::get_name
+     * @covers \notificationscondition_ondates\task\ondates_crontask::get_name
      * @return void
      */
     public function test_get_name() {
-        $task = \core\task\manager::get_scheduled_task(activitysinceend_crontask::class);
+        $task = \core\task\manager::get_scheduled_task(ondates_crontask::class);
 
         $this->assertIsString($task->get_name());
 

@@ -70,15 +70,6 @@ class forumnoreply extends notificationconditionplugin {
         return ['[FFFF]', '[TTTT]'];
     }
 
-    /**
-     * Get subplugin subtype
-     *
-     * @return \lang_string|string
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_forumnoreply');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -92,6 +83,8 @@ class forumnoreply extends notificationconditionplugin {
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
         $pluginname = $this->get_subtype();
+        $cmid = json_decode($context->get_params())->{self::UI_ACTIVITY};
+        $timenowandtime = json_decode($context->get_params())->{self::UI_TIME};
 
         $meetcondition = false;
         $conditionid = $this->get_id();
@@ -100,12 +93,18 @@ class forumnoreply extends notificationconditionplugin {
 
         $time = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
-        if (empty ($time)) {
-            return false;
+        if (empty($time)) {
+            return !empty(self::get_unanswered_threads(
+                $cmid,
+                $courseid,
+                $timeaccess,
+                $timenowandtime,
+                $userid
+            ));
         }
 
         ($timeaccess >= $time) ? $meetcondition = true : $meetcondition = false;
@@ -120,21 +119,32 @@ class forumnoreply extends notificationconditionplugin {
      * @return null
      */
     public function estimate_next_time(evaluationcontext $context) {
-        return null;
+        $estimate = null;
+
+        $evaluate = $this->evaluate($context);
+
+        // Condition.
+        if ($evaluate && !$this->get_iscomplementary()) {
+            return time();
+        }
+
+        // Exception.
+        if ($evaluate && $this->get_iscomplementary()) {
+            return time();
+        }
+
+        return $estimate;
     }
 
     /**
-     * UI of subplugin
+     * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform
-     * @param int              $id
-     * @param int              $courseid
-     * @param string           $type
-     *
-     * @return void
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         // ListForums.
         $listforums = get_coursemodules_in_course('forum', $courseid);
@@ -148,14 +158,14 @@ class forumnoreply extends notificationconditionplugin {
             }
         }
 
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $forums['0'] = 'FFFF';
         }
 
         $element = $mform->createElement(
             'select',
-            $this->get_name_ui($id, self::UI_ACTIVITY),
+            $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activitysinceend',
                 ['typeelement' => '[FFFF]']
@@ -163,10 +173,10 @@ class forumnoreply extends notificationconditionplugin {
             $forums
         );
 
-        $this->get_ui_select_date($mform, $id, $type);
+        $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -188,24 +198,24 @@ class forumnoreply extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $activity = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $activity = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
 
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $activity]));
+        $this->set_cmid((int) $activity);
         return $this->get_parameters();
     }
 
@@ -247,15 +257,64 @@ class forumnoreply extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
+    }
+
+    /**
+     * Get unanswered threads in a forum, or by a specific user
+     *
+     * @param int      $cmid           The course module id.
+     * @param int      $courseid       The course id.
+     * @param int      $timenow        The time now.
+     * @param int      $timenowandtime The subplugin time.
+     * @param int|null $userid         The user id.
+     *
+     * @return object Unanswered threads.
+     */
+    public static function get_unanswered_threads($cmid, $courseid, $timenow, $timenowandtime, $userid = null) {
+        global $DB;
+
+        $modinfo = get_fast_modinfo($courseid);
+        $forumid = $modinfo->get_cm($cmid)->instance;
+
+        $whereuser = '';
+        $params = [];
+        if ($userid) {
+            list($useridsql, $params) = $DB->get_in_or_equal($userid, SQL_PARAMS_NAMED);
+            $whereuser = " AND fd.userid {$useridsql}";
+        }
+
+        $params = [
+            'forum' => $forumid,
+            'course' => $courseid,
+            'timestart' => 0,
+            'timeend' => 0,
+            'timenow' => $timenow,
+            'timenow2' => $timenow,
+            'timenowandtime' => $timenowandtime,
+        ] + $params;
+
+        $sql = "SELECT DISTINCT fd.id, fd.timemodified as timemodified, fd.userid
+                    FROM {forum_discussions} fd
+                    JOIN {forum_posts} fp ON fp.discussion=fd.id AND fp.parent = 0
+               LEFT JOIN {forum_posts} fp2 ON fp.id = fp2.parent
+                    WHERE fd.forum = :forum
+                    AND fd.course = :course
+                    AND fd.timestart >= :timestart
+                    AND (fd.timeend = :timeend OR fd.timeend > :timenow)
+                    AND :timenow2 >= fd.timemodified + CAST( :timenowandtime AS INTEGER )
+                    AND fp2.id IS NULL
+                    {$whereuser}
+                ";
+
+        return $DB->get_records_sql($sql, $params);
     }
 }

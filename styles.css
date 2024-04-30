@@ -112,18 +112,23 @@ body.path-local-notificationsagent .badge.badge-status.badge-active{
 }
 
 body.path-local-notificationsagent .badge.badge-status.badge-paused{
+    background-color: #ffff93;
+    color: #7d7d01;
+}
+
+body.path-local-notificationsagent .badge.badge-status.badge-broken{
     background-color: #fff1f0;
     color: #d72112;
 }
 
 body.path-local-notificationsagent .badge.badge-status.badge-required{
-    background-color: #bcc3ff;
-    color: #0009e4;
+    background-color: #f4e4ff;
+    color: #a928ff;
 }
 
 body.path-local-notificationsagent .badge.badge-shared{
-    background-color: #ffff93;
-    color: #7d7d01;
+    background-color: #d8dcfd;
+    color: #0009e4;
     margin-right: 0.5rem;
 }
 

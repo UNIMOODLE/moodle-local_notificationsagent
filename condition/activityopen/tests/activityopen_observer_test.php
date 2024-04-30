@@ -124,7 +124,7 @@ class activityopen_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'activityopen';
+        $pluginname = activityopen::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;

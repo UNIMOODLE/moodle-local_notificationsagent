@@ -40,6 +40,8 @@ require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_forumnoreply\forumnoreply;
+use local_notificationsagent\evaluationcontext;
 
 /**
  *  Scheduled task for forumnoreply subplugin
@@ -61,61 +63,34 @@ class forumnoreply_crontask extends scheduled_task {
      * @throws \moodle_exception
      */
     public function execute() {
-        global $DB;
         custom_mtrace("forumnoreply start");
 
-        $pluginname = 'forumnoreply';
+        $pluginname = forumnoreply::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
-
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
-            $conditionid = $condition->id;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
-            $timenow = $this->get_timestarted();
 
-            $modinfo = get_fast_modinfo($courseid);
-            $foroid = $modinfo->get_cm($param[notificationplugin::UI_ACTIVITY])->instance;
-
-            $sql = "SELECT DISTINCT fd.id, fd.timemodified as timemodified, fd.userid
-                      FROM {forum_discussions} fd
-                      JOIN {forum_posts} fp ON fp.discussion=fd.id AND fp.parent = 0
-                 LEFT JOIN {forum_posts} fp2 ON fp.id = fp2.parent
-                     WHERE fd.forum = :forum
-                       AND fd.course = :course
-                       AND fd.timestart >= :timestart
-                       AND (fd.timeend = :timeend OR fd.timeend > :timenow)
-                       AND :timenow2 >= fd.timemodified + CAST( :timenowandtime AS INTEGER )
-                       AND fp2.id IS NULL
-                 ";
-
-            $threads = $DB->get_records_sql(
-                $sql,
-                [
-                    'forum' => $foroid,
-                    'course' => $courseid,
-                    'timestart' => 0,
-                    'timeend' => 0,
-                    'timenow' => $timenow,
-                    'timenow2' => $timenow,
-                    'timenowandtime' => $param[notificationplugin::UI_TIME],
-                ]
+            $threads = forumnoreply::get_unanswered_threads(
+                $param[notificationplugin::UI_ACTIVITY],
+                $condition->courseid,
+                $this->get_timestarted(),
+                $param[notificationplugin::UI_TIME],
             );
 
             foreach ($threads as $thread) {
-                if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $courseid, $thread->userid
-                    )
-                    && !notificationsagent::is_ruleoff($condition->ruleid, $thread->userid)
-                ) {
-                    notificationsagent::set_timer_cache(
-                        $thread->userid, $courseid, $thread->timemodified + $param[notificationplugin::UI_TIME], $pluginname,
-                        $conditionid
-                    );
-                    notificationsagent::set_time_trigger($condition->ruleid, $conditionid, $thread->userid, $courseid, $timenow);
-                }
+                $subplugin = new forumnoreply($condition->ruleid, $condition->id);
+                $context = new evaluationcontext();
+                $context->set_params($subplugin->get_parameters());
+                $context->set_complementary($subplugin->get_iscomplementary());
+                $context->set_timeaccess($this->get_timestarted());
+                $context->set_courseid($condition->courseid);
+                $context->set_userid($thread->userid);
+
+                notificationsagent::generate_cache_triggers($subplugin, $context);
             }
         }
-        custom_mtrace("forumnoreply end ");
+
+        custom_mtrace("forumnoreply end");
     }
 }

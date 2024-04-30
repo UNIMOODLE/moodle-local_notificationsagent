@@ -74,6 +74,7 @@ $string['heading'] = 'Notifications Agent';
 $string['status_active'] = 'Active';
 $string['status_paused'] = 'Paused';
 $string['status_required'] = 'Required';
+$string['status_broken'] = 'Broken';
 
 // Import Template.
 $string['import'] = 'Import';
@@ -113,6 +114,7 @@ $string['condition_days'] = 'Days';
 $string['condition_hours'] = 'Hours';
 $string['condition_minutes'] = 'Minutes';
 $string['condition_seconds'] = 'Seconds';
+$string['condition_grade'] = 'Grade';
 
 // EditRule.
 $string['editrule_clonerule'] = 'Add rule';
@@ -253,6 +255,7 @@ $string['notificationsagent:forumnoreply'] = 'Capability needed in order to use 
 $string['notificationsagent:numberoftimes'] = 'Capability needed in order to use number of times condition';
 $string['notificationsagent:sessionend'] = 'Capability needed in order to use session end condition';
 $string['notificationsagent:weekend'] = 'Capability needed in order to use weekend condition';
+$string['notificationsagent:itemgraded'] = 'Capability needed in order to use grade item condition';
 
 $string['notificationsagent:addusergroup'] = 'Capability needed in order to use addusergroup action';
 $string['notificationsagent:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
@@ -285,3 +288,6 @@ $string['timestamp'] = 'Date';
 $string['conditions'] = 'Conditions';
 $string['exceptions'] = 'Exceptions';
 $string['actions'] = 'Actions';
+
+// Cache.
+$string['cachedef_launched'] = 'List of users which periodicity has started.';

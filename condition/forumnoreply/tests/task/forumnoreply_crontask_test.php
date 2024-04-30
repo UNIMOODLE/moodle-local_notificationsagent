@@ -36,6 +36,7 @@ namespace notificationscondition_forumnoreply\task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_forumnoreply\forumnoreply;
 use notificationscondition_forumnoreply\task\forumnoreply_crontask;
 
 defined('MOODLE_INTERNAL') || die();
@@ -112,7 +113,7 @@ class forumnoreply_crontask_test extends \advanced_testcase {
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'forumnoreply';
+        $pluginname = forumnoreply::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestfct = $quizgen->create_instance([

@@ -31,35 +31,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activitymodified\activitymodified;
 
+/**
+ * Class activitymodified_observer
+ */
 class notificationscondition_activitymodified_observer {
+    /**
+     * Handles the event when a course module is updated.
+     *
+     * @param \core\event\course_module_updated $event The course module update event.
+     */
     public static function course_module_updated(\core\event\course_module_updated $event) {
         if (has_capability('moodle/course:managefiles', \context_course::instance($event->courseid), $event->userid)) {
-            if (activitymodified::get_any_new_content(
-                $event->objectid,
-                $event->timecreated,
-            )
-            ) {
-                $pluginname = 'activitymodified';
-                $conditions = notificationsagent::get_conditions_by_cm($pluginname, $event->courseid, $event->objectid);
-                foreach ($conditions as $condition) {
-                    notificationsagent::set_timer_cache(
-                        notificationsagent::GENERIC_USERID,
-                        $event->courseid,
-                        $event->timecreated,
-                        $pluginname,
-                        $condition->id
-                    );
-                    notificationsagent::set_time_trigger(
-                        $condition->ruleid,
-                        $condition->id,
-                        notificationsagent::GENERIC_USERID,
-                        $event->courseid,
-                        $event->timecreated
-                    );
-                }
+            $pluginname = activitymodified::NAME;
+            $conditions = notificationsagent::get_conditions_by_cm($pluginname, $event->courseid, $event->objectid);
+            foreach ($conditions as $condition) {
+                $subplugin = new activitymodified($condition->ruleid, $condition->id);
+                $context = new evaluationcontext();
+                $context->set_params($subplugin->get_parameters());
+                $context->set_complementary($subplugin->get_iscomplementary());
+                $context->set_timeaccess($event->timecreated);
+                $context->set_courseid($event->courseid);
+
+                notificationsagent::generate_cache_triggers($subplugin, $context);
             }
         }
     }

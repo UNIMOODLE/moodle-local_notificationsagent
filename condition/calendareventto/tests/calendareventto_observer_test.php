@@ -37,6 +37,7 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
+ * Class for testing the calendareventto observer.
  * @group notificationsagent
  */
 class calendareventto_observer_test extends \advanced_testcase {
@@ -81,6 +82,9 @@ class calendareventto_observer_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
+    /**
+     * Event duration
+     */
     public const DURATION = 30 * 86400;
 
     final public function setUp(): void {
@@ -132,7 +136,7 @@ class calendareventto_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'calendareventto';
+        $pluginname = calendareventto::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -170,6 +174,11 @@ class calendareventto_observer_test extends \advanced_testcase {
         uopz_unset_return('time');
     }
 
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [60 * 60 * 24 * 70],

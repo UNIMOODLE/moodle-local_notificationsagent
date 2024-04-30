@@ -37,6 +37,8 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
+ * Calendar start observer test
+ *
  * @group notificationsagent
  */
 class calendarstart_observer_test extends \advanced_testcase {
@@ -53,6 +55,9 @@ class calendarstart_observer_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $calendarevent;
     /**
      * Date start for the course
@@ -78,6 +83,9 @@ class calendarstart_observer_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
+    /**
+     * Time duration
+     */
     public const DURATION = 30 * 86400;
 
     final public function setUp(): void {
@@ -129,7 +137,7 @@ class calendarstart_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'calendarstart';
+        $pluginname = calendarstart::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -176,6 +184,13 @@ class calendarstart_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generates a data provider for testing the `dataprovider` method.
+     *
+     * @return array An array of arrays, where each inner array contains two elements:
+     *               - The first element is an integer representing the number of seconds.
+     *               - The second element is an integer representing a flag.
+     */
     public static function dataprovider(): array {
         return [
             [86400, 1],

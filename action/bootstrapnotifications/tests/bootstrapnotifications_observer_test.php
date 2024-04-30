@@ -105,7 +105,8 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new bootstrapnotifications(self::$rule);
+        self::$subplugin = new bootstrapnotifications(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );

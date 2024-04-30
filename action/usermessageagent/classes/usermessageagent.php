@@ -54,17 +54,16 @@ class usermessageagent extends notificationactionplugin {
      * Get the elements for the usermessageagent plugin.
      *
      * @param \moodleform $mform
-     * @param int         $id
      * @param int         $courseid
      * @param int         $type
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
         global $USER;
 
         // Title.
         $title = $mform->createElement(
-            'text', $this->get_name_ui($id, self::UI_TITLE),
+            'text', $this->get_name_ui(self::UI_TITLE),
             get_string(
                 'editrule_action_element_title', 'notificationsaction_usermessageagent',
                 ['typeelement' => '[TTTT]']
@@ -78,7 +77,7 @@ class usermessageagent extends notificationactionplugin {
 
         // Message.
         $message = $mform->createElement(
-            'editor', $this->get_name_ui($id, self::UI_MESSAGE),
+            'editor', $this->get_name_ui(self::UI_MESSAGE),
             get_string(
                 'editrule_action_element_message', 'notificationsaction_usermessageagent',
                 ['typeelement' => '[BBBB]']
@@ -107,40 +106,32 @@ class usermessageagent extends notificationactionplugin {
             );
         }
 
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $listusers['0'] = 'UUUU';
         }
 
         asort($listusers);
 
         $user = $mform->createElement(
-            'select', $this->get_name_ui($id, self::UI_USER),
+            'select', $this->get_name_ui(self::UI_USER),
             get_string(
                 'editrule_action_element_user', 'notificationsaction_addusergroup',
                 ['typeelement' => '[UUUU]']
             ),
             $listusers
         );
-        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
+        $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($user, 'new' . $type . '_group');
-        $mform->setType($this->get_name_ui($id, self::UI_TITLE), PARAM_TEXT);
-        $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
-        $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
-        $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->setType($this->get_name_ui(self::UI_TITLE), PARAM_TEXT);
+        $mform->addRule($this->get_name_ui(self::UI_TITLE), null, 'required', null, 'client');
+        $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
+        $mform->addRule($this->get_name_ui(self::UI_MESSAGE), null, 'required', null, 'client');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
-    }
-
-    /** Returns subtype string for building classnames, filenames, modulenames, etc.
-     *
-     * @return string subplugin type. "usermessageagent"
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationsaction_usermessageagent');
     }
 
     /**
@@ -179,16 +170,15 @@ class usermessageagent extends notificationactionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $title = $params[$this->get_name_ui($id, self::UI_TITLE)] ?? 0;
-        $message = $params[$this->get_name_ui($id, self::UI_MESSAGE)] ?? 0;
-        $user = $params[$this->get_name_ui($id, self::UI_USER)] ?? 0;
+        $title = $params[$this->get_name_ui(self::UI_TITLE)] ?? 0;
+        $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
+        $user = $params[$this->get_name_ui(self::UI_USER)] ?? 0;
 
         $this->set_parameters(json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_USER => $user]));
         return $this->get_parameters();

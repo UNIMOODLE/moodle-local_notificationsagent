@@ -35,11 +35,14 @@ namespace notificationscondition_courseend\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_courseend\courseend;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Test class for courseend_crontask
+ *
  * @group notificationsagent
  */
 class courseend_crontask_test extends \advanced_testcase {
@@ -98,13 +101,17 @@ class courseend_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Test function for courseend_crontask
+     *
+     * @param int $date
+     *
      * @covers       \notificationscondition_courseend\task\courseend_crontask::execute
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'courseend';
+        $pluginname = courseend::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestcect = $quizgen->create_instance([
@@ -148,6 +155,12 @@ class courseend_crontask_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generates a data provider for the test method.
+     *
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

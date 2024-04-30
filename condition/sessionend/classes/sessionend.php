@@ -65,15 +65,6 @@ class sessionend extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_sessionend');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -93,7 +84,7 @@ class sessionend extends notificationconditionplugin {
 
         $timend = $DB->get_field(
             'notificationsagent_cache',
-            'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'startdate', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timend)) {
@@ -131,7 +122,7 @@ class sessionend extends notificationconditionplugin {
 
         // The student never has view the course.
         if (empty($lastaccess)) {
-            //Return null as we cannot provide a estimated date.
+            // Return null as we cannot provide a estimated date.
             return null;
         }
         if ($context->is_complementary() && $context->get_timeaccess() >= $lastaccess + $params->{self::UI_TIME}) {
@@ -141,9 +132,16 @@ class sessionend extends notificationconditionplugin {
         return max(time(), $lastaccess + $params->{self::UI_TIME});
     }
 
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
-        $this->get_ui_select_date($mform, $id, $type);
+    /**
+     * Get the UI elements for the subplugin.
+     *
+     * @param \MoodleQuickForm $mform    The MoodleQuickForm object used to generate the UI.
+     * @param int              $courseid The ID of the course.
+     * @param string           $type     The type of the notification plugin.
+     */
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
+        $this->get_ui_select_date($mform, $type);
     }
 
     /**
@@ -163,18 +161,17 @@ class sessionend extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
@@ -214,15 +211,14 @@ class sessionend extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 

@@ -62,40 +62,19 @@ class calendareventto_crontask extends scheduled_task {
     public function execute() {
         custom_mtrace("calendareventto start");
 
-        $pluginname = get_string('subtype', 'notificationscondition_calendareventto');
+        $pluginname = calendareventto::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
-
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
-            $conditionid = $condition->id;
-
-            $subplugin = new calendareventto(null, $conditionid);
+            $subplugin = new calendareventto($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $context->set_courseid($courseid);
-            $cache = $subplugin->estimate_next_time($context);
+            $context->set_courseid($condition->courseid);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-                )
-                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
 
-        custom_mtrace("calendareventto end ");
+        custom_mtrace("calendareventto end");
     }
 }

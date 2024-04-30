@@ -63,15 +63,6 @@ class sessionstart extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_sessionstart');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -91,7 +82,7 @@ class sessionstart extends notificationconditionplugin {
 
         $timestart = $DB->get_field(
             'notificationsagent_cache',
-            'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'startdate', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timestart)) {
@@ -111,18 +102,15 @@ class sessionstart extends notificationconditionplugin {
     }
 
     /**
-     * Get the user interface of the subplugin
+     * Get the UI elements for the subplugin.
      *
-     * @param editrule_form $mform
-     * @param int           $id
-     * @param int           $courseid
-     * @param string        $type
-     *
-     * @return void
+     * @param \MoodleQuickForm $mform    The Moodle quick form object.
+     * @param int              $courseid The ID of the course.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
-        $this->get_ui_select_date($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
+        $this->get_ui_select_date($mform, $type);
     }
 
     /**
@@ -133,14 +121,14 @@ class sessionstart extends notificationconditionplugin {
      * @return mixed Estimated time as a Unix timestamp or null if cannot be estimated.
      */
     public function estimate_next_time(evaluationcontext $context) {
-        // Condition
+        // Condition.
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
         $params = json_decode($context->get_params(), false);
         $firstacces = self::get_first_course_access($userid, $courseid);
         // The student never has view the course.
         if (empty($firstacces)) {
-            //Return null as we cannot provide a estimated date.
+            // Return null as we cannot provide a estimated date.
             return null;
         }
         if ($context->is_complementary() && $context->get_timeaccess() >= $firstacces + $params->{self::UI_TIME}) {
@@ -167,18 +155,17 @@ class sessionstart extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
@@ -218,15 +205,14 @@ class sessionstart extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 
@@ -256,10 +242,10 @@ class sessionstart extends notificationconditionplugin {
     /**
      * Get the first access time for a specific user and course.
      *
-     * @param int $userid   description of user id
-     * @param int $courseid description of course id
+     * @param int $userid   user id
+     * @param int $courseid course id
      *
-     * @return mixed description of the return value
+     * @return mixed  return firstacces to a course
      */
     public static function get_first_course_access($userid, $courseid) {
         global $DB;

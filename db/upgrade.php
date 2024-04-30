@@ -191,5 +191,17 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024020604, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024020606) {
+        // Rename field timestart on table notificationsagent_cache to startdate.
+        $table = new xmldb_table('notificationsagent_cache');
+        $field = new xmldb_field('timestart', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'userid');
+
+        // Launch rename field startdate.
+        $dbman->rename_field($table, $field, 'startdate');
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024020606, 'local', 'notificationsagent');
+    }
+
     return true;
 }

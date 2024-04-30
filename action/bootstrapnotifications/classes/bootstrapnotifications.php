@@ -51,35 +51,26 @@ class bootstrapnotifications extends notificationactionplugin {
      * Get the elements for the bootstrapnotifications plugin.
      *
      * @param \moodleform $mform
-     * @param int         $id
      * @param int         $courseid
      * @param int         $type
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         $element = $mform->createElement(
-            'text', $this->get_name_ui($id, self::UI_MESSAGE),
+            'text', $this->get_name_ui(self::UI_MESSAGE),
             get_string(
                 'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
                 ['typeelement' => '[TTTT]']
             ), ['size' => '64']
         );
 
-        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
+        $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-        $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_TEXT);
+        $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_TEXT);
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
-    }
-
-    /** Returns subtype string for building classnames, filenames, modulenames, etc.
-     *
-     * @return string subplugin type. "bootrstrapnotifications"
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationsaction_bootstrapnotifications');
     }
 
     /**
@@ -117,14 +108,13 @@ class bootstrapnotifications extends notificationactionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $message = $params[$this->get_name_ui($id, self::UI_MESSAGE)] ?? 0;
+        $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
         $this->set_parameters(json_encode([self::UI_MESSAGE => $message]));
         return $this->get_parameters();
     }

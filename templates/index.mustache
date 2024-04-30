@@ -79,7 +79,7 @@
                                     <span class="badge badge-shared"><i class="fa fa-star mr-2"></i><span>{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</span></span>
                                 {{/ isallshared}}
                             {{/ canshare}}
-                            <span class="badge badge-status{{^ forced }} badge-required{{/ forced}}{{# forced }} badge-{{# status }}paused{{/ status }}{{^ status }}active{{/ status }}{{/forced}}"><i class="fa fa-circle mr-2"></i><span>{{{ status_lang }}}</span></span>
+                            <span class="badge badge-status{{^ forced }} badge-required{{/ forced}}{{# forced }} badge-{{^ validation }}broken{{/ validation }} badge-{{# status }}paused{{/ status }}{{^ status }}active{{/ status }}{{/forced}}"><i class="fa fa-circle mr-2"></i><span>{{{ status_lang }}}</span></span>
                         </div>
                     {{/isrule}}
                 </div>

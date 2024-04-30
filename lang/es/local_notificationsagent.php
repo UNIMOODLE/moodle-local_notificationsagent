@@ -74,6 +74,7 @@ $string['heading'] = 'Agente de Notificaciones';
 $string['status_active'] = 'Activa';
 $string['status_paused'] = 'Pausada';
 $string['status_required'] = 'Obligatoria';
+$string['status_broken'] = 'Inválida';
 
 // Import Template.
 $string['import'] = 'Import';
@@ -96,6 +97,7 @@ $string['condition_days'] = 'Días';
 $string['condition_hours'] = 'Horas';
 $string['condition_minutes'] = 'Minutos';
 $string['condition_seconds'] = 'Segundos';
+$string['condition_grade'] = 'Calificación';
 
 // EditRule.
 $string['editrule_clonerule'] = 'Añadir regla';
@@ -116,7 +118,7 @@ $string['editrule_shareallrule'] = 'Compartir';
 $string['editrule_unshareallrule'] = 'Descompartir';
 $string['editrule_sharedallrule'] = 'Compartido';
 $string['editrule_timesfired'] = 'Nº de veces ejecución';
-$string['editrule_runtime'] = 'Periocidad';
+$string['editrule_runtime'] = 'Periodicidad';
 
 // Condition.
 $string['editrule_generalconditions'] = 'Condiciones generales';
@@ -253,6 +255,7 @@ $string['notificationsagent:forumnoreply'] = 'Capacidad necesaria para utilizar 
 $string['notificationsagent:numberoftimes'] = 'Capacidad necesaria para utilizar la condición de número de veces';
 $string['notificationsagent:sessionend'] = 'Capacidad necesaria para utilizar la condición de fin de sesión';
 $string['notificationsagent:weekend'] = 'Capacidad necesaria para utilizar la condición de fin de semana';
+$string['notificationsagent:itemgraded'] = 'Capacidad necesaria para utilizar la condición de elemento de calificación';
 
 $string['notificationsagent:addusergroup'] = 'Capacidad para usar la acción addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacidad para usar la acción bootstrapnotifications';
@@ -285,3 +288,6 @@ $string['timestamp'] = 'Fecha';
 $string['conditions'] = 'Condiciones';
 $string['exceptions'] = 'Excepciones';
 $string['actions'] = 'Acciones';
+
+// Caché.
+$string['cachedef_launched'] = 'Lista de usuarios cuya periodicidad ha comenzado.';

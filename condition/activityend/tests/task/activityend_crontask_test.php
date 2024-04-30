@@ -36,11 +36,13 @@ namespace notificationscondition_activityend\task;
 use local_notificationsagent\rule;
 use notificationscondition_activityavailable\task\activityavailable_crontask;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_activityend\activityend;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Test for activityend_crontask
  * @group notificationsagent
  */
 class activityend_crontask_test extends \advanced_testcase {
@@ -99,13 +101,15 @@ class activityend_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Execute test
+     * @param int $date
      * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'activityend';
+        $pluginname = activityend::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
@@ -149,6 +153,11 @@ class activityend_crontask_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generates data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

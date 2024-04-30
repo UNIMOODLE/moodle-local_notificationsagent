@@ -41,6 +41,8 @@ use local_notificationsagent\rule;
 use notificationscondition_activitynewcontent\activitynewcontent;
 
 /**
+ * Class activitynewcontent_test
+ *
  * @group notificationsagent
  */
 class activitynewcontent_test extends \advanced_testcase {
@@ -49,6 +51,9 @@ class activitynewcontent_test extends \advanced_testcase {
      * @var rule
      */
     private static $rule;
+    /**
+     * @var activitynewcontent
+     */
     private static $subplugin;
     /**
      * @var \stdClass
@@ -95,7 +100,8 @@ class activitynewcontent_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new activitynewcontent(self::$rule);
+        self::$subplugin = new activitynewcontent(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -135,7 +141,7 @@ class activitynewcontent_test extends \advanced_testcase {
             $objdb = new \stdClass();
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
-            $objdb->timestart = $timeaccess;
+            $objdb->startdate = $timeaccess;
             $objdb->pluginname = self::$subtype;
             $objdb->conditionid = self::CONDITIONID;
             // Insert.
@@ -147,6 +153,7 @@ class activitynewcontent_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
 
     }
+
     /**
      * Data provider for test_evaluate()
      */
@@ -266,7 +273,7 @@ class activitynewcontent_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -276,12 +283,11 @@ class activitynewcontent_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uiactivityname = $method->invoke(self::$subplugin, $id, self::$subplugin::MODNAME);
+        $uiactivityname = $method->invoke(self::$subplugin, self::$subplugin::MODNAME);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
@@ -292,13 +298,13 @@ class activitynewcontent_test extends \advanced_testcase {
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::convert_parameters
      */
     public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_activitynewcontent_modname" => "quiz",
+            $id . "_activitynewcontent_modname" => "quiz",
         ];
         $expected = '{"modname":"quiz"}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
 }
-

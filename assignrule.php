@@ -73,7 +73,6 @@ function get_list_assigned_context($idrule) {
  * @param array $courses
  *
  * @return void
- * @throws dml_exception
  */
 function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     global $DB;

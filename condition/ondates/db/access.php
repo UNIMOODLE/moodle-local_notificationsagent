@@ -13,9 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -24,17 +21,31 @@
 /**
  * Version details
  *
- * @package    notificationscondition_forumnoreply
+ * @package    notificationscondition_ondates
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Events related to creating and updating a course.
-// Used for updating temporary triggers in case of configuration changes in a course.
+/**
+ * local_notificationsagent capabilities definitions.
+ *
+ * @package    notificationscondition_ondates
+ * @copyright  2023 ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
-$observers[] = [
-    'eventname' => 'mod_forum\event\post_created',
-    'callback' => 'notificationscondition_forumnoreply_observer::post_created',
+
+$capabilities = [
+    'local/notificationsagent:ondates' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+        ],
+    ],
 ];

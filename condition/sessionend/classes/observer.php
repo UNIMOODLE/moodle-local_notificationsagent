@@ -28,14 +28,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_sessionend\sessionend;
 use local_notificationsagent\evaluationcontext;
 
+/**
+ * Class representing the sessionend condition plugin.
+ */
 class notificationscondition_sessionend_observer {
 
+
     /**
+     * Called when a course is viewed.
+     *
+     * @param \core\event\course_viewed $event The course_viewed event object
      * @throws \dml_exception
      */
     public static function course_viewed(\core\event\course_viewed $event) {
@@ -47,32 +53,18 @@ class notificationscondition_sessionend_observer {
         $courseid = $event->courseid;
         $timeaccess = $event->timecreated;
 
-        $pluginname = 'sessionend';
-
+        $pluginname = sessionend::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-
         foreach ($conditions as $condition) {
-            $conditionid = $condition->id;
-            $subplugin = new sessionend(null, $conditionid);
+            $subplugin = new sessionend($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($timeaccess);
             $context->set_courseid($courseid);
             $context->set_userid($userid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid
-            )
-            ) {
-                notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $conditionid);
-                notificationsagent::set_time_trigger($condition->ruleid, $conditionid, $userid, $courseid, $cache);
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }

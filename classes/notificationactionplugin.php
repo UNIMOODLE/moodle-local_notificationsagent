@@ -33,8 +33,8 @@
 
 namespace local_notificationsagent;
 
+use local_notificationsagent\form\editrule_form;
 use moodle_exception;
-use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 
@@ -45,6 +45,29 @@ use local_notificationsagent\notificationplugin;
  * plugins should inherit and implement according to their specific needs.
  */
 abstract class notificationactionplugin extends notificationplugin {
+
+    /**
+     * Constructor for the class.
+     *
+     * @param int|stdClass $rule object from DB table 'notificationsagent_rule' or just a rule id
+     * @param int        $id       If is numeric => value is already in DB
+     *
+     */
+    public function __construct($rule, $id = null) {
+        parent::__construct($rule, $id);
+
+        if (is_numeric($id)) {
+            global $DB;
+            if ($subplugin = $DB->get_record('notificationsagent_action', ['id' => $id])) {
+                $this->set_id($subplugin->id);
+                $this->set_pluginname($subplugin->pluginname);
+                $this->set_ruleid($subplugin->ruleid);
+                $this->set_type($subplugin->type);
+                $this->set_parameters($subplugin->parameters);
+            }
+        }
+
+    }
 
     /**
      * Get the title of the notification action plugin.
@@ -69,12 +92,6 @@ abstract class notificationactionplugin extends notificationplugin {
         return parent::TYPE_ACTION;
     }
 
-    /** Returns subtype string for building classnames, filenames, modulenames, etc.
-     *
-     * @return string subplugin type. "messageagent"
-     */
-    abstract public function get_subtype();
-
     /**
      * Checks whether a user has the capability to use an action within a given context.
      *
@@ -87,11 +104,12 @@ abstract class notificationactionplugin extends notificationplugin {
     /**
      * Generate placeholders for the given form and insert them before a specific group.
      *
-     * @param mixed  $mform the moodle form object
-     * @param string $id    the id of the form
-     * @param string $type  the type of the form
+     * @param \moodleform $mform the moodle form object
+     * @param string      $type  the type of the form
+     * @param bool        $showuserplaceholders
      */
-    public function placeholders($mform, $id, $type, $showuserplaceholders) {
+    public function placeholders($mform, $type, $showuserplaceholders) {
+        $id = $this->get_id();
         $placeholders = \html_writer::start_tag(
             'div', ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
         );
@@ -119,48 +137,6 @@ abstract class notificationactionplugin extends notificationplugin {
         $group = $mform->createElement('html', $placeholders);
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
-    }
-
-    /**
-     * Create subplugins from records.
-     *
-     * @param array $records The records to create subplugins from.
-     *
-     * @return array The array of created subplugins.
-     */
-    public static function create_subplugins($records) {
-        $subplugins = [];
-        global $DB;
-        foreach ($records as $record) {
-            $rule = $DB->get_record('notificationsagent_rule', ['id' => $record->ruleid]);
-            $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
-            if (!empty($subplugin)) {
-                $subplugin->set_pluginname($record->pluginname);
-                $subplugin->set_id($record->id);
-                $subplugin->set_parameters($record->parameters);
-                $subplugin->set_type($record->type);
-                $subplugin->set_ruleid($record->ruleid);
-
-                $subplugins[$record->id] = $subplugin;
-            }
-        }
-        return $subplugins;
-    }
-
-    /**
-     * Create a subplugin.
-     *
-     * @param int $id id of action
-     *
-     * @return mixed
-     * @throws \dml_exception
-     */
-    public static function create_subplugin($id) {
-        global $DB;
-        // Find type of subplugin.
-        $record = $DB->get_record('notificationsagent_action', ['id' => $id]);
-        $subplugins = self::create_subplugins([$record]);
-        return $subplugins[$id];
     }
 
     /**
@@ -211,20 +187,20 @@ abstract class notificationactionplugin extends notificationplugin {
      * Save data to the database.
      *
      * @param string $action
-     * @param string $idname The name ID.
-     * @param mixed  $data   The data to be saved.
+     * @param mixed  $data The data to be saved.
      *
      * @return void
-     * @throws moodle_exception errorinserting_notificationsagent_action description of exception
      */
-    public function save($action, $idname, $data) {
+    public function save($action, $data) {
         $dataplugin = new \stdClass();
-        $dataplugin->ruleid = $this->rule->get_id();
+        $dataplugin->ruleid = $this->rule->id;
         $dataplugin->pluginname = get_called_class()::NAME;
         $dataplugin->type = $this->get_type();
-        $dataplugin->parameters = $this->convert_parameters($idname, $data);
+        if ($action == editrule_form::FORM_JSON_ACTION_INSERT || $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
+            $dataplugin->parameters = $this->convert_parameters($data);
+        }
 
-        parent::insert_update_delete($action, $idname, $dataplugin);
+        parent::insert_update_delete($action, $dataplugin);
     }
 
     /**
@@ -249,6 +225,17 @@ abstract class notificationactionplugin extends notificationplugin {
         require_once($CFG->dirroot . '/mod/forum/lib.php');
 
         return (forum_get_course_forum($course, 'news'))->id;
+    }
+
+    /**
+     * Check event observer
+     *
+     * @param array $params
+     *
+     * @return bool
+     */
+    public function check_event_observer($params) {
+        return false;
     }
 
     /**

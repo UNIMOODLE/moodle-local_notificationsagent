@@ -41,6 +41,8 @@ use local_notificationsagent\rule;
 use notificationscondition_activitysinceend\activitysinceend;
 
 /**
+ * Class activitysinceend_test
+ *
  * @group notificationsagent
  */
 class activitysinceend_test extends \advanced_testcase {
@@ -106,6 +108,9 @@ class activitysinceend_test extends \advanced_testcase {
      * Activity date end
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
+    /**
+     * User activity end time
+     */
     public const USER_ACTIVITY_END = 1704445200; // 05/01/2024.
 
     /**
@@ -116,7 +121,8 @@ class activitysinceend_test extends \advanced_testcase {
         $this->resetAfterTest();
         self::$rule = new rule();
 
-        self::$subplugin = new activitysinceend(self::$rule);
+        self::$subplugin = new activitysinceend(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND, 'enablecompletion' => true]
         );
@@ -144,7 +150,9 @@ class activitysinceend_test extends \advanced_testcase {
      * Test evaluate.
      *
      * @param int    $timeaccess
+     * @param bool   $usecache
      * @param string $param
+     * @param bool   $complementary
      * @param bool   $expected
      *
      * @covers       \notificationscondition_activitysinceend\activitysinceend::evaluate
@@ -174,7 +182,7 @@ class activitysinceend_test extends \advanced_testcase {
             $objdb = new \stdClass();
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
-            $objdb->timestart = self::USER_ACTIVITY_END + $params['time'];
+            $objdb->startdate = self::USER_ACTIVITY_END + $params['time'];
             $objdb->pluginname = self::$subtype;
             $objdb->conditionid = self::CONDITIONID;
             // Insert.
@@ -186,6 +194,7 @@ class activitysinceend_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
         // Test estimate next time.
     }
+
     /**
      * Data provider for test_evaluate.
      */
@@ -240,6 +249,11 @@ class activitysinceend_test extends \advanced_testcase {
     /**
      * Test estimate next time.
      *
+     * @param int    $timeaccess
+     * @param string $param
+     * @param bool   $complementary
+     * @param bool   $completion
+     *
      * @covers       \notificationscondition_activitysinceend\activitysinceend::estimate_next_time
      * @dataProvider dataestimate
      */
@@ -280,6 +294,7 @@ class activitysinceend_test extends \advanced_testcase {
         }
         uopz_unset_return('time');
     }
+
     /**
      * Data provider for test_estimatenexttime.
      */
@@ -327,16 +342,17 @@ class activitysinceend_test extends \advanced_testcase {
      * @covers \notificationscondition_activitysinceend\activitysinceend::convert_parameters
      */
     public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_activitysinceend_days" => "1",
-            "5_activitysinceend_hours" => "0",
-            "5_activitysinceend_minutes" => "0",
-            "5_activitysinceend_seconds" => "1",
-            "5_activitysinceend_cmid" => "7",
+            $id . "_activitysinceend_days" => "1",
+            $id . "_activitysinceend_hours" => "0",
+            $id . "_activitysinceend_minutes" => "0",
+            $id . "_activitysinceend_seconds" => "1",
+            $id . "_activitysinceend_cmid" => "7",
         ];
         $expected = '{"time":86401,"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
 
@@ -371,7 +387,7 @@ class activitysinceend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -381,21 +397,20 @@ class activitysinceend_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uiactivityname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_ACTIVITY);
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uiactivityname = $method->invoke(self::$subplugin, self::$subplugin::UI_ACTIVITY);
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $uigroupelements = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $uigroupelements[] = $element->getName();
         }
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
         $this->assertTrue($mform->elementExists($uigroupname));
@@ -414,7 +429,7 @@ class activitysinceend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -429,19 +444,20 @@ class activitysinceend_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $jsoncondition = $mform->getElementValue(editrule_form::FORM_JSON_CONDITION);
         $arraycondition = array_keys(json_decode($jsoncondition, true));
-        $id = $arraycondition[0];
+        $id = $arraycondition[0];// Temp value.
+        self::$subplugin->set_id($id);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $defaulttime = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $defaulttime[$element->getName()] = $element->getValue();
         }
 
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);

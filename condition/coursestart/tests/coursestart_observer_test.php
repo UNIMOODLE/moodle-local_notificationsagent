@@ -37,6 +37,7 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
+ * Course start observer test.
  * @group notificationsagent
  */
 class coursestart_observer_test extends \advanced_testcase {
@@ -118,7 +119,7 @@ class coursestart_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'coursestart';
+        $pluginname = coursestart::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -147,6 +148,11 @@ class coursestart_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

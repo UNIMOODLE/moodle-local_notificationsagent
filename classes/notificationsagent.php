@@ -46,6 +46,8 @@ class notificationsagent {
     private const CONDITION_AVAILABILITY = 'ac';
     /** @var int Default CMID for news type forum */
     public const FORUM_NEWS_CMID = -1;
+    /** @var int Default USERID for grading course item */
+    public const USERID_COURSEITEM = 0;
 
     /**
      * Get the current conditions by plugin and course id
@@ -380,108 +382,151 @@ class notificationsagent {
     /**
      * Set timer cache in the notifications agent cache table.
      *
-     * @param int    $userid             The user ID.
-     * @param int    $courseid           The course ID.
-     * @param int    $timer              The timer value.
-     * @param string $pluginname         The name of the plugin.
-     * @param int    $conditionid        The condition ID.
-     * @param bool   $updatecacheifexist Whether to update the cache if it already exists.
      *
      * @return int|null The ID of the inserted or updated record, or null if no action was taken.
      */
-    public static function set_timer_cache($userid, $courseid, $timer, $pluginname, $conditionid) {
+    public static function set_timer_cache($deletedata, $insertdata) {
         global $DB;
-        $exists = $DB->get_field(
-            'notificationsagent_cache', 'id',
-            [
-                'userid' => $userid,
-                'courseid' => $courseid,
-                'pluginname' => $pluginname,
-                'conditionid' => $conditionid,
-            ]
-        );
-        $objdb = new \stdClass();
-        $objdb->userid = $userid;
-        $objdb->courseid = $courseid;
-        $objdb->timestart = $timer;
-        $objdb->pluginname = $pluginname;
-        $objdb->conditionid = $conditionid;
-        // Insert.
-        if (!$exists) {
-            return $DB->insert_record('notificationsagent_cache', $objdb);
+        if (!empty($deletedata)) {
+            $todelete = implode(' OR ', $deletedata);
+            $DB->delete_records_select('notificationsagent_cache', $todelete);
         }
-        // Update.
-        $objdb->id = $exists;
-        return $DB->update_record('notificationsagent_cache', $objdb);
-
+        if (!empty($insertdata)) {
+            $DB->insert_records('notificationsagent_cache', $insertdata);
+        }
     }
 
     /**
      * Set a time trigger for a specific rule, condition, user, and course.
      *
-     * @param int $ruleid      Rule id
-     * @param int $conditionid Condition id
-     * @param int $userid      User id
-     * @param int $courseid    Course id
-     * @param int $timer       Timer
-     * @param int $ruleoff     Is ruleoff
      */
-    public static function set_time_trigger($ruleid, $conditionid, $userid, $courseid, $timer, $ruleoff = null) {
+    public static function set_time_trigger($deletedata, $insertdata) {
         global $DB;
-        $exists = $DB->get_record(
-            'notificationsagent_triggers',
-            [
-                'ruleid' => $ruleid,
-                'userid' => $userid,
-                'courseid' => $courseid,
-            ],
-            'id, startdate'
-        );
 
-        $objdb = new \stdClass();
-        $objdb->userid = $userid;
-        $objdb->courseid = $courseid;
-        $objdb->ruleid = $ruleid;
-        $objdb->conditionid = $conditionid;
-        $objdb->ruleoff = $ruleoff;
-        $objdb->startdate = $timer;
-        if (!$exists) {
-            $DB->insert_record('notificationsagent_triggers', $objdb);
-        } else {
-            $objdb->id = $exists->id;
-            $DB->update_record('notificationsagent_triggers', $objdb);
+        if (!empty($deletedata)) {
+            $todelete = implode(' OR ', $deletedata);
+            $DB->delete_records_select('notificationsagent_triggers', $todelete);
+        }
+        if (!empty($insertdata)) {
+            $DB->insert_records('notificationsagent_triggers', $insertdata);
         }
     }
 
-    /**
-     * Delete all cache records by rule ID
-     *
-     * @param int $id rule ID
-     *
-     * @return void
-     */
-    public static function delete_cache_by_ruleid($id) {
-        global $DB;
-
-        $conditions = $DB->get_records('notificationsagent_condition', ['ruleid' => $id], 'id');
-        if (!empty($conditions)) {
-            $conditionsid = array_keys($conditions);
-            list($insql, $inparams) = $DB->get_in_or_equal($conditionsid);
-            $DB->delete_records_select('notificationsagent_cache', "conditionid $insql", $inparams);
+    public static function generate_cache_triggers($subplugin, $context) {
+        $insertdata = [];
+        $deletedata = [];
+        $courseid = $context->get_courseid();
+        $coursecontext = \context_course::instance($courseid);
+        $contextuser = $context->get_userid();  // 0 or userid>0
+        $student = $subplugin->rule->createdby;
+        // Avoid to set triggers for event or cron triggered by users who don't own the rule.
+        if ($contextuser > 0 && $contextuser != $student
+            && !has_capability(
+                'local/notificationsagent:managecourserule',
+                $coursecontext, $student
+            )
+        ) {
+            return;
         }
-    }
+        // Student or user is from event or cron per user
+        if ($contextuser > 0 && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $student)) {
+            $userid = $student;
+            $userslimit = rule::get_limit_reached_by_users(
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                [$userid]
+            );
+            if (!$userslimit[$userid]
+                && !self::is_ruleoff($subplugin->rule->id, $userid)
+            ) {
+                $context->set_userid($userid);
+                $cache = $subplugin->estimate_next_time($context);
 
-    /**
-     * Delete all trigger records by rule ID
-     *
-     * @param int $id rule ID
-     *
-     * @return void
-     */
-    public static function delete_triggers_by_ruleid($id) {
-        global $DB;
+                $deletedata[]
+                    = "(userid =  $userid  AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
 
-        $DB->delete_records('notificationsagent_triggers', ['ruleid' => $id]);
+                if (!empty($cache)) {
+                    $insertdata[] = [
+                        'userid' => $userid,
+                        'courseid' => $courseid,
+                        'startdate' => $cache,
+                        'pluginname' => $subplugin->get_subtype(),
+                        'conditionid' => $subplugin->get_id(),
+                        'ruleid' => $subplugin->rule->id,
+                    ];
+                }
+            }
+            self::set_timer_cache($deletedata, $insertdata);
+            self::set_time_trigger($deletedata, $insertdata);
+            return;
+        }
+        if (!$subplugin->is_generic()) {
+            $users = self::get_usersbycourse($coursecontext);
+            $userslimit = rule::get_limit_reached_by_users(
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                array_column($users, 'id')
+            );
+
+            foreach ($users as $user) {
+                if (
+                    !$userslimit[$user->id]
+                    && !self::is_ruleoff($subplugin->rule->id, $user->id)
+                ) {
+                    $context->set_userid($user->id);
+                    $cache = $subplugin->estimate_next_time($context);
+
+                    $deletedata[]
+                        = "(userid = $user->id AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
+                    if (empty($cache)) {
+                        continue;
+                    }
+                    $insertdata[] = [
+                        'userid' => $user->id,
+                        'courseid' => $courseid,
+                        'startdate' => $cache,
+                        'pluginname' => $subplugin->get_subtype(),
+                        'conditionid' => $subplugin->get_id(),
+                        'ruleid' => $subplugin->rule->id,
+                    ];
+                }
+            }
+        }
+
+        if ($subplugin->is_generic()) {
+            $userid = self::GENERIC_USERID;
+            $userslimit = rule::get_limit_reached_by_users(
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                [$userid]
+            );
+
+            if (!$userslimit[$userid]
+                && !self::is_ruleoff($subplugin->rule->id, $userid)
+            ) {
+                $context->set_userid($userid);
+                $cache = $subplugin->estimate_next_time($context);
+
+                $deletedata[]
+                    = "(userid =  $userid  AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
+
+                if (!empty($cache)) {
+                    $insertdata[] = [
+                        'userid' => $userid,
+                        'courseid' => $courseid,
+                        'startdate' => $cache,
+                        'pluginname' => $subplugin->get_subtype(),
+                        'conditionid' => $subplugin->get_id(),
+                        'ruleid' => $subplugin->rule->id,
+                    ];
+                }
+            }
+        }
+        self::set_timer_cache($deletedata, $insertdata);
+        self::set_time_trigger($deletedata, $insertdata);
     }
 
     /**
@@ -522,7 +567,7 @@ class notificationsagent {
                 !empty($datatables[3]) ? $joinarray[] = $datatables[3] . " AS timeend " : '';
 
                 $joinarray = implode(',', $joinarray);
-                $dates = "SELECT " . $joinarray . " 
+                $dates = "SELECT " . $joinarray . "
                             FROM {" . $table . "}
                            WHERE id = :instance";
 
@@ -545,33 +590,6 @@ class notificationsagent {
         }
 
         return $dates;
-    }
-
-    /**
-     * Check if the rule has been launched the maximum number of times given a user and course.
-     *
-     * @param integer $ruleid         Rule id
-     * @param integer $ruletimesfired Number of times a rule can be launched
-     * @param integer $courseid       Course id
-     * @param integer $userid         User id
-     *
-     * @return bool $waslaunched Has the rule been launched the max. number of times by user?
-     */
-    public static function was_launched_indicated_times($ruleid, $ruletimesfired, $courseid, $userid) {
-        global $DB;
-
-        $waslaunched = false;
-
-        $timesfired = $DB->get_field('notificationsagent_launched', 'timesfired', [
-            'ruleid' => $ruleid, 'courseid' => $courseid,
-            'userid' => $userid,
-        ]);
-
-        if (isset($timesfired) && $timesfired >= $ruletimesfired) {
-            $waslaunched = true;
-        }
-
-        return $waslaunched;
     }
 
     /**
@@ -627,25 +645,23 @@ class notificationsagent {
     /**
      * Get supported course modules .
      *
-     * @param int $cmid The course module ID
+     * @param int $cmid     The course module ID
+     * @param int $courseid The course ID
      *
      * @return bool Whether the module is supported
      */
-    public static function supported_cm($cmid) {
-        global $DB;
+    public static function supported_cm($cmid, $courseid) {
         $supported = false;
 
-        $supportedcm = "
-                    SELECT mcm.id,mm.name
-                      FROM {course_modules} mcm
-                      JOIN {modules} mm ON mm.id = mcm.module
-                     WHERE mcm.id = :cmid";
+        $fastmodinfo = get_fast_modinfo($courseid);
+        $checkcm = $fastmodinfo->cms[$cmid] ?? null;
 
-        if ($modtype = $DB->get_record_sql($supportedcm, ['cmid' => $cmid])) {
+        if ($checkcm) {
+            $modname = $checkcm->modname;
             $config = get_config('local_notificationsagent', 'startdate');
             $array = explode("\n", $config);
 
-            foreach (preg_grep('/\b' . $modtype->name . '\b/i', $array) as $value) {
+            foreach (preg_grep('/\b' . $modname . '\b/i', $array) as $value) {
                 $supported = true;
             }
         }
@@ -653,4 +669,51 @@ class notificationsagent {
         return $supported;
     }
 
+    /**
+     * Deletes cache records for a given user and a list of condition IDs.
+     *
+     * @param array $conditionids An array of condition IDs to delete.
+     * @param int   $userid       The user ID whose cache records to delete.
+     *
+     * @return void
+     */
+    public static function cache_bulk_delete_conditions_by_userid($conditionids, $userid) {
+        global $DB;
+
+        list($conditionsql, $params) = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
+        $params = ['userid' => $userid] + $params;
+
+        $DB->delete_records_select(
+            'notificationsagent_cache',
+            "userid = :userid AND conditionid {$conditionsql}", $params
+        );
+    }
+
+    /**
+     * Evaluate the result of an expression based on the given operator.
+     *
+     * @param string $operator The operator to be used in the expression.
+     * @param float  $a        The first operand in the expression.
+     * @param float  $b        The second operand in the expression.
+     *
+     * @return  bool           The result of the evaluation.
+     */
+    public static function evaluate_expression($operator, $a, $b) {
+        switch ($operator) {
+            case '=':
+                return $a == $b;
+            case '!=':
+                return $a != $b;
+            case '>':
+                return $a > $b;
+            case '<':
+                return $a < $b;
+            case '>=':
+                return $a >= $b;
+            case '<=':
+                return $a <= $b;
+            default:
+                return false;
+        }
+    }
 }

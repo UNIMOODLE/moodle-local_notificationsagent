@@ -102,7 +102,8 @@ class forummessage_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new forummessage(self::$rule);
+        self::$subplugin = new forummessage(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -215,14 +216,15 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::convert_parameters
      */
-    public function test_convert_parameters() {
+    public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_forummessage_title" => "Test title", "5_forummessage_message" => ['text' => "Message body"],
-            "5_forummessage_cmid" => "5",
+            $id . "_forummessage_title" => "Test title", $id . "_forummessage_message" => ['text' => "Message body"],
+            $id . "_forummessage_cmid" => "5",
         ];
         $expected = '{"title":"Test title","message":{"text":"Message body"},"cmid":"5"}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
 
@@ -235,7 +237,7 @@ class forummessage_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -245,14 +247,13 @@ class forummessage_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uititlename = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_TITLE);
-        $uiamessagename = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MESSAGE);
-        $uiactivityname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_ACTIVITY);
+        $uititlename = $method->invoke(self::$subplugin, self::$subplugin::UI_TITLE);
+        $uiamessagename = $method->invoke(self::$subplugin, self::$subplugin::UI_MESSAGE);
+        $uiactivityname = $method->invoke(self::$subplugin, self::$subplugin::UI_ACTIVITY);
 
         $this->assertTrue($mform->elementExists($uititlename));
         $this->assertTrue($mform->elementExists($uiamessagename));

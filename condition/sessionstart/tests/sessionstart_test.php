@@ -105,7 +105,8 @@ class sessionstart_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new sessionstart(self::$rule);
+        self::$subplugin = new sessionstart(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -121,20 +122,17 @@ class sessionstart_test extends \advanced_testcase {
     }
 
     /**
-     * Test sessionstart evaluate
+     * Test the evaluate function.
      *
-     * @param int    $timeaccess
-     * @param        $usecache
-     * @param        $usefirstaccess
-     * @param string $param
-     * @param        $complementary
-     * @param bool   $expected
-     *
-     * @covers       \notificationscondition_sessionstart\sessionstart::evaluate
-     * @covers       \notificationscondition_sessionstart\sessionstart::set_first_course_access
-     * @covers       \notificationscondition_sessionstart\sessionstart::get_first_course_access
+     * @param int    $timeaccess     The time access value.
+     * @param bool   $usecache       Whether to use cache or not.
+     * @param bool   $usefirstaccess Whether to use first access or not.
+     * @param string $param          The parameter value.
+     * @param int    $complementary  The complementary value.
+     * @param bool   $expected       The expected result.
      *
      * @dataProvider dataprovider
+     * @covers       \notificationscondition_sessionstart\sessionstart::evaluate
      */
     public function test_evaluate($timeaccess, $usecache, $usefirstaccess, $param, $complementary, $expected) {
         global $DB;
@@ -148,7 +146,7 @@ class sessionstart_test extends \advanced_testcase {
             $objdb = new \stdClass();
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
-            $objdb->timestart = self::USER_FIRSTACCESS + $params['time'];
+            $objdb->startdate = self::USER_FIRSTACCESS + $params['time'];
             $objdb->pluginname = self::$subtype;
             $objdb->conditionid = self::CONDITIONID;
             // Insert.
@@ -308,15 +306,16 @@ class sessionstart_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\sessionstart::convert_parameters
      */
     public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_sessionstart_days" => "1",
-            "5_sessionstart_hours" => "0",
-            "5_sessionstart_minutes" => "0",
-            "5_sessionstart_seconds" => "1",
+            $id . "_sessionstart_days" => "1",
+            $id . "_sessionstart_hours" => "0",
+            $id . "_sessionstart_minutes" => "0",
+            $id . "_sessionstart_seconds" => "1",
         ];
         $expected = '{"time":86401}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
 
     }
@@ -346,7 +345,7 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -356,20 +355,19 @@ class sessionstart_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $uigroupelements = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $uigroupelements[] = $element->getName();
         }
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uigroupname));
         $this->assertTrue(in_array($uidays, $uigroupelements));
@@ -387,7 +385,7 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -402,19 +400,20 @@ class sessionstart_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $jsoncondition = $mform->getElementValue(editrule_form::FORM_JSON_CONDITION);
         $arraycondition = array_keys(json_decode($jsoncondition, true));
-        $id = $arraycondition[0];
+        $id = $arraycondition[0];// Temp value.
+        self::$subplugin->set_id($id);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $defaulttime = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $defaulttime[$element->getName()] = $element->getValue();
         }
 
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);

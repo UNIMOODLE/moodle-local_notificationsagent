@@ -48,25 +48,6 @@ class notificationsbaseinfo extends base {
     private static $plugins = [];
 
     /**
-     * Create a new instance of a specific plugin based on the given rule, subtype, and plugin name.
-     *
-     * @param rule   $rule       description of the rule parameter
-     * @param string $subtype    description of the subtype parameter
-     * @param string $pluginname description of the pluginname parameter
-     *
-     * @return mixed|void
-     */
-    public static function instance($rule, $subtype, $pluginname) {
-        $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION
-            : notificationplugin::TYPE_CONDITION);
-        $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
-        if (class_exists($pluginclass)) {
-            $plugin = new $pluginclass($rule);
-            return $plugin;
-        }
-    }
-
-    /**
      * Finds all system-wide enabled plugins, the result may include missing plugins.
      * First conditions, then actions.
      *
@@ -118,7 +99,7 @@ class notificationsbaseinfo extends base {
         }
         $enabled = [];
         foreach ($plugins as $pluginname => $version) {
-            $enabled[$pluginname] = self::instance($rule, $subtype, $pluginname);
+            $enabled[$pluginname] = notificationplugin::create_instance(null, $subtype, $pluginname);
         }
         return $enabled;
     }
@@ -136,11 +117,7 @@ class notificationsbaseinfo extends base {
         $rule = new \stdClass();
         $rule->ruleid = null;
         foreach (array_keys(self::get_system_enabled_plugins(null, $subtype)) as $pluginname) {
-            $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION
-                : notificationplugin::TYPE_CONDITION);
-            $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
-            if (class_exists($pluginclass)) {
-                $pluginobj = new $pluginclass($rule);
+            if ($pluginobj = notificationplugin::create_instance(null, $subtype, $pluginname)) {
                 $context = \context_course::instance($courseid);
                 // Check subplugin capability for current user in course.
                 if ($pluginobj->check_capability($context)) {

@@ -35,11 +35,13 @@ namespace notificationscondition_activityavailable\task;
 
 use local_notificationsagent\rule;
 use local_notificationsagent\task\notificationsagent_trigger_cron;
+use notificationscondition_activityavailable\activityavailable;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Class for testing the activityavailable_crontask task.
  * @group notificationsagent
  */
 class activityavailable_crontask_test extends \advanced_testcase {
@@ -106,7 +108,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      */
     public function test_execute() {
         global $DB, $USER;
-        $pluginname = 'activityavailable';
+        $pluginname = activityavailable::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([

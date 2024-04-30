@@ -42,7 +42,11 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 use notificationscondition_activitylastsend\activitylastsend;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\rule;
 
+/**
+ * Class activitylastsend_crontask
+ */
 class activitylastsend_crontask extends scheduled_task {
 
     /**
@@ -60,52 +64,18 @@ class activitylastsend_crontask extends scheduled_task {
     public function execute() {
         custom_mtrace("Activity last send start");
 
-        $pluginname = 'activitylastsend';
+        $pluginname = activitylastsend::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
-            $decode = $condition->parameters;
-            $param = json_decode($decode, true);
-            $cmid = $param[notificationplugin::UI_ACTIVITY];
+            $subplugin = new activitylastsend($condition->ruleid, $condition->id);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($condition->courseid);
 
-            $users = notificationsagent::get_usersbycourse(\context_course::instance($condition->courseid));
-            foreach ($users as $user) {
-                $data = activitylastsend::get_cmidfiles(
-                    $cmid,
-                    $user->id,
-                    $param[notificationplugin::UI_TIME],
-                    $this->get_timestarted()
-                );
+            notificationsagent::generate_cache_triggers($subplugin, $context);
 
-                if (isset($data->timemodified)
-                    && !notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id
-                    )
-                    && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
-                ) {
-                    $subplugin = new activitylastsend(null, $condition->id);
-                    $context = new evaluationcontext();
-                    $context->set_params($subplugin->get_parameters());
-                    $context->set_complementary($subplugin->get_iscomplementary());
-                    $context->set_timeaccess($this->get_timestarted());
-                    $context->set_userid($user->id);
-                    $cache = $subplugin->estimate_next_time($context);
-
-                    notificationsagent::set_timer_cache(
-                        $user->id,
-                        $condition->courseid,
-                        $cache,
-                        $pluginname,
-                        $condition->id
-                    );
-                    notificationsagent::set_time_trigger(
-                        $condition->ruleid,
-                        $condition->id,
-                        $user->id,
-                        $condition->courseid,
-                        $cache
-                    );
-                }
-            }
         }
 
         custom_mtrace("Activity lastsend end");

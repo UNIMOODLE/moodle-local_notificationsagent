@@ -31,10 +31,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_notificationsagent\notificationplugin;
-use local_notificationsagent\notificationsagent;
-use notificationscondition_calendareventto\calendareventto;
+use core\event\calendar_event_deleted;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\external\update_rule_status;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\rule;
+use notificationscondition_calendareventto\calendareventto;
 
 /**
  * Observer for calendareventto condition
@@ -47,45 +49,59 @@ class notificationscondition_calendareventto_observer {
      * @param \core\event\calendar_event_updated $event
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public static function calendar_updated(core\event\calendar_event_updated $event) {
         $other = $event->other;
-        $courseid = $event->courseid;
 
         // If startdate is not set in other array then the startdate setting has not been modified.
         if (!isset($other["timestart"])) {
             return;
         }
 
-        $pluginname = 'calendareventto';
-        $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
+        $pluginname = calendareventto::NAME;
+        $cmid = $event->objectid;
+        $courseid = $event->courseid;
 
+        $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         foreach ($conditions as $condition) {
-            $conditionid = $condition->id;
-            $subplugin = new calendareventto(null, $conditionid);
+            $subplugin = new calendareventto($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($event->timecreated);
             $context->set_courseid($courseid);
 
-            $cache = $subplugin->estimate_next_time($context);
+            notificationsagent::generate_cache_triggers($subplugin, $context);
+        }
+    }
 
-            if (empty($cache)) {
-                continue;
-            }
+    /**
+     * A function to handle the calendar_event_deleted event.
+     *
+     * @param calendar_event_deleted $event The course module event object
+     */
+    public static function calendar_event_deleted(calendar_event_deleted $event) {
+        global $DB;
 
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
+        $cmid = $event->objectid;
+
+        // Get rules with conditions with cmid.
+        $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid, mnc.pluginname
+                  FROM {notificationsagent_condition} mnc
+                 WHERE mnc.pluginname = :name
+                   AND mnc.cmid = :cmid';
+
+        $dataobj = $DB->get_records_sql($sql, [
+            'name' => calendareventto::NAME,
+            'cmid' => $cmid,
+        ]);
+
+        foreach ($dataobj as $data) {
+            $subplugin = new calendareventto($data->ruleid, $data->id);
+            $result = $subplugin->validation($event->courseid);
+            if (!$result) {
+                update_rule_status::execute(
+                    $data->ruleid, rule::PAUSE_RULE,
                 );
             }
         }

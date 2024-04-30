@@ -33,11 +33,10 @@
 
 namespace local_notificationsagent;
 
-use moodle_exception;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
-use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 
 /**
  * Abstract class representing a notification condition plugin.
@@ -47,6 +46,81 @@ use local_notificationsagent\evaluationcontext;
  *
  */
 abstract class notificationconditionplugin extends notificationplugin {
+
+    /**
+     * Indicates if the plugin is complementary.
+     *
+     * @var int
+     */
+    private $iscomplementary = 0;
+
+    /**
+     * cmid of course moduule in conditions if any.
+     *
+     * @var int
+     */
+    private $cmid;
+
+    /**
+     * Constructor for the class.
+     *
+     * @param int|stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
+     * @param mixed|null   $id       If is numeric => value is already in DB
+     *
+     */
+    public function __construct($ruleorid, $id = null) {
+        parent::__construct($ruleorid, $id);
+
+        if (is_numeric($id)) {
+            global $DB;
+            if ($subplugin = $DB->get_record('notificationsagent_condition', ['id' => $id])) {
+                $this->set_id($subplugin->id);
+                $this->set_pluginname($subplugin->pluginname);
+                $this->set_ruleid($subplugin->ruleid);
+                $this->set_type($subplugin->type);
+                $this->set_parameters($subplugin->parameters);
+                $this->set_cmid($subplugin->cmid);
+                $this->set_iscomplementary($subplugin->complementary);
+            }
+        }
+
+    }
+
+    /**
+     * Get the value of iscomplementary
+     *
+     * @return int
+     */
+    public function get_iscomplementary(): int {
+        return $this->iscomplementary;
+    }
+
+    /**
+     * Set the value of iscomplementary.
+     *
+     * @param int $iscomplementary The new value for iscomplementary
+     */
+    public function set_iscomplementary(int $iscomplementary): void {
+        $this->iscomplementary = $iscomplementary;
+    }
+
+    /**
+     * Get id of course module
+     *
+     * @return int
+     */
+    public function get_cmid(): ?int {
+        return $this->cmid;
+    }
+
+    /**
+     * Set the cmid.
+     *
+     * @param int|null $cmid
+     */
+    public function set_cmid($cmid): void {
+        $this->cmid = $cmid;
+    }
 
     /**
      * Get the type of the function.
@@ -70,27 +144,6 @@ abstract class notificationconditionplugin extends notificationplugin {
      * @return array The elements of the condition.
      */
     abstract public function get_elements();
-
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    abstract public function get_subtype();
-
-    /**
-     * Return the module identifier specified in the condition
-     *
-     * @return int|null $cmid Course module id or null
-     */
-    public function get_cmid() {
-        $cmid = null;
-        $parameters = $this->get_parameters();
-        if (!empty($parameters)) {
-            $cmid = json_decode($this->get_parameters(), true)[self::UI_ACTIVITY] ?? null;
-        }
-        return $cmid;
-    }
 
     /**
      * Checks whether the user has the capability to use the condition within a given context.
@@ -120,84 +173,58 @@ abstract class notificationconditionplugin extends notificationplugin {
     abstract public function estimate_next_time(evaluationcontext $context);
 
     /**
-     * Create subplugins from the given records.
-     *
-     * @param array $records The array of records to create subplugins from.
-     *
-     * @return array The array of created subplugins.
-     */
-    public static function create_subplugins($records) {
-        $subplugins = [];
-        global $DB;
-        foreach ($records as $record) {
-            $rule = $DB->get_record('notificationsagent_rule', ['id' => $record->ruleid]);
-            $subplugin = notificationsbaseinfo::instance($rule, $record->type, $record->pluginname);
-            if (!empty($subplugin)) {
-                $subplugin->set_iscomplementary($record->complementary);
-                $subplugin->set_pluginname($record->pluginname);
-                $subplugin->set_id($record->id);
-                $subplugin->set_parameters($record->parameters);
-                $subplugin->set_type($record->type);
-                $subplugin->set_ruleid($record->ruleid);
-
-                $subplugins[$record->id] = $subplugin;
-            }
-        }
-        return $subplugins;
-    }
-
-    /**
-     * Create a subplugin based on the given ID.
-     *
-     * @param int $id description
-     *
-     * @return array
-     */
-    public static function create_subplugin($id) {
-        global $DB;
-        // Find type of subplugin.
-        $record = $DB->get_record('notificationsagent_condition', ['id' => $id]);
-        $subplugins = self::create_subplugins([$record]);
-        return $subplugins[$id];
-    }
-
-    /**
      * Save data and set notifications for students.
      *
      * @param string    $action
-     * @param int       $idname
      * @param \stdClass $data
      * @param int       $complementary
-     * @param array     $arraytimer
+     * @param array     $arraytimer to save triggers
      * @param array     $students
      *
      * @return void
      */
-    public function save($action, $idname, $data, $complementary, &$arraytimer, $students = []) {
+    public function save($action, $data, $complementary, &$arraytimer, $students = []) {
         $courseid = $data->courseid;
 
         $dataplugin = new \stdClass();
-        $dataplugin->ruleid = $this->rule->get_id();
+        $dataplugin->ruleid = $this->rule->id;
         $dataplugin->pluginname = get_called_class()::NAME;
         $dataplugin->type = $this->get_type();
         $dataplugin->complementary = $complementary;
-        $dataplugin->parameters = $this->convert_parameters($idname, $data);
-        $dataplugin->cmid = $this->get_cmid();
+        if ($action == editrule_form::FORM_JSON_ACTION_INSERT || $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
+            $dataplugin->parameters = $this->convert_parameters($data);
+            $dataplugin->cmid = $this->get_cmid();
+        }
 
-        if (parent::insert_update_delete($action, $idname, $dataplugin)) {
+        if (parent::insert_update_delete($action, $dataplugin)) {
             $contextevaluation = new evaluationcontext();
             $contextevaluation->set_courseid($courseid);
             $contextevaluation->set_params($this->get_parameters());
             $contextevaluation->set_timeaccess(time());
             $contextevaluation->set_complementary($complementary);
 
+            // Array to save cache
+            $deletedata = [];
+            $insertdata = [];
             if (!$this->is_generic()) {
+                // $arraycache = [];
                 foreach ($students as $student) {
                     $contextevaluation->set_userid($student->id);
                     $cache = $this->estimate_next_time($contextevaluation);
-                    notificationsagent::set_timer_cache(
-                        $student->id, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id
-                    );
+
+                    $deletedata[] = "(userid = $student->id AND courseid= $courseid AND conditionid= {$dataplugin->id})";
+                    if (empty($cache)) {
+                        continue;
+                    }
+                    $insertdata[] = [
+                        'userid' => $student->id,
+                        'courseid' => $courseid,
+                        'startdate' => $cache,
+                        'pluginname' => $this->get_subtype(),
+                        'conditionid' => $dataplugin->id,
+                        'ruleid' => $dataplugin->ruleid,
+                    ];
+
                     if (isset($arraytimer[$student->id])) {
                         if ($arraytimer[$student->id]['timer'] < $cache) {
                             $arraytimer[$student->id]['timer'] = $cache;
@@ -208,11 +235,22 @@ abstract class notificationconditionplugin extends notificationplugin {
                     $arraytimer[$student->id]['timer'] = $cache;
                     $arraytimer[$student->id]['conditionid'] = $dataplugin->id;
                 }
+
             } else {
                 $cache = $this->estimate_next_time($contextevaluation);
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $data->courseid, $cache, $dataplugin->pluginname, $dataplugin->id
-                );
+                $studentid = notificationsagent::GENERIC_USERID;
+                $deletedata[] = "(userid = $studentid AND courseid= $courseid AND conditionid= {$dataplugin->id})";
+                if (!empty($cache)) {
+                    $insertdata[] = [
+                        'userid' => $studentid,
+                        'courseid' => $courseid,
+                        'startdate' => $cache,
+                        'pluginname' => $this->get_subtype(),
+                        'conditionid' => $dataplugin->id,
+                        'ruleid' => $dataplugin->ruleid,
+                    ];
+                }
+
                 if (isset($arraytimer[notificationsagent::GENERIC_USERID])) {
                     if ($arraytimer[notificationsagent::GENERIC_USERID]['timer'] < $cache) {
                         $arraytimer[notificationsagent::GENERIC_USERID]['timer'] = $cache;
@@ -223,6 +261,11 @@ abstract class notificationconditionplugin extends notificationplugin {
                     $arraytimer[notificationsagent::GENERIC_USERID]['conditionid'] = $dataplugin->id;
                 }
             }
+
+            notificationsagent::set_timer_cache(
+                $deletedata, $insertdata
+            );
+
         }
     }
 

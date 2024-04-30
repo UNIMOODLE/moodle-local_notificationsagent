@@ -31,6 +31,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activitynewcontent\activitynewcontent;
 
@@ -53,30 +54,27 @@ class notificationscondition_activitynewcontent_observer {
             return;
         }
         $courseid = $event->courseid;
-        $cache = $event->timecreated;
-        $pluginname = 'activitynewcontent';
+
+        $pluginname = activitynewcontent::NAME;
 
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
 
         foreach ($conditions as $condition) {
             $decode = $condition->parameters;
-            $pluginname = $condition->pluginname;
-            $conditionid = $condition->id;
             $param = json_decode($decode, true);
             $modname = $param[activitynewcontent::MODNAME];
+
             if ($namemodule == $modname) {
-                if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-                )
-                ) {
-                    // Update every time a module is updated.
-                    notificationsagent::set_timer_cache(
-                        notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                    );
-                    notificationsagent::set_time_trigger(
-                        $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                    );
-                }
+                $subplugin = new activitynewcontent($condition->ruleid, $condition->id);
+                $context = new evaluationcontext();
+                $context->set_params($subplugin->get_parameters());
+                $context->set_complementary($subplugin->get_iscomplementary());
+                $context->set_timeaccess($event->timecreated);
+                $context->set_observer(true);
+                $context->set_courseid($courseid);
+
+                notificationsagent::generate_cache_triggers($subplugin, $context);
+
             }
         }
     }

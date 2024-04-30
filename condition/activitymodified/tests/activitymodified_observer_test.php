@@ -37,6 +37,8 @@ use local_notificationsagent\rule;
 use local_notificationsagent\notificationsagent;
 
 /**
+ * Class for testing the observer of the activitymodified condition.
+ *
  * @group notificationsagent
  */
 class activitymodified_observer_test extends \advanced_testcase {
@@ -52,6 +54,9 @@ class activitymodified_observer_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $activity;
     /**
      * Date start for the course
@@ -95,7 +100,7 @@ class activitymodified_observer_test extends \advanced_testcase {
             \uopz_set_return('time', $fileuploadtime);
         }
 
-        $pluginname = 'activitymodified';
+        $pluginname = activitymodified::NAME;
 
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course, $role);
         self::setUser(self::$user->id);

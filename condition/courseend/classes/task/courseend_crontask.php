@@ -38,11 +38,13 @@ global $CFG;
 require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_courseend\courseend;
 use local_notificationsagent\evaluationcontext;
 
+/**
+ * Class courseend_crontask
+ */
 class courseend_crontask extends scheduled_task {
 
     /**
@@ -58,39 +60,21 @@ class courseend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        global $DB;
         custom_mtrace("Courseend start");
 
-        $pluginname = get_string('subtype', 'notificationscondition_courseend');
+        $pluginname = courseend::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
-
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
-            $conditionid = $condition->id;
-
-            $subplugin = new courseend(null, $conditionid);
+            $subplugin = new courseend($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $context->set_courseid($courseid);
-            $cache = $subplugin->estimate_next_time($context);
+            $context->set_courseid($condition->courseid);
 
-            if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-                )
-                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
 
-        custom_mtrace("Courseend end ");
+        custom_mtrace("Courseend end");
     }
 }

@@ -73,16 +73,6 @@ class activitynewcontent extends notificationconditionplugin {
         return ['[AAAA]'];
     }
 
-    /**
-     * Subtype of subplugin
-     *
-     * @return \lang_string|string
-     * @throws \coding_exception
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_activitynewcontent');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -100,7 +90,7 @@ class activitynewcontent extends notificationconditionplugin {
 
         $timelastsend = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
@@ -118,21 +108,29 @@ class activitynewcontent extends notificationconditionplugin {
      *
      */
     public function estimate_next_time(evaluationcontext $context) {
-        return null;
+        $estimate = null;
+        // Condiition.
+        if (!$context->is_complementary() && $context->get_observer()) {
+            $estimate = time();
+        }
+
+        // Exception.
+        if ($context->is_complementary() && !$context->get_observer()) {
+            $estimate = time();
+        }
+
+        return $estimate;
     }
 
     /**
-     * User interface
+     * Get the UI elements for the subplugin.
      *
-     * @param \moodleform $mform
-     * @param int         $id
-     * @param int         $courseid
-     * @param string      $type
-     *
-     * @return void
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         // Activity.
         $listactivities = [];
@@ -143,8 +141,8 @@ class activitynewcontent extends notificationconditionplugin {
             $listactivities[$key] = format_string($value);
         }
 
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
 
@@ -152,7 +150,7 @@ class activitynewcontent extends notificationconditionplugin {
 
         $element = $mform->createElement(
             'select',
-            $this->get_name_ui($id, self::MODNAME),
+            $this->get_name_ui(self::MODNAME),
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activitysinceend',
                 ['typeelement' => '[AAAA]']
@@ -162,7 +160,7 @@ class activitynewcontent extends notificationconditionplugin {
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
     }
 
@@ -183,14 +181,13 @@ class activitynewcontent extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $modname = $params[$this->get_name_ui($id, self::MODNAME)] ?? 0;
+        $modname = $params[$this->get_name_ui(self::MODNAME)] ?? 0;
         $this->set_parameters(json_encode([self::MODNAME => $modname]));
         return $this->get_parameters();
     }

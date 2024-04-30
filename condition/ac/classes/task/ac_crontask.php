@@ -38,8 +38,13 @@ global $CFG;
 require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 
 use core\task\scheduled_task;
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
+use notificationscondition_ac\ac;
 
+/**
+ * Class ac_crontask
+ */
 class ac_crontask extends scheduled_task {
 
     /**
@@ -58,19 +63,14 @@ class ac_crontask extends scheduled_task {
         $conditions = notificationsagent::get_availability_conditions();
 
         foreach ($conditions as $condition) {
-            $context = \context_course::instance($condition->courseid);
-            $users = notificationsagent::get_usersbycourse($context);
-            foreach ($users as $user) {
-                if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $condition->courseid, $user->id
-                    )
-                    && !notificationsagent::is_ruleoff($condition->ruleid, $user->id)
-                ) {
-                    notificationsagent::set_time_trigger(
-                        $condition->ruleid, $condition->id, $user->id, $condition->courseid, $this->get_timestarted()
-                    );
-                }
-            }
+            $subplugin = new ac($condition->ruleid, $condition->id);
+            $context = new evaluationcontext();
+            $context->set_params($subplugin->get_parameters());
+            $context->set_complementary($subplugin->get_iscomplementary());
+            $context->set_timeaccess($this->get_timestarted());
+            $context->set_courseid($condition->courseid);
+
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }

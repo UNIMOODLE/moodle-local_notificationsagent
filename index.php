@@ -152,6 +152,7 @@ $conditionsarray = [];
 $exceptionsarray = [];
 $actionsarray = [];
 
+
 foreach ($rules as $rule) {
     $ac = $rule->get_ac();
     $conditions = $rule->get_conditions();
@@ -206,16 +207,19 @@ foreach ($rules as $rule) {
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
         'status' => $rule->get_status(),
-        'status_lang' => $rule->get_forced() ?
+        'status_lang' => 
+            !$rule->validation($courseid) ? get_string('status_broken', 'local_notificationsagent') :
+            ($rule->get_forced() ?
             ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
                 : get_string('status_active', 'local_notificationsagent')
-            ) : get_string('status_required', 'local_notificationsagent'),
+            ) : get_string('status_required', 'local_notificationsagent')),
         'conditions' => $conditionsarray,
         'exceptions' => $exceptionsarray,
         'actions' => $actionsarray,
         'type' => $rule->get_type(),
         'isrule' => $rule->get_template(),
         'forced' => $rule->get_forced(),
+        'validation' => $rule->validation($courseid),
         'shared' => $rule->get_shared(),
         'canshare' => $rule->can_share(),
         'candelete' => $rule->can_delete(),

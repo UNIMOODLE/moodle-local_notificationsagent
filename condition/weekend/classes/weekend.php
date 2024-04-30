@@ -67,15 +67,6 @@ class weekend extends notificationconditionplugin {
     }
 
     /**
-     * Subtype of subplugine
-     *
-     * @return \lang_string|string
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_weekend');
-    }
-
-    /**
      * Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -132,17 +123,14 @@ class weekend extends notificationconditionplugin {
     }
 
     /**
-     * Weekend UI
+     * Get the UI elements for the subplugin.
      *
-     * @param \moodleform $mform
-     * @param int         $id
-     * @param int         $courseid
-     * @param string      $type
-     *
-     * @return void
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         $weekendconfig = get_config(null, 'calendar_weekend');
         $calendar = \core_calendar\type_factory::get_calendar_instance();
@@ -156,7 +144,7 @@ class weekend extends notificationconditionplugin {
         $concatenatedtoday = implode(', ', $test);
 
         $element = $mform->createElement(
-            'static', $this->get_name_ui($id, self::UI_DESCRIPTION), get_string('weekendtag', 'notificationscondition_weekend'),
+            'static', $this->get_name_ui(self::UI_DESCRIPTION), get_string('weekendtag', 'notificationscondition_weekend'),
             get_string('weekendtext', 'notificationscondition_weekend', ['weekend' => $concatenatedtoday])
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
@@ -180,12 +168,11 @@ class weekend extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         return null;
     }
 

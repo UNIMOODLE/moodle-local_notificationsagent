@@ -70,17 +70,16 @@ class privateforummessage extends notificationactionplugin {
      * Get the elements for the privateforummessage plugin.
      *
      * @param \moodleform $mform
-     * @param int         $id
      * @param int         $courseid
      * @param int         $type
      */
-    public function get_ui($mform, $id, $courseid, $type) {
+    public function get_ui($mform, $courseid, $type) {
         $forumname = [];
-        $this->get_ui_title($mform, $id, $type);
+        $this->get_ui_title($mform, $type);
 
         // Title.
         $title = $mform->createElement(
-            'text', $this->get_name_ui($id, self::UI_TITLE),
+            'text', $this->get_name_ui(self::UI_TITLE),
             get_string(
                 'editrule_action_element_title', 'notificationsaction_privateforummessage',
                 ['typeelement' => '[TTTT]']
@@ -94,7 +93,7 @@ class privateforummessage extends notificationactionplugin {
 
         // Message.
         $message = $mform->createElement(
-            'editor', $this->get_name_ui($id, self::UI_MESSAGE),
+            'editor', $this->get_name_ui(self::UI_MESSAGE),
             get_string(
                 'editrule_action_element_message', 'notificationsaction_privateforummessage',
                 ['typeelement' => '[BBBB]']
@@ -102,7 +101,7 @@ class privateforummessage extends notificationactionplugin {
             ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
         // Forum.
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $forumname['0'] = 'FFFF';
         } else {
             $forumlist = get_coursemodules_in_course('forum', $courseid);
@@ -115,7 +114,7 @@ class privateforummessage extends notificationactionplugin {
 
         $cm = $mform->createElement(
             'select',
-            $this->get_name_ui($id, self::UI_ACTIVITY),
+            $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_action_element_forum',
                 'notificationsaction_privateforummessage',
@@ -124,27 +123,19 @@ class privateforummessage extends notificationactionplugin {
             $forumname
         );
 
-        $this->placeholders($mform, $id, $type, $this->show_user_placeholders());
+        $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($cm, 'new' . $type . '_group');
-        $mform->setType($this->get_name_ui($id, self::UI_TITLE), PARAM_TEXT);
-        $mform->addRule($this->get_name_ui($id, self::UI_TITLE), null, 'required', null, 'client');
-        $mform->setType($this->get_name_ui($id, self::UI_MESSAGE), PARAM_RAW);
-        $mform->addRule($this->get_name_ui($id, self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->setType($this->get_name_ui(self::UI_TITLE), PARAM_TEXT);
+        $mform->addRule($this->get_name_ui(self::UI_TITLE), null, 'required', null, 'client');
+        $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
+        $mform->addRule($this->get_name_ui(self::UI_MESSAGE), null, 'required', null, 'client');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
 
-    }
-
-    /** Returns subtype string for building classnames, filenames, modulenames, etc.
-     *
-     * @return string subplugin type. "privateforummessage"
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationsaction_privateforummessage');
     }
 
     /**
@@ -167,16 +158,15 @@ class privateforummessage extends notificationactionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $title = $params[$this->get_name_ui($id, self::UI_TITLE)] ?? 0;
-        $message = $params[$this->get_name_ui($id, self::UI_MESSAGE)] ?? 0;
-        $forum = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $title = $params[$this->get_name_ui(self::UI_TITLE)] ?? 0;
+        $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
+        $forum = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $this->set_parameters(
             json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_ACTIVITY => $forum])
         );
@@ -240,7 +230,7 @@ class privateforummessage extends notificationactionplugin {
         // Set up the Moodle Web Services client.
 
         $timenow = time();
-        $pluginname = 'forumnoreply';
+        $pluginname = self::NAME;
         $condition = $context->get_rule()->get_condition($pluginname);
         if ($condition) {
             $decode = $condition->get_parameters();
@@ -261,7 +251,7 @@ class privateforummessage extends notificationactionplugin {
                        AND fd.userid = :usertrigger
             ";
 
-        $threads = $DB->get_record_sql($sqlthreads, [
+        $threads = $DB->get_records_sql($sqlthreads, [
             'forum' => $forumid,
             'course' => $courseid,
             'timestart' => 0,
@@ -275,21 +265,25 @@ class privateforummessage extends notificationactionplugin {
             return false;
         }
 
-        $obj = new \stdClass();
-        $obj->discussion = $threads->discussionid;
-        $obj->parent = $threads->postid;
-        $obj->privatereplyto = $userid;
-        $obj->userid = get_admin()->id;
-        $obj->created = $timenow;
-        $obj->modified = $timenow;
-        $obj->mailed = FORUM_MAILED_PENDING;
-        $obj->subject = $postsubject;
-        $obj->message = $postmessage;
-        $obj->forum = $forumid;
-        $obj->course = $courseid;
+        $result = false;
+        foreach ($threads as $thread) {
+            $obj = new \stdClass();
+            $obj->discussion = $thread->discussionid;
+            $obj->parent = $thread->postid;
+            $obj->privatereplyto = $userid;
+            $obj->userid = get_admin()->id;
+            $obj->created = $timenow;
+            $obj->modified = $timenow;
+            $obj->mailed = FORUM_MAILED_PENDING;
+            $obj->subject = $postsubject;
+            $obj->message = $postmessage;
+            $obj->forum = $forumid;
+            $obj->course = $courseid;
+    
+            $result = self::forum_add_post($obj);
+        }
 
-        return self::forum_add_post($obj);
-
+        return $result;
     }
 
     /**
@@ -341,6 +335,7 @@ class privateforummessage extends notificationactionplugin {
         $post->mailed = FORUM_MAILED_PENDING;
         $post->subject = $obj->subject;
         $post->message = $obj->message;
+        $post->messageformat = FORMAT_HTML;
         $post->forum = $forum->id;
         $post->course = $forum->course;
 

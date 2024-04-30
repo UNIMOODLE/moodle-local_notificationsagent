@@ -38,6 +38,9 @@ use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * Class activitystudentend condition
+ */
 class activitystudentend extends notificationconditionplugin {
 
     /**
@@ -63,10 +66,6 @@ class activitystudentend extends notificationconditionplugin {
         return ['[TTTT]', '[AAAA]'];
     }
 
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_activitystudentend');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -87,7 +86,7 @@ class activitystudentend extends notificationconditionplugin {
         // Timestart es el tiempo de primer acceso más time.
         $lastaccess = $DB->get_field(
             'notificationsagent_cache',
-            'timestart', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'startdate', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($lastaccess)) {
@@ -132,7 +131,7 @@ class activitystudentend extends notificationconditionplugin {
             }
         }
 
-        //Exception.
+        // Exception.
         if ($timeaccess >= $lastaccess
             && $timeaccess <= $lastaccess + $params->{self::UI_TIME}
             && $context->is_complementary()
@@ -143,8 +142,16 @@ class activitystudentend extends notificationconditionplugin {
         return $timereturn;
     }
 
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    /**
+     * Get the UI elements for the subplugin.
+     *
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
+     */
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
+
         // Activity.
         $listactivities = [];
         $modinfo = get_fast_modinfo($courseid);
@@ -152,8 +159,8 @@ class activitystudentend extends notificationconditionplugin {
             $listactivities[$cm->id] = format_string($cm->name);
         }
 
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
 
@@ -161,7 +168,7 @@ class activitystudentend extends notificationconditionplugin {
 
         $element = $mform->createElement(
             'select',
-            $this->get_name_ui($id, self::UI_ACTIVITY),
+            $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activitystudentend',
                 ['typeelement' => '[AAAA]']
@@ -169,10 +176,10 @@ class activitystudentend extends notificationconditionplugin {
             $listactivities
         );
 
-        $this->get_ui_select_date($mform, $id, $type);
+        $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -194,23 +201,23 @@ class activitystudentend extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $activity = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $activity = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $activity]));
+        $this->set_cmid((int) $activity);
         return $this->get_parameters();
     }
 
@@ -251,35 +258,32 @@ class activitystudentend extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 
     /**
      * Set user's access time to an activity
      *
-     * @param $userid
-     * @param $courseid
-     * @param $idactivity
-     * @param $timecreated
-     *
-     * @throws \dml_exception
+     * @param int $userid
+     * @param int $courseid
+     * @param int $idactivity
+     * @param int $timecreated
      */
     public static function set_activity_access($userid, $courseid, $idactivity, $timecreated) {
         global $DB;
-        $exists = $DB->record_exists(
-            'notificationsagent_cmview',
-            ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]
-        );
 
+        $exists = $DB->get_field(
+            'notificationsagent_cmview',
+            'id', ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $idactivity],
+        );
         $objdb = new \stdClass();
         $objdb->userid = $userid;
         $objdb->courseid = $courseid;
@@ -290,12 +294,7 @@ class activitystudentend extends notificationconditionplugin {
             // Si el registro no existe, inserta uno nuevo.
             $DB->insert_record('notificationsagent_cmview', $objdb);
         } else {
-            // Si el registro existe, obtén la ID y actualiza el registro.
-            $existingrecord = $DB->get_record(
-                'notificationsagent_cmview',
-                ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $idactivity]
-            );
-            $objdb->id = $existingrecord->id;
+            $objdb->id = $exists;
             $DB->update_record('notificationsagent_cmview', $objdb);
         }
     }
@@ -303,12 +302,11 @@ class activitystudentend extends notificationconditionplugin {
     /**
      * Get user's access time to an activity
      *
-     * @param $userid
-     * @param $courseid
-     * @param $cmid
+     * @param int $userid
+     * @param int $courseid
+     * @param int $cmid
      *
      * @return false|mixed|null
-     * @throws \dml_exception
      */
     public static function get_cmlastaccess($userid, $courseid, $cmid) {
         global $DB;

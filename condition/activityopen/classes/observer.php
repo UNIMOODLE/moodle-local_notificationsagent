@@ -35,41 +35,34 @@ use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
 use notificationscondition_activityopen\activityopen;
+use local_notificationsagent\rule;
 
+/**
+ * Class notificationscondition_activityopen_observer
+ */
 class notificationscondition_activityopen_observer {
 
+    /**
+     * Updates the course module when it is modified.
+     *
+     * @param \core\event\course_module_updated $event The course module update event.
+     */
     public static function course_module_updated(\core\event\course_module_updated $event) {
         $courseid = $event->courseid;
         $cmid = $event->objectid;
 
-        $pluginname = 'activityopen';
+        $pluginname = activityopen::NAME;
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         foreach ($conditions as $condition) {
-            $conditionid = $condition->id;
-            $subplugin = new activityopen(null, $conditionid);
+            $subplugin = new activityopen($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($event->timecreated);
             $context->set_courseid($courseid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }

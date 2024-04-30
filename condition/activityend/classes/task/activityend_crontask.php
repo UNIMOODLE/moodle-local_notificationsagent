@@ -41,7 +41,11 @@ use core\task\scheduled_task;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activityend\activityend;
+use local_notificationsagent\rule;
 
+/**
+ * Class activityend_crontask
+ */
 class activityend_crontask extends scheduled_task {
 
     /**
@@ -59,36 +63,19 @@ class activityend_crontask extends scheduled_task {
     public function execute() {
         custom_mtrace("Activityend start");
 
-        $pluginname = 'activityend';
+        $pluginname = activityend::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
             $conditionid = $condition->id;
-
-            $subplugin = new activityend(null, $conditionid);
+            $subplugin = new activityend($condition->ruleid, $conditionid);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $cache = $subplugin->estimate_next_time($context);
+            $context->set_courseid($condition->courseid);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-                )
-                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
 
         }
         custom_mtrace("Activityend end ");

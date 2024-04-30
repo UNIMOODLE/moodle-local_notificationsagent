@@ -37,6 +37,7 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
+ * Class for testing the courseend observer.
  * @group notificationsagent
  */
 class courseend_observer_test extends \advanced_testcase {
@@ -118,7 +119,7 @@ class courseend_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'courseend';
+        $pluginname = courseend::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -147,6 +148,11 @@ class courseend_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * A description of the entire PHP function.
+     *
+     * @return array
+     */
     public static function dataprovider(): array {
         return [
             [86400],

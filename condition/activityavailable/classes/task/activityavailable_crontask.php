@@ -41,7 +41,11 @@ use core\task\scheduled_task;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activityavailable\activityavailable;
+use local_notificationsagent\rule;
 
+/**
+ * Class for testing the activityavailable_crontask.
+ */
 class activityavailable_crontask extends scheduled_task {
 
     /**
@@ -58,31 +62,21 @@ class activityavailable_crontask extends scheduled_task {
      */
     public function execute() {
         custom_mtrace("Activityavailable start");
-        $pluginname = 'activityavailable';
+        $pluginname = activityavailable::NAME;
+
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
             $courseid = $condition->courseid;
-
-            $subplugin = new activityavailable(null, $condition->id);
+            $subplugin = new activityavailable($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
             $context->set_courseid($courseid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            $context = \context_course::instance($courseid);
-            $enrolledusers = notificationsagent::get_usersbycourse($context);
-            foreach ($enrolledusers as $enrolleduser) {
-                if (!notificationsagent::was_launched_indicated_times(
-                        $condition->ruleid, $condition->ruletimesfired, $courseid, $enrolleduser->id
-                    )
-                    && !notificationsagent::is_ruleoff($condition->ruleid, $enrolleduser->id)
-                ) {
-                    notificationsagent::set_time_trigger($condition->ruleid, $condition->id, $enrolleduser->id, $courseid, $cache);
-                }
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
+
         }
         custom_mtrace("Activityavailable end ");
     }

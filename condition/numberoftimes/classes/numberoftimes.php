@@ -69,15 +69,6 @@ class numberoftimes extends notificationconditionplugin {
         return ['[TTTT]', '[N]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_numberoftimes');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -111,17 +102,27 @@ class numberoftimes extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /** Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
+     */
     public function estimate_next_time(evaluationcontext $context) {
         return null;
     }
 
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    /**
+     * Get the UI elements for the subplugin.
+     *
+     * @param \MoodleQuickForm $mform    The Moodle quick form object.
+     * @param int              $courseid The ID of the course.
+     * @param string           $type     The type of the condition.
+     */
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         // Number of times.
         $element = $mform->createElement(
-            'float', $this->get_name_ui($id, self::N_TIMES),
+            'float', $this->get_name_ui(self::N_TIMES),
             get_string('condition_number_times', 'notificationscondition_numberoftimes', ['typeelement' => '[N]']),
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
@@ -130,10 +131,10 @@ class numberoftimes extends notificationconditionplugin {
             ]
         );
 
-        $this->get_ui_select_date($mform, $id, $type);
+        $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
     }
 
@@ -154,19 +155,18 @@ class numberoftimes extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $numbertimes = $params[$this->get_name_ui($id, self::N_TIMES)];
+        $numbertimes = $params[$this->get_name_ui(self::N_TIMES)];
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
@@ -206,15 +206,14 @@ class numberoftimes extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 

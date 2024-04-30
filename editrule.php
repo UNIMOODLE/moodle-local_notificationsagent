@@ -148,7 +148,7 @@ $ruleid = optional_param('ruleid', null, PARAM_INT);
 $ruleid = empty($ruleid) ? null : $ruleid;
 $rule = new rule($ruleid, $ruletype, $typeaction);
 $customdata = [
-    'rule' => $rule,
+    'rule' => $rule->to_record(),
     'timesfired' => rule::MINIMUM_EXECUTION,
     'courseid' => $courseid,
     'getaction' => $typeaction,
@@ -164,7 +164,7 @@ if ($mform->is_cancelled()) {
         get_string('rulecancelled', 'local_notificationsagent')
     );
 } else if ($mform->no_submit_button_pressed()) {
-    $mform->addOrRemoveSubplugin();
+    $mform->addorremovesubplugin();
 
 } else if ($fromform = $mform->get_data()) {
     $rule->save_form($fromform);

@@ -61,15 +61,6 @@ class ac extends notificationconditionplugin {
      */
     public function get_elements() {}
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_ac');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -84,24 +75,11 @@ class ac extends notificationconditionplugin {
 
         $courseid = $context->get_courseid();
         $params = $context->get_params();
-        $pluginname = $this->get_subtype();
-        $conditionid = $this->get_id();
         $userid = $context->get_userid();
 
-        $cacheexists = $DB->record_exists('notificationsagent_cache', [
-            'pluginname' => $pluginname, 'conditionid' => $conditionid,
-            'courseid' => $courseid, 'userid' => $userid,
-        ]);
-
-        if ($cacheexists) {
-            $meetcondition = true;
-        }
-
-        if (!$cacheexists) {
-            $info = new mod_ac_availability_info($courseid, $params);
-            $information = "";
-            $meetcondition = $info->is_available($information, false, $userid);
-        }
+        $info = new mod_ac_availability_info($courseid, $params);
+        $information = "";
+        $meetcondition = $info->is_available($information, false, $userid);
 
         return $meetcondition;
     }
@@ -109,8 +87,15 @@ class ac extends notificationconditionplugin {
     /** Estimate next time when this condition will be true.
      *
      * @param evaluationcontext $context
+     *
+     * @return int|null
      */
     public function estimate_next_time(evaluationcontext $context) {
+        $result = $this->evaluate($context);
+
+        if ($result) {
+            return time();
+        }
         return null;
     }
 
@@ -118,11 +103,10 @@ class ac extends notificationconditionplugin {
      * Get the UI for the condition.
      *
      * @param \moodleform $mform
-     * @param int         $id
      * @param int         $courseid
      * @param string      $exception
      */
-    public function get_ui($mform, $id, $courseid, $exception) {
+    public function get_ui($mform, $courseid, $exception) {
         return '';
     }
 
@@ -143,12 +127,11 @@ class ac extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
         $this->set_parameters($params[editrule_form::FORM_JSON_AC]);
         return $this->get_parameters();
@@ -160,8 +143,7 @@ class ac extends notificationconditionplugin {
      *
      * @param string $content  — The content to be processed, passed by reference.
      * @param int    $courseid — The ID of the course related to the content.
-     * @param mixed  $options  — Additional options if any, null by default.
-     * @param mixed  $complementary
+     * @param bool   $complementary
      *
      */
     public function process_markups(&$content, $courseid, $complementary = null) {
@@ -194,21 +176,20 @@ class ac extends notificationconditionplugin {
      * Saves the data to the database.
      *
      * @param string $action        The action to perform (insert, update, delete).
-     * @param string $idname        The ID name of the data.
      * @param mixed  $data          The data to be saved.
      * @param mixed  $complementary Additional complementary data.
      * @param int    $timer         (Optional) The timer. Default is 0.
      * @param array  $students      (Optional) The students. Default is an empty array.
      */
-    public function save($action, $idname, $data, $complementary, &$timer = 0, $students = []) {
+    public function save($action, $data, $complementary, &$timer = 0, $students = []) {
         // Get data from form.
-        $this->convert_parameters($idname, $data);
+        $this->convert_parameters($data);
         // If availability json is empty and row exists (UPDATE) then $action = delete
         if (mod_ac_availability_info::is_empty($this->get_parameters()) && $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
             $action = editrule_form::FORM_JSON_ACTION_DELETE;
-            parent::save($action, $idname, $data, $complementary, $timer, $students);
+            parent::save($action, $data, $complementary, $timer, $students);
         } else if (!mod_ac_availability_info::is_empty($this->get_parameters())) {
-            parent::save($action, $idname, $data, $complementary, $timer, $students);
+            parent::save($action, $data, $complementary, $timer, $students);
         }
     }
 

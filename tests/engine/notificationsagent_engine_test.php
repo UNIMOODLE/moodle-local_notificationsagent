@@ -274,7 +274,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
                     [
                         'pluginname' => 'messageagent',
                         'params' => '{
-                        "title":"Title" ,"message":{"text":"Message to {User_FirstName} {Follow_Link}"}
+                        "title":"Title" ,"message":{"text":"Message to {User_FirstName} {Follow_Link} {Course_Category_Name} "}
                         }',
                     ],
                 ],

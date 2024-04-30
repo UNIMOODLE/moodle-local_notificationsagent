@@ -74,6 +74,7 @@ $string['heading'] = 'Axente de notificación';
 $string['status_active'] = 'Activo';
 $string['status_paused'] = 'En pausa';
 $string['status_required'] = 'Requirido';
+$string['status_broken'] = 'Roto';
 
 // Importar modelo.
 $string['import'] = 'Importar';
@@ -96,6 +97,7 @@ $string['condition_days'] = 'Días';
 $string['condition_hours'] = 'Horas ';
 $string['condition_minutes'] = 'Minutos';
 $string['condition_seconds'] = 'Segundos';
+$string['condition_grade'] = 'Cualificación';
 
 // Editar regra.
 $string['editrule_clonerule'] = 'Engadir regra';
@@ -251,6 +253,7 @@ $string['notificationsagent:forumnoreply'] = 'Necesítase capacidade para utiliz
 $string['notificationsagent:numberoftimes'] = 'Capacidade necesaria para utilizar a condición de número de veces';
 $string['notificationsagent:sessionend'] = 'Capacidade necesaria para utilizar a condición de finalización da sesión';
 $string['notificationsagent:weekend'] = 'Capacidade necesaria para usar a condición de fin de semana';
+$string['notificationsagent:itemgraded'] = 'Capacidade necesaria para utilizar a condición de elemento cualificativo';
 
 $string['notificationsagent:addusergroup'] = 'Capacidade de usar a acción addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacidade de usar a acción bootstrapnotifications';
@@ -283,3 +286,6 @@ $string['timestamp'] = 'Data';
 $string['conditions'] = 'Condicións';
 $string['exceptions'] = 'Excepcións';
 $string['actions'] = 'Accións';
+
+// Caché.
+$string['cachedef_launched'] = 'Lista de usuarios cuxa recorrencia comezou.';

@@ -74,6 +74,7 @@ $string['heading'] = 'Agent de Notificacions';
 $string['status_active'] = 'Activa';
 $string['status_paused'] = 'Pausada';
 $string['status_required'] = 'Obligatòria';
+$string['status_broken'] = 'Trencat';
 
 // Import Template.
 $string['import'] = 'Import';
@@ -96,6 +97,7 @@ $string['condition_days'] = 'Dies';
 $string['condition_hours'] = 'Hores';
 $string['condition_minutes'] = 'Minuts';
 $string['condition_seconds'] = 'Segons';
+$string['condition_grade'] = 'Qualificació';
 
 // EditRule.
 $string['editrule_clonerule'] = 'Afegir regla';
@@ -253,6 +255,7 @@ $string['notificationsagent:forumnoreply'] = 'Capacitat necessària per utilitza
 $string['notificationsagent:numberoftimes'] = 'Capacitat necessària per utilitzar la condició de nombre de vegades';
 $string['notificationsagent:sessionend'] = 'Capacitat necessària per utilitzar la condició de finalització de la sessió';
 $string['notificationsagent:weekend'] = 'Capacitat necessària per utilitzar la condició del cap de setmana';
+$string['notificationsagent:itemgraded'] = 'Capacitat necessària per utilitzar la condició de element de qualificació';
 
 
 $string['notificationsagent:addusergroup'] = 'Capacitat per utilitzar l\'acció addusergroup';
@@ -286,3 +289,6 @@ $string['timestamp'] = 'Data';
 $string['conditions'] = 'Condicions';
 $string['exceptions'] = 'Excepcions';
 $string['actions'] = 'Accions';
+
+// Memòria cau.
+$string['cachedef_launched'] = 'Llista d\'usuaris la periodicitat dels quals ha començat.';

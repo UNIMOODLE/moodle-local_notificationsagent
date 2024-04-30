@@ -102,7 +102,8 @@ class numberoftimes_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
         self::$rule->set_id(25600);
-        self::$subplugin = new numberoftimes(self::$rule);
+        self::$subplugin = new numberoftimes(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -120,7 +121,10 @@ class numberoftimes_test extends \advanced_testcase {
      *  Test evaluate.
      *
      * @param int    $timeaccess
+     * @param int    $timemodified
+     * @param int    $timesfired
      * @param string $param
+     * @param bool   $launched
      * @param bool   $expected
      *
      * @covers       \notificationscondition_numberoftimes\numberoftimes::evaluate
@@ -274,16 +278,17 @@ class numberoftimes_test extends \advanced_testcase {
      * @covers \notificationscondition_numberoftimes\numberoftimes::convert_parameters
      */
     public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_numberoftimes_days" => "1",
-            "5_numberoftimes_hours" => "0",
-            "5_numberoftimes_minutes" => "0",
-            "5_numberoftimes_seconds" => "1",
-            "5_numberoftimes_times" => "1",
+            $id . "_numberoftimes_days" => "1",
+            $id . "_numberoftimes_hours" => "0",
+            $id . "_numberoftimes_minutes" => "0",
+            $id . "_numberoftimes_seconds" => "1",
+            $id . "_numberoftimes_times" => "1",
         ];
         $expected = '{"time":86401,"times":1}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
 
@@ -296,7 +301,7 @@ class numberoftimes_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -306,21 +311,20 @@ class numberoftimes_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $uigroupelements = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $uigroupelements[] = $element->getName();
         }
-        $uitimes = $method->invoke(self::$subplugin, $id, self::$subplugin::N_TIMES);
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uitimes = $method->invoke(self::$subplugin, self::$subplugin::N_TIMES);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uitimes));
         $this->assertTrue($mform->elementExists($uigroupname));
@@ -339,7 +343,7 @@ class numberoftimes_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -354,19 +358,20 @@ class numberoftimes_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $jsoncondition = $mform->getElementValue(editrule_form::FORM_JSON_CONDITION);
         $arraycondition = array_keys(json_decode($jsoncondition, true));
-        $id = $arraycondition[0];
+        $id = $arraycondition[0];// Temp value.
+        self::$subplugin->set_id($id);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $defaulttime = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $defaulttime[$element->getName()] = $element->getValue();
         }
 
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);

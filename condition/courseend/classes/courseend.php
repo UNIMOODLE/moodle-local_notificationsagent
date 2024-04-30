@@ -65,15 +65,6 @@ class courseend extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_courseend');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -95,7 +86,7 @@ class courseend extends notificationconditionplugin {
 
         $timeend = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
         $course = get_course($courseid);
@@ -107,14 +98,24 @@ class courseend extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /** Estimate next time when this condition will be true.
+     *
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
+     */
     public function estimate_next_time(evaluationcontext $context) {
+        global $DB, $COURSE;
+
         $timeend = null;
         $params = json_decode($context->get_params());
         $time = $params->{self::UI_TIME};
         $timeaccess = $context->get_timeaccess();
         $courseid = $context->get_courseid();
-        $courseend = get_course($courseid)->enddate;
+        if ($COURSE->id == $courseid) {
+            $courseend = $DB->get_field('course', 'enddate', ['id' => $courseid]);
+        } else {
+            $courseend = get_course($courseid)->enddate;
+        }
+
         // Condition.
         if (!$context->is_complementary()) {
             if ($timeaccess <= $courseend - $time) {
@@ -135,33 +136,46 @@ class courseend extends notificationconditionplugin {
     }
 
     /**
-     * Get the UI.
+     * Get the UI elements for the subplugin.
      *
-     * @param \moodleform $mform
-     * @param int         $id
-     * @param int         $courseid
-     * @param string      $type
+     * @param \MoodleQuickForm $mform    The Moodle quick form object.
+     * @param int              $courseid The ID of the course.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
-        $this->get_ui_select_date($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
+        $this->get_ui_select_date($mform, $type);
     }
 
     /**
-     * Validation editrule_form
+     * Validates the form for the course end notification condition.
      *
-     * @param mixed  $mform
-     * @param int    $id       The name from form field
-     * @param int    $courseid course id
-     * @param array &$array    The array to be modified by reference
+     * @param int        $courseid The ID of the course.
+     * @param array      $array    The array to store validation errors.
      */
-    public function validation_form($mform, $id, $courseid, &$array) {
-        $uiname = $this->get_name_ui($id, $this->get_subtype());
+    public function validation($courseid, &$array = null) {
+        if ($validation = parent::validation($courseid, $array) == 'break') {
+            return true;
+        }
+
+        // If false from parent and array is null, return.
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
+
         $courseend = get_course($courseid)->enddate;
 
         if (empty($courseend)) {
+            $validation = false;
+            if (is_null($array)) {
+                return $validation;
+            }
+            $uiname = $this->get_name_ui($this->get_subtype());
             $array[$uiname] = get_string('validation_editrule_form_dateend', 'notificationscondition_courseend');
+            $validation = false;
         }
+
+        return $validation;
     }
 
     /**
@@ -181,18 +195,17 @@ class courseend extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
@@ -232,15 +245,14 @@ class courseend extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 

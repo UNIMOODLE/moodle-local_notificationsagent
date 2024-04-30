@@ -65,15 +65,6 @@ class coursestart extends notificationconditionplugin {
         return ['[TTTT]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_coursestart');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -95,7 +86,7 @@ class coursestart extends notificationconditionplugin {
 
         $timestart = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
@@ -116,14 +107,22 @@ class coursestart extends notificationconditionplugin {
      * @return int|mixed|null
      */
     public function estimate_next_time(evaluationcontext $context) {
+        global $DB, $COURSE;
+
         $timestart = null;
         $params = json_decode($context->get_params());
         $courseid = $context->get_courseid();
-        $course = get_course($courseid);
+
+        if ($COURSE->id == $courseid) {
+            $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+        } else {
+            $course = get_course($courseid);
+        }
+
         $timeaccess = $context->get_timeaccess();
         // Condition.
         if (!$context->is_complementary()) {
-            if ($timeaccess <= $course->startdate + $params->{self::UI_TIME} && $timeaccess >= $course->startdate) {
+            if ($timeaccess <= ($course->startdate + $params->{self::UI_TIME})) {
                 $timestart = $course->startdate + $params->{self::UI_TIME};
             } else {
                 return time();
@@ -139,24 +138,21 @@ class coursestart extends notificationconditionplugin {
     }
 
     /**
-     * User interface
+     * Get the UI elements for the subplugin.
      *
-     * @param \moodleform $mform
-     * @param int         $id
-     * @param int         $courseid
-     * @param string      $type
-     *
-     * @return void
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
-        $this->get_ui_select_date($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
+        $this->get_ui_select_date($mform, $type);
     }
 
     /**
      *  Check subplugin capability
      *
-     * @param $context
+     * @param \context $context
      *
      * @return bool
      */
@@ -170,18 +166,17 @@ class coursestart extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
@@ -221,15 +216,14 @@ class coursestart extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 

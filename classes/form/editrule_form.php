@@ -35,7 +35,6 @@ namespace local_notificationsagent\form;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationplugin;
-use local_notificationsagent\rule;
 use notificationscondition_ac\mod_ac_availability_info;
 
 defined('MOODLE_INTERNAL') || die();
@@ -58,7 +57,7 @@ class editrule_form extends \moodleform {
     /**
      * Private variable for $rule.
      *
-     * @var rule Instance of rule
+     * @var stdClass of rule
      */
     private $_rule;
 
@@ -209,7 +208,7 @@ class editrule_form extends \moodleform {
 
         $mform->addElement('hidden', 'ruleid');
         $mform->setType('ruleid', PARAM_INT);
-        $mform->setDefault('ruleid', $rule->get_id());
+        $mform->setDefault('ruleid', $rule->id);
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
         $mform->setDefault('courseid', $this->_customdata["courseid"]);
@@ -222,7 +221,7 @@ class editrule_form extends \moodleform {
 
         $mform->addElement('hidden', 'type', get_string('editrule_type', 'local_notificationsagent'));
         $mform->setType('type', PARAM_INT);
-        $mform->setDefault('type', $rule->get_template());
+        $mform->setDefault('type', $rule->template);
 
         // JSON WITH SUBPLUGINS SELECTED.
         $mform->addElement('hidden', self::FORM_JSON_CONDITION);
@@ -273,7 +272,7 @@ class editrule_form extends \moodleform {
      * Add or remove subplugins inside rule
      * This method is called from no_submit_button_pressed()
      */
-    public function addOrRemoveSubplugin() {
+    public function addorremovesubplugin() {
         $mform = $this->_form;
 
         // When click registerNoSubmitButton to ADD.
@@ -319,10 +318,10 @@ class editrule_form extends \moodleform {
         if (!empty($condition->getValue())) {
             $conditionvalue = json_decode($condition->getValue(), true);
         }
-        $key = time();
+        $key = "new" . time();
         $conditionvalue[$key] = ["pluginname" => $pluginname, "action" => self::FORM_JSON_ACTION_INSERT];
         // Set default values for plugin.
-        content::set_default_plugin($this->_rule, $this, $key, $pluginname, $type);
+        content::set_default_plugin($key, $this->_rule, $this, $pluginname, $type);
         $condition->setValue(json_encode($conditionvalue));
     }
 
@@ -372,7 +371,7 @@ class editrule_form extends \moodleform {
             foreach ($json as $key => $value) {
                 // Load all plugins to insert or update
                 if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
-                    content::get_plugin_ui($this->_rule, $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type);
+                    content::get_plugin_ui($key, $this->_rule, $mform, $this->_customdata["courseid"], $value["pluginname"], $type);
                 }
             }
         }
@@ -493,9 +492,9 @@ class editrule_form extends \moodleform {
         }
 
         // LOAD JSON.
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_CONDITION, $errors);
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_EXCEPTION, $errors);
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_ACTION, $errors);
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_CONDITION, $data, $errors);
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_EXCEPTION, $data, $errors);
+        $this->loadJsonContentForValidation(notificationplugin::TYPE_ACTION, $data, $errors);
 
         return $errors;
     }
@@ -504,9 +503,10 @@ class editrule_form extends \moodleform {
      * Load JSON content for validation.
      *
      * @param string $type   Subplugin type
+     * @param array  $data   data form
      * @param array  $errors Erros
      */
-    private function loadJsonContentForValidation($type, &$errors) {
+    private function loadJsonContentForValidation($type, $data, &$errors) {
         $mform = $this->_form;
         $name = $type == notificationplugin::TYPE_CONDITION
             ? self::FORM_JSON_CONDITION
@@ -516,9 +516,11 @@ class editrule_form extends \moodleform {
         if (!empty($json)) {
             $json = json_decode($json, true);
             foreach ($json as $key => $value) {
-                content::get_validation_form_plugin(
-                    $this->_rule, $mform, $key, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
-                );
+                if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
+                    content::get_validation_form_plugin(
+                        $key, $data, $this->_rule, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
+                    );
+                }
             }
         }
     }
@@ -575,69 +577,51 @@ class editrule_form extends \moodleform {
 class content {
 
     /**
-     * Instance the subplugin.
-     *
-     * @param rule   $rule       rule
-     * @param string $pluginname Subplugin name
-     * @param string $subtype    Subplugin type
-     *
-     * @return mixed
-     */
-    private static function instance_subplugin($rule, $pluginname, $subtype) {
-        $type = ($subtype == notificationplugin::TYPE_ACTION ? notificationplugin::TYPE_ACTION
-            : notificationplugin::TYPE_CONDITION);
-        $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
-        if (class_exists($pluginclass)) {
-            return new $pluginclass($rule);
-        }
-        return false;
-    }
-
-    /**
      * Get the plugin UI.
      *
-     * @param rule        $rule       rule
+     * @param mixed       $id         id
+     * @param stdClass    $rule       rule
      * @param \moodleform $mform      Form
-     * @param int         $id         id
      * @param int         $idcourse   course id
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
-    public static function get_plugin_ui($rule, $mform, $id, $idcourse, $pluginname, $subtype) {
-        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
-            $pluginobj->get_ui($mform, $id, $idcourse, $subtype);
+    public static function get_plugin_ui($id, $rule, $mform, $idcourse, $pluginname, $subtype) {
+        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+            $subplugin->get_ui($mform, $idcourse, $subtype);
         }
     }
 
     /**
      * Set the default plugin for a form and id.
      *
-     * @param rule        $rule       rule
+     * @param mixed       $id         id
+     * @param stdClass    $rule       rule
      * @param \moodleform $form       Form
-     * @param int         $id         id
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
-    public static function set_default_plugin($rule, $form, $id, $pluginname, $subtype) {
-        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
-            $pluginobj->set_default($form, $id);
+    public static function set_default_plugin($id, $rule, $form, $pluginname, $subtype) {
+        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+            $subplugin->set_default($form);
         }
     }
 
     /**
      * Get the validation form plugin.
      *
-     * @param rule        $rule       rule
-     * @param \moodleform $mform      Form
-     * @param int         $id         id
-     * @param int         $idcourse   course id
-     * @param string      $pluginname Subplugin name
-     * @param string      $subtype    Subplugin type
-     * @param array       $errors     description
+     * @param int       $id         id
+     * @param array     $data       data form
+     * @param \stdClass $rule       rule
+     * @param int       $idcourse   course id
+     * @param string    $pluginname Subplugin name
+     * @param string    $subtype    Subplugin type
+     * @param array     $errors     array of errors
      */
-    public static function get_validation_form_plugin($rule, $mform, $id, $idcourse, $pluginname, $subtype, &$errors) {
-        if ($pluginobj = self::instance_subplugin($rule, $pluginname, $subtype)) {
-            $pluginobj->validation_form($mform, $id, $idcourse, $errors);
+    public static function get_validation_form_plugin($id, $data, $rule, $idcourse, $pluginname, $subtype, &$errors) {
+        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+            $subplugin->convert_parameters($data);
+            $subplugin->validation($idcourse, $errors);
         }
     }
 

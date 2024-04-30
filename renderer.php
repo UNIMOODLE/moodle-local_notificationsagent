@@ -35,7 +35,7 @@ class local_notificationsagent_renderer extends plugin_renderer_base {
     /**
      * Function for the Tabs.
      *
-     * @param string $tabtarget description
+     * @param string $tabtarget Targer tab
      *
      * @return string
      */

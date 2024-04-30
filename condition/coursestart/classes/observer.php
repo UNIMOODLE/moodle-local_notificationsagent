@@ -32,12 +32,20 @@
  */
 
 use local_notificationsagent\notificationsagent;
-use local_notificationsagent\notificationplugin;
 use notificationscondition_coursestart\coursestart;
 use local_notificationsagent\evaluationcontext;
 
+/**
+ * Class observer of coursestart
+ */
 class notificationscondition_coursestart_observer {
 
+    /**
+     * Handles the course_updated event.
+     *
+     * @param \core\event\course_updated $event The course_updated event object
+     * @return null|void Returns null if the courseid is 1, otherwise does not return anything
+     */
     public static function course_updated(\core\event\course_updated $event) {
         if ($event->courseid == 1) {
             return null;
@@ -46,42 +54,21 @@ class notificationscondition_coursestart_observer {
         $courseid = $event->courseid;
         $other = $event->other;
         // If startdate is not set in other array then the startdate setting has not been modified.
-        if (isset($other["updatedfields"]["startdate"])) {
-            $startdate = $other["updatedfields"]["startdate"];
-        } else {
+        if (!isset($other["updatedfields"]["startdate"])) {
             return;
         }
 
-        $pluginname = 'coursestart';
+        $pluginname = coursestart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
-
         foreach ($conditions as $condition) {
-            $pluginname = $condition->pluginname;
-            $conditionid = $condition->id;
-
-            $subplugin = new coursestart(null, $conditionid);
+            $subplugin = new coursestart($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($event->timecreated);
             $context->set_courseid($courseid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-            )
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }

@@ -149,13 +149,15 @@ class notificationacplugin extends info {
      */
     public static function is_empty($availability) {
         $result = true;
-        $tree = new \core_availability\tree(json_decode($availability));
-        $children = $tree->get_all_children('core_availability\tree');
-        if (!empty($children)) {
-            foreach ($children as $child) {
-                if (!$child->is_empty()) {
-                    $result = false;
-                    break;
+        if (!empty($availability)) {
+            $tree = new \core_availability\tree(json_decode($availability));
+            $children = $tree->get_all_children('core_availability\tree');
+            if (!empty($children)) {
+                foreach ($children as $child) {
+                    if (!$child->is_empty()) {
+                        $result = false;
+                        break;
+                    }
                 }
             }
         }

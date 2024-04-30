@@ -74,7 +74,7 @@ class evaluationcontext {
     private $triggercondition;
 
     /**
-     * @var object The rule.
+     * @var rule The rule.
      */
     private $rule;
 
@@ -93,6 +93,11 @@ class evaluationcontext {
     private $startdate;
 
     /**
+     * @var bool Set true for event triggered plugins.
+     */
+    private $observer = false;
+
+    /**
      * Get the user ID.
      *
      * @return int
@@ -104,7 +109,7 @@ class evaluationcontext {
     /**
      * Set the user ID.
      *
-     * @param int $userid description
+     * @param int $userid User id
      */
     public function set_userid($userid): void {
         $this->userid = $userid;
@@ -158,7 +163,7 @@ class evaluationcontext {
     /**
      * Set the parameters for the PHP function.
      *
-     * @param array $params description
+     * @param array $params Params
      */
     public function set_params($params): void {
         $this->params = $params;
@@ -255,20 +260,20 @@ class evaluationcontext {
     }
 
     /**
-     * Get the rule object.
+     * Get the rule instance.
      *
-     * @return object
+     * @return rule
      */
     public function get_rule(): object {
         return $this->rule;
     }
 
     /**
-     * Set a rule for the PHP function.
+     * Set a rule instance for the PHP function.
      *
-     * @param object $rule
+     * @param rule $rule
      */
-    public function set_rule(object $rule): void {
+    public function set_rule(rule $rule): void {
         $this->rule = $rule;
     }
 
@@ -306,6 +311,20 @@ class evaluationcontext {
      */
     public function set_startdate(int $startdate): void {
         $this->startdate = $startdate;
+    }
+
+    /**
+     * @return bool
+     */
+    public function get_observer(): bool {
+        return $this->observer;
+    }
+
+    /**
+     * @param bool $observer
+     */
+    public function set_observer(bool $observer): void {
+        $this->observer = $observer;
     }
 
 }

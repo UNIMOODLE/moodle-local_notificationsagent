@@ -31,23 +31,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_notificationsagent\notificationsagent;
-use local_notificationsagent\notificationplugin;
-use notificationscondition_activitystudentend\activitystudentend;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\rule;
+use notificationscondition_activitystudentend\activitystudentend;
 
+/**
+ * Class of activitystudentend observer
+ */
 class notificationscondition_activitystudentend_observer {
 
     /**
-     * @throws dml_exception
+     * Course module viewed event
+     *
+     * @param \core\event\course_module_viewed $event Course module viewed event
      */
-    public static function course_module_viewed($event) {
+    public static function course_module_viewed(\core\event\course_module_viewed $event) {
         $courseid = $event->courseid;
-        $cmid = $event->objectid;
+        $cmid = $event->contextinstanceid;
         $userid = $event->userid;
         $timecreated = $event->timecreated;
 
-        $pluginname = 'activitystudentend';
+        $pluginname = activitystudentend::NAME;
 
         activitystudentend::set_activity_access($userid, $courseid, $cmid, $timecreated);
 
@@ -55,26 +60,17 @@ class notificationscondition_activitystudentend_observer {
 
         foreach ($conditions as $condition) {
             $conditionid = $condition->id;
-            $subplugin = new activitystudentend(null, $conditionid);
+            $ruleid = $condition->ruleid;
+
+            $subplugin = new activitystudentend($ruleid, $conditionid);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($timecreated);
             $context->set_courseid($courseid);
             $context->set_userid($userid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid
-            )
-            ) {
-                notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $conditionid);
-                notificationsagent::set_time_trigger($condition->ruleid, $conditionid, $userid, $courseid, $cache);
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }

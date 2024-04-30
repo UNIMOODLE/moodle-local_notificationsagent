@@ -40,6 +40,8 @@ use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
 
 /**
+ * Test for the notificationscondition_calendarstart plugin.
+ *
  * @group notificationsagent
  */
 class calendarstart_test extends \advanced_testcase {
@@ -89,6 +91,9 @@ class calendarstart_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+    /**
+     * Duration for the event
+     */
     public const DURATION = 30 * 86400;
     /**
      * @var \stdClass
@@ -103,7 +108,8 @@ class calendarstart_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new calendarstart(self::$rule);
+        self::$subplugin = new calendarstart(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -132,7 +138,7 @@ class calendarstart_test extends \advanced_testcase {
      * @param int    $timeaccess    The access time.
      * @param bool   $usecache      Whether to use cache or not.
      * @param string $param         The parameters.
-     * @param array  $complementary The complementary array.
+     * @param bool   $complementary The complementary array.
      * @param bool   $expected      The expected result.
      *
      * @dataProvider dataprovider
@@ -157,9 +163,9 @@ class calendarstart_test extends \advanced_testcase {
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
             if ($params['radio'] === 1) {
-                $objdb->timestart = self::$caledarevent->timestart + $params['time'];
+                $objdb->startdate = self::$caledarevent->timestart + $params['time'];
             } else {
-                $objdb->timestart = self::$caledarevent->timestart + $params['time'] + self::DURATION;
+                $objdb->startdate = self::$caledarevent->timestart + $params['time'] + self::DURATION;
             }
 
             $objdb->pluginname = self::$subtype;
@@ -414,7 +420,7 @@ class calendarstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -424,27 +430,26 @@ class calendarstart_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uiactivityname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_ACTIVITY);
-        $uiradiogroup = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_RADIO_GROUP);
+        $uiactivityname = $method->invoke(self::$subplugin, self::$subplugin::UI_ACTIVITY);
+        $uiradiogroup = $method->invoke(self::$subplugin, self::$subplugin::UI_RADIO_GROUP);
         $uiradiogroupelements = [];
         foreach ($mform->getElement($uiradiogroup)->getElements() as $element) {
             $uiradiogroupelements[$element->getName()] = $element->getName();
         }
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         $uigroupelements = [];
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $uigroupelements[] = $element->getName();
         }
-        $uiradio = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_RADIO);
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uiradio = $method->invoke(self::$subplugin, self::$subplugin::UI_RADIO);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
         $this->assertTrue($mform->elementExists($uigroupname));
@@ -464,7 +469,7 @@ class calendarstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -479,24 +484,25 @@ class calendarstart_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $jsoncondition = $mform->getElementValue(editrule_form::FORM_JSON_CONDITION);
         $arraycondition = array_keys(json_decode($jsoncondition, true));
-        $id = $arraycondition[0];
+        $id = $arraycondition[0];// Temp value.
+        self::$subplugin->set_id($id);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uiradiogroup = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_RADIO_GROUP);
+        $uiradiogroup = $method->invoke(self::$subplugin, self::$subplugin::UI_RADIO_GROUP);
         $default = [];
         foreach ($mform->getElement($uiradiogroup)->getElements() as $element) {
             $default[$element->getName()][] = $element->getValue();
         }
-        $uigroupname = $method->invoke(self::$subplugin, $id, self::$subplugin->get_subtype());
+        $uigroupname = $method->invoke(self::$subplugin, self::$subplugin->get_subtype());
         foreach ($mform->getElement($uigroupname)->getElements() as $element) {
             $default[$element->getName()] = $element->getValue();
         }
 
-        $uiradio = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_RADIO);
-        $uidays = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DAYS);
-        $uihours = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_HOURS);
-        $uiminutes = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_SECONDS);
+        $uiradio = $method->invoke(self::$subplugin, self::$subplugin::UI_RADIO);
+        $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
+        $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
+        $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
+        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($default[$uiradio]) && in_array(self::$subplugin::UI_RADIO_DEFAULT_VALUE, $default[$uiradio]));
         $this->assertTrue(isset($default[$uidays]) && $default[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
@@ -511,17 +517,18 @@ class calendarstart_test extends \advanced_testcase {
      * @covers \notificationscondition_calendarstart\calendarstart::convert_parameters
      */
     public function test_convertparameters() {
+        $id = self::$subplugin->get_id();
         $params = [
-            "5_calendarstart_days" => "1",
-            "5_calendarstart_hours" => "0",
-            "5_calendarstart_minutes" => "0",
-            "5_calendarstart_seconds" => "1",
-            "5_calendarstart_cmid" => "7",
-            "5_calendarstart_radio" => "1",
+            $id . "_calendarstart_days" => "1",
+            $id . "_calendarstart_hours" => "0",
+            $id . "_calendarstart_minutes" => "0",
+            $id . "_calendarstart_seconds" => "1",
+            $id . "_calendarstart_cmid" => "7",
+            $id . "_calendarstart_radio" => "1",
         ];
         $expected = '{"time":86401,"cmid":7,"radio":"1"}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, 5, $params);
+        $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
 }

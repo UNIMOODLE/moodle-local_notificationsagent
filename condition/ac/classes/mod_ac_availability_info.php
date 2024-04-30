@@ -35,6 +35,9 @@ namespace notificationscondition_ac;
 
 use local_notificationsagent\notificationacplugin;
 
+/**
+ * Class mod_ac_availability_info
+ */
 class mod_ac_availability_info extends notificationacplugin {
 
 }

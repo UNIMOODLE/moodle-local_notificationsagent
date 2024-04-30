@@ -40,4 +40,5 @@ $string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
 $string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}';
 $string['subtype'] = 'privateforummessage';
-$string['privateforummessage_replyerror'] = 'A publicación non se puido publicar probablemente porque non se executou a condición forumnoreply.';
+$string['privateforummessage_replyerror']
+    = 'A publicación non se puido publicar probablemente porque non se executou a condición forumnoreply.';

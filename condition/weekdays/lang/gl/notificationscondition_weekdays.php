@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -24,23 +24,23 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activitysinceend
+ * @package    notificationscondition_weekdays
+ * @category   string
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined("MOODLE_INTERNAL") || die();
 
-$tasks = [
-    [
-        'classname' => 'notificationscondition_activitysinceend\task\activitysinceend_crontask',
-        'blocking' => 0,
-        'minute' => '30',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*',
-    ],
-];
+$string['pluginname'] = 'Condición relativa a cada día da semana';
+$string['conditiontext'] = 'Todos os días da semana [LMXJVSD]';
+$string['subtype'] = 'weekdays';
+$string['modname'] = 'weekdays';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['weekdays_crontask'] = 'weekdays cron task';
+$string['weekdaystext'] = 'É día da semana ({$a->weekdays})';
+$string['weekdaystag'] = 'Día da semana';
+$string['weekdaysrequired'] = 'Seleccione polo menos un día';

@@ -38,6 +38,8 @@ use local_notificationsagent\rule;
 use notificationscondition_activitynewcontent\activitynewcontent;
 
 /**
+ * Class activitynewcontent_observer_test
+ *
  * @group notificationsagent
  */
 class activitynewcontent_observer_test extends \advanced_testcase {
@@ -125,7 +127,7 @@ class activitynewcontent_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'activitynewcontent';
+        $pluginname = activitynewcontent::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;

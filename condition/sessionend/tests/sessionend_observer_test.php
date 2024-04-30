@@ -36,6 +36,8 @@ namespace notificationscondition_sessionend;
 use local_notificationsagent\rule;
 
 /**
+ * Session end observer test.
+ *
  * @group notificationsagent
  */
 class sessionend_observer_test extends \advanced_testcase {
@@ -117,7 +119,7 @@ class sessionend_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'sessionend';
+        $pluginname = sessionend::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -156,6 +158,11 @@ class sessionend_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

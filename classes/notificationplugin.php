@@ -34,7 +34,6 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\rule;
 use moodle_exception;
 
 /**
@@ -123,6 +122,16 @@ abstract class notificationplugin {
     public const UI_USER = 'user';
 
     /**
+     * User interface constant for grade.
+     */
+    public const UI_GRADE = 'grade';
+
+    /**
+     * User interface constant for operator.
+     */
+    public const UI_OP = 'op';
+
+    /**
      * Default value for days in UI.
      */
     public const UI_DAYS_DEFAULT_VALUE = 0;
@@ -153,6 +162,18 @@ abstract class notificationplugin {
     const CONFIG_ENABLED = 'enabled';
 
     /**
+     * Conditional operators.
+     */
+    const OPERATORS
+        = [
+            0 => '>',
+            1 => '>=',
+            2 => '=',
+            3 => '<',
+            4 => '<=',
+        ];
+
+    /**
      * @var $id int the id of the subplugin instance
      */
     public $id;
@@ -163,7 +184,7 @@ abstract class notificationplugin {
      */
     private $ruleid;
     /**
-     * @var Rule $rule the assistrule object for this instance
+     * @var stdClass $rule object
      */
     public $rule;
     /**
@@ -188,56 +209,33 @@ abstract class notificationplugin {
     private $type;
 
     /**
-     * Indicates if the plugin is complementary.
-     *
-     * @var int
-     */
-    private $iscomplementary = 0;
-
-    /**
-     * cmid of course moduule in conditions if any.
-     *
-     * @var int
-     */
-    private $cmid;
-
-    /**
      * Constructor for the class.
      *
-     * @param rule $rule
-     * @param int  $id
+     * @param int|stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
+     * @param mixed        $id       If is numeric => value is already in DB
      *
      */
-    public function __construct($rule, $id = null) {
-        $this->rule = $rule;
+    public function __construct($ruleorid, $id = null) {
+        global $DB;
 
-        if (!empty($id)) {
-            global $DB;
-            $subplugin = $DB->get_record('notificationsagent_condition', ['id' => $id]);
-
-            $this->set_id($id);
-            $this->set_pluginname($subplugin->pluginname);
-            $this->set_ruleid($subplugin->ruleid);
-            $this->set_type($subplugin->type);
-            $this->set_parameters($subplugin->parameters);
-            $this->set_cmid($subplugin->cmid);
-            $this->set_iscomplementary($subplugin->complementary);
-            $this->rule = new rule($subplugin->ruleid);
-
+        if (is_object($ruleorid)) {
+            $rule = $ruleorid;
+        } else {
+            $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleorid]);
         }
-
+        $this->rule = $rule;
+        $this->set_id($id);
     }
 
     /**
      * Get name for user interface.
      *
-     * @param int    $id   description
-     * @param string $name description
+     * @param string $name UI name
      *
      * @return string
      */
-    protected function get_name_ui($id, $name) {
-        return $id . '_' . get_called_class()::NAME . '_' . $name;
+    protected function get_name_ui($name) {
+        return $this->get_id() . '_' . get_called_class()::NAME . '_' . $name;
     }
 
     /**
@@ -265,7 +263,9 @@ abstract class notificationplugin {
      *
      * @return string subplugin type. "messageagent"
      */
-    abstract public function get_subtype();
+    public function get_subtype() {
+        return get_called_class()::NAME;
+    }
 
     /**
      * Retrieve the description of the entity.
@@ -283,14 +283,13 @@ abstract class notificationplugin {
      * Generates the UI title element for the form and inserts it before a specified group.
      *
      * @param \MoodleQuickForm $mform The form to which the title element will be added.
-     * @param int|string       $id    The identifier used for the title element.
      * @param string           $type  The type of the notification plugin, used to build the class attribute.
      */
-    protected function get_ui_title($mform, $id, $type) {
+    protected function get_ui_title($mform, $type) {
         $title = \html_writer::start_tag('h5');
         $title .= $this->get_title();
         $class = 'remove-' . $type . '-span';
-        $title .= \html_writer::span('', 'btn icon fa fa-trash align-top ' . $class, ['id' => $id]);
+        $title .= \html_writer::span('', 'btn icon fa fa-trash align-top ' . $class, ['id' => $this->get_id()]);
         $title .= \html_writer::end_tag('h5');
         $titleelement = $mform->createElement('html', $title);
         $mform->insertElementBefore($titleelement, 'new' . $type . '_group');
@@ -300,10 +299,10 @@ abstract class notificationplugin {
      * Builds select elements for date selection in the form.
      *
      * @param \MoodleQuickForm $mform The form to which the date elements will be added.
-     * @param int|string       $id    The identifier used for date elements.
      * @param string           $type  The type of the notification plugin, used to determine condition or action.
      */
-    protected function get_ui_select_date($mform, $id, $type) {
+    protected function get_ui_select_date($mform, $type) {
+        $id = $this->get_id();
         $conditionoraction = ($type == self::TYPE_ACTION ? self::TYPE_ACTION : self::TYPE_CONDITION);
 
         $timegroup = [];
@@ -311,7 +310,7 @@ abstract class notificationplugin {
         // Days.
         $timegroup[] = $mform->createElement(
             'float',
-            $this->get_name_ui($id, self::UI_DAYS),
+            $this->get_name_ui(self::UI_DAYS),
             '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
@@ -323,7 +322,7 @@ abstract class notificationplugin {
         // Hours.
         $timegroup[] = $mform->createElement(
             'float',
-            $this->get_name_ui($id, self::UI_HOURS),
+            $this->get_name_ui(self::UI_HOURS),
             '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
@@ -335,7 +334,7 @@ abstract class notificationplugin {
         // Minutes.
         $timegroup[] = $mform->createElement(
             'float',
-            $this->get_name_ui($id, self::UI_MINUTES),
+            $this->get_name_ui(self::UI_MINUTES),
             '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
@@ -347,7 +346,7 @@ abstract class notificationplugin {
         // Seconds.
         $timegroup[] = $mform->createElement(
             'float',
-            $this->get_name_ui($id, self::UI_SECONDS),
+            $this->get_name_ui(self::UI_SECONDS),
             '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
@@ -358,7 +357,7 @@ abstract class notificationplugin {
 
         // GroupTime.
         $group = $mform->createElement(
-            'group', $this->get_name_ui($id, $this->get_subtype()),
+            'group', $this->get_name_ui($this->get_subtype()),
             get_string(
                 'editrule_condition_element_time', 'notifications' . $conditionoraction . '_' . get_called_class()::NAME,
                 ['typeelement' => '[TTTT]']
@@ -369,7 +368,7 @@ abstract class notificationplugin {
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addGroupRule(
-            $this->get_name_ui($id, $this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui($this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -377,15 +376,13 @@ abstract class notificationplugin {
     /**
      * Set the default select date values for the given ID.
      *
-     * @param int $id description
-     *
      * @return array
      */
-    protected function set_default_select_date($id) {
-        $params[$this->get_name_ui($id, self::UI_DAYS)] = self::UI_DAYS_DEFAULT_VALUE;
-        $params[$this->get_name_ui($id, self::UI_HOURS)] = self::UI_HOURS_DEFAULT_VALUE;
-        $params[$this->get_name_ui($id, self::UI_MINUTES)] = self::UI_MINUTES_DEFAULT_VALUE;
-        $params[$this->get_name_ui($id, self::UI_SECONDS)] = self::UI_SECONDS_DEFAULT_VALUE;
+    protected function set_default_select_date() {
+        $params[$this->get_name_ui(self::UI_DAYS)] = self::UI_DAYS_DEFAULT_VALUE;
+        $params[$this->get_name_ui(self::UI_HOURS)] = self::UI_HOURS_DEFAULT_VALUE;
+        $params[$this->get_name_ui(self::UI_MINUTES)] = self::UI_MINUTES_DEFAULT_VALUE;
+        $params[$this->get_name_ui(self::UI_SECONDS)] = self::UI_SECONDS_DEFAULT_VALUE;
         return $params;
     }
 
@@ -399,30 +396,52 @@ abstract class notificationplugin {
     }
 
     /**
-     *  Validation editrule_form
+     * Validation editrule_form
+     * If this method overrides, call to parent::validation
      *
-     * @param editrule_form $mform
-     * @param int           $id       The name from form field
-     * @param int           $courseid course id
-     * @param array         $array    The array to be modified by reference
+     * @param int        $courseid Course id
+     * @param array      $array    The array to be modified by reference. If is null, validation is not being called from the form
+     *                             and return directly
      *
-     * @return void
+     * @return bool
      */
-    public function validation_form($mform, $id, $courseid, &$array) {}
+    public function validation($courseid, &$array = null) {
+        if ($courseid == SITEID) {
+            return 'break';
+        }
+
+        // All parameters.
+        $data = json_decode($this->get_parameters() ?? '', true);
+
+        // Parameters to validate.
+        if ($cmid = $data[self::UI_ACTIVITY] ?? null) {
+            // Validations.
+            if (!$validation = notificationsagent::supported_cm($cmid, $courseid)) {
+                if (is_null($array)) {
+                    return $validation;
+                }
+                $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
+                    'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
+                );
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Save data (insert/update/delete)
      *
      * @param string    $action
-     * @param integer   $idname
      * @param \stdClass $dataplugin
      *
      * @return bool
      * @throws moodle_exception
      */
-    protected function insert_update_delete($action, $idname, &$dataplugin) {
+    protected function insert_update_delete($action, &$dataplugin) {
         global $DB;
 
+        $id = $this->get_id();
         $table = $this->get_type() == self::TYPE_ACTION ? 'notificationsagent_action' : 'notificationsagent_condition';
         // Insert plugin.
         if ($action == editrule_form::FORM_JSON_ACTION_INSERT) {
@@ -433,37 +452,29 @@ abstract class notificationplugin {
 
             // Update plugin.
         } else if ($action == editrule_form::FORM_JSON_ACTION_UPDATE) {
-            $dataplugin->id = $idname;
+            $dataplugin->id = $id;
             if (!$DB->update_record($table, $dataplugin)) {
                 throw new moodle_exception('errorupdating', 'notificationplugin');
-            }
-            if ($this->get_type() != self::TYPE_ACTION) {
-                if (!$DB->delete_records('notificationsagent_triggers', ['conditionid' => $idname])) {
-                    throw new moodle_exception('errordeletingtriggers', 'notificationplugin');
-                }
             }
             return true;
 
             // Delete plugin.
         } else if ($action == editrule_form::FORM_JSON_ACTION_DELETE) {
-            if (!$DB->delete_records($table, ['id' => $idname])) {
+            if (!$DB->delete_records($table, ['id' => $id])) {
                 throw new moodle_exception('errordeleting', 'notificationplugin');
             }
+
             if ($this->get_type() != self::TYPE_ACTION) {
-                if (!$DB->delete_records('notificationsagent_cache', ['conditionid' => $idname])) {
+                if (!$DB->delete_records('notificationsagent_cache', ['conditionid' => $id])) {
                     throw new moodle_exception('errordeletingcache', 'notificationplugin');
                 }
-                if (!$DB->delete_records('notificationsagent_triggers', ['conditionid' => $idname])) {
-                    throw new moodle_exception('errordeletingtriggers', 'notificationplugin');
-                }
             }
-            return false;
 
+            return false; // If delete, do not call to estimate_next_time method.
         } else {
             throw new moodle_exception('errorinsertupdatedelete', 'notificationplugin');
         }
 
-        return false;
     }
 
     /**
@@ -481,22 +492,58 @@ abstract class notificationplugin {
     abstract public function process_markups(&$content, $courseid, $options = null);
 
     /**
-     * Creates an array of subplugin instances from the provided database records.
+     * Create subplugins from the given records.
      *
-     * @param array $records Database records to create subplugin instances from.
+     * @param array        $records  The array of records to create subplugins from.
+     * @param int|stdClass $ruleorid Object from DB table 'notificationsagent_rule' or just a rule id
      *
-     * @return array An array of instantiated subplugins.
+     * @return array The array of created subplugins.
      */
-    abstract public static function create_subplugins($records);
+    public static function create_subplugins($records, $ruleorid) {
+        global $DB;
+
+        $subplugins = [];
+
+        if (is_object($ruleorid)) {
+            $rule = $ruleorid;
+        } else {
+            $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleorid]);
+        }
+
+        foreach ($records as $record) {
+            if ($subplugin = self::create_instance($record->id, $record->type, $record->pluginname, $rule)) {
+                $subplugins[$record->id] = $subplugin;
+            }
+        }
+
+        return $subplugins;
+    }
 
     /**
-     * Creates a single subplugin instance based on the provided identifier.
+     * Create a subplugin
      *
-     * @param mixed $id The identifier used to create a subplugin instance.
+     * @param int|stdClass $id       If is numeric => value is already in DB
+     * @param string       $type     The type of the subplugin
+     * @param string       $pluginname The name of the subplugin
+     * @param int|stdClass $ruleorid Object from DB table 'notificationsagent_rule' or just a rule id
      *
-     * @return mixed An instance of a subplugin.
+     * @return stdClass
      */
-    abstract public static function create_subplugin($id);
+    public static function create_instance($id, $type, $pluginname, $ruleorid = 0) {
+        global $DB;
+
+        if (is_object($ruleorid)) {
+            $rule = $ruleorid;
+        } else {
+            $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleorid]);
+        }
+
+        $pluginclass = '\notifications' . $type . '_' . $pluginname . '\\' . $pluginname;
+        if (class_exists($pluginclass)) {
+            $plugin = new $pluginclass($rule, $id);
+            return $plugin;
+        }
+    }
 
     /**
      * Determines if the plugin is generic or specific to a certain type.
@@ -544,30 +591,12 @@ abstract class notificationplugin {
     /**
      * Set the ID of the object.
      *
-     * @param int $id The ID to set
+     * @param mixed|null $id The ID to set
      *
      * @return void
      */
-    public function set_id(int $id): void {
+    public function set_id($id): void {
         $this->id = $id;
-    }
-
-    /**
-     * Get the value of iscomplementary
-     *
-     * @return int
-     */
-    public function get_iscomplementary(): int {
-        return $this->iscomplementary;
-    }
-
-    /**
-     * Set the value of iscomplementary.
-     *
-     * @param int $iscomplementary The new value for iscomplementary
-     */
-    public function set_iscomplementary(int $iscomplementary): void {
-        $this->iscomplementary = $iscomplementary;
     }
 
     /**
@@ -603,17 +632,16 @@ abstract class notificationplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param array $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    abstract protected function convert_parameters($id, $params);
+    abstract public function convert_parameters($params);
 
     /**
      * Set the parameters for the PHP function.
      *
-     * @param array $parameters description
+     * @param array $parameters
      */
     public function set_parameters($parameters): void {
         $this->parameters = $parameters;
@@ -642,13 +670,13 @@ abstract class notificationplugin {
                 foreach ($array as $key => $value) {
                     if ($key == self::UI_TIME) {
                         $format = to_human_format($value);
-                        $return[$this->get_name_ui($this->get_id(), self::UI_DAYS)] = $format["days"];
-                        $return[$this->get_name_ui($this->get_id(), self::UI_HOURS)] = $format["hours"];
-                        $return[$this->get_name_ui($this->get_id(), self::UI_MINUTES)] = $format["minutes"];
-                        $return[$this->get_name_ui($this->get_id(), self::UI_SECONDS)] = $format["seconds"];
+                        $return[$this->get_name_ui(self::UI_DAYS)] = $format["days"];
+                        $return[$this->get_name_ui(self::UI_HOURS)] = $format["hours"];
+                        $return[$this->get_name_ui(self::UI_MINUTES)] = $format["minutes"];
+                        $return[$this->get_name_ui(self::UI_SECONDS)] = $format["seconds"];
                         continue;
                     }
-                    $return[$this->get_name_ui($this->get_id(), $key)] = $value;
+                    $return[$this->get_name_ui($key)] = $value;
                 }
             }
         }
@@ -659,23 +687,10 @@ abstract class notificationplugin {
      * Set the defalut values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {}
-
-    // /**
-    //  * @return int
-    //  */
-    // public function get_cmid(): int {
-    //     return $this->cmid;
-    // }
-
-    /**
-     * @param int|null $cmid
-     */
-    public function set_cmid($cmid): void {
-        $this->cmid = $cmid;
+    public function set_default($form) {
     }
+
 }

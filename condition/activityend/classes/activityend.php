@@ -39,6 +39,9 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
+/**
+ * This class handles the condition of activity end.
+ */
 class activityend extends notificationconditionplugin {
 
     /**
@@ -64,10 +67,6 @@ class activityend extends notificationconditionplugin {
         return ['[TTTT]', '[AAAA]'];
     }
 
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_activityend');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -91,7 +90,7 @@ class activityend extends notificationconditionplugin {
 
         $timeend = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
@@ -104,7 +103,13 @@ class activityend extends notificationconditionplugin {
         return $meetcondition;
     }
 
-    /** Estimate next time when this condition will be true. */
+    /**
+     * Estimate the next time when this condition will be true.
+     *
+     * @param evaluationcontext $context The evaluation context object.
+     *
+     * @return int|null The estimated time when the condition will be true, or null if it cannot be estimated.
+     */
     public function estimate_next_time(evaluationcontext $context) {
         $timeend = null;
         $params = json_decode($context->get_params());
@@ -132,8 +137,15 @@ class activityend extends notificationconditionplugin {
         return $timeend;
     }
 
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    /**
+     * Get the UI elements for the subplugin.
+     *
+     * @param \MoodleQuickForm $mform    The mform object to generate the UI for.
+     * @param int              $courseid The ID of the course.
+     * @param string           $type     The type of the form element.
+     */
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
 
         // Activity.
         $listactivities = [];
@@ -141,8 +153,8 @@ class activityend extends notificationconditionplugin {
         foreach ($modinfo->get_cms() as $cm) {
             $listactivities[$cm->id] = format_string($cm->name);
         }
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $listactivities['0'] = 'AAAA';
         }
 
@@ -150,7 +162,7 @@ class activityend extends notificationconditionplugin {
 
         $element = $mform->createElement(
             'select',
-            $this->get_name_ui($id, self::UI_ACTIVITY),
+            $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_condition_activity', 'notificationscondition_activityend',
                 ['typeelement' => '[AAAA]']
@@ -158,38 +170,45 @@ class activityend extends notificationconditionplugin {
             $listactivities
         );
 
-        $this->get_ui_select_date($mform, $id, $type);
+        $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
 
     /**
-     * Validation editrule_form
+     * Validates the form for the activity end notification condition.
      *
-     * @param mixed  $mform
-     * @param int    $id       The name from form field
-     * @param int    $courseid course id
-     * @param array &$array    The array to be modified by reference
+     * @param int        $courseid The ID of the course.
+     * @param array      $array    The array to store validation errors.
      */
-    public function validation_form($mform, $id, $courseid, &$array) {
-        global $COURSE;
-
-        $uiactivity = $this->get_name_ui($id, self::UI_ACTIVITY);
-        if ($mform->elementExists($uiactivity)) {
-            $cmid = $mform->getElementValue($uiactivity)[0];
-            $timeend = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend ?? $COURSE->enddate;
-            if (empty($timeend)) {
-                $array[$uiactivity] = get_string('validation_editrule_form_dateend', 'notificationscondition_activityend');
-            }
-            $supported = notificationsagent::supported_cm($cmid);
-            if (!$supported) {
-                $array[$uiactivity] = get_string('validation_editrule_form_supported_cm', 'notificationscondition_activityend');;
-            }
-
+    public function validation($courseid, &$array = null) {
+        if (($validation = parent::validation($courseid, $array)) === 'break') {
+            return true;
         }
+
+        // If false from parent and $array is null, return
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
+
+        // All parameters
+        $data = json_decode($this->get_parameters(), true);
+
+        // Parameters to validate
+        $cmid = $data[self::UI_ACTIVITY];
+        if (!$validation = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend) {
+            if (is_null($array)) {
+                return $validation;
+            }
+            $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
+                'validation_editrule_form_dateend', 'notificationscondition_activityend'
+            );
+        }
+
+        return $validation;
     }
 
     /**
@@ -209,23 +228,23 @@ class activityend extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $activity = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $activity = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $activity]));
+        $this->set_cmid((int) $activity);
         return $this->get_parameters();
     }
 
@@ -267,15 +286,14 @@ class activityend extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 }

@@ -51,6 +51,7 @@ class notificationsaction extends notificationsbaseinfo {
 
     /**
      * Finds all enabled plugins, the result may include missing plugins.
+     *
      * @return array|null of enabled plugins $pluginname=>$pluginname, null means unknown
      */
     public static function get_enabled_plugins() {
@@ -62,7 +63,7 @@ class notificationsaction extends notificationsbaseinfo {
         }
         $installed = [];
         foreach ($plugins as $plugin => $version) {
-            $installed[] = 'notificationsaction_'.$plugin;
+            $installed[] = 'notificationsaction_' . $plugin;
         }
 
         list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
@@ -87,7 +88,8 @@ class notificationsaction extends notificationsbaseinfo {
      * Enable or disable a plugin and return whether the value has changed.
      *
      * @param string $pluginname The name of the plugin to enable or disable.
-     * @param int $enabled The flag to enable (1) or disable (0) the plugin.
+     * @param int    $enabled    The flag to enable (1) or disable (0) the plugin.
+     *
      * @return bool Whether the value has changed after enabling or disabling the plugin.
      */
     public static function enable_plugin(string $pluginname, int $enabled): bool {
@@ -110,6 +112,7 @@ class notificationsaction extends notificationsbaseinfo {
 
     /**
      * Return URL used for management of plugins of this type.
+     *
      * @return moodle_url
      */
     public static function get_manage_url() {
@@ -118,6 +121,7 @@ class notificationsaction extends notificationsbaseinfo {
 
     /**
      * Get settings section name.
+     *
      * @return string
      */
     public function get_settings_section_name() {
@@ -131,8 +135,8 @@ class notificationsaction extends notificationsbaseinfo {
      * Alternatively it can create a link to some settings page (instance of admin_externalpage)
      *
      * @param \part_of_admin_tree $adminroot
-     * @param string $parentnodename
-     * @param bool $hassiteconfig whether the current user has moodle/site:config capability
+     * @param string              $parentnodename
+     * @param bool                $hassiteconfig whether the current user has moodle/site:config capability
      */
     public function load_settings(\part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
@@ -160,4 +164,3 @@ class notificationsaction extends notificationsbaseinfo {
     }
 
 }
-

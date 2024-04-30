@@ -35,11 +35,13 @@ namespace notificationscondition_calendarstart\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_calendarstart\calendarstart;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Test for calendarstart crontask
  * @group notificationsagent
  */
 class calendarstart_crontask_test extends \advanced_testcase {
@@ -56,6 +58,9 @@ class calendarstart_crontask_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $calendarevent;
     /**
      * Date start for the course
@@ -81,8 +86,14 @@ class calendarstart_crontask_test extends \advanced_testcase {
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600;
+    /**
+     * Activity duration
+     */
     public const DURATION = 30 * 86400;
 
+    /**
+     * Set up the test environment before each test case.
+     */
     final public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -109,6 +120,11 @@ class calendarstart_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Execute the task
+     *
+     * @param int $date
+     * @param int $radio
+     *
      * @covers       \notificationscondition_calendarstart\task\calendarstart_crontask::execute
      * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time
      * @covers       ::custom_trace
@@ -116,7 +132,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      */
     public function test_execute($date, $radio) {
         global $DB, $USER;
-        $pluginname = 'calendarstart';
+        $pluginname = calendarstart::NAME;
         \uopz_set_return('time', self::CM_DATESTART);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
@@ -162,6 +178,13 @@ class calendarstart_crontask_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Returns an array of data for the dataprovider function.
+     *
+     * @return array An array of arrays, where each inner array contains two elements:
+     *               - The first element is an integer representing the number of seconds.
+     *               - The second element is an integer representing a flag.
+     */
     public static function dataprovider(): array {
         return [
             [86400, 1],

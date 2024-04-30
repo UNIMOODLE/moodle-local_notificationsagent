@@ -35,11 +35,14 @@ namespace notificationscondition_activityopen\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_activityopen\activityopen;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Class for testing the activityopen_crontask task.
+ *
  * @group notificationsagent
  */
 class activityopen_crontask_test extends \advanced_testcase {
@@ -98,13 +101,15 @@ class activityopen_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Test for the activityopen_crontask task.
+     * @param int $date
      * @covers       \notificationscondition_activityopen\task\activityopen_crontask::execute
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'activityopen';
+        $pluginname = activityopen::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
@@ -147,6 +152,11 @@ class activityopen_crontask_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generate a data provider for the test case.
+     *
+     * @return array The data provider for the test case.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

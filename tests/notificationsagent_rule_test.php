@@ -112,6 +112,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * Testing evaluate function
      *
      * @covers       \local_notificationsagent\rule::evaluate
+     * @covers       \local_notificationsagent\rule::set_conditions
+     * @covers       \local_notificationsagent\rule::set_exceptions
+     * @covers       \local_notificationsagent\rule::get_conditions
      * @dataProvider dataprovider
      *
      * @param int   $date
@@ -174,6 +177,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
         }
         $instance = self::$rule::create_instance($ruleid);
         $conditions = $instance->get_conditions();
+        $this->assertNotEmpty($instance->get_conditions($conditiondata[0]['pluginname']));
         $exceptions = $instance->get_exceptions();
         self::$rule->set_conditions($conditions);
         self::$rule->set_exceptions($exceptions);
@@ -246,7 +250,6 @@ class notificationsagent_rule_test extends \advanced_testcase {
     /**
      * @covers \local_notificationsagent\rule::create
      * @covers \local_notificationsagent\rule::create_instance
-     * @covers \local_notificationsagent\rule::get_conditions
      * @covers \local_notificationsagent\rule::get_exceptions
      * @covers \local_notificationsagent\rule::get_actions
      * @covers \local_notificationsagent\rule::set_createdby
@@ -255,6 +258,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::get_id
      * @covers \local_notificationsagent\rule::set_default_context
      * @covers \local_notificationsagent\rule::get_default_context
+     * @covers \local_notificationsagent\rule::get_conditions
+     * @covers \local_notificationsagent\rule::get_condition
+     * @covers \local_notificationsagent\rule::build_category_array
+     * @covers \local_notificationsagent\rule::build_output_categories
+     * @covers \local_notificationsagent\rule::count_category_courses
      *
      */
 
@@ -314,9 +322,22 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertSame($USER->id, $instance->get_createdby());
         $this->assertEquals(self::$rule->get_id(), $instance->get_id());
         $this->assertNotEmpty($instance->get_conditions());
+        $this->assertNotEmpty($instance->get_conditions('forumnoreply'));
+        $this->assertNotEmpty($instance->get_condition('forumnoreply'));
+        $this->assertNotEmpty($instance->get_conditions_to_evaluate());
         $this->assertNotEmpty($instance->get_exceptions());
         $this->assertNotEmpty($instance->get_actions());
         $this->assertSame(self::$course->id, $instance->get_default_context());
+
+        // Find optimal file where insert this (lib.php functions).
+        $categories = build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
+        $this->assertIsArray($categories);
+        $outputcategories = build_output_categories([$categories]);
+        $this->assertIsString($outputcategories);
+        $this->assertGreaterThan(0, strlen($outputcategories));
+        $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
+        //
+        
     }
 
     /**
@@ -344,6 +365,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
 
         $ruleid = self::$rule->create($dataform);
+
         $instance = self::$rule::create_instance($ruleid);
 
         // Simulate data from edit form.
@@ -385,6 +407,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::delete_conditions
      * @covers \local_notificationsagent\rule::delete_actions
      * @covers \local_notificationsagent\rule::delete_context
+     * @covers \local_notificationsagent\rule::delete_launched
+     * @covers \local_notificationsagent\rule::delete_cache
+     * @covers \local_notificationsagent\rule::delete_triggers
      * @return void
      * @throws \dml_exception
      */
@@ -432,7 +457,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
             [
                 'ruleid' => $ruleid, 'pluginname' => 'forumnoreply',
                 'courseid' => self::$course->id, 'userid' => self::$user->id,
-                'timestart' => time(), 'conditionid' => $conditionid,
+                'startdate' => time(), 'conditionid' => $conditionid,
             ],
         );
 
@@ -497,6 +522,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\rule::get_teacher_rules_assign
      * @covers       \local_notificationsagent\rule::get_teacher_rules_index
      * @covers       \local_notificationsagent\rule::get_owner_rules_by_course
+     * @covers       \local_notificationsagent\rule::get_owner_rules
+     * @covers       \local_notificationsagent\rule::get_default_context
+     * @covers       \local_notificationsagent\rule::get_course_rules_forced
+     * @covers       \local_notificationsagent\rule::get_rules_assign
+     * @covers       \local_notificationsagent\rule::get_assignedcontext
      * @dataProvider dataprovider_get_rules
      *
      * @return void
@@ -536,6 +566,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
         $this->assertIsNumeric($defaultcontext);
 
+        $assignedcontext = self::$rule->get_assignedcontext();
+        $this->assertIsNumeric($assignedcontext['course'][0]);
+        $this->assertGreaterThan(0, $assignedcontext['course'][0]);
+        $this->assertSame($assignedcontext['category'][0], self::$course->category);
+
         $rulecontext = self::$rule->has_context();
         $this->assertTrue($rulecontext);
 
@@ -555,6 +590,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
             $this->assertTrue($ruleobj->has_context());
             $this->assertEquals($shared, $instance->get_shared());
         }
+        $this->assertIsArray($instance->get_rules_assign($context, $courseid));
 
     }
 

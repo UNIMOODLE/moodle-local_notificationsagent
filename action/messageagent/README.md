@@ -2,7 +2,8 @@
 
 This plugin is part of the Notifications Agent plugin.
 
-The objective of the plugin is to send a notification to the students enrolled in a course when a series of conditions are met.
+The objective of the plugin is to send a notification to the students enrolled in a course when a series of conditions
+are met.
 
 ## Installing via uploaded ZIP file ##
 
@@ -38,7 +39,7 @@ version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-this program.  If not, see <https://www.gnu.org/licenses/>.
+this program. If not, see <https://www.gnu.org/licenses/>.

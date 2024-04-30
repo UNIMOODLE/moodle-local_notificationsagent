@@ -100,7 +100,8 @@ class weekend_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         self::$rule = new rule();
 
-        self::$subplugin = new weekend(self::$rule);
+        self::$subplugin = new weekend(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
@@ -115,8 +116,11 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
+     * Test evaluate
      *
      * @param int  $timeaccess
+     * @param bool $usecache
+     * @param bool $complementary
      * @param bool $expected
      *
      * @covers       \notificationscondition_weekend\weekend::evaluate
@@ -133,7 +137,7 @@ class weekend_test extends \advanced_testcase {
             $objdb = new \stdClass();
             $objdb->userid = self::$user->id;
             $objdb->courseid = self::$coursetest->id;
-            $objdb->timestart = $timeaccess;
+            $objdb->startdate = $timeaccess;
             $objdb->pluginname = self::$subtype;
             $objdb->conditionid = self::CONDITIONID;
             // Insert.
@@ -229,9 +233,9 @@ class weekend_test extends \advanced_testcase {
     /**
      * Dataprovider for estimatenext time
      *
-     * @return array[]
+     * @return array
      */
-    public static function dataweekend() {
+    public static function dataweekend(): array {
         return [
             'Condition Monday -> Saturday' => [1704074700, 1704506700, 0],
             'Condition Friday -> Saturday' => [1704470400, 1704470400, 0],
@@ -291,7 +295,7 @@ class weekend_test extends \advanced_testcase {
         $params = [];
 
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
-        $result = $method->invoke(self::$subplugin, $id, $params);
+        $result = $method->invoke(self::$subplugin, $params);
 
         $this->assertNull($result);
     }
@@ -308,10 +312,13 @@ class weekend_test extends \advanced_testcase {
     }
 
     /**
-     * Test whether is weekend
+     * Test is weekend.
      *
-     * @covers       \notificationscondition_weekend\weekend::is_weekend()
+     * @param int  $time     time
+     * @param bool $expected expected
+     *
      * @dataProvider dataproviderwe
+     * @covers       \notificationscondition_weekend\weekend::is_weekend
      */
     final public function test_isweekend(int $time, bool $expected) {
         set_config('calendar_weekend', 65);
@@ -341,7 +348,7 @@ class weekend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule,
+            'rule' => self::$rule->to_record(),
             'timesfired' => rule::MINIMUM_EXECUTION,
             'courseid' => $courseid,
             'getaction' => $typeaction,
@@ -351,12 +358,11 @@ class weekend_test extends \advanced_testcase {
         $form->definition();
         $form->definition_after_data();
         $mform = phpunitutil::get_property($form, '_form');
-        $id = time();
         $subtype = notificationplugin::TYPE_CONDITION;
-        self::$subplugin->get_ui($mform, $id, $courseid, $subtype);
+        self::$subplugin->get_ui($mform, $courseid, $subtype);
 
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uidescriptionname = $method->invoke(self::$subplugin, $id, self::$subplugin::UI_DESCRIPTION);
+        $uidescriptionname = $method->invoke(self::$subplugin, self::$subplugin::UI_DESCRIPTION);
 
         $this->assertTrue($mform->elementExists($uidescriptionname));
     }

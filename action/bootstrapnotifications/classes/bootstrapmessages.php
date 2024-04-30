@@ -30,6 +30,7 @@
  */
 
 namespace notificationsaction_bootstrapnotifications;
+
 /**
  * Class representing a bootstrapmessages action plugin.
  */
@@ -44,16 +45,16 @@ class bootstrapmessages extends \core\persistent {
      * @return array
      */
     protected static function define_properties() {
-        return array(
-            'userid' => array(
+        return [
+            'userid' => [
                 'type' => PARAM_INT,
-            ),
-            'courseid' => array(
+            ],
+            'courseid' => [
                 'type' => PARAM_INT,
-            ),
-            'message' => array(
+            ],
+            'message' => [
                 'type' => PARAM_RAW,
-            ),
-        );
+            ],
+        ];
     }
 }

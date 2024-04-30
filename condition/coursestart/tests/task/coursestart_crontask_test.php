@@ -35,8 +35,11 @@ namespace notificationscondition_coursestart\task;
 
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_coursestart\coursestart;
 
 /**
+ * Class coursestart_crontask_test
+ *
  * @covers \notificationscondition_coursestart\task\coursestart_crontask
  * @group  notificationsagent
  */
@@ -96,13 +99,16 @@ class coursestart_crontask_test extends \advanced_testcase {
     }
 
     /**
-     * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
-     * @covers       ::custom_trace
+     * Set up test environment before each test.
+     *
+     * @param int $date
+     *
      * @dataProvider dataprovider
+     * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'coursestart';
+        $pluginname = coursestart::NAME;
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestcsct = $quizgen->create_instance([
@@ -145,6 +151,11 @@ class coursestart_crontask_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400],

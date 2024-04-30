@@ -37,6 +37,7 @@ use local_notificationsagent\rule;
 use notificationscondition_sessionstart\sessionstart;
 
 /**
+ * Session start observer test.
  * @group notificationsagent
  */
 class sessionstart_observer_test extends \advanced_testcase {
@@ -119,7 +120,7 @@ class sessionstart_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $pluginname = 'sessionstart';
+        $pluginname = sessionstart::NAME;
         $objdb = new \stdClass();
         $objdb->ruleid = self::$rule->get_id();
         $objdb->courseid = self::$course->id;
@@ -167,6 +168,11 @@ class sessionstart_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [86400, true],

@@ -39,6 +39,9 @@ use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
+global $CFG;
+require_once($CFG->dirroot . '/calendar/lib.php');
+
 /**
  * Calendarevetto class
  */
@@ -67,15 +70,6 @@ class calendareventto extends notificationconditionplugin {
         return ['[TTTT]', '[CCCC]'];
     }
 
-    /**
-     * Get the subtype of the condition.
-     *
-     * @return string The subtype of the condition.
-     */
-    public function get_subtype() {
-        return get_string('subtype', 'notificationscondition_calendareventto');
-    }
-
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
      * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
@@ -96,7 +90,7 @@ class calendareventto extends notificationconditionplugin {
 
         $timestart = $DB->get_field(
             'notificationsagent_cache',
-            'timestart',
+            'startdate',
             ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
         $event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}]);
@@ -146,19 +140,14 @@ class calendareventto extends notificationconditionplugin {
     }
 
     /**
-     * Get the user interface of the subplugin
+     * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform
-     * @param int              $id
-     * @param int              $courseid
-     * @param string           $type
-     *
-     * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
+     * @param int              $courseid The course identifier.
+     * @param string           $type     The type of the notification plugin.
      */
-    public function get_ui($mform, $id, $courseid, $type) {
-        $this->get_ui_title($mform, $id, $type);
+    public function get_ui($mform, $courseid, $type) {
+        $this->get_ui_title($mform, $type);
         global $DB;
 
         $listevents = $DB->get_records_sql("SELECT * FROM {event} WHERE eventtype IN ('course')");
@@ -168,13 +157,13 @@ class calendareventto extends notificationconditionplugin {
             $events[$event->id] = $event->name;
         }
 
-        // Only is template
-        if ($this->rule->get_template() == rule::TEMPLATE_TYPE) {
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE) {
             $events['0'] = 'CCCC';
         }
 
         $element = $mform->createElement(
-            'select', $this->get_name_ui($id, self::UI_ACTIVITY),
+            'select', $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
                 'editrule_condition_calendar', 'notificationscondition_calendareventto',
                 ['typeelement' => '[CCCC]']
@@ -182,10 +171,10 @@ class calendareventto extends notificationconditionplugin {
             $events
         );
 
-        $this->get_ui_select_date($mform, $id, $type);
+        $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui($id, self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -207,24 +196,24 @@ class calendareventto extends notificationconditionplugin {
      * This method should take an identifier and parameters for a notification
      * and convert them into a format suitable for use by the plugin.
      *
-     * @param int   $id     The identifier for the notification.
      * @param mixed $params The parameters associated with the notification.
      *
      * @return mixed The converted parameters.
      */
-    protected function convert_parameters($id, $params) {
+    public function convert_parameters($params) {
         $params = (array) $params;
-        $calendar = $params[$this->get_name_ui($id, self::UI_ACTIVITY)] ?? 0;
+        $calendar = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $timevalues = [
-            'days' => $params[$this->get_name_ui($id, self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui($id, self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui($id, self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui($id, self::UI_SECONDS)] ?? 0,
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
         ];
         $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
 
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $calendar]));
+        $this->set_cmid((int) $calendar);
         return $this->get_parameters();
     }
 
@@ -251,6 +240,26 @@ class calendareventto extends notificationconditionplugin {
     }
 
     /**
+     * Validates the subplugin
+     * Do not call to parent::validation, not necessary
+     *
+     * @param int        $courseid The ID of the course.
+     * @param array      $array    The array to store validation errors.
+     */
+    public function validation($courseid, &$array = null) {
+        $validation = true;
+
+        $data = json_decode($this->get_parameters(), true);
+
+        if (!calendar_get_events_by_id([$data[self::UI_ACTIVITY]])) {
+            $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string('editrule_required_error', 'local_notificationsagent');
+            return $validation = false;
+        }
+
+        return $validation;
+    }
+
+    /**
      * Whether a condition is generic or not
      *
      * @return bool
@@ -260,15 +269,14 @@ class calendareventto extends notificationconditionplugin {
     }
 
     /**
-     * Set the defalut values
+     * Set the default values
      *
      * @param editrule_form $form
-     * @param int           $id
      *
      * @return void
      */
-    public function set_default($form, $id) {
-        $params = $this->set_default_select_date($id);
+    public function set_default($form) {
+        $params = $this->set_default_select_date();
         $form->set_data($params);
     }
 

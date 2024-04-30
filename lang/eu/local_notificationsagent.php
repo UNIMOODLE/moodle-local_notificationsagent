@@ -74,6 +74,7 @@ $string['heading'] = 'Jakinarazpen-agentea';
 $string['status_active'] = 'Aktibo';
 $string['status_paused'] = 'Pausatuta';
 $string['status_required'] = 'Beharrezkoa';
+$string['status_broken'] = 'Hautsita';
 
 // Inportatu Txantiloia.
 $string['import'] = 'Inportatu';
@@ -96,6 +97,7 @@ $string['condition_days'] = 'Egunak';
 $string['condition_hours'] = 'Orduak';
 $string['condition_minutes'] = 'Minututuak';
 $string['condition_seconds'] = 'Segunduak';
+$string['condition_grade'] = 'Titulazioa';
 
 // Editatu Araua.
 $string['editrule_clonerule'] = 'Gehitu araua';
@@ -259,6 +261,7 @@ $string['notificationsagent:forumnoreply'] = 'Foroan erantzunik gabeko baldintza
 $string['notificationsagent:numberoftimes'] = 'Baldintza kopurua erabiltzeko gaitasuna behar da';
 $string['notificationsagent:sessionend'] = 'Saio amaierako baldintza erabiltzeko gaitasuna behar da';
 $string['notificationsagent:weekend'] = 'Asteburuko baldintza erabiltzeko gaitasuna behar da';
+$string['notificationsagent:itemgraded'] = 'Elementu kalifikatzaile-baldintza erabiltzeko beharrezkoa den gaitasuna';
 
 $string['notificationsagent:addusergroup'] = 'Addusergroup ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:bootstrapnotifications'] = 'Bootstrapnotifications ekintza erabiltzeko gaitasuna';
@@ -291,3 +294,6 @@ $string['timestamp'] = 'Data';
 $string['conditions'] = 'Baldintzak';
 $string['exceptions'] = 'Salbuespenak';
 $string['actions'] = 'Ekintzak';
+
+// Cachea.
+$string['cachedef_launched'] = 'Errepikapena hasi den erabiltzaileen zerrenda.';

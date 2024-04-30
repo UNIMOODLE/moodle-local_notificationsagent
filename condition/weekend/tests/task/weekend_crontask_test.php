@@ -41,6 +41,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Test for weekend cron task
+ *
  * @group notificationsagent
  */
 class weekend_crontask_test extends \advanced_testcase {
@@ -97,13 +99,17 @@ class weekend_crontask_test extends \advanced_testcase {
     }
 
     /**
+     * Test for weekend cron task
+     *
+     * @param int $date
+     *
      * @covers       \notificationscondition_weekend\task\weekend_crontask::execute
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
     public function test_execute($date) {
         global $DB, $USER;
-        $pluginname = 'weekend';
+        $pluginname = weekend::NAME;
         \uopz_set_return('time', $date);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -145,6 +151,11 @@ class weekend_crontask_test extends \advanced_testcase {
         uopz_unset_return('time');
     }
 
+    /**
+     * Generates a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
     public static function dataprovider(): array {
         return [
             [1706182049],

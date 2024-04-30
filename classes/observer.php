@@ -1,0 +1,75 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Produced by the UNIMOODLE University Group: Universities of
+// Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+// Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+// Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+/**
+ * Version details
+ *
+ * @package    local_notificationsagent
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/lib/externallib.php');
+
+use core\event\course_module_deleted;
+use local_notificationsagent\external\update_rule_status;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\rule;
+
+/**
+ * Observer for the notificationscondition_sessionstart plugin.
+ */
+class local_notificationsagent_observer {
+
+    /**
+     * A function to handle the course_module_deleted event.
+     *
+     * @param course_module_deleted $event The course module event object
+     */
+    public static function course_module_deleted(course_module_deleted $event) {
+        global $DB;
+
+        $cmid = $event->contextinstanceid;
+
+        // Get rules with conditions with cmid.
+        $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid, mnc.pluginname
+                  FROM {notificationsagent_condition} mnc
+                 WHERE mnc.cmid = :cmid';
+
+        $dataobj = $DB->get_records_sql($sql, [
+            'cmid' => $cmid,
+        ]);
+
+        foreach ($dataobj as $data) {
+            $subplugin = notificationplugin::create_instance(
+                $data->id, notificationplugin::TYPE_CONDITION, $data->pluginname, $data->ruleid
+            );
+            $result = $subplugin->validation($event->courseid);
+            if (!$result) {
+                update_rule_status::execute(
+                    $data->ruleid, rule::PAUSE_RULE,
+                );
+            }
+        }
+    }
+}

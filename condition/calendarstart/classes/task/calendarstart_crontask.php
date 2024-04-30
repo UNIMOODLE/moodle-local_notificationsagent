@@ -39,11 +39,13 @@ require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 require_once(__DIR__ . '/../../../../../../calendar/lib.php');
 
 use core\task\scheduled_task;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_calendarstart\calendarstart;
 use local_notificationsagent\evaluationcontext;
 
+/**
+ * Class calendarstart_crontask
+ */
 class calendarstart_crontask extends scheduled_task {
 
     /**
@@ -61,49 +63,19 @@ class calendarstart_crontask extends scheduled_task {
     public function execute() {
         custom_mtrace("calendarstart start");
 
-        $pluginname = get_string('subtype', 'notificationscondition_calendarstart');
+        $pluginname = calendarstart::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
-
-            $conditionid = $condition->id;
-
-            $subplugin = new calendarstart(null, $conditionid);
+            $subplugin = new calendarstart($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $context->set_courseid($courseid);
+            $context->set_courseid($condition->courseid);
 
-            $cache = $subplugin->estimate_next_time($context);
-
-            if (empty($cache)) {
-                continue;
-            }
-
-            // $calendarevent = calendar_get_events_by_id([$param->{notificationplugin::UI_ACTIVITY}]);
-            // if ($param->{calendarstart::UI_RADIO} == 1) {
-            //     $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart
-            //         + $param->{notificationplugin::UI_TIME};
-            // } else {
-            //     $cache = $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timestart +
-            //         $calendarevent[$param->{notificationplugin::UI_ACTIVITY}]->timeduration + $param->{notificationplugin::UI_TIME};
-            // }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                    $condition->ruleid, $condition->ruletimesfired, $courseid, notificationsagent::GENERIC_USERID
-                )
-                && !notificationsagent::is_ruleoff($condition->ruleid, notificationsagent::GENERIC_USERID)
-            ) {
-                notificationsagent::set_timer_cache(
-                    notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $conditionid
-                );
-                notificationsagent::set_time_trigger(
-                    $condition->ruleid, $conditionid, notificationsagent::GENERIC_USERID, $courseid, $cache
-                );
-            }
-
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
-        custom_mtrace("calendarstart end ");
+
+        custom_mtrace("calendarstart end");
     }
 }

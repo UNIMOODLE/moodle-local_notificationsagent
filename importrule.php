@@ -38,6 +38,8 @@ global $CFG, $DB;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\rule;
 
 $courseid = required_param('courseid', PARAM_INT);
 $context = context_course::instance($courseid);
@@ -113,44 +115,12 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
                     }
                 }
 
-                // Ruta y creación de objetos de plugin.
-                $rule = new \stdClass();
-                $pluginclass = '\notificationscondition_' . $pluginname . '\\' . $pluginname;
-                if (class_exists($pluginclass)) {
-                    $pluginobj = new $pluginclass($rule);
-
-                    $idconditions = $DB->insert_record('notificationsagent_condition', $sqlconditions);
-                    $obj = notificationconditionplugin::create_subplugin($idconditions);
-                    $pluginname = $obj->get_subtype();
-                    $params = $obj->get_parameters();
-                    $contextevaluation = new evaluationcontext();
-                    $contextevaluation->set_courseid($courseid);
-                    $contextevaluation->set_params($params);
-                    $cache = $pluginobj->estimate_next_time($contextevaluation);
-                    if (!$obj->is_generic()) {
-                        foreach ($students as $student) {
-                            notificationsagent::set_timer_cache($student->id, $courseid, $cache, $pluginname, $idconditions, true);
-                            if ($timer <= $cache) {
-                                $timer = $cache;
-                                notificationsagent::set_time_trigger($idrule, $idconditions, $student->id, $courseid, $timer);
-                            }
-                        }
-                    } else {
-                        notificationsagent::set_timer_cache(
-                            notificationsagent::GENERIC_USERID, $courseid, $cache, $pluginname, $idconditions, true
-                        );
-                        if ($timer <= $cache) {
-                            $timer = $cache;
-                            notificationsagent::set_time_trigger(
-                                $idrule, $idconditions, notificationsagent::GENERIC_USERID, $courseid, $timer
-                            );
-                        }
-                    }
-                }
+                // TODO REFACTOR. Save triggers.
+                $DB->insert_record('notificationsagent_condition', $sqlconditions);
             }
         }
 
-        if ($idcontext && $idrule && (!is_null($idactions) && !is_null($idconditions))) {
+        if ($idcontext && $idrule && (!is_null($idactions) && !is_null($conditionid))) {
             $message = get_string('import_success', 'local_notificationsagent');
             echo \core\notification::success($message);
         } else {

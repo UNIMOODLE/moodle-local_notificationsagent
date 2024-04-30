@@ -35,11 +35,13 @@ namespace notificationscondition_activitylastsend\task;
 
 use local_notificationsagent\rule;
 use notificationscondition_activityend\task\activityend_crontask;
+use notificationscondition_activitylastsend\activitylastsend;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Class for testing the activitylastsend_crontask task.
  * @group notificationsagent
  */
 class activitylastsend_crontask_test extends \advanced_testcase {
@@ -55,6 +57,9 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
+    /**
+     * @var \stdClass
+     */
     private static $activity;
     /**
      * Date start for the course
@@ -97,7 +102,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
     public function test_execute($fileuploadtime, $crontimestarted) {
         global $DB, $USER;
 
-        $pluginname = 'activitylastsend';
+        $pluginname = activitylastsend::NAME;
 
         $assigncontext = \context_module::instance(self::$activity->cmid);
 

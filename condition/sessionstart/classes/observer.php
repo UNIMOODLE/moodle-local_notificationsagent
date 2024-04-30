@@ -30,7 +30,6 @@
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
-use local_notificationsagent\notificationplugin;
 use notificationscondition_sessionstart\sessionstart;
 
 /**
@@ -60,32 +59,18 @@ class notificationscondition_sessionstart_observer {
         // We use this event to avoid querying the log_standard_log for a course firstaccess.
         sessionstart::set_first_course_access($userid, $courseid, $timeaccess);
 
-        $pluginname = 'sessionstart';
-
+        $pluginname = sessionstart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         foreach ($conditions as $condition) {
-            $conditionid = $condition->id;
-
-            $subplugin = new sessionstart(null, $conditionid);
+            $subplugin = new sessionstart($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($timeaccess);
             $context->set_courseid($courseid);
             $context->set_userid($userid);
-            $cache = $subplugin->estimate_next_time($context);
 
-            if (empty($cache)) {
-                continue;
-            }
-
-            if (!notificationsagent::was_launched_indicated_times(
-                $condition->ruleid, $condition->ruletimesfired, $courseid, $userid
-            )
-            ) {
-                notificationsagent::set_timer_cache($userid, $courseid, $cache, $pluginname, $conditionid);
-                notificationsagent::set_time_trigger($condition->ruleid, $conditionid, $userid, $courseid, $cache);
-            }
+            notificationsagent::generate_cache_triggers($subplugin, $context);
         }
     }
 }
