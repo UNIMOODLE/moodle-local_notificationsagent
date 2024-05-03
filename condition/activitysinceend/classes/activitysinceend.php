@@ -109,7 +109,7 @@ class activitysinceend extends notificationconditionplugin {
         $userid = $context->get_userid();
         $params = json_decode($context->get_params(), false);
         $cmid = $params->{self::UI_ACTIVITY};
-        $timecompletion = self::get_timecompletion($cmid, $userid)->timemodified;
+        $timecompletion = self::get_timecompletion($cmid, $userid)->timemodified ?? $timereturn;
         $timeaccess = $context->get_timeaccess();
 
         if (empty($timecompletion)) {
