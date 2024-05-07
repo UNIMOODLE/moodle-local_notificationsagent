@@ -131,8 +131,9 @@ class activitymodified_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      * @covers       \notificationscondition_activitymodified\activitymodified::evaluate
+     * @covers       \notificationscondition_activitymodified\activitymodified::estimate_next_time
      */
-    public function test_evaluate($timeaccess, $usecache, $useuploadfile, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $useuploadfile, $expected, $complementary) {
         global $DB;
 
         self::$context->set_params(
@@ -141,9 +142,10 @@ class activitymodified_test extends \advanced_testcase {
             )
         );
         self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        uopz_set_return('time', self::$context->get_timeaccess());
+        \uopz_set_return('time', self::$context->get_timeaccess());
         $activityctx = \context_module::instance(self::$activity->cmid);
 
         if ($usecache) {
@@ -177,8 +179,15 @@ class activitymodified_test extends \advanced_testcase {
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
+        if ($result && !self::$context->is_complementary()) {
+            $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+        }
 
-        uopz_unset_return('time');
+        if (!$result && self::$context->is_complementary()) {
+            $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+        }
+
+        \uopz_unset_return('time');
     }
 
     /**
@@ -186,11 +195,15 @@ class activitymodified_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Testing evaluate with cache #0' => [1704445200, true, false, false],
-            'Testing evaluate with cache #1' => [1706173200, true, false, true],
-            'Testing evaluate with cache #2' => [1707123600, true, false, true],
-            'Testing evaluate without cache and an uploaded file 1 minute ago' => [1707123600, false, true, true],
-            'Testing evaluate without cache and not uploaded file' => [1707123600, false, false, false],
+            'Testing evaluate with cache #0' => [1704445200, true, false, false, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            'Testing evaluate with cache #1' => [1706173200, true, false, true, notificationplugin::COMPLEMENTARY_CONDITION],
+            'Testing evaluate with cache #2' => [1707123600, true, false, true, notificationplugin::COMPLEMENTARY_CONDITION],
+            'Testing evaluate without cache and an uploaded file 1 minute ago' => [
+                1707123600, false, true, true, notificationplugin::COMPLEMENTARY_CONDITION,
+            ],
+            'Testing evaluate without cache and not uploaded file' => [
+                1707123600, false, false, false, notificationplugin::COMPLEMENTARY_EXCEPTION,
+            ],
         ];
     }
 
@@ -243,15 +256,6 @@ class activitymodified_test extends \advanced_testcase {
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
         }
-    }
-
-    /**
-     * Test for estimating the next time.
-     *
-     * @covers \notificationscondition_activitymodified\activitymodified::estimate_next_time
-     */
-    public function test_estimatenexttime() {
-        self::assertNull(self::$subplugin->estimate_next_time(self::$context));
     }
 
     /**

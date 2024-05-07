@@ -165,7 +165,6 @@ class weekdays_test extends \advanced_testcase {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
-
     /**
      * Test is can share.
      *
@@ -236,7 +235,7 @@ class weekdays_test extends \advanced_testcase {
         self::$context->set_params($param);
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 
@@ -395,13 +394,12 @@ class weekdays_test extends \advanced_testcase {
      * Test validate form.
      *
      * @dataProvider datavalidation
-     * @covers \notificationscondition_weekdays\weekdays::validation
+     * @covers       \notificationscondition_weekdays\weekdays::validation
      */
     public function test_validation($params) {
         self::$subplugin->set_parameters($params);
         $this->assertIsBool(self::$subplugin->validation(self::$coursetest->id));
     }
-
 
     /**
      * Dataprovider for validation

@@ -292,7 +292,7 @@ class activitysinceend_test extends \advanced_testcase {
                 }
             }
         }
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**
@@ -489,7 +489,7 @@ class activitysinceend_test extends \advanced_testcase {
 
         $this->assertEquals(time(), $completion->timemodified);
         $this->assertEquals(self::$user->id, $completion->userid);
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
 }

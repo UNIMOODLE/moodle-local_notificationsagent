@@ -117,8 +117,6 @@ class calendarstart_observer_test extends \advanced_testcase {
      * @param $radio
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      * @covers       \notificationscondition_calendarstart_observer::calendar_updated
      *
      * @dataProvider dataprovider
@@ -144,11 +142,12 @@ class calendarstart_observer_test extends \advanced_testcase {
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
         $objdb->parameters = '{"time":"' . $time . '", "cmid":"' . self::$calendarevent->id . '", "radio":"' . $radio . '"}';
-        $objdb->cmid = 3;
+        $objdb->cmid = self::$calendarevent->id;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
+
         $event = \core\event\calendar_event_updated::create([
             'context' => \context_course::instance(self::$course->id),
             'userid' => self::$user->id,

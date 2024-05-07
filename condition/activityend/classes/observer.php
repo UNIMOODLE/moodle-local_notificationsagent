@@ -60,6 +60,7 @@ class notificationscondition_activityend_observer {
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($event->timecreated);
+            $context->set_courseid($courseid);
 
             notificationsagent::generate_cache_triggers($subplugin, $context);
         }

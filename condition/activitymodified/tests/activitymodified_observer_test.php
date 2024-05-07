@@ -182,7 +182,7 @@ class activitymodified_observer_test extends \advanced_testcase {
         }
 
         if (!is_null($fileuploadtime)) {
-            uopz_unset_return('time');
+            \uopz_unset_return('time');
         }
     }
 

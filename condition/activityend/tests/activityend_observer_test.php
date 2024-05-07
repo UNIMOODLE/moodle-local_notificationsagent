@@ -166,6 +166,6 @@ class activityend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
 
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 }

@@ -139,7 +139,7 @@ class usergroupadd_test extends \advanced_testcase {
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
                 'userid' => self::$user->id
-                , 'groupid' => self::$group->id
+                , 'groupid' => self::$group->id,
             ]);
         }
         self::$context->set_complementary($complementary);
@@ -243,13 +243,13 @@ class usergroupadd_test extends \advanced_testcase {
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
                 'userid' => self::$user->id
-                , 'groupid' => self::$group->id
+                , 'groupid' => self::$group->id,
             ]);
         }
         self::$context->set_timeaccess($timeaccess);
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 

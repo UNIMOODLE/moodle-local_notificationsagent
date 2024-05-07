@@ -98,13 +98,15 @@ class forumnoreply extends notificationconditionplugin {
         );
 
         if (empty($time)) {
-            return !empty(self::get_unanswered_threads(
+            return !empty(
+            self::get_unanswered_threads(
                 $cmid,
                 $courseid,
                 $timeaccess,
                 $timenowandtime,
                 $userid
-            ));
+            )
+            );
         }
 
         ($timeaccess >= $time) ? $meetcondition = true : $meetcondition = false;
@@ -293,14 +295,14 @@ class forumnoreply extends notificationconditionplugin {
         }
 
         $params = [
-            'forum' => $forumid,
-            'course' => $courseid,
-            'timestart' => 0,
-            'timeend' => 0,
-            'timenow' => $timenow,
-            'timenow2' => $timenow,
-            'timenowandtime' => $timenowandtime,
-        ] + $params;
+                'forum' => $forumid,
+                'course' => $courseid,
+                'timestart' => 0,
+                'timeend' => 0,
+                'timenow' => $timenow,
+                'timenow2' => $timenow,
+                'timenowandtime' => $timenowandtime,
+            ] + $params;
 
         $sql = "SELECT DISTINCT fd.id, fd.timemodified as timemodified, fd.userid
                     FROM {forum_discussions} fd
@@ -310,7 +312,7 @@ class forumnoreply extends notificationconditionplugin {
                     AND fd.course = :course
                     AND fd.timestart >= :timestart
                     AND (fd.timeend = :timeend OR fd.timeend > :timenow)
-                    AND :timenow2 >= fd.timemodified + CAST( :timenowandtime AS INTEGER )
+                    AND :timenow2 >= fd.timemodified + " . $DB->sql_cast_char2int($timenowandtime) . "
                     AND fp2.id IS NULL
                     {$whereuser}
                 ";

@@ -137,7 +137,6 @@ class weekend_crontask_test extends \advanced_testcase {
         $task->set_timestarted($date);
         $result = $task->execute();
 
-        $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
         if (!weekend::is_weekend($date)) {
@@ -148,7 +147,7 @@ class weekend_crontask_test extends \advanced_testcase {
             $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
         }
 
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**

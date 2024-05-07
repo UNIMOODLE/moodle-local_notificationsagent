@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició: data relativa des de la fi de l\'activitat';
@@ -41,5 +40,3 @@ $string['subtype'] = 'activitysinceend';
 $string['modname'] = 'activitysinceend';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
-$string['activitysinceend_crontask'] = 'activitysinceend cron task';
-

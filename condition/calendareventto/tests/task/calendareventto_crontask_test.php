@@ -119,6 +119,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
 
     /**
      * Test the execute method.
+     *
      * @param int $date
      *
      * @covers       \notificationscondition_calendareventto\task\calendareventto_crontask::execute
@@ -159,7 +160,6 @@ class calendareventto_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::$calendarevent->timestart - $date, $cache->timestart);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
     }
 

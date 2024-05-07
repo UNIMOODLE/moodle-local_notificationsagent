@@ -75,7 +75,7 @@ class weekend_crontask extends scheduled_task {
             $context->set_courseid($condition->courseid);
 
             notificationsagent::generate_cache_triggers($subplugin, $context);
-            
+
         }
         custom_mtrace("Weekend end");
     }

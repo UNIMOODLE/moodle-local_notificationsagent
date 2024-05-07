@@ -107,7 +107,7 @@ class activityopen_observer_test extends \advanced_testcase {
 
     public function test_course_module_updated() {
         global $DB, $USER;
-        uopz_set_return('time', self::COURSE_DATESTART);
+        \uopz_set_return('time', self::COURSE_DATESTART);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
             'course' => self::$course->id,
@@ -162,6 +162,6 @@ class activityopen_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 }

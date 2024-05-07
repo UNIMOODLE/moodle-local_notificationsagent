@@ -295,7 +295,7 @@ class calendareventto_test extends \advanced_testcase {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**

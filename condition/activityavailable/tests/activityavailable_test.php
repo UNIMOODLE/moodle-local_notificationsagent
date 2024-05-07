@@ -42,6 +42,7 @@ use local_notificationsagent\form\editrule_form;
 
 /**
  * Class for testing the activityavailable.
+ *
  * @group notificationsagent
  */
 class activityavailable_test extends \advanced_testcase {
@@ -124,12 +125,11 @@ class activityavailable_test extends \advanced_testcase {
      * @param string $conditionjson
      * @param bool   $expected
      *
-     * @throws \coding_exception
      * @covers       \notificationscondition_activityavailable\activityavailable::evaluate
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate(string $conditionjson, bool $expected) {
+    public function test_evaluate(string $conditionjson, int $visible, bool $expected) {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
             'name' => 'Quiz unittest',
@@ -137,6 +137,7 @@ class activityavailable_test extends \advanced_testcase {
             "timeopen" => self::CM_DATESTART,
             "timeclose" => self::CM_DATEEND,
             'availability' => $conditionjson,
+            'visible' => $visible,
         ]);
 
         self::$context->set_params(json_encode(['cmid' => $cmtestaa->cmid]));
@@ -146,16 +147,20 @@ class activityavailable_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
 
     }
+
     /**
      * Data provider for test_evaluate.
      */
     public static function dataprovider(): array {
         return [
             [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', true,
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 1, true,
             ],
             [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}', false,
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 0, false,
+            ],
+            [
+                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}', 1, false,
             ],
         ];
     }
@@ -228,7 +233,7 @@ class activityavailable_test extends \advanced_testcase {
 
         $this->assertEquals($expected, $result);
 
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**
@@ -292,7 +297,7 @@ class activityavailable_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id."_activityavailable_cmid" => "7",
+            $id . "_activityavailable_cmid" => "7",
         ];
         $expected = '{"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');

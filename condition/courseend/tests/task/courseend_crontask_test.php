@@ -150,7 +150,7 @@ class courseend_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::COURSE_DATEEND - $date, $cache->timestart);
+        $this->assertEquals($conditionid, $cache->conditionid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
     }

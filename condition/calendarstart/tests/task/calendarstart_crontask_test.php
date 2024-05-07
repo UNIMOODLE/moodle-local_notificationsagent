@@ -42,6 +42,7 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Test for calendarstart crontask
+ *
  * @group notificationsagent
  */
 class calendarstart_crontask_test extends \advanced_testcase {
@@ -174,7 +175,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $cache->courseid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 

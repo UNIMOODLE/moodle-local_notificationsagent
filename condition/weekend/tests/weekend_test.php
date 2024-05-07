@@ -226,7 +226,7 @@ class weekend_test extends \advanced_testcase {
         // Test estimate next time.
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 

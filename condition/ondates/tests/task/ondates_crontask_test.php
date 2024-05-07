@@ -143,7 +143,7 @@ class ondates_crontask_test extends \advanced_testcase {
             $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
         }
 
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     public static function dataprovider(): array {

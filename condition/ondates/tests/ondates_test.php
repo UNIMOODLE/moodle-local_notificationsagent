@@ -160,23 +160,23 @@ class ondates_test extends \advanced_testcase {
         return [
             [
                 1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1713913200, "enddate":1714345199}'
+                , '{"startdate":1713913200, "enddate":1714345199}',
             ],
             [
                 1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1714345199, "enddate":1713913200}'
+                , '{"startdate":1714345199, "enddate":1713913200}',
             ],
             [
                 1701691707, false, notificationplugin::COMPLEMENTARY_CONDITION, true
-                , '{"startdate":1701622222, "enddate":1714345199}'
+                , '{"startdate":1701622222, "enddate":1714345199}',
             ],
             [
                 1703498961, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1713913200, "enddate":1714345199}'
+                , '{"startdate":1713913200, "enddate":1714345199}',
             ],
             [
                 1701400000, true, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1701500000, "enddate":1701510000}'
+                , '{"startdate":1701500000, "enddate":1701510000}',
             ],
         ];
     }
@@ -243,7 +243,7 @@ class ondates_test extends \advanced_testcase {
         // Test estimate next time.
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 
@@ -260,7 +260,7 @@ class ondates_test extends \advanced_testcase {
             'Condition Dec 03 2023 -> May 28 2024 ' => [1716995444, false, '{"startdate":1701622222, "enddate":1716894444}', 0],
             'Exception Dec 03 2023 -> May 28 2024 ' => [
                 1716995444, 1716995444
-                , '{"startdate":1701622222, "enddate":1716894444}', 1
+                , '{"startdate":1701622222, "enddate":1716894444}', 1,
             ],
             'Exception Dec 03 2023 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}', 1],
             'Exception Jan 20 2024 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}', 1],
@@ -331,6 +331,7 @@ class ondates_test extends \advanced_testcase {
      * Test process markups.
      *
      * @covers \notificationscondition_ondates\ondates::process_markups
+     * @covers \notificationscondition_ondates\ondates::replace_first
      */
     public function test_processmarkups() {
         $content = [];
@@ -408,6 +409,41 @@ class ondates_test extends \advanced_testcase {
         $this->assertTrue($mform->elementExists($startdatename));
         $this->assertTrue($mform->elementExists($enddatename));
 
+    }
+
+    /**
+     * Test validate form.
+     *
+     * @dataProvider datavalidation
+     * @covers       \notificationscondition_ondates\ondates::validation
+     */
+    public function test_validation($params, $expected) {
+        self::$subplugin->set_parameters($params);
+        $this->assertSame(self::$subplugin->validation(self::$coursetest->id), $expected);
+    }
+
+    /**
+     * Dataprovider for validation
+     *
+     * @return array[]
+     */
+    public static function datavalidation(): array {
+        return [
+            'Startdate(May 02 2024) Enddate(Jan 13 2027)' => ['{"startdate": 1714627363, "enddate": 1799827363}', true],
+            'Startdate(May 04 2024) Enddate(May 02 2024)' => ['{"startdate": 1714827363, "enddate": 1714627363}', false],
+            'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', false],
+        ];
+    }
+
+    /**
+     * Test load data form.
+     *
+     * @covers \notificationscondition_ondates\ondates::load_dataform
+     */
+    public function test_loaddataform() {
+        $params = '{"startdate": 1714627363, "enddate": 1799827363}';
+        self::$subplugin->set_parameters($params);
+        $this->assertIsArray(self::$subplugin->load_dataform());
     }
 
 }

@@ -336,7 +336,7 @@ class calendarstart_test extends \advanced_testcase {
                 }
             }
         }
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**
@@ -355,7 +355,6 @@ class calendarstart_test extends \advanced_testcase {
                 self::COURSE_DATESTART + self::DURATION + 1, false, '{"time":864000, "radio":0}',
                 notificationplugin::COMPLEMENTARY_CONDITION, true,
             ],
-
             [1704445200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],
             [1706173200, false, '{"time":864000, "radio":1}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
             [1704445200, false, '{"time":864000, "radio":0}', notificationplugin::COMPLEMENTARY_EXCEPTION, false],

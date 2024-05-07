@@ -78,7 +78,7 @@ class activityavailable extends notificationconditionplugin {
         $cmid = $params->{self::UI_ACTIVITY};
 
         $available = false;
-        if ($cmid && $cm = get_fast_modinfo($courseid)->get_cm($cmid)) {
+        if ($cmid && ($cm = get_fast_modinfo($courseid)->get_cm($cmid)) && $cm->visible) {
             $infoclass = new notificationacplugin($courseid, $cm->availability);
             $variable = '';
             $available = $infoclass->is_available($variable, false, $userid);

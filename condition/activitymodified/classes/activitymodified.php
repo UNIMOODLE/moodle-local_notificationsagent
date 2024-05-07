@@ -232,22 +232,20 @@ class activitymodified extends notificationconditionplugin {
     public static function get_any_new_content($cmid, $eventtimecreated) {
         global $DB;
 
-        $sql = '
+        $sql = " 
             SELECT f.id, f.userid, f.timemodified
-            FROM {context} ctx
-            JOIN {files} f
-              ON ctx.id = f.contextid
-             AND ctx.instanceid = :cmid
-             AND ctx.contextlevel = :contextlevel
-           WHERE f.filesize <> 0
-             AND f.timemodified >= CAST(:time AS INTEGER) - CAST(:minuteago AS INTEGER)
-        ';
+               FROM {context} ctx
+                JOIN {files} f
+                   ON ctx.id = f.contextid
+                 AND ctx.instanceid = :cmid
+                 AND ctx.contextlevel = :contextlevel
+            WHERE f.filesize <> 0
+                 AND f.timemodified >= " . $DB->sql_cast_char2int($eventtimecreated) . " - " . $DB->sql_cast_char2int(60) . "
+            ";
 
         $params = [
             'cmid' => $cmid,
             'contextlevel' => CONTEXT_MODULE,
-            'time' => (int) $eventtimecreated,
-            'minuteago' => 60,
         ];
 
         return !empty($DB->get_record_sql($sql, $params));

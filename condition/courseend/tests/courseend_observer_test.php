@@ -38,6 +38,7 @@ use local_notificationsagent\rule;
 
 /**
  * Class for testing the courseend observer.
+ *
  * @group notificationsagent
  */
 class courseend_observer_test extends \advanced_testcase {
@@ -99,8 +100,6 @@ class courseend_observer_test extends \advanced_testcase {
      * @param $time
      *
      * @return void
-     * @throws \coding_exception
-     * @throws \dml_exception
      * @covers       \notificationscondition_courseend_observer::course_updated
      *
      * @dataProvider dataprovider
@@ -108,7 +107,7 @@ class courseend_observer_test extends \advanced_testcase {
 
     public function test_course_updated($time) {
         global $DB, $USER;
-
+        \uopz_set_return('time', self::COURSE_DATEEND);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -126,13 +125,12 @@ class courseend_observer_test extends \advanced_testcase {
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
         $objdb->parameters = '{"time":"' . $time . '"}';
-        $objdb->cmid = 3;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
-        self::$course->enddate = self::COURSE_DATESTART + 84600;
+        self::$course->enddate = self::COURSE_DATEEND + 84600;
         update_course(self::$course);
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -145,7 +143,7 @@ class courseend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
-
+        \uopz_unset_return('time');
     }
 
     /**

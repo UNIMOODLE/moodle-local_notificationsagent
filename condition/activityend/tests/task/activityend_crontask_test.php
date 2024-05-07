@@ -43,6 +43,7 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Test for activityend_crontask
+ *
  * @group notificationsagent
  */
 class activityend_crontask_test extends \advanced_testcase {
@@ -102,7 +103,9 @@ class activityend_crontask_test extends \advanced_testcase {
 
     /**
      * Execute test
+     *
      * @param int $date
+     *
      * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
      * @covers       ::custom_trace
      * @dataProvider dataprovider
@@ -148,7 +151,7 @@ class activityend_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::CM_DATEEND - $date, $cache->timestart);
+        $this->assertEquals(self::CM_DATEEND - $date, $cache->startdate);
         $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
 
     }

@@ -119,19 +119,22 @@ class forumnoreply_test extends \advanced_testcase {
      * @param bool   $expected
      *
      * @covers       \notificationscondition_forumnoreply\forumnoreply::evaluate
+     * @covers       \notificationscondition_forumnoreply\forumnoreply::estimate_next_time
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $param, $expected) {
+    public function test_evaluate($timeaccess, $param, $expected, $complementary) {
+        \uopz_set_return('time', $timeaccess);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
+        self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
         global $DB;
         $params = json_decode(self::$context->get_params(), true);
         $objdb = new \stdClass();
         $objdb->userid = self::$user->id;
-        $objdb->courseid = self::$coursetest->id;
+     ´   $objdb->courseid = self::$coursetest->id;
         $objdb->startdate = self::COURSE_DATESTART + $params['time'];
         $objdb->pluginname = self::$subtype;
         $objdb->conditionid = self::CONDITIONID;
@@ -142,6 +145,16 @@ class forumnoreply_test extends \advanced_testcase {
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
 
+        if ($result && !$complementary) {
+            $this->assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
+        }
+        if ($result && $complementary) {
+            $this->assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
+        }
+        if (!$result) {
+            $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
+        }
+        \uopz_unset_return('time');
     }
 
     /**
@@ -151,11 +164,15 @@ class forumnoreply_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
+            [1704445200, '{"time":864000, "cmid":1}', false, notificationplugin::COMPLEMENTARY_CONDITION],
+            [1706173200, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_CONDITION],
+            [1707123600, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_CONDITION],
+            [1705050059, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_CONDITION],
 
-            [1704445200, '{"time":864000}', false],
-            [1706173200, '{"time":864000}', true],
-            [1707123600, '{"time":864000}', true],
-            [1705050059, '{"time":864000}', true],
+            [1704445200, '{"time":864000, "cmid":1}', false, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            [1706173200, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            [1707123600, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_EXCEPTION],
+            [1705050059, '{"time":864000, "cmid":1}', true, notificationplugin::COMPLEMENTARY_EXCEPTION],
         ];
     }
 
@@ -196,16 +213,6 @@ class forumnoreply_test extends \advanced_testcase {
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
         );
-    }
-
-    /**
-     * Testing estimate next timee
-     *
-     * @covers \notificationscondition_forumnoreply\forumnoreply::estimate_next_time
-     */
-    public function test_estimatenexttime() {
-        // Test estimate next time.
-        $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
     }
 
     /**

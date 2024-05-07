@@ -144,7 +144,7 @@ class activitysinceend_observer_test extends \advanced_testcase {
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
-        
+
         $completion = new \completion_info(self::$course);
         $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
 
@@ -168,7 +168,7 @@ class activitysinceend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
 
     }
 

@@ -271,7 +271,7 @@ class activitylastsend_test extends \advanced_testcase {
                 }
             }
         }
-        uopz_unset_return('time');
+        \uopz_unset_return('time');
     }
 
     /**

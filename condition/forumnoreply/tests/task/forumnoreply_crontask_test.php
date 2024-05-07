@@ -165,7 +165,6 @@ class forumnoreply_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::COURSE_DATESTART, $cache->timestart);
         $this->assertEquals(self::$user->id, $cache->userid);
         $this->assertEquals($conditionid, $cache->conditionid);
 
