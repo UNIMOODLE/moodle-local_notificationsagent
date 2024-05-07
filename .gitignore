@@ -4,3 +4,4 @@ mockups/*
 tests/phpunit
 phpdoc/
 .phpdoc/
+tests/phpunit/*
