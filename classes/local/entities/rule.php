@@ -148,7 +148,15 @@ class rule extends base {
         ))
             ->set_type(column::TYPE_LONGTEXT)
             ->set_is_sortable(true)
-            ->add_field("{$reportalias}.actiondetail");
+            ->add_field("{$reportalias}.actiondetail")
+            ->add_callback(static function($str): string {
+                $json = json_decode($str, true);
+                $result = '';
+                foreach ($json as $key => $value) {
+                    $result .= "  " . $key . " : " . mb_convert_encoding($value, 'UTF-8');
+                }
+                return $result;
+            });
 
         $columns[] = (new column(
             'timestamp',

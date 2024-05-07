@@ -57,7 +57,7 @@ class editrule_form extends \moodleform {
     /**
      * Private variable for $rule.
      *
-     * @var stdClass of rule
+     * @var \stdClass of rule
      */
     private $_rule;
 
@@ -580,14 +580,15 @@ class content {
      * Get the plugin UI.
      *
      * @param mixed       $id         id
-     * @param stdClass    $rule       rule
+     * @param \stdClass   $rule       rule
      * @param \moodleform $mform      Form
      * @param int         $idcourse   course id
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
     public static function get_plugin_ui($id, $rule, $mform, $idcourse, $pluginname, $subtype) {
-        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+        $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
+        if ($subplugin = notificationplugin::create_instance($id, $typeconditionoraction, $pluginname, $rule)) {
             $subplugin->get_ui($mform, $idcourse, $subtype);
         }
     }
@@ -596,13 +597,14 @@ class content {
      * Set the default plugin for a form and id.
      *
      * @param mixed       $id         id
-     * @param stdClass    $rule       rule
+     * @param \stdClass   $rule       rule
      * @param \moodleform $form       Form
      * @param string      $pluginname Subplugin name
      * @param string      $subtype    Subplugin type
      */
     public static function set_default_plugin($id, $rule, $form, $pluginname, $subtype) {
-        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+        $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
+        if ($subplugin = notificationplugin::create_instance($id, $typeconditionoraction, $pluginname, $rule)) {
             $subplugin->set_default($form);
         }
     }
@@ -619,7 +621,8 @@ class content {
      * @param array     $errors     array of errors
      */
     public static function get_validation_form_plugin($id, $data, $rule, $idcourse, $pluginname, $subtype, &$errors) {
-        if ($subplugin = notificationplugin::create_instance($id, $subtype, $pluginname, $rule)) {
+        $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
+        if ($subplugin = notificationplugin::create_instance($id, $typeconditionoraction, $pluginname, $rule)) {
             $subplugin->convert_parameters($data);
             $subplugin->validation($idcourse, $errors);
         }

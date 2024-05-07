@@ -207,7 +207,6 @@ abstract class notificationconditionplugin extends notificationplugin {
             $deletedata = [];
             $insertdata = [];
             if (!$this->is_generic()) {
-                // $arraycache = [];
                 foreach ($students as $student) {
                     $contextevaluation->set_userid($student->id);
                     $cache = $this->estimate_next_time($contextevaluation);

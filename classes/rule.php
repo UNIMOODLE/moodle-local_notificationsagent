@@ -1275,7 +1275,7 @@ class rule {
         }
 
         $this->save_form_conditions_exceptions($data);
-        $this->save_form_actions($data, $data->{editrule_form::FORM_JSON_ACTION});
+        $this->save_form_actions($data);
     }
 
     /**
@@ -1284,9 +1284,20 @@ class rule {
      * @param stdClass $data Form data containing the conditions or exceptions.
      */
     private function save_form_conditions_exceptions($data) {
+        global $USER;
+
         $courseid = $data->courseid;
         $context = context_course::instance($courseid);
-        $students = notificationsagent::get_usersbycourse($context);
+
+        // If $USER has student role, only generate triggers for its
+        if (has_capability(
+            'local/notificationsagent:managecourserule',
+            $context, $USER->id
+        )) {
+            $students = notificationsagent::get_usersbycourse($context);
+        } else {
+            $students = [$USER];
+        }
 
         $arraytimer = [];
 
@@ -1324,7 +1335,7 @@ class rule {
         }
 
         $this->delete_triggers();
-        $this->save_form_triggers($data, $arraytimer);
+        $this->save_form_triggers($data, $arraytimer, $context);
     }
 
     /**
@@ -1348,10 +1359,13 @@ class rule {
     /**
      * Save form data for triggers
      *
-     * @param stdClass $data       Form data containing the conditions.
-     * @param array    $arraytimer Form data containing the actions.
+     * @param stdClass          $data       Form data containing the conditions.
+     * @param array             $arraytimer Form data containing the actions.
+     * @param context_course    $context    Course context.
      */
-    private function save_form_triggers($data, $arraytimer) {
+    private function save_form_triggers($data, $arraytimer, $context) {
+        global $USER;
+
         $courseid = $data->courseid;
         if (!empty($arraytimer)) {
             $generictimer = $arraytimer[notificationsagent::GENERIC_USERID]["timer"] ?? null;
@@ -1371,7 +1385,15 @@ class rule {
                     ];
                 }
             } else {
-                $studentid = notificationsagent::GENERIC_USERID;
+                // If $USER has student role, only generate triggers for its
+                if (has_capability(
+                    'local/notificationsagent:managecourserule',
+                    $context, $USER->id
+                )) {
+                    $studentid = notificationsagent::GENERIC_USERID;
+                } else {
+                    $studentid = $USER->id;
+                }
                 $insertdata[] = [
                     'userid' => $studentid,
                     'courseid' => $courseid,
@@ -1389,10 +1411,10 @@ class rule {
      * Save form data related to actions based on the provided JSON configuration.
      *
      * @param stdClass $data Form data containing the actions.
-     * @param string   $json JSON-encoded string representing actions configurations.
      */
-    private function save_form_actions($data, $json) {
-        $array = json_decode($json, true);
+    private function save_form_actions($data) {
+        $actions = $data->{editrule_form::FORM_JSON_ACTION};
+        $array = json_decode($actions, true);
         if (!empty($array)) {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];

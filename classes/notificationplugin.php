@@ -211,8 +211,8 @@ abstract class notificationplugin {
     /**
      * Constructor for the class.
      *
-     * @param int|stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
-     * @param mixed        $id       If is numeric => value is already in DB
+     * @param int|\stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
+     * @param mixed         $id       If is numeric => value is already in DB
      *
      */
     public function __construct($ruleorid, $id = null) {
@@ -399,8 +399,8 @@ abstract class notificationplugin {
      * Validation editrule_form
      * If this method overrides, call to parent::validation
      *
-     * @param int        $courseid Course id
-     * @param array      $array    The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int   $courseid      Course id
+     * @param array $array         The array to be modified by reference. If is null, validation is not being called from the form
      *                             and return directly
      *
      * @return bool
@@ -522,12 +522,12 @@ abstract class notificationplugin {
     /**
      * Create a subplugin
      *
-     * @param int|stdClass $id       If is numeric => value is already in DB
-     * @param string       $type     The type of the subplugin
-     * @param string       $pluginname The name of the subplugin
-     * @param int|stdClass $ruleorid Object from DB table 'notificationsagent_rule' or just a rule id
+     * @param int|\stdClass $id         If is numeric => value is already in DB
+     * @param string        $type       The type of the subplugin
+     * @param string        $pluginname The name of the subplugin
+     * @param int|\stdClass $ruleorid   Object from DB table 'notificationsagent_rule' or just a rule id
      *
-     * @return stdClass
+     * @return \stdClass
      */
     public static function create_instance($id, $type, $pluginname, $ruleorid = 0) {
         global $DB;
@@ -690,7 +690,6 @@ abstract class notificationplugin {
      *
      * @return void
      */
-    public function set_default($form) {
-    }
+    public function set_default($form) {}
 
 }

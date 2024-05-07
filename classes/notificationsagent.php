@@ -462,7 +462,15 @@ class notificationsagent {
             return;
         }
         if (!$subplugin->is_generic()) {
-            $users = self::get_usersbycourse($coursecontext);
+            // If $USER has student role, only generate triggers for its
+            if (has_capability(
+                'local/notificationsagent:managecourserule',
+                $coursecontext, $student
+            )) {
+                $users =  $contextuser ? [(object) ['id' => $contextuser]] : self::get_usersbycourse($coursecontext);
+            } else {
+                $users = [(object) ['id' => $student]];
+            }
             $userslimit = rule::get_limit_reached_by_users(
                 $courseid,
                 $subplugin->rule->id,
@@ -496,7 +504,16 @@ class notificationsagent {
         }
 
         if ($subplugin->is_generic()) {
-            $userid = self::GENERIC_USERID;
+            // If $USER has student role, only generate triggers for its
+            if (has_capability(
+                'local/notificationsagent:managecourserule',
+                $coursecontext, $student
+            )) {
+                $userid = notificationsagent::GENERIC_USERID;
+            } else {
+                $userid = $student;
+            }
+
             $userslimit = rule::get_limit_reached_by_users(
                 $courseid,
                 $subplugin->rule->id,
