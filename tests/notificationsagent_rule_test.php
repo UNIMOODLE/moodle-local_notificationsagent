@@ -337,7 +337,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertGreaterThan(0, strlen($outputcategories));
         $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
         //
-        
+
     }
 
     /**
@@ -402,8 +402,8 @@ class notificationsagent_rule_test extends \advanced_testcase {
     /**
      * Testing delete rule
      *
-     * @covers \local_notificationsagent\rule::delete
      * @covers \local_notificationsagent\rule::before_delete
+     * @covers \local_notificationsagent\rule::delete
      * @covers \local_notificationsagent\rule::delete_conditions
      * @covers \local_notificationsagent\rule::delete_actions
      * @covers \local_notificationsagent\rule::delete_context
@@ -411,7 +411,6 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::delete_cache
      * @covers \local_notificationsagent\rule::delete_triggers
      * @return void
-     * @throws \dml_exception
      */
     public function test_delete() {
         global $DB, $USER;
@@ -430,12 +429,15 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $conditionid = $DB->insert_record(
             'notificationsagent_condition',
             [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                'ruleid' => $ruleid,
+                'type' => 'condition',
+                'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
                 'parameters' => '{"time":300,"forum":3}',
                 'pluginname' => 'forumnoreply',
             ],
         );
-        $DB->insert_record(
+        $this->assertIsInt($conditionid);
+        $condition2 = $DB->insert_record(
             'notificationsagent_condition',
             [
                 'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
@@ -443,34 +445,39 @@ class notificationsagent_rule_test extends \advanced_testcase {
                 'pluginname' => 'coursestart',
             ],
         );
-
-        $DB->insert_record(
+        $this->assertIsInt($condition2);
+        $action = $DB->insert_record(
             'notificationsagent_action',
             [
                 'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
                 'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
             ],
         );
-
+        $this->assertIsInt($action);
         $DB->insert_record(
             'notificationsagent_cache',
             [
-                'ruleid' => $ruleid, 'pluginname' => 'forumnoreply',
-                'courseid' => self::$course->id, 'userid' => self::$user->id,
-                'startdate' => time(), 'conditionid' => $conditionid,
-            ],
-        );
-
-        $DB->insert_record(
-            'notificationsagent_cache',
-            [
-                'ruleid' => $ruleid, 'courseid' => self::$course->id,
+                'ruleid' => $ruleid,
+                'pluginname' => 'forumnoreply',
+                'courseid' => self::$course->id,
                 'userid' => self::$user->id,
-                'startdate' => time(), 'conditionid' => $conditionid,
+                'startdate' => time(),
+                'conditionid' => $conditionid,
             ],
         );
 
-        $DB->insert_record(
+        $cacheid = $DB->insert_record(
+            'notificationsagent_cache',
+            [
+                'ruleid' => $ruleid,
+                'courseid' => self::$course->id,
+                'userid' => self::$user->id,
+                'startdate' => time(),
+                'conditionid' => $conditionid,
+            ],
+        );
+        $this->assertIsInt($cacheid);
+        $launched = $DB->insert_record(
             'notificationsagent_launched',
             [
                 'ruleid' => $ruleid, 'courseid' => self::$course->id,
@@ -479,28 +486,36 @@ class notificationsagent_rule_test extends \advanced_testcase {
                 'timemodified' => time(),
             ],
         );
-
-        $DB->insert_record(
+        $this->assertIsInt($launched);
+        $contexid = $DB->insert_record(
             'notificationsagent_context',
             [
                 'ruleid' => $ruleid, 'contextid' => 50,
                 'objectid' => 2,
             ],
         );
-
+        $this->assertIsInt($contexid);
         $instance = self::$rule::create_instance($ruleid);
+        // print print_r($instance, true);
         $this->assertInstanceOf(rule::class, $instance);
-        $instance->before_delete();
-        $this->assertTrue($instance->delete());
+        $delete = $instance->delete();
+        $this->assertTrue($delete);
+
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
         $launched = $DB->get_record('notificationsagent_launched', ['ruleid' => self::$rule->get_id()]);
         $context = $DB->get_record('notificationsagent_launched', ['ruleid' => self::$rule->get_id()]);
+        $conditions = $DB->get_record('notificationsagent_condition', ['ruleid' => self::$rule->get_id()]);
+        $actions = $DB->get_record('notificationsagent_action', ['ruleid' => self::$rule->get_id()]);
+        $rule = $DB->get_record('notificationsagent_rule', ['id' => self::$rule->get_id()]);
 
+        $this->assertFalse($launched);
         $this->assertFalse($cache);
         $this->assertFalse($trigger);
-        $this->assertFalse($launched);
+        $this->assertFalse($conditions);
+        $this->assertFalse($actions);
         $this->assertFalse($context);
+        $this->assertFalse($rule);
 
     }
 

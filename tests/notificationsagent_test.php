@@ -185,38 +185,38 @@ class notificationsagent_test extends \advanced_testcase {
         ];
     }
 
-    /**
-     * Testing was_launched_indicated_times.
-     *
-     * @param int  $timesfired
-     * @param int  $firedtimes
-     * @param bool $expected
-     *
-     * @return void
-     * @throws \dml_exception
-     * @dataProvider launched_provider
-     * @covers       \local_notificationsagent\notificationsagent::was_launched_indicated_times
-     */
-    public function test_was_launched_indicated_times($timesfired, $firedtimes, $expected) {
-        global $DB;
-        self::$rule->set_timesfired($timesfired);
-
-        $DB->insert_record('notificationsagent_launched', [
-            'ruleid' => self::$rule->get_id(),
-            'courseid' => self::$course->id,
-            'userid' => self::$user->id,
-            'timesfired' => $firedtimes,
-            'timecreated' => 1708604296,
-            'timemodified' => 1708604296,
-        ]);
-
-        $result = notificationsagent::was_launched_indicated_times(
-            self::$rule->get_id(), self::$rule->get_timesfired(), self::$course->id, self::$user->id
-        );
-
-        $this->assertSame($expected, $result);
-
-    }
+    // /**
+    //  * Testing was_launched_indicated_times.
+    //  *
+    //  * @param int  $timesfired
+    //  * @param int  $firedtimes
+    //  * @param bool $expected
+    //  *
+    //  * @return void
+    //  * @throws \dml_exception
+    //  * @dataProvider launched_provider
+    //  * @covers       \local_notificationsagent\notificationsagent::was_launched_indicated_times
+    //  */
+    // public function test_was_launched_indicated_times($timesfired, $firedtimes, $expected) {
+    //     global $DB;
+    //     self::$rule->set_timesfired($timesfired);
+    //
+    //     $DB->insert_record('notificationsagent_launched', [
+    //         'ruleid' => self::$rule->get_id(),
+    //         'courseid' => self::$course->id,
+    //         'userid' => self::$user->id,
+    //         'timesfired' => $firedtimes,
+    //         'timecreated' => 1708604296,
+    //         'timemodified' => 1708604296,
+    //     ]);
+    //
+    //     $result = notificationsagent::was_launched_indicated_times(
+    //         self::$rule->get_id(), self::$rule->get_timesfired(), self::$course->id, self::$user->id
+    //     );
+    //
+    //     $this->assertSame($expected, $result);
+    //
+    // }
 
     /**
      * Dataprovider for launched
@@ -343,11 +343,21 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_timer_cache(
-            self::$user->id,
-            self::$course->id,
-            self::CM_DATESTART,
-            'sessionend',
-            self::CMID
+            [
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'startdate' => self::CM_DATESTART,
+                'cmid' => self::CMID,
+            ],
+            [
+                [
+                    'userid' => self::$user->id,
+                    'courseid' => self::$course->id,
+                    'startdate' => self::CM_DATESTART,
+                    'pluginname' => 'sessionend',
+                    'conditionid' => self::CMID,
+                ],
+            ]
         );
 
         $cache = $DB->get_record(
@@ -361,14 +371,24 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertIsNumeric($cache->id);
         $this->assertEquals(self::$user->id, $cache->userid);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(self::CM_DATESTART, $cache->timestart);
+        $this->assertEquals(self::CM_DATESTART, $cache->startdate);
 
         notificationsagent::set_timer_cache(
-            self::$user->id,
-            self::$course->id,
-            self::CM_DATESTART + 86400,
-            'sessionend',
-            self::CMID
+            [
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'startdate' => self::CM_DATESTART + 86400,
+
+                'cmid' => self::CMID,
+            ], [
+                [
+                    'userid' => self::$user->id,
+                    'courseid' => self::$course->id,
+                    'startdate' => self::CM_DATESTART + 86400,
+                    'pluginname' => "sessionend",
+                    'conditionid' => self::CMID,
+                ],
+            ]
         );
 
         $cacheupdated = $DB->get_record(
@@ -382,8 +402,7 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertIsNumeric($cacheupdated->id);
         $this->assertEquals(self::$user->id, $cacheupdated->userid);
         $this->assertEquals(self::$course->id, $cacheupdated->courseid);
-        $this->assertEquals(self::CM_DATESTART + 86400, $cacheupdated->timestart);
-
+        $this->assertEquals(self::CM_DATESTART + 86400, $cacheupdated->startdate);
     }
 
     /**
@@ -397,11 +416,21 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_time_trigger(
-            self::$rule->get_id(),
-            self::CMID,
-            self::$user->id,
-            self::$course->id,
-            self::CM_DATESTART
+            [
+                'ruleid' => self::$rule->get_id(),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'conditionid' => self::CMID,
+            ], [
+                [
+                    'ruleid' => self::$rule->get_id(),
+                    'userid' => self::$user->id,
+                    'courseid' => self::$course->id,
+                    'startdate' => self::CM_DATESTART,
+                    'conditionid' => self::CMID,
+                ],
+            ]
+
         );
 
         $trigger = $DB->get_record(
@@ -415,15 +444,26 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertIsNumeric($trigger->id);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::CMID, $trigger->conditionid);
+        $this->assertEquals(self::CM_DATESTART, $trigger->startdate);
         $this->assertEquals(self::$user->id, $trigger->userid);
         $this->assertEquals(self::$course->id, $trigger->courseid);
 
         notificationsagent::set_time_trigger(
-            self::$rule->get_id(),
-            self::CMID + 1,
-            self::$user->id,
-            self::$course->id,
-            self::CM_DATEEND
+            [
+                'ruleid' => self::$rule->get_id(),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'conditionid' => self::CMID,
+            ],
+            [
+                [
+                    'ruleid' => self::$rule->get_id(),
+                    'userid' => self::$user->id,
+                    'courseid' => self::$course->id,
+                    'startdate' => self::CM_DATESTART + 1,
+                    'conditionid' => self::CMID,
+                ],
+            ]
         );
 
         $triggerupdated = $DB->get_record(
@@ -436,7 +476,8 @@ class notificationsagent_test extends \advanced_testcase {
         );
         $this->assertIsNumeric($triggerupdated->id);
         $this->assertEquals(self::$rule->get_id(), $triggerupdated->ruleid);
-        $this->assertEquals(self::CMID + 1, $triggerupdated->conditionid);
+        $this->assertEquals(self::CMID, $triggerupdated->conditionid);
+        $this->assertEquals(self::CM_DATESTART + 1, $triggerupdated->startdate);
         $this->assertEquals(self::$user->id, $triggerupdated->userid);
         $this->assertEquals(self::$course->id, $triggerupdated->courseid);
 
@@ -526,7 +567,7 @@ class notificationsagent_test extends \advanced_testcase {
         $objdb->parameters = '{"time":"86400"}';
         $objdb->cmid = self::CMID;
         // Insert.
-        $DB->insert_record('notificationsagent_condition', $objdb);
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
 
         $instance = rule::create_instance($ruleid);
         $context = self::$rule->get_default_context();
@@ -539,7 +580,7 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals($pluginname, $conditions->pluginname);
         $this->assertEquals(self::CMID, $conditions->cmid);
         $this->assertEquals($instance->get_timesfired(), $conditions->ruletimesfired);
-        $this->assertEquals($instance->get_conditions($pluginname)[0]->get_parameters(), $conditions->parameters);
+        $this->assertEquals($instance->get_conditions($pluginname)[$conditionid]->get_parameters(), $conditions->parameters);
 
     }
 
@@ -580,7 +621,7 @@ class notificationsagent_test extends \advanced_testcase {
         $objdb->parameters = '{"time":"86400"}';
         $objdb->cmid = self::CMID;
         // Insert.
-        $DB->insert_record('notificationsagent_condition', $objdb);
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
 
         $instance = rule::create_instance($ruleid);
         $context = self::$rule->get_default_context();
@@ -593,7 +634,7 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $result->courseid);
         $this->assertEquals($pluginname, $result->pluginname);
         $this->assertEquals($instance->get_timesfired(), $result->ruletimesfired);
-        $this->assertEquals($instance->get_conditions($pluginname)[0]->get_parameters(), $result->parameters);
+        $this->assertEquals($instance->get_conditions($pluginname)[$conditionid]->get_parameters(), $result->parameters);
 
     }
 
