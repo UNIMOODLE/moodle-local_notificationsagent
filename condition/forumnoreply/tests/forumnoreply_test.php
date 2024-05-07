@@ -134,7 +134,7 @@ class forumnoreply_test extends \advanced_testcase {
         $params = json_decode(self::$context->get_params(), true);
         $objdb = new \stdClass();
         $objdb->userid = self::$user->id;
-     ´   $objdb->courseid = self::$coursetest->id;
+        $objdb->courseid = self::$coursetest->id;
         $objdb->startdate = self::COURSE_DATESTART + $params['time'];
         $objdb->pluginname = self::$subtype;
         $objdb->conditionid = self::CONDITIONID;
