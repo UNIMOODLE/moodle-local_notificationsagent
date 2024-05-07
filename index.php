@@ -225,10 +225,11 @@ foreach ($rules as $rule) {
         'candelete' => $rule->can_delete(),
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
-            ?
-            get_string('type_rule', 'local_notificationsagent')
-            :
-            get_string('type_template', 'local_notificationsagent'),
+            ? ($rule->get_shared() == 0
+            ? get_string('type_sharedrule','local_notificationsagent')
+            : get_string('type_rule', 'local_notificationsagent')
+            )
+            : get_string('type_template', 'local_notificationsagent'),
         'editurl' => new moodle_url(
             "/local/notificationsagent/editrule.php", ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
         ),
@@ -267,7 +268,7 @@ $categoriesall = core_course_category::top()->get_children();
 $categoryarray = [];
 $ruleid = "";
 foreach ($categoriesall as $cat) {
-    $categoryarray[] = build_category_array($cat, $ruleid);
+    $categoryarray[] = rule::build_category_array($cat, $ruleid);
 }
 
 if (!empty($categoryarray)) {
@@ -294,7 +295,7 @@ if (!empty($categoryarray)) {
     $outputcategories .= html_writer::end_div(); // ... .header-listing
     $outputcategories .= html_writer::start_div("", ["class" => "category-listing"]);
     $outputcategories .= html_writer::start_tag("ul", ["id" => "category-listing-content-0", "class" => "m-0 pl-0"]);
-    $outputcategories .= build_output_categories($categoryarray);
+    $outputcategories .= rule::build_output_categories($categoryarray);
     $outputcategories .= html_writer::end_tag("ul"); // ... #category-listing-content-0
     $outputcategories .= html_writer::end_div(); // ... .category-listing
     $outputcategories .= html_writer::end_div(); // ... .course-category-listing

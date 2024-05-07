@@ -91,6 +91,7 @@ $string['ruledownload'] = 'Export rule as';
 $string['assign'] = 'Assign';
 $string['type_template'] = 'template';
 $string['type_rule'] = 'rule';
+$string['type_sharedrule'] = 'shared rule';
 
 // Share modal.
 $string['sharetitle'] = 'Share rule {$a->title}';

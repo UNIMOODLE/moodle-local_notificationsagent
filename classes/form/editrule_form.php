@@ -173,7 +173,7 @@ class editrule_form extends \moodleform {
             'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
             ['size' => '64']
         );
-        $mform->addRule('title', null, 'required', null, 'client');
+        $mform->addRule('title', ' ', 'required');
         $mform->addElement(
             'text', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
             ['size' => '5']

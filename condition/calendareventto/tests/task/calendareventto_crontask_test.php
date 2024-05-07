@@ -126,7 +126,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
-    public function test_execute($date) {
+    public function test_execute($date, $user) {
         global $DB, $USER;
         $pluginname = calendareventto::NAME;
 
@@ -136,7 +136,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -157,10 +157,14 @@ class calendareventto_crontask_test extends \advanced_testcase {
         $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
+        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
+        $this->assertEquals(self::$course->id, $trigger->courseid);
+        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
     }
 
     /**
@@ -170,7 +174,8 @@ class calendareventto_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [60 * 60 * 24 * 70],
+            [60 * 60 * 24 * 70, 0],
+            [60 * 60 * 24 * 70, 2],
         ];
     }
 

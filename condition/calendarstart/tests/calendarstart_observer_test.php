@@ -122,7 +122,7 @@ class calendarstart_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_calendar_updated($time, $radio) {
+    public function test_calendar_updated($time, $radio, $user) {
         global $DB, $USER;
 
         $dataform = new \StdClass();
@@ -131,7 +131,7 @@ class calendarstart_observer_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -168,17 +168,17 @@ class calendarstart_observer_test extends \advanced_testcase {
         if ($radio === 1) {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         } else {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         }
 
     }
@@ -192,10 +192,14 @@ class calendarstart_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, 1],
-            [86400 * 3, 1],
-            [86400, 0],
-            [86400 * 3, 0],
+            [86400, 1, 0],
+            [86400 * 3, 1, 0],
+            [86400, 0, 0],
+            [86400 * 3, 0, 0],
+            [86400, 1, 2],
+            [86400 * 3, 1, 2],
+            [86400, 0, 2],
+            [86400 * 3, 0, 2],
         ];
     }
 

@@ -124,7 +124,7 @@ class calendareventto_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_calendar_updated($time) {
+    public function test_calendar_updated($time, $user) {
         global $DB, $USER;
         \uopz_set_return('time', self::COURSE_DATESTART);
         $dataform = new \StdClass();
@@ -133,7 +133,7 @@ class calendareventto_observer_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -168,10 +168,10 @@ class calendareventto_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         \uopz_unset_return('time');
     }
 
@@ -182,7 +182,8 @@ class calendareventto_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [60 * 60 * 24 * 70],
+            [60 * 60 * 24 * 70, 0],
+            [60 * 60 * 24 * 70, 2],
         ];
     }
 

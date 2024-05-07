@@ -91,6 +91,7 @@ $string['ruledownload'] = 'Exportar regla como';
 $string['assign'] = 'Asignar';
 $string['type_template'] = 'Plantilla';
 $string['type_rule'] = 'Regla';
+$string['type_sharedrule'] = 'Regla compartida';
 
 // Condition plugins.
 $string['condition_days'] = 'Días';

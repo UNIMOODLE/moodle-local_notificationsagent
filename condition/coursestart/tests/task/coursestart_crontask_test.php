@@ -106,7 +106,7 @@ class coursestart_crontask_test extends \advanced_testcase {
      * @dataProvider dataprovider
      * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
      */
-    public function test_execute($date) {
+    public function test_execute($date, $user) {
         global $DB, $USER;
         $pluginname = coursestart::NAME;
 
@@ -123,7 +123,7 @@ class coursestart_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -147,7 +147,7 @@ class coursestart_crontask_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
 
     }
 
@@ -158,8 +158,10 @@ class coursestart_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400],
-            [86400 * 3],
+            [86400, 0],
+            [86400 * 3, 0],
+            [86400, 2],
+            [86400 * 3, 2],
         ];
     }
 

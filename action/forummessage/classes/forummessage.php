@@ -132,9 +132,9 @@ class forummessage extends notificationactionplugin {
         $mform->insertElementBefore($message, 'new' . $type . '_group');
         $mform->insertElementBefore($cm, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui(self::UI_TITLE), PARAM_TEXT);
-        $mform->addRule($this->get_name_ui(self::UI_TITLE), null, 'required', null, 'client');
+        $mform->addRule($this->get_name_ui(self::UI_TITLE), ' ', 'required');
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
-        $mform->addRule($this->get_name_ui(self::UI_MESSAGE), null, 'required', null, 'client');
+        $mform->addRule($this->get_name_ui(self::UI_MESSAGE), ' ', 'required');
         $mform->addRule(
             $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );

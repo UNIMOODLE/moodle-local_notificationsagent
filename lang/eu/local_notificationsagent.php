@@ -91,6 +91,7 @@ $string['ruledownload'] = 'Esportatu araua honela';
 $string['assign'] = 'Esleitu';
 $string['type_template'] = 'Txantiloia';
 $string['type_rule'] = 'Araua';
+$string['type_sharedrule'] = 'Arau partekatua';
 
 // Baldintza pluginak.
 $string['condition_days'] = 'Egunak';

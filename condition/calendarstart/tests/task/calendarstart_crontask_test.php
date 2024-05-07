@@ -131,7 +131,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
-    public function test_execute($date, $radio) {
+    public function test_execute($date, $radio, $user) {
         global $DB, $USER;
         $pluginname = calendarstart::NAME;
         \uopz_set_return('time', self::CM_DATESTART);
@@ -148,7 +148,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -170,10 +170,23 @@ class calendarstart_crontask_test extends \advanced_testcase {
         $task->execute();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
-
-        $this->assertEquals($pluginname, $cache->pluginname);
-        $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
+        
+        if ($radio === 1) {
+            $this->assertEquals($pluginname, $cache->pluginname);
+            $this->assertEquals(self::$course->id, $cache->courseid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
+            $this->assertEquals(self::$course->id, $trigger->courseid);
+            $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
+        } else {
+            $this->assertEquals($pluginname, $cache->pluginname);
+            $this->assertEquals(self::$course->id, $cache->courseid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
+            $this->assertEquals(self::$course->id, $trigger->courseid);
+            $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
+        }
 
         \uopz_unset_return('time');
 
@@ -188,10 +201,14 @@ class calendarstart_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, 1],
-            [86400 * 3, 1],
-            [86400, 0],
-            [86400 * 3, 0],
+            [86400, 1, 0],
+            [86400 * 3, 1, 0],
+            [86400, 0, 0],
+            [86400 * 3, 0, 0],
+            [86400, 1, 2],
+            [86400 * 3, 1, 2],
+            [86400, 0, 2],
+            [86400 * 3, 0, 2],
         ];
     }
 

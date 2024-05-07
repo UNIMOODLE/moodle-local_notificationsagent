@@ -107,7 +107,7 @@ class weekend_crontask_test extends \advanced_testcase {
      * @covers       ::custom_trace
      * @dataProvider dataprovider
      */
-    public function test_execute($date) {
+    public function test_execute($date, $user) {
         global $DB, $USER;
         $pluginname = weekend::NAME;
         \uopz_set_return('time', $date);
@@ -117,7 +117,7 @@ class weekend_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -144,7 +144,7 @@ class weekend_crontask_test extends \advanced_testcase {
         } else {
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+            $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         }
 
         \uopz_unset_return('time');
@@ -157,9 +157,12 @@ class weekend_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1706182049],
-            [1705741200],
-            [1705827600],
+            [1706182049, 0],
+            [1705741200, 0],
+            [1705827600, 0],
+            [1706182049, 2],
+            [1705741200, 2],
+            [1705827600, 2],
         ];
     }
 

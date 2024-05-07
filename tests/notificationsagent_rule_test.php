@@ -263,6 +263,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::build_category_array
      * @covers \local_notificationsagent\rule::build_output_categories
      * @covers \local_notificationsagent\rule::count_category_courses
+     * @covers \local_notificationsagent\rule::get_moodle_url
      *
      */
 
@@ -330,9 +331,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertSame(self::$course->id, $instance->get_default_context());
 
         // Find optimal file where insert this (lib.php functions).
-        $categories = build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
+        $categories = $instance->build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
         $this->assertIsArray($categories);
-        $outputcategories = build_output_categories([$categories]);
+        $outputcategories = $instance->build_output_categories([$categories]);
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
         $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
@@ -696,4 +697,35 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Testing categories output
+     *
+     * @covers       \local_notificationsagent\rule::build_category_array
+     * @covers       \local_notificationsagent\rule::build_output_categories
+     * @covers       \local_notificationsagent\rule::get_module_url
+     * @covers       ::build_category_array
+     *
+     */
+    public function test_output_categories() {
+        self::setUser(self::$user->id);
+        // Simulate data from form.
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+
+        $ruleid = self::$rule->create($dataform);
+
+        $instance = self::$rule::create_instance($ruleid);
+        $categories = $instance->build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
+        $outputcategories = $instance->build_output_categories([$categories]);
+
+        $this->assertIsString($outputcategories);
+        $this->assertGreaterThan(0, strlen($outputcategories));
+        $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
+
+    }
 }

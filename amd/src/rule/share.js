@@ -137,13 +137,15 @@ const setRuleShare = async(id, shared) => {
             let shareItemIcon = document.createElement('i');
             let shareItemText = '';
             let shareItemMessage = '';
-            
+            let shareItemTag= document.querySelector('div#card-'+id).querySelector('span.badge');
             if (!shared) {
+                shareItemTag.textContent = await getString('type_sharedrule', 'local_notificationsagent');
                 shareItemText = await getString('editrule_unsharerule', 'local_notificationsagent');
                 shareItem.setAttribute(selectors.shareRuleDataShared, SHARING_TYPE.SHARED);
                 shareItemIcon.className = 'fa fa-chain-broken mr-2';
                 shareItemMessage = await getString('shareaccept', 'local_notificationsagent');
             } else {
+                shareItemTag.textContent = await getString('type_rule', 'local_notificationsagent');
                 shareItemText = await getString('editrule_sharerule', 'local_notificationsagent');
                 shareItem.setAttribute(selectors.shareRuleDataShared, SHARING_TYPE.UNSHARED);
                 shareItemIcon.className = 'fa fa-link mr-2';

@@ -69,7 +69,7 @@ class notificationscondition_activitysinceend_observer {
             $context->set_courseid($courseid);
             $context->set_userid($userid);
             $context->set_timeaccess($event->timecreated);
-            
+
             notificationsagent::generate_cache_triggers($subplugin, $context);
 
         }

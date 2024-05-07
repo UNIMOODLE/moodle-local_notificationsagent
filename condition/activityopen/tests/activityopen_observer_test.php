@@ -103,9 +103,10 @@ class activityopen_observer_test extends \advanced_testcase {
      *
      * @return void
      * @covers       \notificationscondition_activityopen_observer::course_module_updated
+     * @dataProvider dataprovider
      */
 
-    public function test_course_module_updated() {
+    public function test_course_module_updated($user) {
         global $DB, $USER;
         \uopz_set_return('time', self::COURSE_DATESTART);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
@@ -120,7 +121,7 @@ class activityopen_observer_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = empty($user) ? self::$user->id : $user;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -157,11 +158,23 @@ class activityopen_observer_test extends \advanced_testcase {
 
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         \uopz_unset_return('time');
+    }
+
+    /**
+     * Generate a data provider for testing the `dataprovider` method.
+     *
+     * @return array The data provider array.
+     */
+    public static function dataprovider(): array {
+        return [
+            [0],
+            [2],
+        ];
     }
 }

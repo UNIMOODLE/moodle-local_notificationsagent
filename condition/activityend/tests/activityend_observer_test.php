@@ -33,6 +33,7 @@
 
 namespace notificationscondition_activityend;
 
+use Generator;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_activityend\activityend;
@@ -94,7 +95,13 @@ class activityend_observer_test extends \advanced_testcase {
                 'enddate' => self::COURSE_DATEEND,
             ])
         );
-        self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
+
+        $role = 'student';
+        $arguments = $this->getProvidedData();
+        foreach ($arguments as $key => $value) {
+            $$key = $value;
+        }
+        self::$user = self::getDataGenerator()->create_and_enrol(self::$course, $role);
 
     }
 
@@ -105,10 +112,12 @@ class activityend_observer_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @covers       \notificationscondition_activityend_observer::course_module_updated
+     * @dataProvider dataprovidercoursemoduleupdated
      */
 
-    public function test_course_module_updated() {
+    public function test_course_module_updated($role) {
         global $DB, $USER;
+        
         \uopz_set_return('time', self::COURSE_DATEEND - 120);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
@@ -158,14 +167,23 @@ class activityend_observer_test extends \advanced_testcase {
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
+        $expected = $role == 'student' ? self::$user->id : notificationsagent::GENERIC_USERID;
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $cache->userid);
+        $this->assertEquals($expected, $cache->userid);
 
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-        $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+        $this->assertEquals($expected, $trigger->userid);
 
         \uopz_unset_return('time');
+    }
+
+    /**
+     * Data provider for course_module_updated.
+     */
+    public static function dataprovidercoursemoduleupdated(): Generator {
+        yield ['role' => 'student'];
+        yield ['role' => 'editingteacher'];
     }
 }
