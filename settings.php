@@ -149,5 +149,10 @@ mod_workshop|workshop|submissionstart|submissionend',
             "$CFG->wwwroot/local/notificationsagent/report.php"
         )
     );
-
+    $ADMIN->add(
+        'taskconfig', new admin_externalpage(
+            'notificationsagentadmin', get_string('pluginname', 'local_notificationsagent'),
+            "$CFG->wwwroot/local/notificationsagent/index.php"
+        )
+    );
 }
