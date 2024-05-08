@@ -47,7 +47,7 @@ class notificationsagent {
     /** @var int Default CMID for news type forum */
     public const FORUM_NEWS_CMID = -1;
     /** @var int Default USERID for grading course item */
-    public const USERID_COURSEITEM = 0;
+    public const USERID_COURSEITEM = -1;
 
     /**
      * Get the current conditions by plugin and course id
@@ -65,7 +65,7 @@ class notificationsagent {
         $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname
                                      FROM {notificationsagent_rule} nr
                                      JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                                      AND nr.status = 0 AND nr.template = 1
+                                      AND nr.status = 0 AND nr.template = 1 AND nr.deleted = 0
                                      JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
                                     WHERE nc.pluginname = :pluginname
                                       AND (nctx.contextid = :categorycontextid
@@ -92,7 +92,7 @@ class notificationsagent {
                                  nc.pluginname, nctx.objectid AS courseid
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
                            WHERE nc.id = :courseconditionid
                              AND nctx.contextid = :coursecontextid
@@ -147,7 +147,7 @@ class notificationsagent {
         $conditionssql = 'SELECT nc.id, nc.ruleid, nr.timesfired AS ruletimesfired, nc.parameters, nc.pluginname, nc.cmid
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1 AND nctx.contextid = :coursecontextid
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0 AND nctx.contextid = :coursecontextid
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
                            WHERE pluginname = :pluginname
                              AND nctx.objectid = :courseid
@@ -181,7 +181,7 @@ class notificationsagent {
         $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname
                                      FROM {notificationsagent_rule} nr
                                      JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                                      AND nr.status = 0 AND nr.template = 1
+                                      AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
                                      JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
                                     WHERE nc.pluginname = :pluginname
                                       AND (nctx.contextid = :categorycontextid
@@ -207,7 +207,7 @@ class notificationsagent {
                                  nc.parameters, nc.pluginname, nctx.objectid AS courseid
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
                            WHERE nc.id = :courseconditionid
                              AND (nctx.contextid = :coursecontextid
@@ -260,7 +260,7 @@ class notificationsagent {
         $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.pluginname
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
-                             AND nr.status = 0 AND nr.template = 1
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
                            WHERE (nctx.contextid = :categorycontextid
                               OR (nctx.contextid = :coursecontextid
@@ -292,7 +292,7 @@ class notificationsagent {
                                  nr.timesfired AS ruletimesfired, nctx.objectid AS courseid
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
                            WHERE nc.id = :courseconditionid
                              AND (nctx.contextid = :coursecontextid
@@ -413,6 +413,8 @@ class notificationsagent {
     }
 
     public static function generate_cache_triggers($subplugin, $context) {
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
         $insertdata = [];
         $deletedata = [];
         $courseid = $context->get_courseid();
@@ -466,8 +468,9 @@ class notificationsagent {
             if (has_capability(
                 'local/notificationsagent:managecourserule',
                 $coursecontext, $student
-            )) {
-                $users =  $contextuser ? [(object) ['id' => $contextuser]] : self::get_usersbycourse($coursecontext);
+            )
+            ) {
+                $users = $contextuser ? [(object) ['id' => $contextuser]] : self::get_usersbycourse($coursecontext);
             } else {
                 $users = [(object) ['id' => $student]];
             }
@@ -508,7 +511,8 @@ class notificationsagent {
             if (has_capability(
                 'local/notificationsagent:managecourserule',
                 $coursecontext, $student
-            )) {
+            )
+            ) {
                 $userid = notificationsagent::GENERIC_USERID;
             } else {
                 $userid = $student;
@@ -544,6 +548,8 @@ class notificationsagent {
         }
         self::set_timer_cache($deletedata, $insertdata);
         self::set_time_trigger($deletedata, $insertdata);
+
+        $transaction->allow_commit();
     }
 
     /**
@@ -687,14 +693,14 @@ class notificationsagent {
     }
 
     /**
-     * Deletes cache records for a given user and a list of condition IDs.
+     * Deletes cache and triggers records for a given user and a list of condition IDs.
      *
      * @param array $conditionids An array of condition IDs to delete.
      * @param int   $userid       The user ID whose cache records to delete.
      *
      * @return void
      */
-    public static function cache_bulk_delete_conditions_by_userid($conditionids, $userid) {
+    public static function bulk_delete_conditions_by_userid($conditionids, $userid) {
         global $DB;
 
         list($conditionsql, $params) = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
@@ -702,6 +708,10 @@ class notificationsagent {
 
         $DB->delete_records_select(
             'notificationsagent_cache',
+            "userid = :userid AND conditionid {$conditionsql}", $params
+        );
+        $DB->delete_records_select(
+            'notificationsagent_triggers',
             "userid = :userid AND conditionid {$conditionsql}", $params
         );
     }

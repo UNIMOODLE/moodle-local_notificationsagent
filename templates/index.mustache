@@ -71,7 +71,7 @@
         <div id="card-{{{ id }}}" class="card card-{{{ type }}}{{^ forced}} card-required{{/ forced}}" data-type="{{{ type }}}" data-forced="{{{ forced }}}">
             <div class="card-header bg-transparent mx-3 px-0">
                 <div class="d-flex justify-content-between">
-                    <span class="badge badge-type badge-{{{ type }}}">{{{ type_lang }}}</span>
+                    <span class="badge badge-type badge-{{{ type }}}{{^ shared}} shared{{/ shared}}">{{{ type_lang }}}</span>
                     {{#isrule}}
                         <div class="d-flex">
                             {{# canshare}}

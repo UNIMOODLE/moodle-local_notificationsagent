@@ -61,7 +61,7 @@ class notificationscondition_itemgraded_observer {
         );
 
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cm->id);
-        notificationsagent::cache_bulk_delete_conditions_by_userid(
+        notificationsagent::bulk_delete_conditions_by_userid(
             array_column($conditions, 'id'),
             $userid
         );

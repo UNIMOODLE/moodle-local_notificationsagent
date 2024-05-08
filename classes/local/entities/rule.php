@@ -152,6 +152,9 @@ class rule extends base {
             ->add_callback(static function($str): string {
                 $json = json_decode($str, true);
                 $result = '';
+                if($json == null){
+                   return $result ;
+                }
                 foreach ($json as $key => $value) {
                     $result .= "  " . $key . " : " . mb_convert_encoding($value, 'UTF-8');
                 }

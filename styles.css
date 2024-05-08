@@ -29,6 +29,14 @@ body.path-local-notificationsagent .notificationvars > a:not(:last-child){
     margin-right: .5rem;
 }
 
+body.path-local-notificationsagent .mform .form-group[id^="fgroup_id_new"][id$="_group"] {
+    border-top: 1px solid #dee2e6!important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 1.5rem !important;
+    padding-top: 1rem !important;
+}
+
 body.path-local-notificationsagent .mform .form-inline .form-group .custom-select{
     width: 100%;
 }
@@ -47,30 +55,30 @@ body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
     }
 }
 
-body.path-local-notificationsagent .card{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"]{
     height: 500px;
 }
 
-body.path-local-notificationsagent .card.card-template,
-body.path-local-notificationsagent .card.card-required{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"].card-template,
+body.path-local-notificationsagent .d-flex>.card[id^="card-"].card-required{
     background-color: #F3F3F3;
 }
 
-body.path-local-notificationsagent .card .name{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .name{
     font-weight: 600;
 }
 
-body.path-local-notificationsagent .card .card-body{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .card-body{
     overflow-y: auto;
 }
 
-body.path-local-notificationsagent .card .card-content{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .card-content{
     flex: 1;
 }
 
-body.path-local-notificationsagent .card .conditions-content > span,
-body.path-local-notificationsagent .card .exceptions-content > span,
-body.path-local-notificationsagent .card .actions-content > span{
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .conditions-content > span,
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .exceptions-content > span,
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .actions-content > span{
     font-size: 18px;
 }
 
@@ -90,6 +98,11 @@ body.path-local-notificationsagent .badge.badge-template{
 body.path-local-notificationsagent .badge.badge-rule{
     background-color: #ECF3FD;
     color: #117CDC;
+}
+
+body.path-local-notificationsagent .badge.badge-rule.shared{
+    background-color: #d8dcfd;
+    color: #0009e4;
 }
 
 body.path-local-notificationsagent .badge.badge-status,

@@ -203,5 +203,19 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024020606, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024043002) {
+        // Define field deleted to be added to notificationsagent_rule.
+        $table = new xmldb_table('notificationsagent_rule');
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'runtime');
+
+        // Conditionally launch add field deleted.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043002, 'local', 'notificationsagent');
+    }
+
     return true;
 }

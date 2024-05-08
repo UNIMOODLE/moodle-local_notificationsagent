@@ -32,14 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició: data relativa a l\'inici de l\'activitat';
-$string['conditiontext'] = 'Heu transcorregut [TTTTT] des de la data d\'obertura de l\'activitat [AAAA].';
+$string['conditiontext'] = 'Heu transcorregut [TTTT] des de la data d\'obertura de l\'activitat [AAAA].';
 $string['subtype'] = 'activityopen';
 $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
-

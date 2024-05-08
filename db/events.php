@@ -28,11 +28,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-// This event will listen the user's first session in a course.
 
 $observers = [
     [
         'eventname' => '\core\event\course_module_deleted',
         'callback' => 'local_notificationsagent_observer::course_module_deleted',
-    ]
+    ],
+];
+
+$observers = [
+    [
+        'eventname' => '\core\event\config_log_created',
+        'callback' => 'local_notificationsagent_observer::config_log_created',
+    ],
 ];

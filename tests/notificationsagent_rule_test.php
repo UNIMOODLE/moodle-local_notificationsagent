@@ -514,9 +514,10 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertFalse($cache);
         $this->assertFalse($trigger);
         $this->assertFalse($conditions);
-        $this->assertFalse($actions);
+        $this->assertNotEmpty($actions);
         $this->assertFalse($context);
-        $this->assertFalse($rule);
+        $this->assertNotEmpty($rule);
+        $this->assertEquals(1, $rule->deleted);
 
     }
 

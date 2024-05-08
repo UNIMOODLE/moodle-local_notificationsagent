@@ -396,7 +396,7 @@ abstract class notificationplugin {
     }
 
     /**
-     * Validation editrule_form
+     * Validation subplugin
      * If this method overrides, call to parent::validation
      *
      * @param int   $courseid      Course id
@@ -408,22 +408,6 @@ abstract class notificationplugin {
     public function validation($courseid, &$array = null) {
         if ($courseid == SITEID) {
             return 'break';
-        }
-
-        // All parameters.
-        $data = json_decode($this->get_parameters() ?? '', true);
-
-        // Parameters to validate.
-        if ($cmid = $data[self::UI_ACTIVITY] ?? null) {
-            // Validations.
-            if (!$validation = notificationsagent::supported_cm($cmid, $courseid)) {
-                if (is_null($array)) {
-                    return $validation;
-                }
-                $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                    'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
-                );
-            }
         }
 
         return true;

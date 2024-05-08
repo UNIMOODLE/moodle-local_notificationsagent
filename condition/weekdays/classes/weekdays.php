@@ -269,14 +269,20 @@ class weekdays extends notificationconditionplugin {
     }
 
     /**
-     * Validates the form for the activity end notification condition.
-     * Do not call to parent::validation, not necessary
+     * Validates the subplugin
      *
      * @param int        $courseid The ID of the course.
      * @param array      $array    The array to store validation errors.
      */
     public function validation($courseid, &$array = null) {
-        $validation = false;
+        if (($validation = parent::validation($courseid, $array)) === 'break') {
+            return true;
+        }
+
+        // If false from parent and $array is null, return
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
 
         $data = json_decode($this->get_parameters(), true);
 

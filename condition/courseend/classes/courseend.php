@@ -148,7 +148,7 @@ class courseend extends notificationconditionplugin {
     }
 
     /**
-     * Validates the form for the course end notification condition.
+     * Validates the subplugin
      *
      * @param int        $courseid The ID of the course.
      * @param array      $array    The array to store validation errors.

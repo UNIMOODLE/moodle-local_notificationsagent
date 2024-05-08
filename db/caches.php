@@ -31,10 +31,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\notificationplugin;
+
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
     'launched' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simpledata' => true,
+    ],
+    notificationplugin::TYPE_CONDITION => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simpledata' => true,
+    ],
+    notificationplugin::TYPE_ACTION => [
         'mode' => cache_store::MODE_APPLICATION,
         'simpledata' => true,
     ],

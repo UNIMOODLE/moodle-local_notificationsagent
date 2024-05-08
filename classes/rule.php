@@ -89,6 +89,9 @@ class rule {
     /** @var int $runtime Execution runtime in seconds, default is 86400 */
     private $runtime = 86400;
 
+    /** @var int $deleted Soft delete flag, default is 0 */
+    private $deleted = 0;
+
     /** @var mixed $ac Access control instance or null */
     private $ac = null;
 
@@ -1192,7 +1195,7 @@ class rule {
         $this->delete_cache();
         $this->delete_triggers();
         $this->delete_conditions();
-        $this->delete_actions();
+        // $this->delete_actions(); // Keep actions for report
         $this->delete_context();
     }
 
@@ -1205,8 +1208,9 @@ class rule {
         global $DB;
 
         $this->before_delete();
-
-        return $DB->delete_records('notificationsagent_rule', ['id' => $this->get_id()]);
+        $this->set_deleted(1);
+        // return $DB->delete_records('notificationsagent_rule', ['id' => $this->get_id()]);
+        return $DB->update_record('notificationsagent_rule', ['id' => $this->get_id(), 'deleted' => $this->get_deleted()]);
     }
 
     /**
@@ -1269,6 +1273,9 @@ class rule {
      * @param stdClass $data Form data to be processed.
      */
     public function save_form($data) {
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
+
         if ($this->is_new()) {
             $this->create($data);
         } else {
@@ -1277,6 +1284,7 @@ class rule {
 
         $this->save_form_conditions_exceptions($data);
         $this->save_form_actions($data);
+        $transaction->allow_commit();
     }
 
     /**
@@ -1294,7 +1302,8 @@ class rule {
         if (has_capability(
             'local/notificationsagent:managecourserule',
             $context, $USER->id
-        )) {
+        )
+        ) {
             $students = notificationsagent::get_usersbycourse($context);
         } else {
             $students = [$USER];
@@ -1360,9 +1369,9 @@ class rule {
     /**
      * Save form data for triggers
      *
-     * @param stdClass          $data       Form data containing the conditions.
-     * @param array             $arraytimer Form data containing the actions.
-     * @param context_course    $context    Course context.
+     * @param stdClass       $data       Form data containing the conditions.
+     * @param array          $arraytimer Form data containing the actions.
+     * @param context_course $context    Course context.
      */
     private function save_form_triggers($data, $arraytimer, $context) {
         global $USER;
@@ -1390,7 +1399,8 @@ class rule {
                 if (has_capability(
                     'local/notificationsagent:managecourserule',
                     $context, $USER->id
-                )) {
+                )
+                ) {
                     $studentid = notificationsagent::GENERIC_USERID;
                 } else {
                     $studentid = $USER->id;
@@ -1638,7 +1648,7 @@ class rule {
 
         $sql = 'SELECT DISTINCT nr.id
                   FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid AND nr.deleted = 0
                    AND nctx.contextid = :coursecontextid AND nctx.objectid = :siteid
         ';
         $data = $DB->get_records_sql($sql, [
@@ -1661,7 +1671,7 @@ class rule {
 
         $sql = 'SELECT DISTINCT nr.id
                   FROM {notificationsagent_rule} nr
-                 WHERE nr.shared = 0
+                 WHERE nr.shared = 0 AND nr.deleted = 0
         ';
         $data = $DB->get_records_sql($sql);
 
@@ -1683,13 +1693,13 @@ class rule {
         $sql = 'SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :coursecontextid
+                   AND nctx.contextid = :coursecontextid  AND nr.deleted = 0
                  WHERE nctx.objectid = :coursecontext
                  UNION
                 SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :categorycontextid
+                   AND nctx.contextid = :categorycontextid AND nr.deleted = 0
                   JOIN {course_categories} cc ON nctx.objectid = cc.id
                   JOIN {course} c ON cc.id = c.category
                  WHERE c.id = :categorycontext
@@ -1721,14 +1731,14 @@ class rule {
         $sql = 'SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :coursecontextid
+                   AND nctx.contextid = :coursecontextid AND nr.deleted = 0
                  WHERE nctx.objectid = :coursecontext
                    AND nr.forced = :forcedcourse
                  UNION
                 SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :categorycontextid
+                   AND nctx.contextid = :categorycontextid AND nr.deleted = 0
                   JOIN {course_categories} cc ON nctx.objectid = cc.id
                   JOIN {course} c ON cc.id = c.category
                  WHERE c.id = :categorycontext
@@ -1789,6 +1799,7 @@ class rule {
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid AND nctx.objectid = :objectid
+                  AND nr.deleted = 0
                  WHERE nr.createdby = :createdby
               ORDER BY nr.status, nr.createdat ASC 
         ';
@@ -1813,7 +1824,7 @@ class rule {
 
         $sql = 'SELECT nr.id
                   FROM {notificationsagent_rule} nr
-                 WHERE nr.createdby = :createdby
+                 WHERE nr.createdby = :createdby AND nr.deleted = 0
         ';
         $data = $DB->get_records_sql($sql, [
             'createdby' => $USER->id,
@@ -2112,11 +2123,25 @@ class rule {
     }
 
     /**
+     * @return int
+     */
+    public function get_deleted(): int {
+        return $this->deleted;
+    }
+
+    /**
+     * @param int $deleted
+     */
+    public function set_deleted(int $deleted): void {
+        $this->deleted = $deleted;
+    }
+
+    /**
      *
      * Retrieve data for modal window
      *
-     * @param core_course_category $category
-     * @param int                  $ruleid
+     * @param \core_course_category $category
+     * @param int                   $ruleid
      *
      * @return array
      */
@@ -2157,7 +2182,7 @@ class rule {
     /**
      * Count courses under category parent
      *
-     * @param core_course_category $category
+     * @param \core_course_category $category
      *
      * @return array
      */

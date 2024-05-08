@@ -91,7 +91,7 @@ class activitysinceend extends notificationconditionplugin {
         );
 
         if (empty($timeend)) {
-            $timeend = self::get_timecompletion($cmid, $userid)->timemodified;
+            $timeend = self::get_timecompletion($cmid, $userid)->timemodified ?? null;;
             if (empty($timeend)) {
                 return $meetcondition;
             }

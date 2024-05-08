@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
+use core\event\config_log_created;
 use core\event\course_module_deleted;
 use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationplugin;
@@ -70,6 +71,26 @@ class local_notificationsagent_observer {
                     $data->ruleid, rule::PAUSE_RULE,
                 );
             }
+        }
+    }
+
+    /**
+     * A function to handle the config_log_created event.
+     *
+     * @param config_log_created $event The course module event object
+     */
+    public static function config_log_created(config_log_created $event) {
+        $modifieditem = $event->other['plugin'];
+        $notificationscondition = preg_filter(
+            '/^/', 'notificationscondition_',
+            array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationscondition'))
+        );
+        $notificationsaction = preg_filter(
+            '/^/', 'notificationsaction_', array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationsaction'))
+        );
+        if (in_array($modifieditem, $notificationscondition, false) || in_array($modifieditem, $notificationsaction, false)) {
+            \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION)->purge();
+            \cache::make('local_notificationsagent', notificationplugin::TYPE_ACTION)->purge();
         }
     }
 }

@@ -93,11 +93,13 @@ class itemgraded extends notificationconditionplugin {
             $cm = get_coursemodule_from_id(false, $params->{self::UI_ACTIVITY}, 0, false, MUST_EXIST);
             $usergrade = grade_get_grades($courseid, 'mod', $cm->modname, $cm->instance, $userid);
 
-            $gradeisachieved = notificationsagent::evaluate_expression(
-                $params->{self::UI_OP},
-                $usergrade->items[0]->grades[$userid]->grade,
-                $params->{self::UI_GRADE}
-            );
+            if (isset($usergrade->items[0]->grades[$userid]->grade)) {
+                $gradeisachieved = notificationsagent::evaluate_expression(
+                    $params->{self::UI_OP},
+                    $usergrade->items[0]->grades[$userid]->grade,
+                    $params->{self::UI_GRADE}
+                );
+            }
         }
 
         if ($cache || $gradeisachieved) {

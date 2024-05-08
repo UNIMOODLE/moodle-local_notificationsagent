@@ -52,7 +52,7 @@ class notificationscondition_activitysinceend_observer {
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $event->contextinstanceid);
 
         if ($event->other['completionstate'] == COMPLETION_INCOMPLETE) {
-            notificationsagent::cache_bulk_delete_conditions_by_userid(
+            notificationsagent::bulk_delete_conditions_by_userid(
                 array_column($conditions, 'id'),
                 $userid
             );

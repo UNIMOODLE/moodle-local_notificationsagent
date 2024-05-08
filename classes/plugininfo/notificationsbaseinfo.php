@@ -36,7 +36,6 @@ namespace local_notificationsagent\plugininfo;
 use core\plugininfo\base;
 use core_plugin_manager;
 use local_notificationsagent\notificationplugin;
-use local_notificationsagent\rule;
 
 /**
  * Plugin information class for the notifications base plugin
@@ -45,7 +44,8 @@ class notificationsbaseinfo extends base {
     /**
      * @var array $plugins Cache of initialized plugins indexed by notification rule id and type
      */
-    private static $plugins = [];
+    private static $pluginscondition = [];
+    private static $pluginsaction = [];
 
     /**
      * Finds all system-wide enabled plugins, the result may include missing plugins.
@@ -55,53 +55,31 @@ class notificationsbaseinfo extends base {
      *
      * @return array
      */
-    public static function get_system_enabled_plugins_all_types($rule = null) {
-        $conditions = self::get_system_enabled_plugins($rule, notificationplugin::TYPE_CONDITION);
-        $actions = self::get_system_enabled_plugins($rule, notificationplugin::TYPE_ACTION);
-        return array_merge($conditions, $actions);
-    }
-
-    /** Finds all system-wide enabled plugins, the result may include missing plugins.
-     *
-     * @param \stdClass $rule    record of the instance for initiallizing plugins
-     * @param string    $subtype 'condition' or 'action'
-     *
-     * @return array of enabled plugins $pluginname=>$plugin
-     */
-    public static function get_system_enabled_plugins($rule = null, $subtype = null) {
-        global $DB;
-        if (!isset(self::$plugins[$subtype])) {
-            if ($subtype == null) {
-                return self::get_system_enabled_plugins_all_types($rule);
-            } else {
-                $plugins = core_plugin_manager::instance()->get_installed_plugins('notifications' . $subtype);
-            }
-            if (!$plugins) {
-                return [];
-            }
-            $installed = [];
-            foreach ($plugins as $pluginname => $version) {
-                $installed[] = 'notifications' . $subtype . '_' . $pluginname;
-            }
-
-            list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
-            $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'disabled'", $params, 'plugin ASC');
-            foreach ($disabled as $conf) {
-                if (empty($conf->value)) {
-                    continue;
+    public static function get_all_enabled_plugins() {
+        $cachecondition = \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION);
+        self::$pluginscondition = $cachecondition->get(notificationplugin::TYPE_CONDITION) ? $cachecondition->get(notificationplugin::TYPE_CONDITION) : [];
+        if(empty(self::$pluginscondition)){
+            $notificationscondition = core_plugin_manager::instance()->get_enabled_plugins('notificationscondition');
+            foreach ($notificationscondition as $pluginname) {
+                if ($pluginobj = notificationplugin::create_instance(null, notificationplugin::TYPE_CONDITION, $pluginname)) {
+                    self::$pluginscondition[] = $pluginobj;
                 }
-                list($type, $name) = explode('_', $conf->plugin, 2);
-                unset($plugins[$name]);
             }
-            self::$plugins[$subtype] = $plugins;
-        } else {
-            $plugins = self::$plugins[$subtype];
+            $cachecondition->set(notificationplugin::TYPE_CONDITION, self::$pluginscondition);
         }
-        $enabled = [];
-        foreach ($plugins as $pluginname => $version) {
-            $enabled[$pluginname] = notificationplugin::create_instance(null, $subtype, $pluginname);
+
+        $cacheaction = \cache::make('local_notificationsagent', notificationplugin::TYPE_ACTION);
+        self::$pluginsaction = $cacheaction->get(notificationplugin::TYPE_ACTION) ? $cacheaction->get(notificationplugin::TYPE_ACTION) : [];
+        if(empty(self::$pluginsaction)){
+            $notificationsaction = core_plugin_manager::instance()->get_enabled_plugins('notificationsaction');
+            foreach ($notificationsaction as $pluginname) {
+                if ($pluginobj = notificationplugin::create_instance(null, notificationplugin::TYPE_ACTION, $pluginname)) {
+                    self::$pluginsaction[] = $pluginobj;
+                }
+            }
+            $cacheaction->set(notificationplugin::TYPE_ACTION, self::$pluginsaction);
         }
-        return $enabled;
+        
     }
 
     /**
@@ -113,20 +91,30 @@ class notificationsbaseinfo extends base {
      * @return array
      */
     public static function get_description($courseid, $subtype) {
-        $listactions = [];
-        $rule = new \stdClass();
-        $rule->ruleid = null;
-        foreach (array_keys(self::get_system_enabled_plugins(null, $subtype)) as $pluginname) {
-            if ($pluginobj = notificationplugin::create_instance(null, $subtype, $pluginname)) {
-                $context = \context_course::instance($courseid);
+        self::get_all_enabled_plugins();
+        $context = \context_course::instance($courseid);
+
+        if($subtype == notificationplugin::TYPE_CONDITION){
+            $list = [];
+            foreach (self::$pluginscondition as $pluginobj) {
                 // Check subplugin capability for current user in course.
                 if ($pluginobj->check_capability($context)) {
-                    $listactions[] = $pluginobj->get_description();
+                    $list[] = $pluginobj->get_description();
                 }
             }
+            return $list;
         }
 
-        return $listactions;
+        if($subtype == notificationplugin::TYPE_ACTION){
+            $list = [];
+            foreach (self::$pluginsaction as $pluginobj) {
+                // Check subplugin capability for current user in course.
+                if ($pluginobj->check_capability($context)) {
+                    $list[] = $pluginobj->get_description();
+                }
+            }
+            return $list;
+        }
     }
 
 }

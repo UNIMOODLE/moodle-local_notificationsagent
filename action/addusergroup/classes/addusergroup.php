@@ -189,13 +189,19 @@ class addusergroup extends notificationactionplugin {
 
     /**
      * Validates the subplugin
-     * Do not call to parent::validation, not necessary
      *
      * @param int        $courseid The ID of the course.
      * @param array      $array    The array to store validation errors.
      */
     public function validation($courseid, &$array = null) {
-        $validation = true;
+        if (($validation = parent::validation($courseid, $array)) === 'break') {
+            return true;
+        }
+
+        // If false from parent and $array is null, return
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
 
         $data = json_decode($this->get_parameters(), true);
 

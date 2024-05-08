@@ -32,14 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Baldintza: jarduera hasierako data erlatiboa';
-$string['conditiontext'] = '[TTTTT] jardueraren irekiera datatik [AAAA] igaro da.';
+$string['conditiontext'] = '[TTTT] jardueraren irekiera datatik [AAAA] igaro da.';
 $string['subtype'] = 'activityopen';
 $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
-

@@ -32,6 +32,7 @@
  */
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_usergroupadd\usergroupadd;

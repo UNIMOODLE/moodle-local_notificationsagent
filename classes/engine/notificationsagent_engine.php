@@ -61,6 +61,7 @@ class notificationsagent_engine {
         $ruleids, $timeaccess, $userid, $courseid, $triggercondition,
         $startdate
     ) {
+        global $DB;
         foreach ($ruleids as $ruleid) {
             $rule = rule::create_instance($ruleid);
             $context = new evaluationcontext();
@@ -75,6 +76,7 @@ class notificationsagent_engine {
                 $coursecontext = \context_course::instance($context->get_courseid());
                 $users = notificationsagent::get_usersbycourse($coursecontext);
                 foreach ($users as $user) {
+                    $transaction = $DB->start_delegated_transaction();
                     $context->set_userid($user->id);
                     if ($context->is_evaluate($rule)) {
                         $result = $rule->evaluate($context);
@@ -114,12 +116,14 @@ class notificationsagent_engine {
                             }
                         }
                     }
+                    $transaction->allow_commit();
                 }
             } else {
                 if ($context->is_evaluate($rule)) {
                     $result = $rule->evaluate($context);
                     $contextcourse = \context_course::instance($context->get_courseid());
                     if ($result) {
+                        $transaction = $DB->start_delegated_transaction();
                         $context->set_usertimesfired($rule->set_launched($context));
                         $actions = $rule->get_actions();
                         foreach ($actions as $action) {
@@ -158,6 +162,7 @@ class notificationsagent_engine {
                                 $coursecontext = \context_course::instance($context->get_courseid());
                                 $users = notificationsagent::get_usersbycourse($coursecontext);
                                 foreach ($users as $user) {
+
                                     $context->set_userid($user->id);
                                     $actionparams = json_decode($action->get_parameters(), true);
                                     $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
@@ -190,6 +195,7 @@ class notificationsagent_engine {
                                 }
                             }
                         }
+                        $transaction->allow_commit();
                     }
                 }
             }
