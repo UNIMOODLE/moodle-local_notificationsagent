@@ -36,6 +36,7 @@ require_once('renderer.php');
 require_once("../../lib/modinfolib.php");
 require_once("lib.php");
 
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationplugin;
 
@@ -268,7 +269,7 @@ $categoriesall = core_course_category::top()->get_children();
 $categoryarray = [];
 $ruleid = "";
 foreach ($categoriesall as $cat) {
-    $categoryarray[] = rule::build_category_array($cat, $ruleid);
+    $categoryarray[] = helper::build_category_array($cat, $ruleid);
 }
 
 if (!empty($categoryarray)) {
@@ -295,7 +296,7 @@ if (!empty($categoryarray)) {
     $outputcategories .= html_writer::end_div(); // ... .header-listing
     $outputcategories .= html_writer::start_div("", ["class" => "category-listing"]);
     $outputcategories .= html_writer::start_tag("ul", ["id" => "category-listing-content-0", "class" => "m-0 pl-0"]);
-    $outputcategories .= rule::build_output_categories($categoryarray);
+    $outputcategories .= helper::build_output_categories($categoryarray);
     $outputcategories .= html_writer::end_tag("ul"); // ... #category-listing-content-0
     $outputcategories .= html_writer::end_div(); // ... .category-listing
     $outputcategories .= html_writer::end_div(); // ... .course-category-listing

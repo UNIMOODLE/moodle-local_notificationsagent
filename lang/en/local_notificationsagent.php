@@ -182,6 +182,7 @@ $string['rulesaved'] = 'Rule saved';
 // Rule errors
 $string['editrule_required_error'] = 'Required field';
 $string['editrule_runtime_error'] = 'If '.$string['editrule_timesfired'].' is > 0, must indicate an interval';
+$string['editrule_execution_error'] = $string['editrule_timesfired'].' between {$a->minimum} and {$a->maximum}';
 
 // Card content.
 $string['cardif'] = 'If:';

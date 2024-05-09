@@ -33,6 +33,8 @@
 
 namespace local_notificationsagent;
 
+use local_notificationsagent\helper\helper;
+
 /**
  * Testing rule class
  *
@@ -260,9 +262,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::get_default_context
      * @covers \local_notificationsagent\rule::get_conditions
      * @covers \local_notificationsagent\rule::get_condition
-     * @covers \local_notificationsagent\rule::build_category_array
-     * @covers \local_notificationsagent\rule::build_output_categories
-     * @covers \local_notificationsagent\rule::count_category_courses
+     * @covers \local_notificationsagent\helper\helper::build_category_array
+     * @covers \local_notificationsagent\helper\helper::build_output_categories
+     * @covers \local_notificationsagent\helper\helper::count_category_courses
      * @covers \local_notificationsagent\rule::get_moodle_url
      *
      */
@@ -331,9 +333,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertSame(self::$course->id, $instance->get_default_context());
 
         // Find optimal file where insert this (lib.php functions).
-        $categories = $instance->build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
+        $categories = helper::build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
         $this->assertIsArray($categories);
-        $outputcategories = $instance->build_output_categories([$categories]);
+        $outputcategories = helper::build_output_categories([$categories]);
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
         $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
@@ -701,8 +703,8 @@ class notificationsagent_rule_test extends \advanced_testcase {
     /**
      * Testing categories output
      *
-     * @covers       \local_notificationsagent\rule::build_category_array
-     * @covers       \local_notificationsagent\rule::build_output_categories
+     * @covers       \local_notificationsagent\helper\helper::build_category_array
+     * @covers       \local_notificationsagent\helper\helper::build_output_categories
      */
     public function test_build_output_categories() {
         self::setUser(self::$user->id);
@@ -715,11 +717,8 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
 
-        $ruleid = self::$rule->create($dataform);
-
-        $instance = self::$rule::create_instance($ruleid);
-        $categories = $instance->build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
-        $outputcategories = $instance->build_output_categories([$categories]);
+        $categories = helper::build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
+        $outputcategories = helper::build_output_categories([$categories]);
 
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
@@ -731,11 +730,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * Test count category courses
      *
      * @return void
-     * @covers \local_notificationsagent\rule::count_category_courses
+     * @covers \local_notificationsagent\helper\helper::count_category_courses
      */
     public function test_count_category_courses() {
         $category = \core_course_category::get(self::$course->category);
-        $cat = rule::count_category_courses($category);
+        $cat = helper::count_category_courses($category);
         $this->assertEquals(1, $cat);
 
     }

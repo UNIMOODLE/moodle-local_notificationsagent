@@ -399,18 +399,40 @@ abstract class notificationplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid      Course id
-     * @param array $array         The array to be modified by reference. If is null, validation is not being called from the form
-     *                             and return directly
-     *
+     * @param int   $courseid           Course id
+     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     *                                  and return directly
+     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
+     * 
      * @return bool
      */
-    public function validation($courseid, &$array = null) {
+    public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
+        $validation = true;
         if ($courseid == SITEID) {
             return 'break';
         }
 
-        return true;
+        if ($onlyverifysiteid) {
+            return $validation;
+        }
+
+        // All parameters.
+        $data = json_decode($this->get_parameters() ?? '', true);
+
+        // Check cmid exists
+        if ($cmid = $data[self::UI_ACTIVITY] ?? null) {
+            $fastmodinfo = get_fast_modinfo($courseid);
+            if (!$validation = isset($fastmodinfo->cms[$cmid]) ? true : false) {
+                if (is_null($array)) {
+                    return $validation;
+                }
+                $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
+                    'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
+                );
+            }
+        }
+
+        return $validation;
     }
 
     /**

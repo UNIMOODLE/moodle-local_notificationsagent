@@ -188,13 +188,17 @@ class addusergroup extends notificationactionplugin {
     }
 
     /**
-     * Validates the subplugin
+     * Validation subplugin
      *
-     * @param int        $courseid The ID of the course.
-     * @param array      $array    The array to store validation errors.
+     * @param int   $courseid           Course id
+     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     *                                  and return directly
+     * @param bool  $onlyverifysiteid   Default true
+     * 
+     * @return bool
      */
-    public function validation($courseid, &$array = null) {
-        if (($validation = parent::validation($courseid, $array)) === 'break') {
+    public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
+        if (($validation = parent::validation($courseid, $array, $onlyverifysiteid)) === 'break') {
             return true;
         }
 

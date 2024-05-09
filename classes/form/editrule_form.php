@@ -35,6 +35,7 @@ namespace local_notificationsagent\form;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationplugin;
+use local_notificationsagent\rule;
 use notificationscondition_ac\mod_ac_availability_info;
 
 defined('MOODLE_INTERNAL') || die();
@@ -175,16 +176,14 @@ class editrule_form extends \moodleform {
         );
         $mform->addRule('title', ' ', 'required');
         $mform->addElement(
-            'text', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
+            'float', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
             ['size' => '5']
         );
         $mform->setDefault('timesfired', $this->_customdata['timesfired']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('title', PARAM_TEXT);
-            $mform->setType('timesfired', PARAM_TEXT);
         } else {
             $mform->setType('title', PARAM_CLEANHTML);
-            $mform->setType('timesfired', PARAM_CLEANHTML);
         }
 
         $runtimegroup[] = $mform->createElement('float', 'runtime_days', '', [
@@ -467,6 +466,10 @@ class editrule_form extends \moodleform {
     public function validation($data, $files) {
         $errors = [];
         
+        if ($data["timesfired"] < rule::MINIMUM_EXECUTION || $data["timesfired"] > rule::MAXIMUM_EXECUTION) {
+            $errors["timesfired"] = get_string('editrule_execution_error', 'local_notificationsagent', ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]);
+        }
+
         // If timesfired > 1, runtime > 0.
         if ($data["timesfired"] > 1) {
             if (empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
