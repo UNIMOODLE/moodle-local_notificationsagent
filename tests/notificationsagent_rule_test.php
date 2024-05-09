@@ -703,11 +703,8 @@ class notificationsagent_rule_test extends \advanced_testcase {
      *
      * @covers       \local_notificationsagent\rule::build_category_array
      * @covers       \local_notificationsagent\rule::build_output_categories
-     * @covers       \local_notificationsagent\rule::get_module_url
-     * @covers       ::build_category_array
-     *
      */
-    public function test_output_categories() {
+    public function test_build_output_categories() {
         self::setUser(self::$user->id);
         // Simulate data from form.
 
@@ -727,6 +724,19 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
         $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
+
+    }
+
+    /**
+     * Test count category courses
+     *
+     * @return void
+     * @covers \local_notificationsagent\rule::count_category_courses
+     */
+    public function test_count_category_courses() {
+        $category = \core_course_category::get(self::$course->category);
+        $cat = rule::count_category_courses($category);
+        $this->assertEquals(1, $cat);
 
     }
 }

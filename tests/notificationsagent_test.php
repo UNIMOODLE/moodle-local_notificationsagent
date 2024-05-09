@@ -889,4 +889,63 @@ class notificationsagent_test extends \advanced_testcase {
             'no supported cm' => [false, 'book'],
         ];
     }
+
+    /**
+     * Test  bulk_delete_conditions_by_userid
+     *
+     * @return void
+     * @covers \local_notificationsagent\notificationsagent::bulk_delete_conditions_by_userid
+     */
+    public function test_bulk_delete_conditions_by_userid() {
+        global $DB;
+        $objdbtrigger = new \stdClass();
+        $objdbtrigger->ruleid = self::$rule->get_id();
+        $objdbtrigger->conditionid = 24900;
+        $objdbtrigger->courseid = self::$course->id;
+        $objdbtrigger->userid = self::$user->id;
+        $objdbtrigger->startdate = self::COURSE_DATESTART;
+        $inserttrigger = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
+        $this->assertIsNumeric($inserttrigger);
+
+        $objdb = new \stdClass();
+        $objdb->userid = self::$user->id;
+        $objdb->courseid = self::$course->id;
+        $objdb->startdate = time();
+        $objdb->pluginname = 'sessionend';
+        $objdb->conditionid = 1;
+        $insertcache = $DB->insert_record('notificationsagent_cache', $objdb);
+        $this->assertIsNumeric($insertcache);
+
+        notificationsagent::bulk_delete_conditions_by_userid([$insertcache, $inserttrigger], self::$user->id);
+
+        $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $insertcache]);
+        $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $inserttrigger]);
+
+        $this->assertEmpty($trigger);
+        $this->assertEmpty($cache);
+    }
+
+    /**
+     * Test Evaluate expression
+     *
+     * @dataProvider dataexpresion
+     * @return void
+     */
+    public function test_evaluate_expression($operator, $a, $b, $expected) {
+        $result = notificationsagent::evaluate_expression($operator, $a, $b);
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataexpresion() {
+        return [
+            ['=', 3, 2, false],
+            ['!=', 3, 2, true],
+            ['>', 3, 2, true],
+            ['<', 3, 2, false],
+            ['>=', 3, 3, true],
+            ['<=', 3, 3, true],
+            ['', 3, 3, false],
+        ];
+    }
+
 }

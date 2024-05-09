@@ -197,6 +197,11 @@ abstract class notificationconditionplugin extends notificationplugin {
         }
 
         if (parent::insert_update_delete($action, $dataplugin)) {
+            // Delete cache for this condition
+            notificationsagent::set_timer_cache(
+                ["(courseid= $courseid AND conditionid= {$dataplugin->id})"], []
+            );
+
             $contextevaluation = new evaluationcontext();
             $contextevaluation->set_courseid($courseid);
             $contextevaluation->set_params($this->get_parameters());
@@ -204,14 +209,12 @@ abstract class notificationconditionplugin extends notificationplugin {
             $contextevaluation->set_complementary($complementary);
 
             // Array to save cache
-            $deletedata = [];
             $insertdata = [];
             if (!$this->is_generic()) {
                 foreach ($students as $student) {
                     $contextevaluation->set_userid($student->id);
                     $cache = $this->estimate_next_time($contextevaluation);
 
-                    $deletedata[] = "(userid = $student->id AND courseid= $courseid AND conditionid= {$dataplugin->id})";
                     if (empty($cache)) {
                         continue;
                     }
@@ -238,7 +241,6 @@ abstract class notificationconditionplugin extends notificationplugin {
             } else {
                 $cache = $this->estimate_next_time($contextevaluation);
                 $studentid = notificationsagent::GENERIC_USERID;
-                $deletedata[] = "(userid = $studentid AND courseid= $courseid AND conditionid= {$dataplugin->id})";
                 if (!empty($cache)) {
                     $insertdata[] = [
                         'userid' => $studentid,
@@ -262,7 +264,7 @@ abstract class notificationconditionplugin extends notificationplugin {
             }
 
             notificationsagent::set_timer_cache(
-                $deletedata, $insertdata
+                [], $insertdata
             );
 
         }

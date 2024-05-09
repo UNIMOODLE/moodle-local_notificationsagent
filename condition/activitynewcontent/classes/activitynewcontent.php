@@ -109,7 +109,7 @@ class activitynewcontent extends notificationconditionplugin {
      */
     public function estimate_next_time(evaluationcontext $context) {
         $estimate = null;
-        // Condiition.
+        // Condition.
         if (!$context->is_complementary() && $context->get_observer()) {
             $estimate = time();
         }

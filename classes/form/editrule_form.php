@@ -466,10 +466,7 @@ class editrule_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = [];
-
-        // Use this code to validate the 'Restrict access' section.
-        // FrontendCustom::report_validation_errors($data, $errors);.
-
+        
         // If timesfired > 1, runtime > 0.
         if ($data["timesfired"] > 1) {
             if (empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
@@ -478,23 +475,24 @@ class editrule_form extends \moodleform {
                 $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
             }
         }
-
-        // Count ac/conditions and actions > 0.
+    
         $ac = $data[self::FORM_JSON_AC];
-        $jsoncondition = $data[self::FORM_JSON_CONDITION];
-        $jsonaction = $data[self::FORM_JSON_ACTION];
+        $jsoncondition = json_decode($data[self::FORM_JSON_CONDITION], true);
+        $jsonexception = json_decode($data[self::FORM_JSON_EXCEPTION], true);
+        $jsonaction = json_decode($data[self::FORM_JSON_ACTION], true);
 
-        if (empty($jsoncondition) && mod_ac_availability_info::is_empty($ac)) {
+        // VALIDATION FOR JSON.
+        $countcondition = $this->validationJsonContent(notificationplugin::TYPE_CONDITION, $jsoncondition, $data, $errors);
+        $this->validationJsonContent(notificationplugin::TYPE_EXCEPTION, $jsonexception, $data, $errors);
+        $countaction = $this->validationJsonContent(notificationplugin::TYPE_ACTION, $jsonaction, $data, $errors);
+
+        if (empty($countcondition) && mod_ac_availability_info::is_empty($ac)) {
             $errors["newcondition_group"] = get_string('editrule_condition_error', 'local_notificationsagent');
         }
-        if (empty($jsonaction)) {
+        
+        if (empty($countaction) && empty($jsonaction)) {
             $errors["newaction_group"] = get_string('editrule_action_error', 'local_notificationsagent');
         }
-
-        // LOAD JSON.
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_CONDITION, $data, $errors);
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_EXCEPTION, $data, $errors);
-        $this->loadJsonContentForValidation(notificationplugin::TYPE_ACTION, $data, $errors);
 
         return $errors;
     }
@@ -502,27 +500,24 @@ class editrule_form extends \moodleform {
     /**
      * Load JSON content for validation.
      *
-     * @param string $type   Subplugin type
+     * @param array  $type   json type
+     * @param array  $json   data form json
      * @param array  $data   data form
      * @param array  $errors Erros
      */
-    private function loadJsonContentForValidation($type, $data, &$errors) {
-        $mform = $this->_form;
-        $name = $type == notificationplugin::TYPE_CONDITION
-            ? self::FORM_JSON_CONDITION
-            : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
-                : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
-        $json = $mform->getElementValue($name);
-        if (!empty($json)) {
-            $json = json_decode($json, true);
+    private function validationJsonContent($type, $json, $data, &$errors) {
+        $count = 0;
+        if(!empty($json)){
             foreach ($json as $key => $value) {
                 if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
+                    $count++;
                     content::get_validation_form_plugin(
                         $key, $data, $this->_rule, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
                     );
                 }
             }
         }
+        return $count;
     }
 
     /**
@@ -708,17 +703,17 @@ class frontendCustom extends \core_availability\frontend {
      * For use within forms, reports any validation errors from the availability
      * field.
      *
-     * @param array $data   Form data fields
+     * @param string $ac   Form data fields
      * @param array $errors Error array
      */
-    public static function report_validation_errors(array $data, array &$errors) {
+    public static function report_validation_errors($ac, array &$errors) {
         // Empty value is allowed!
-        if ($data[editrule_form::FORM_JSON_AC] === '') {
+        if (mod_ac_availability_info::is_empty($ac)) {
             return;
         }
 
         // Decode value.
-        $decoded = json_decode($data[editrule_form::FORM_JSON_AC]);
+        $decoded = json_decode($ac);
         if (!$decoded) {
             // This shouldn't be possible.
             throw new \coding_exception('Invalid JSON from availabilityconditionsjson field');

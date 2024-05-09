@@ -41,7 +41,6 @@ use core\task\scheduled_task;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activityavailable\activityavailable;
-use local_notificationsagent\rule;
 
 /**
  * Class for testing the activityavailable_crontask.

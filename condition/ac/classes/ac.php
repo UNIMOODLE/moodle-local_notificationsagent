@@ -69,19 +69,12 @@ class ac extends notificationconditionplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(evaluationcontext $context): bool {
-        global $DB;
-
-        $meetcondition = false;
-
         $courseid = $context->get_courseid();
         $params = $context->get_params();
         $userid = $context->get_userid();
-
         $info = new mod_ac_availability_info($courseid, $params);
         $information = "";
-        $meetcondition = $info->is_available($information, false, $userid);
-
-        return $meetcondition;
+        return $info->is_available($information, false, $userid);
     }
 
     /** Estimate next time when this condition will be true.
@@ -92,7 +85,6 @@ class ac extends notificationconditionplugin {
      */
     public function estimate_next_time(evaluationcontext $context) {
         $result = $this->evaluate($context);
-
         if ($result) {
             return time();
         }
