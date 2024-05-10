@@ -92,6 +92,7 @@ $string['assign'] = 'Asignar';
 $string['type_template'] = 'Modelo';
 $string['type_rule'] = 'Regra';
 $string['type_sharedrule'] = 'Regra compartida';
+$string['fulltemplate'] = 'Modelo';
 
 // Condicionar complementos.
 $string['condition_days'] = 'Días';
@@ -118,6 +119,7 @@ $string['editrule_unshareallrule'] = 'Non compartir';
 $string['editrule_sharedallrule'] = 'Compartido';
 $string['editrule_timesfired'] = 'Número de veces disparado';
 $string['editrule_runtime'] = 'Periocidade';
+$string['editrule_orderby'] = 'Ordenar por';
 
 // Condition.
 $string['editrule_generalconditions'] = 'Condicións xerais';
@@ -169,6 +171,7 @@ $string['editrule_execution_error'] = $string['editrule_timesfired'].' entre {$a
 $string['cardif'] = 'Si:';
 $string['cardunless'] = 'Excepto se:';
 $string['cardthen'] = 'Entón:';
+$string['cardsharedby'] = 'Compartido por {$a->username} no curso {$a->coursename}';
 
 // Tempo de condición da tarxeta.
 $string['card_day'] = 'día';

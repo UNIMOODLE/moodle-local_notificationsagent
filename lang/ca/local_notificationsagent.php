@@ -92,7 +92,7 @@ $string['assign'] = 'Assignar';
 $string['type_template'] = 'Plantilla';
 $string['type_rule'] = 'Regla';
 $string['type_sharedrule'] = 'Regla compartida';
-
+$string['fulltemplate'] = 'Plantilla';
 // Condition plugins.
 $string['condition_days'] = 'Dies';
 $string['condition_hours'] = 'Hores';
@@ -120,6 +120,7 @@ $string['editrule_unshareallrule'] = 'Descompartir';
 $string['editrule_sharedallrule'] = 'Compartit';
 $string['editrule_timesfired'] = 'Nombre de vegades execució';
 $string['editrule_runtime'] = 'Periocitat';
+$string['editrule_orderby'] = 'Ordenar per';
 
 // Condition.
 $string['editrule_generalconditions'] = 'Condicions generals';
@@ -171,6 +172,7 @@ $string['editrule_execution_error'] = $string['editrule_timesfired'].' entre {$a
 $string['cardif'] = 'Si:';
 $string['cardunless'] = 'Excepte si:';
 $string['cardthen'] = 'Aleshores:';
+$string['cardsharedby'] = 'Compartida per {$a->username} al curs {$a->coursename}';
 
 // Card Condition time.
 $string['card_day'] = 'dia';

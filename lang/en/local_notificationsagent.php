@@ -92,6 +92,7 @@ $string['assign'] = 'Assign';
 $string['type_template'] = 'template';
 $string['type_rule'] = 'rule';
 $string['type_sharedrule'] = 'shared rule';
+$string['fulltemplate'] = 'Template';
 
 // Share modal.
 $string['sharetitle'] = 'Share rule {$a->title}';
@@ -137,6 +138,7 @@ $string['editrule_unshareallrule'] = 'Unshare';
 $string['editrule_sharedallrule'] = 'Shared';
 $string['editrule_timesfired'] = 'No. of executions';
 $string['editrule_runtime'] = 'Interval';
+$string['editrule_orderby'] = 'Order by';
 
 // Condition.
 $string['editrule_generalconditions'] = 'General conditions';
@@ -188,6 +190,8 @@ $string['editrule_execution_error'] = $string['editrule_timesfired'].' between {
 $string['cardif'] = 'If:';
 $string['cardunless'] = 'Unless:';
 $string['cardthen'] = 'Then:';
+$string['cardsharedby'] = 'Shared by {$a->username} in course {$a->coursename}';
+
 
 // Card Condition time.
 $string['card_day'] = 'day';

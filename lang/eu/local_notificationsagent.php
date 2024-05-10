@@ -92,6 +92,7 @@ $string['assign'] = 'Esleitu';
 $string['type_template'] = 'Txantiloia';
 $string['type_rule'] = 'Araua';
 $string['type_sharedrule'] = 'Arau partekatua';
+$string['fulltemplate'] = 'Txantiloia';
 
 // Baldintza pluginak.
 $string['condition_days'] = 'Egunak';
@@ -120,6 +121,7 @@ $string['editrule_unshareallrule'] = 'Partekatu gabe';
 $string['editrule_sharedallrule'] = 'Partekatua';
 $string['editrule_timesfired'] = 'Tiro kopurua';
 $string['editrule_runtime'] = 'Aldikotasuna';
+$string['editrule_orderby'] = 'Ordenatu';
 
 // Condition.
 $string['editrule_generalconditions'] = 'Baldintza orokorrak';
@@ -176,6 +178,7 @@ $string['editrule_execution_error'] = $string['editrule_timesfired'].' {$a->mini
 $string['cardif'] = 'Bai:';
 $string['cardunless'] = 'Bada izan ezik:';
 $string['cardthen'] = 'Orduan:';
+$string['cardsharedby'] = 'Partekatua {$a->username} ikastaroan {$a->coursename}';
 
 // Txartelaren baldintza-denbora.
 $string['card_day'] = 'eguna';
