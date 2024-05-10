@@ -64,7 +64,24 @@
     {{#capabilities.report}}
         <a href="{{{url.reporturl}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_reports, local_notificationsagent{{/str}}</a>
     {{/capabilities.report}}
+    <div class="d-flex flex-wrap ml-auto align-items-end">
+        <button type="button" id="applyordergroupbtn" class="btn btn-outline-primary mr-3">
+            {{#str}}editrule_orderby, local_notificationsagent{{/str}}
+        </button>
+        <select id="orderrulesid" class="select custom-select mr-3">
+            <option value="1">{{#str}}status_active, local_notificationsagent{{/str}}</option>
+            <option value="2">{{#str}}status_paused, local_notificationsagent{{/str}}</option>
+            <option value="3">{{#str}}status_required, local_notificationsagent{{/str}}</option>
+            <option value="4">{{#str}}editrule_sharedallrule, local_notificationsagent{{/str}}</option>
+            <option value="5">{{#str}}status_broken, local_notificationsagent{{/str}}</option>
+            {{#iscontextsite}}
+                <option value="6">{{#str}}fullrule, local_notificationsagent{{/str}}</option>
+                <option value="7">{{#str}}fulltemplate, local_notificationsagent{{/str}}</option>
+            {{/iscontextsite}}
+        </select>
+    </div>
 </div>
+
 
 <div class="d-flex flex-wrap">
     {{#rulecontent}}

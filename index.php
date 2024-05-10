@@ -30,7 +30,6 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require_once("../../config.php");
 require_once('renderer.php');
 require_once("../../lib/modinfolib.php");
@@ -106,6 +105,7 @@ $PAGE->requires->js_call_amd('local_notificationsagent/rule/delete', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/share', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/shareall', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/unshareall', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/sort_rule_cards', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
@@ -145,14 +145,14 @@ $templatecontext['url'] = [
     'addtemplate' => $addtemplate,
     'reporturl' => $reporturl,
 ];
-
-$rules = rule::get_rules_index($context, $courseid);
+$pregerencesorderid = get_user_preferences('orderid');
+!empty($pregerencesorderid) ? $orderid = $pregerencesorderid : $orderid = null;
+$rules = rule::get_rules_index($context, $courseid, $orderid);
 $rulecontent = [];
 
 $conditionsarray = [];
 $exceptionsarray = [];
 $actionsarray = [];
-
 
 foreach ($rules as $rule) {
     $ac = $rule->get_ac();
@@ -204,6 +204,7 @@ foreach ($rules as $rule) {
         'content' => $actionscontent,
     ];
 
+    $datanamerule = rule::get_coursename_and_username_by_rule_id($rule->get_id());
     $rulecontent[] = [
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
@@ -227,7 +228,7 @@ foreach ($rules as $rule) {
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
             ? ($rule->get_shared() == 0
-            ? get_string('type_sharedrule','local_notificationsagent')
+            ? ($courseid == 1 ? get_string('cardsharedby', 'local_notificationsagent', $datanamerule) : get_string('type_sharedrule','local_notificationsagent'))
             : get_string('type_rule', 'local_notificationsagent')
             )
             : get_string('type_template', 'local_notificationsagent'),
@@ -303,7 +304,6 @@ if (!empty($categoryarray)) {
 
     $templatecontext['output_categoriescourses'] = $outputcategories;
 }
-
 echo $renderer->render_from_template('local_notificationsagent/index', $templatecontext);
 
 echo $output->footer();

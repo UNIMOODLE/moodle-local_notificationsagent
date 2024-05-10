@@ -83,4 +83,13 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/notificationsagent:unshareruleall',
     ],
+    'local_notificationsagent_manage_sessions' => [
+        'classname' => \local_notificationsagent\external\manage_sessions::class,
+        'method' => 'manage_sessions',
+        'description' => 'Create session about rules orders',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/notificationsagent:updaterulestatus',
+    ],
+
 ];
