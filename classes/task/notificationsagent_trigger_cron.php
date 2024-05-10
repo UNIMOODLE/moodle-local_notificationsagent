@@ -33,10 +33,6 @@
 
 namespace local_notificationsagent\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\engine\notificationsagent_engine;
 use local_notificationsagent\notificationsagent;
@@ -59,7 +55,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
      */
     public function execute() {
         $timestarted = $this->get_timestarted();
-        custom_mtrace("Task started-> " . $timestarted);
+        \local_notificationsagent\helper\helper::custom_mtrace("Task started-> " . $timestarted);
         // Get cron task lastrun.
         $tasklastrunttime = get_config('local_notificationsagent', 'cronlastrun');
         // Rules in the interval  $timestarted and $tasklastrunttime.
@@ -72,7 +68,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
                 [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid, $trigger->startdate
             );
         }
-        custom_mtrace("Task finished-> " . time());
-        custom_mtrace("RUNTIME: " . $tasklastrunttime);
+        \local_notificationsagent\helper\helper::custom_mtrace("Task finished-> " . time());
+        \local_notificationsagent\helper\helper::custom_mtrace("RUNTIME: " . $tasklastrunttime);
     }
 }

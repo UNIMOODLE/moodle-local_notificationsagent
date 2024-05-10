@@ -42,6 +42,7 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Class for testing the activityavailable_crontask task.
+ *
  * @group notificationsagent
  */
 class activityavailable_crontask_test extends \advanced_testcase {
@@ -103,7 +104,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      *  Testing excute method from task.
      *
      * @covers       \notificationscondition_activityavailable\task\activityavailable_crontask::execute
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      *
      */
     public function test_execute() {

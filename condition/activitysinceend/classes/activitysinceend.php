@@ -202,14 +202,7 @@ class activitysinceend extends notificationconditionplugin {
     public function convert_parameters($params) {
         $params = (array) $params;
         $activity = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
-        $timevalues = [
-            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
-        ];
-        $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
-            + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
+        $timeinseconds = $this->select_date_to_unix($params);
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $activity]));
         $this->set_cmid((int) $activity);
         return $this->get_parameters();
@@ -236,7 +229,7 @@ class activitysinceend extends notificationconditionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $paramstoreplace = [to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
+        $paramstoreplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;

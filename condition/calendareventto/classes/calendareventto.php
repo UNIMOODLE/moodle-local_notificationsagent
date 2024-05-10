@@ -203,15 +203,7 @@ class calendareventto extends notificationconditionplugin {
     public function convert_parameters($params) {
         $params = (array) $params;
         $calendar = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
-        $timevalues = [
-            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
-            'seconds' => $params[$this->get_name_ui(self::UI_SECONDS)] ?? 0,
-        ];
-        $timeinseconds = ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
-            + ($timevalues['minutes'] * 60) + $timevalues['seconds'];
-
+        $timeinseconds = $this->select_date_to_unix($params);
         $this->set_parameters(json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $calendar]));
         $this->set_cmid((int) $calendar);
         return $this->get_parameters();
@@ -232,7 +224,7 @@ class calendareventto extends notificationconditionplugin {
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
-        $paramstoteplace = [to_human_format($jsonparams->{self::UI_TIME}, true)];
+        $paramstoteplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true)];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 

@@ -273,7 +273,7 @@ class rule {
      *
      * @return array $instances Rule object
      */
-    public static function get_rules_index($context, $courseid) {
+    public static function get_rules_index($context, $courseid, $orderid = null) {
         $rules = [];
         $instances = [];
 
@@ -294,7 +294,35 @@ class rule {
                 $instances[] = self::create_instance($rule->id);
             }
         }
-
+        $order = 0;
+        if ($orderid) {
+            switch($orderid) {
+                case 1:
+                    $orderstring = 'status';
+                    break;
+                case 2:
+                    $orderstring = 'status';
+                    $order = 1;
+                    break;
+                case 3:
+                    $orderstring = 'forced';
+                    break;
+                case 4:
+                    $orderstring = 'shared';
+                    break;
+                case 5:
+                    $orderstring = 'broken';
+                    break;
+                case 6:
+                    $orderstring = 'template';
+                    $order = 1;
+                    break;
+                case 7:
+                    $orderstring = 'template';
+                    break;
+            }
+            $instances = self::order_rules_by_field($instances, $orderstring, $order, $courseid);
+        }
         return $instances;
     }
 
@@ -1173,7 +1201,7 @@ class rule {
                             break;
 
                         case 'Follow_Link':
-                            $paramstoreplace[] = get_follow_link($context);
+                            $paramstoreplace[] = \local_notificationsagent\helper\helper::get_follow_link($context);
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
                             break;
                     }
@@ -1921,7 +1949,7 @@ class rule {
      * @return integer $data Time in days, hours and minutes
      */
     public function get_runtime_format() {
-        return to_human_format($this->get_runtime());
+        return \local_notificationsagent\helper\helper::to_human_format($this->get_runtime());
     }
 
     /**
@@ -1932,17 +1960,17 @@ class rule {
      * @return integer $data Seconds
      */
     private static function get_runtime_database_format($runtime) {
-        $data = to_seconds_format(['days' => self::MINIMUM_RUNTIME]);
-
         $days = trim($runtime['runtime_days']);
         $hours = trim($runtime['runtime_hours']);
         $minutes = trim($runtime['runtime_minutes']);
         if (!empty($days) || !empty($hours) || !empty($minutes)) {
-            $data = to_seconds_format([
+            $data = \local_notificationsagent\helper\helper::to_seconds_format([
                 'days' => $days,
                 'hours' => $hours,
                 'minutes' => $minutes,
             ]);
+        }else{
+            $data = \local_notificationsagent\helper\helper::to_seconds_format(['days' => self::MINIMUM_RUNTIME]);
         }
 
         return $data;
@@ -2136,5 +2164,63 @@ class rule {
     public function set_deleted(int $deleted): void {
         $this->deleted = $deleted;
     }
+
+    /**
+     * Order rules by field
+     *
+     * @param array $rules 
+     * @param string $field Field order by.
+     * @param int $desc Desc or Asc.
+     * @param int $courseid
+     *
+     * @return array
+     */
+    public static function order_rules_by_field($rules, $field, $desc, $courseid) {
+
+        if ($field == "broken") {
+            usort($rules, function($a, $b) use ($courseid) {
+                if ($a->validation($courseid) && !$b->validation($courseid)) {
+                    return 1;
+                } else if (!$a->validation($courseid) && $b->validation($courseid)) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+        } else {
+            if ($desc == 1) {
+                usort($rules, function($a, $b) use ($field) {
+                    return $b->$field - $a->$field;
+                });
+            } else {
+                usort($rules, function($a, $b) use ($field) {
+                    return $a->$field - $b->$field;
+                });
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Return username and coursename by rule id
+     *
+     * @param int $ruleid The rule id.
+     *
+     * @return array
+     */
+    public static function get_coursename_and_username_by_rule_id($ruleid) {
+        global $DB;
+        $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleid], '*', IGNORE_MISSING);
+        $username = \core_user::get_user($rule->createdby)->firstname;
+        $courseid = $DB->get_record('notificationsagent_context', ['ruleid' => $ruleid], '*', IGNORE_MULTIPLE
+        , MUST_EXIST, 0 , 1)->objectid;
+        $coursename = $DB->get_record('course', ['id' => $courseid], 'shortname')->shortname;
+        return [
+            'username' => $username,
+            'coursename' => $coursename
+        ];
+    }
+
 
 }

@@ -33,10 +33,6 @@
 
 namespace notificationscondition_courseend\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_courseend\courseend;
@@ -60,7 +56,7 @@ class courseend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Courseend start");
+        \local_notificationsagent\helper\helper::custom_mtrace("Courseend start");
 
         $pluginname = courseend::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -75,6 +71,6 @@ class courseend_crontask extends scheduled_task {
             notificationsagent::generate_cache_triggers($subplugin, $context);
         }
 
-        custom_mtrace("Courseend end");
+        \local_notificationsagent\helper\helper::custom_mtrace("Courseend end");
     }
 }

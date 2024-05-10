@@ -35,10 +35,6 @@ use local_notificationsagent\notificationsagent;
 use notificationscondition_weekdays\weekdays;
 use local_notificationsagent\evaluationcontext;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 /**
  * weekdays cron task
  */
@@ -57,8 +53,8 @@ class weekdays_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("weekdays start");
-        
+        \local_notificationsagent\helper\helper::custom_mtrace("weekdays start");
+
         $pluginname = weekdays::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
@@ -70,8 +66,8 @@ class weekdays_crontask extends scheduled_task {
             $context->set_courseid($condition->courseid);
 
             notificationsagent::generate_cache_triggers($subplugin, $context);
-            
+
         }
-        custom_mtrace("weekdays end");
+        \local_notificationsagent\helper\helper::custom_mtrace("weekdays end");
     }
 }

@@ -33,10 +33,6 @@
 
 namespace notificationscondition_activityavailable\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
@@ -60,7 +56,7 @@ class activityavailable_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Activityavailable start");
+        \local_notificationsagent\helper\helper::custom_mtrace("Activityavailable start");
         $pluginname = activityavailable::NAME;
 
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -77,6 +73,6 @@ class activityavailable_crontask extends scheduled_task {
             notificationsagent::generate_cache_triggers($subplugin, $context);
 
         }
-        custom_mtrace("Activityavailable end ");
+        \local_notificationsagent\helper\helper::custom_mtrace("Activityavailable end ");
     }
 }

@@ -186,17 +186,30 @@ class editrule_form extends \moodleform {
             $mform->setType('title', PARAM_CLEANHTML);
         }
 
+        // Days.
+        $runtimegroup[] = $mform->createElement(
+            'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+        );
         $runtimegroup[] = $mform->createElement('float', 'runtime_days', '', [
             'class' => 'mr-2', 'size' => 7, 'maxlength' => '3',
             'placeholder' => get_string('condition_days', 'local_notificationsagent'),
             'value' => 1,
         ]);
 
+        // Hours.
+        $runtimegroup[] = $mform->createElement(
+            'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+        );
         $runtimegroup[] = $mform->createElement('float', 'runtime_hours', '', [
             'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
             'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
             'value' => 0,
         ]);
+
+        // Minutes.
+        $runtimegroup[] = $mform->createElement(
+            'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+        );
         $runtimegroup[] = $mform->createElement('float', 'runtime_minutes', '', [
             'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
             'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),

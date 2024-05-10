@@ -123,7 +123,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * @param int $date
      *
      * @covers       \notificationscondition_calendareventto\task\calendareventto_crontask::execute
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
     public function test_execute($date, $user) {

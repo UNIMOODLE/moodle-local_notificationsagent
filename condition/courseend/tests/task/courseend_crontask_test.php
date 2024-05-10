@@ -106,7 +106,7 @@ class courseend_crontask_test extends \advanced_testcase {
      * @param int $date
      *
      * @covers       \notificationscondition_courseend\task\courseend_crontask::execute
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
     public function test_execute($date, $user) {

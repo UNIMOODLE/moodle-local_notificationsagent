@@ -112,11 +112,6 @@ abstract class notificationplugin {
     public const UI_MINUTES = 'minutes';
 
     /**
-     * User interface constant for seconds.
-     */
-    public const UI_SECONDS = 'seconds';
-
-    /**
      * User interface constant for user.
      */
     public const UI_USER = 'user';
@@ -145,11 +140,6 @@ abstract class notificationplugin {
      * Default value for minutes in UI.
      */
     public const UI_MINUTES_DEFAULT_VALUE = 0;
-
-    /**
-     * Default value for seconds in UI.
-     */
-    public const UI_SECONDS_DEFAULT_VALUE = 0;
 
     /**
      * Configuration status disabled.
@@ -302,16 +292,16 @@ abstract class notificationplugin {
      * @param string           $type  The type of the notification plugin, used to determine condition or action.
      */
     protected function get_ui_select_date($mform, $type) {
-        $id = $this->get_id();
         $conditionoraction = ($type == self::TYPE_ACTION ? self::TYPE_ACTION : self::TYPE_CONDITION);
-
-        $timegroup = [];
 
         // Days.
         $timegroup[] = $mform->createElement(
+            'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+        );
+        $timegroup[] = $mform->createElement(
             'float',
             $this->get_name_ui(self::UI_DAYS),
-            '',
+            get_string('condition_days', 'local_notificationsagent'),
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                 'placeholder' => get_string('condition_days', 'local_notificationsagent'),
@@ -320,6 +310,9 @@ abstract class notificationplugin {
         );
 
         // Hours.
+        $timegroup[] = $mform->createElement(
+            'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+        );
         $timegroup[] = $mform->createElement(
             'float',
             $this->get_name_ui(self::UI_HOURS),
@@ -333,24 +326,15 @@ abstract class notificationplugin {
 
         // Minutes.
         $timegroup[] = $mform->createElement(
+            'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+        );
+        $timegroup[] = $mform->createElement(
             'float',
             $this->get_name_ui(self::UI_MINUTES),
             '',
             [
                 'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                 'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            ]
-        );
-
-        // Seconds.
-        $timegroup[] = $mform->createElement(
-            'float',
-            $this->get_name_ui(self::UI_SECONDS),
-            '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
-                'placeholder' => get_string('condition_seconds', 'local_notificationsagent'),
                 'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
             ]
         );
@@ -366,11 +350,23 @@ abstract class notificationplugin {
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
+    }
 
-        $mform->addGroupRule(
-            $this->get_name_ui($this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
-        );
+    /**
+     * Convert select date value to unix
+     * 
+     * @param array $params The parameters of the form
+     *
+     * @return array
+     */
+    protected function select_date_to_unix($params) {
+        $timevalues = [
+            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
+            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
+            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+        ];
+        return ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
+            + ($timevalues['minutes'] * 60);
     }
 
     /**
@@ -382,7 +378,6 @@ abstract class notificationplugin {
         $params[$this->get_name_ui(self::UI_DAYS)] = self::UI_DAYS_DEFAULT_VALUE;
         $params[$this->get_name_ui(self::UI_HOURS)] = self::UI_HOURS_DEFAULT_VALUE;
         $params[$this->get_name_ui(self::UI_MINUTES)] = self::UI_MINUTES_DEFAULT_VALUE;
-        $params[$this->get_name_ui(self::UI_SECONDS)] = self::UI_SECONDS_DEFAULT_VALUE;
         return $params;
     }
 
@@ -675,11 +670,10 @@ abstract class notificationplugin {
             if (!empty($array)) {
                 foreach ($array as $key => $value) {
                     if ($key == self::UI_TIME) {
-                        $format = to_human_format($value);
+                        $format = \local_notificationsagent\helper\helper::to_human_format($value);
                         $return[$this->get_name_ui(self::UI_DAYS)] = $format["days"];
                         $return[$this->get_name_ui(self::UI_HOURS)] = $format["hours"];
                         $return[$this->get_name_ui(self::UI_MINUTES)] = $format["minutes"];
-                        $return[$this->get_name_ui(self::UI_SECONDS)] = $format["seconds"];
                         continue;
                     }
                     $return[$this->get_name_ui($key)] = $value;

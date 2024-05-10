@@ -35,10 +35,6 @@ use local_notificationsagent\notificationsagent;
 use notificationscondition_weekend\weekend;
 use local_notificationsagent\evaluationcontext;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 /**
  * Weekend cron task
  */
@@ -57,7 +53,7 @@ class weekend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Weekend start");
+        \local_notificationsagent\helper\helper::custom_mtrace("Weekend start");
 
         $currenttime = $this->get_timestarted();
         if (!weekend::is_weekend($currenttime)) {
@@ -77,6 +73,6 @@ class weekend_crontask extends scheduled_task {
             notificationsagent::generate_cache_triggers($subplugin, $context);
 
         }
-        custom_mtrace("Weekend end");
+        \local_notificationsagent\helper\helper::custom_mtrace("Weekend end");
     }
 }

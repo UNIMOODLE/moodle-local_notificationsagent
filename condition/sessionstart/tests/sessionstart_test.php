@@ -35,10 +35,10 @@ namespace notificationscondition_sessionstart;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
+use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_sessionstart\sessionstart;
 
 /**
  * Test for the notificationscondition_sessionstart plugin.
@@ -310,10 +310,9 @@ class sessionstart_test extends \advanced_testcase {
         $params = [
             $id . "_sessionstart_days" => "1",
             $id . "_sessionstart_hours" => "0",
-            $id . "_sessionstart_minutes" => "0",
-            $id . "_sessionstart_seconds" => "1",
+            $id . "_sessionstart_minutes" => "1",
         ];
-        $expected = '{"time":86401}';
+        $expected = '{"time":86460}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
@@ -329,7 +328,7 @@ class sessionstart_test extends \advanced_testcase {
         $time = 86400;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -367,13 +366,11 @@ class sessionstart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uigroupname));
         $this->assertTrue(in_array($uidays, $uigroupelements));
         $this->assertTrue(in_array($uihours, $uigroupelements));
         $this->assertTrue(in_array($uiminutes, $uigroupelements));
-        $this->assertTrue(in_array($uiseconds, $uigroupelements));
     }
 
     /**
@@ -413,16 +410,46 @@ class sessionstart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
             isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
-        $this->assertTrue(
-            isset($defaulttime[$uiseconds]) && $defaulttime[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE
-        );
+    }
+
+    /**
+     * Test update after restore
+     *
+     * @covers \notificationscondition_sessionstart\sessionstart::update_after_restore
+     * @return void
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore(2, self::$coursetest->id, $logger));
+    }
+
+    /**
+     * Test set_first_course_access
+     *
+     * @return void
+     * @covers \notificationscondition_sessionstart\sessionstart::set_first_course_access
+     */
+    public function test_set_first_course_access() {
+        $this->assertIsNumeric(sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time()));
+
+    }
+
+    /**
+     * Test get_first_course_access
+     *
+     * @return void
+     * @covers \notificationscondition_sessionstart\sessionstart::get_first_course_access
+     */
+    public function test_get_first_course_access() {
+        $this->assertNull(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id,));
+        sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time());
+        $this->assertIsNumeric(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id,));
     }
 
 }

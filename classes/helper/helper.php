@@ -34,12 +34,136 @@
 namespace local_notificationsagent\helper;
 
 use html_writer;
+use moodle_url;
 
 /**
  *  Helper class for plugin
  */
-class helper {
-    
+class helper
+{
+
+    /**
+     * Trace for scheduled tasks. Only meant for debugging
+     * Disable in settings for producion environments.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function custom_mtrace($message)
+    {
+        $tracelog = get_config('local_notificationsagent', 'tracelog');
+        if ($tracelog) {
+            mtrace($message);
+        }
+    }
+
+    /**
+     * Returns seconds in human format
+     *
+     * @param integer $seconds Seconds
+     * @param bool    $toshow
+     *
+     * @return array|string $data Time in days, hours, minutes and seconds
+     */
+    public static function to_human_format($seconds, $toshow = false)
+    {
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@$seconds");
+
+        $stringtoshow = [];
+        $a = $dtF->diff($dtT)->format('%a') and
+            $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
+        $h = $dtF->diff($dtT)->format('%h') and
+            $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
+        $i = $dtF->diff($dtT)->format('%i') and
+            $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
+        $s = $dtF->diff($dtT)->format('%s') and
+            $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
+
+        if (empty($stringtoshow)) {
+            $stringtoshow[] = "0 " . get_string('card_second', 'local_notificationsagent');
+        }
+
+        if ($toshow) {
+            return implode(",", $stringtoshow);
+        }
+
+        return ['days' => $a, 'hours' => $h, 'minutes' => $i, 'seconds' => $s];
+    }
+
+    /**
+     * Get the URL used to access the course that the instance is in.
+     *
+     * @param int $id
+     *
+     * @return moodle_url
+     */
+    public static function get_course_url($id)
+    {
+        return new moodle_url('/course/view.php', ['id' => $id]);
+    }
+
+    /**
+     * Get the URL for a specific module in a course.
+     *
+     * @param int $courseid The ID of the course.
+     * @param int $cmid     The ID of the course module.
+     *
+     * @return moodle_url The URL of the course module.
+     */
+    public static function get_module_url($courseid, $cmid)
+    {
+        return new moodle_url(
+            get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
+            ['id' => $cmid]
+        );
+    }
+
+    /**
+     * Get the direct link to the course or module based on the trigger condition.
+     *
+     * @param object $context The Evaluation context object
+     *
+     * @return string The URL of the module or course
+     * @throws moodle_exception When there is an error with the condition ID
+     */
+    public static function get_follow_link($context)
+    {
+        $conditions = $context->get_rule()->get_conditions();
+        $condition = $conditions[$context->get_triggercondition()] ?? '';
+        $cmid = !empty($condition) ? ((json_decode($condition->get_parameters()))->cmid ?? '') : '';
+
+        return !empty($cmid) ? self::get_module_url($context->get_courseid(), $cmid) : self::get_course_url($context->get_courseid());
+    }
+
+    /**
+     * Returns human format in seconds
+     *
+     * @param array $time Time in days, hours, minutes and seconds
+     *
+     * @return integer $seconds Seconds
+     */
+    public static function to_seconds_format($time)
+    {
+        $seconds = 0;
+
+        if (isset($time['days']) && $time['days'] != "") {
+            $seconds = $time['days'] * 24 * 60 * 60;
+        }
+        if (isset($time['hours']) && $time['hours'] != "") {
+            $seconds += $time['hours'] * 60 * 60;
+        }
+        if (isset($time['minutes']) && $time['minutes'] != "") {
+            $seconds += $time['minutes'] * 60;
+        }
+        if (isset($time['seconds']) && $time['seconds'] != "") {
+            $seconds += $time['seconds'];
+        }
+
+        return $seconds;
+    }
+
     /**
      *
      * Retrieve data for modal window
@@ -49,7 +173,8 @@ class helper {
      *
      * @return array
      */
-    public static function build_category_array($category, $ruleid) {
+    public static function build_category_array($category, $ruleid)
+    {
         global $DB;
         $courses = $category->get_courses();
         $count = $category->coursecount;
@@ -90,7 +215,8 @@ class helper {
      *
      * @return array
      */
-    public static function count_category_courses($category) {
+    public static function count_category_courses($category)
+    {
         $countcategorycourses = $category->coursecount;
 
         $subcategories = $category->get_children();
@@ -109,7 +235,8 @@ class helper {
      *
      * @return string
      */
-    public static function build_output_categories($arraycategories, $categoryid = 0) {
+    public static function build_output_categories($arraycategories, $categoryid = 0)
+    {
         $output = "";
         foreach ($arraycategories as $key => $category) {
             $output .= html_writer::start_tag("li", [
@@ -124,10 +251,11 @@ class helper {
                 "data-parent" => "#category-listing-content-" . $categoryid,
             ]);
             $output .= html_writer::tag(
-                "label", "",
+                "label",
+                "",
                 ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
             );
-            $output .= html_writer::end_div();// ... .custom-checkbox
+            $output .= html_writer::end_div(); // ... .custom-checkbox
             $output .= html_writer::start_div("", [
                 "class" => "d-flex px-0", "data-toggle" => "collapse",
                 "data-target" => "#category-listing-content-" . $category["id"],
@@ -136,15 +264,15 @@ class helper {
             $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
             $output .= $category["name"];
             $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
-            $output .= html_writer::end_div();// ....categoryname
-            $output .= html_writer::end_div();// ... .data-toggle
+            $output .= html_writer::end_div(); // ....categoryname
+            $output .= html_writer::end_div(); // ... .data-toggle
             $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);
             $output .= html_writer::start_tag("span", ["class" => "course-count text-muted"]);
             $output .= $category["countsubcategoriescourses"];
             $output .= html_writer::tag("i", "", ["class" => "fa fa-graduation-cap fa-fw ml-2"]);
-            $output .= html_writer::end_tag("span");// ... .course-count
-            $output .= html_writer::end_div();// ... .col-auto
-            $output .= html_writer::end_div();// ... .d-flex
+            $output .= html_writer::end_tag("span"); // ... .course-count
+            $output .= html_writer::end_div(); // ... .col-auto
+            $output .= html_writer::end_div(); // ... .d-flex
             $output .= html_writer::start_tag("ul", [
                 "id" => "category-listing-content-" . $category["id"],
                 "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
@@ -161,7 +289,8 @@ class helper {
                     $output .= html_writer::start_div("", ["class" => "d-flex"]);
                     $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
                     $output .= html_writer::tag(
-                        "input", "",
+                        "input",
+                        "",
                         [
                             "id" => "checkboxcourse-" . $course["id"],
                             "type" => "checkbox", "class" => "custom-control-input",
@@ -169,22 +298,22 @@ class helper {
                         ]
                     );
                     $output .= html_writer::tag(
-                        "label", "",
+                        "label",
+                        "",
                         ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
                     );
-                    $output .= html_writer::end_div();// ... .custom-checkbox
+                    $output .= html_writer::end_div(); // ... .custom-checkbox
                     $output .= html_writer::start_div("", ["class" => "coursename"]);
                     $output .= $course["name"];
-                    $output .= html_writer::end_div();// ... .coursename
-                    $output .= html_writer::end_div();// ... .d-flex
+                    $output .= html_writer::end_div(); // ... .coursename
+                    $output .= html_writer::end_div(); // ... .d-flex
                     $output .= html_writer::end_tag("li");
                     // ... .listitem.listitem-course.list-group-item.list-group-item-action
                 }
             }
-            $output .= html_writer::end_tag("ul");// ... #category-listing-content-x
-            $output .= html_writer::end_tag("li");// ... .listitem.listitem-category.list-group-item
+            $output .= html_writer::end_tag("ul"); // ... #category-listing-content-x
+            $output .= html_writer::end_tag("li"); // ... .listitem.listitem-category.list-group-item
         }
         return $output;
     }
-
 }

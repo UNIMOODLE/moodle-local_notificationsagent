@@ -33,10 +33,6 @@
 
 namespace notificationscondition_forumnoreply\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
@@ -63,7 +59,7 @@ class forumnoreply_crontask extends scheduled_task {
      * @throws \moodle_exception
      */
     public function execute() {
-        custom_mtrace("forumnoreply start");
+        \local_notificationsagent\helper\helper::custom_mtrace("forumnoreply start");
 
         $pluginname = forumnoreply::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -91,6 +87,6 @@ class forumnoreply_crontask extends scheduled_task {
             }
         }
 
-        custom_mtrace("forumnoreply end");
+        \local_notificationsagent\helper\helper::custom_mtrace("forumnoreply end");
     }
 }

@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
 
 use core\event\config_log_created;
 use core\event\course_module_deleted;
+use core\event\course_deleted;
 use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
@@ -92,5 +93,20 @@ class local_notificationsagent_observer {
             \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION)->purge();
             \cache::make('local_notificationsagent', notificationplugin::TYPE_ACTION)->purge();
         }
+    }
+
+    /**
+     *  Function for course deleted listener
+     *  Delete all reports records from a course when a course delete event is triggered
+     *
+     * @param course_deleted $event
+     *
+     * @return void
+     */
+    public static function course_deleted(course_deleted $event) {
+        global $DB;
+        $DB->delete_records_list('notificationsagent_report', 'courseid', [$event->courseid]);
+        $DB->delete_records_list('notificationsagent_triggers', 'courseid', [$event->courseid]);
+
     }
 }

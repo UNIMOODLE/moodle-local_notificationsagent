@@ -64,6 +64,10 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
                 'local_notificationsagent_rule_launched',
                 $this->get_pathfor('/rules/rule/launcheds/launched')
             ),
+            new restore_path_element(
+                'local_notificationsagent_rule_report',
+                $this->get_pathfor('/rules/rule/reports/report')
+            ),
         ];
     }
 
@@ -156,7 +160,9 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         $record->type = $data['type'];
         $record->parameters = $data['parameters'];
 
-        $DB->insert_record('notificationsagent_action', $record);
+        $newactionid = $DB->insert_record('notificationsagent_action', $record);
+
+        $this->set_mapping('notificationsagent_action', $data['id'], $newactionid, false);
     }
 
     /**
@@ -183,6 +189,30 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         }
     }
 
+    /**
+     * Procces plugin report
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function process_local_notificationsagent_rule_report($data) {
+        global $DB;
+
+        // Only import the history of report records if the source and target course is the same.
+        if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
+            $record = new \stdClass;
+            $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+            $record->userid = $data['userid'];
+            $record->courseid = $this->get_mappingid('course', $data['courseid']);
+            $record->actionid = $this->get_mappingid('notificationsagent_action', $data['actionid']);
+            $record->actiondetail = $data['actiondetail'];
+            $record->timestamp = $data['timestamp'];
+   
+            $DB->insert_record('notificationsagent_report', $record);
+        }
+    }
+    
     /**
      * Executed after course restore is complete.
      *

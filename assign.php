@@ -171,7 +171,11 @@ foreach ($rules as $rule) {
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
             ?
-            get_string('type_rule', 'local_notificationsagent')
+            ($rule->get_shared() == 0
+            ?
+            get_string('type_sharedrule', 'local_notificationsagent')
+            :
+            get_string('type_rule', 'local_notificationsagent'))
             :
             get_string('type_template', 'local_notificationsagent'),
         'editurl' => new moodle_url(

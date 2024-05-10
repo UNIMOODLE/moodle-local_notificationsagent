@@ -403,7 +403,7 @@ class calendarstart_test extends \advanced_testcase {
         $time = self::$caledarevent->timestart;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -448,7 +448,6 @@ class calendarstart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
         $this->assertTrue($mform->elementExists($uigroupname));
@@ -456,7 +455,6 @@ class calendarstart_test extends \advanced_testcase {
         $this->assertTrue(in_array($uidays, $uigroupelements));
         $this->assertTrue(in_array($uihours, $uigroupelements));
         $this->assertTrue(in_array($uiminutes, $uigroupelements));
-        $this->assertTrue(in_array($uiseconds, $uigroupelements));
     }
 
     /**
@@ -501,13 +499,11 @@ class calendarstart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($default[$uiradio]) && in_array(self::$subplugin::UI_RADIO_DEFAULT_VALUE, $default[$uiradio]));
         $this->assertTrue(isset($default[$uidays]) && $default[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($default[$uihours]) && $default[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(isset($default[$uiminutes]) && $default[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE);
-        $this->assertTrue(isset($default[$uiseconds]) && $default[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE);
     }
 
     /**
@@ -520,12 +516,11 @@ class calendarstart_test extends \advanced_testcase {
         $params = [
             $id . "_calendarstart_days" => "1",
             $id . "_calendarstart_hours" => "0",
-            $id . "_calendarstart_minutes" => "0",
-            $id . "_calendarstart_seconds" => "1",
+            $id . "_calendarstart_minutes" => "1",
             $id . "_calendarstart_cmid" => "7",
             $id . "_calendarstart_radio" => "1",
         ];
-        $expected = '{"time":86401,"cmid":7,"radio":"1"}';
+        $expected = '{"time":86460,"cmid":7,"radio":"1"}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);

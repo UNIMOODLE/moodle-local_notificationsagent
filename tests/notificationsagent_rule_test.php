@@ -338,7 +338,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $outputcategories = helper::build_output_categories([$categories]);
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
-        $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
+        $this->assertNotNull(\local_notificationsagent\helper\helper::get_module_url(self::$course->id, self::$cmtest->cmid));
         //
 
     }
@@ -722,7 +722,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
-        $this->assertNotNull(get_module_url(self::$course->id, self::$cmtest->cmid));
+        $this->assertNotNull(\local_notificationsagent\helper\helper::get_module_url(self::$course->id, self::$cmtest->cmid));
 
     }
 

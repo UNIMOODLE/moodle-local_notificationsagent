@@ -125,7 +125,7 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
      * @return void
      * @dataProvider dataprovider_cron
      * @covers       \local_notificationsagent\task\notificationsagent_trigger_cron::execute
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      */
 
     public function test_execute(

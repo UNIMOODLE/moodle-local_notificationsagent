@@ -325,11 +325,10 @@ class activityopen_test extends \advanced_testcase {
         $params = [
             $id . "_activityopen_days" => "1",
             $id . "_activityopen_hours" => "0",
-            $id . "_activityopen_minutes" => "0",
-            $id . "_activityopen_seconds" => "1",
+            $id . "_activityopen_minutes" => "1",
             $id . "_activityopen_cmid" => "7",
         ];
-        $expected = '{"time":86401,"cmid":7}';
+        $expected = '{"time":86460,"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
@@ -345,11 +344,11 @@ class activityopen_test extends \advanced_testcase {
         $cmgen = $quizgenerator->create_instance([
             'course' => self::$coursetest->id,
         ]);
-        $time = '86401';
+        $time = '86460';
         $params[self::$subplugin::UI_TIME] = $time;
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [to_human_format($time, true), $cmgen->name],
+        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
             self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
@@ -389,14 +388,12 @@ class activityopen_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uiactivityname));
         $this->assertTrue($mform->elementExists($uigroupname));
         $this->assertTrue(in_array($uidays, $uigroupelements));
         $this->assertTrue(in_array($uihours, $uigroupelements));
         $this->assertTrue(in_array($uiminutes, $uigroupelements));
-        $this->assertTrue(in_array($uiseconds, $uigroupelements));
     }
 
     /**
@@ -436,15 +433,11 @@ class activityopen_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
             isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
-        );
-        $this->assertTrue(
-            isset($defaulttime[$uiseconds]) && $defaulttime[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE
         );
     }
 }

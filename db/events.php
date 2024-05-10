@@ -34,11 +34,12 @@ $observers = [
         'eventname' => '\core\event\course_module_deleted',
         'callback' => 'local_notificationsagent_observer::course_module_deleted',
     ],
-];
-
-$observers = [
     [
         'eventname' => '\core\event\config_log_created',
         'callback' => 'local_notificationsagent_observer::config_log_created',
+    ],
+    [
+        'eventname' => '\core\event\course_deleted',
+        'callback' => 'local_notificationsagent_observer::course_deleted',
     ],
 ];

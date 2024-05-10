@@ -35,7 +35,6 @@ namespace notificationscondition_calendarstart\task;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
 require_once(__DIR__ . '/../../../../../../calendar/lib.php');
 
 use core\task\scheduled_task;
@@ -61,7 +60,7 @@ class calendarstart_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("calendarstart start");
+        \local_notificationsagent\helper\helper::custom_mtrace("calendarstart start");
 
         $pluginname = calendarstart::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -76,6 +75,6 @@ class calendarstart_crontask extends scheduled_task {
             notificationsagent::generate_cache_triggers($subplugin, $context);
         }
 
-        custom_mtrace("calendarstart end");
+        \local_notificationsagent\helper\helper::custom_mtrace("calendarstart end");
     }
 }

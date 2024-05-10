@@ -318,7 +318,7 @@ class coursestart_test extends \advanced_testcase {
         $time = self::$coursetest->enddate;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -356,13 +356,11 @@ class coursestart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue($mform->elementExists($uigroupname));
         $this->assertTrue(in_array($uidays, $uigroupelements));
         $this->assertTrue(in_array($uihours, $uigroupelements));
         $this->assertTrue(in_array($uiminutes, $uigroupelements));
-        $this->assertTrue(in_array($uiseconds, $uigroupelements));
     }
 
     /**
@@ -402,15 +400,11 @@ class coursestart_test extends \advanced_testcase {
         $uidays = $method->invoke(self::$subplugin, self::$subplugin::UI_DAYS);
         $uihours = $method->invoke(self::$subplugin, self::$subplugin::UI_HOURS);
         $uiminutes = $method->invoke(self::$subplugin, self::$subplugin::UI_MINUTES);
-        $uiseconds = $method->invoke(self::$subplugin, self::$subplugin::UI_SECONDS);
 
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
             isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
-        );
-        $this->assertTrue(
-            isset($defaulttime[$uiseconds]) && $defaulttime[$uiseconds] == self::$subplugin::UI_SECONDS_DEFAULT_VALUE
         );
     }
 
@@ -424,10 +418,9 @@ class coursestart_test extends \advanced_testcase {
         $params = [
             $id . "_coursestart_days" => "1",
             $id . "_coursestart_hours" => "0",
-            $id . "_coursestart_minutes" => "0",
-            $id . "_coursestart_seconds" => "1",
+            $id . "_coursestart_minutes" => "1",
         ];
-        $expected = '{"time":86401}';
+        $expected = '{"time":86460}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);

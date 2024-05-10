@@ -33,10 +33,6 @@
 
 namespace notificationscondition_activitylastsend\task;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/local/notificationsagent/lib.php');
-
 use core\task\scheduled_task;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationplugin;
@@ -62,7 +58,7 @@ class activitylastsend_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        custom_mtrace("Activity last send start");
+        \local_notificationsagent\helper\helper::custom_mtrace("Activity last send start");
 
         $pluginname = activitylastsend::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
@@ -78,6 +74,6 @@ class activitylastsend_crontask extends scheduled_task {
 
         }
 
-        custom_mtrace("Activity lastsend end");
+        \local_notificationsagent\helper\helper::custom_mtrace("Activity lastsend end");
     }
 }

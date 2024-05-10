@@ -128,7 +128,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_calendarstart\task\calendarstart_crontask::execute
      * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
     public function test_execute($date, $radio, $user) {
@@ -171,7 +171,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
-        
+
         if ($radio === 1) {
             $this->assertEquals($pluginname, $cache->pluginname);
             $this->assertEquals(self::$course->id, $cache->courseid);

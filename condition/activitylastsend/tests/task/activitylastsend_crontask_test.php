@@ -42,6 +42,7 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Class for testing the activitylastsend_crontask task.
+ *
  * @group notificationsagent
  */
 class activitylastsend_crontask_test extends \advanced_testcase {
@@ -96,7 +97,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      * @param int $crontimestarted Cron task time
      *
      * @covers       \notificationscondition_activitylastsend\task\activitylastsend_crontask::execute
-     * @covers       ::custom_trace
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
     public function test_execute($fileuploadtime, $crontimestarted) {

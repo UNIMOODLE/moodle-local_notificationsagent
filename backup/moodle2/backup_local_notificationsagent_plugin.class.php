@@ -85,6 +85,13 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
         ]);
         $launcheds->add_child($launched);
 
+        $reports = new backup_nested_element('reports');
+        $rule->add_child($reports);
+        $report = new backup_nested_element('report', ['id'], [
+            'ruleid', 'userid', 'courseid', 'actionid', 'actiondetail', 'timestamp',
+        ]);
+        $reports->add_child($report);
+
         // Rule source.
         $rule->set_source_sql(
             '
@@ -166,6 +173,23 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                AND nctx.contextid = ?
               JOIN {notificationsagent_launched} nl ON nr.id = nl.ruleid
                AND nl.courseid = ?
+             WHERE nctx.objectid = ?
+               AND nr.id = ?
+        ',  [
+                backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
+                backup::VAR_COURSEID, backup::VAR_PARENTID,
+            ]
+        );
+
+        // Launched source.
+        $report->set_source_sql(
+            '
+            SELECT nre.*
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = ?
+              JOIN {notificationsagent_report} nre ON nr.id = nre.ruleid
+               AND nre.courseid = ?
              WHERE nctx.objectid = ?
                AND nr.id = ?
         ',  [
