@@ -36,7 +36,7 @@ import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {updateRuleShare} from 'local_notificationsagent/rule/repository';
-
+import ajax from 'core/ajax';
 /**
  * Types of rule sharing.
  * 

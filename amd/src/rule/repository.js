@@ -123,8 +123,26 @@ const unshareAllRule = (ruleid) => {
     return Ajax.call([request])[0];
 };
 
+/**
+ * Reject the sharing of a rule
+ *
+ * @param {String} sessionname The session name.
+ * @param {Number} orderid The order ID.
+ * @returns {object} jQuery promise
+ */
+const saveOrderSession = (sessionname, orderid) => {
+    const request = {
+        methodname: 'local_notificationsagent_manage_sessions',
+        args: {
+            sessionname,
+            orderid
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
 export default {
     updateRuleStatus, deleteRule, updateRuleShare, 
     shareAllRule, unshareAllRule, 
-    checkRuleContext
+    checkRuleContext, saveOrderSession
 }
