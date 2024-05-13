@@ -42,3 +42,4 @@ $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Ekintza {$a->typeelement}:';
 $string['coursestart_crontask'] = 'ikastaro_hasiera cron lan';
+$string['privacy:metadata'] = 'coursestart pluginak ez du datu pertsonalik gordetzen.';

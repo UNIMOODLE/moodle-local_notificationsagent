@@ -41,3 +41,4 @@ $string['modname'] = 'activitylastsend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'Activity lastsend cron task';
+$string['privacy:metadata'] = 'The activitylastsend plugin does not store any personal data.';

@@ -40,3 +40,4 @@ $string['condition_number_times'] = '{$a->typeelement} Times :';
 $string['condition_number'] = 'Times';
 $string['numberoftimes_crontask'] = 'Numberoftimes cron task';
 
+$string['privacy:metadata'] = 'The numberoftimes plugin does not store any personal data.';

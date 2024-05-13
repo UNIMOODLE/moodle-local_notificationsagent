@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -24,19 +24,26 @@
 /**
  * Version details
  *
- * @package     notificationscondition_itemgraded
- * @category    string
- * @copyright   2023 Proyecto UNIMOODLE
- * @author      UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * @author      ISYC <soporte@isyc.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    notificationscondition_sessionend
+ * @copyright  2023 Proyecto UNIMOODLE
+ * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+ * @author     ISYC <soporte@isyc.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace notificationscondition_sessionend\privacy;
 
-$string['pluginname'] = 'Condició relacionada amb lobtenció duna puntuació en un element de qualificació.';
-$string['conditiontext'] = 'L\'usuari ha obtingut la qualificació [OOOP] [GGGG] a l\'activitat [AAAA].';
-$string['subtype'] = 'itemgraded';
-$string['modname'] = 'itemgraded';
-$string['editrule_condition_grade'] = 'Qualificació {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+class provider implements
+    // This plugin does not store any personal user data.
+    \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}

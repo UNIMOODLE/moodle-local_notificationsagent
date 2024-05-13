@@ -38,3 +38,4 @@ $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['coursestart_crontask'] = 'Course start cron task';
 
+$string['privacy:metadata'] = 'The coursestart plugin does not store any personal data.';

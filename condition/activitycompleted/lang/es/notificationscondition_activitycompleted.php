@@ -39,3 +39,4 @@ $string['conditiontext'] = 'El usuario tiene completada la actividad [AAAA].';
 $string['subtype'] = 'activitycompleted';
 $string['modname'] = 'activitycompleted';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['privacy:metadata'] = 'El plugin de activitycompleted no almacena ningún dato personal.';

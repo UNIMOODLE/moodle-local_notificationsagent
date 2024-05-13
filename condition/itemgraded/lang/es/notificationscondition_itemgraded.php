@@ -40,3 +40,4 @@ $string['subtype'] = 'itemgraded';
 $string['modname'] = 'itemgraded';
 $string['editrule_condition_grade'] = 'Calificación {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['privacy:metadata'] = 'El plugin de itemgraded no almacena ningún dato personal.';

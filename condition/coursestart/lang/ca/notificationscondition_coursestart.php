@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició relativa a la data d\'inici del curs';
@@ -42,3 +41,4 @@ $string['modname'] = 'coursestart';
 $string['editrule_condition_element_time'] = 'Temps {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['coursestart_crontask'] = 'Tasca cron d\'inici de curs';
+$string['privacy:metadata'] = 'El plugin coursestart no emmagatzema cap dada personal.';

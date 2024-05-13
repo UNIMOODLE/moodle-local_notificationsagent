@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició: fil obert pel usuari sense resposta.';
@@ -43,3 +42,4 @@ $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['forumnoreply_crontask'] = 'forumnoreply cron task';
 
+$string['privacy:metadata'] = 'El plugin forumnoreply no emmagatzema cap dada personal.';

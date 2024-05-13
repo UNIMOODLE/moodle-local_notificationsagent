@@ -42,3 +42,4 @@ $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
 $string['usergroupaddtext'] = 'The user has been added to a group ({$a->usergroupadd})';
 $string['usergroupaddtag'] = 'The user has been added to a group';
 
+$string['privacy:metadata'] = 'The usergroupadd plugin does not store any personal data.';

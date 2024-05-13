@@ -41,3 +41,4 @@ $string['modname'] = 'activitystudentend';
 $string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitystudentend_crontask'] = 'Jarduera irekitzeko krono-lan';
+$string['privacy:metadata'] = 'activitystudentend pluginak ez du datu pertsonalik gordetzen.';

@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'activitylastsend cron task';
 
+$string['privacy:metadata'] = 'activitylastsend pluginak ez du datu pertsonalik gordetzen.';

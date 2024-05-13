@@ -39,3 +39,4 @@ $string['messageprovider:bootstrap_notifications'] = 'Proveedor de notificacione
 $string['bootstrapnotifications_action'] = 'Notificación Bootstrap con texto [TTTT]';
 $string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Texto {$a->typeelement}';
+$string['privacy:metadata'] = 'El plugin de bootstrapnotifications no almacena ningún dato personal.';

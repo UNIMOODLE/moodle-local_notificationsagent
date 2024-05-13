@@ -41,3 +41,4 @@ $string['modname'] = 'calendareventto';
 $string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Egunerako amaitzeko krono-lan';
 $string['editrule_condition_calendar'] = 'Ekitaldi {$a->typeelement}:';
+$string['privacy:metadata'] = 'calendareventto pluginak ez du datu pertsonalik gordetzen.';

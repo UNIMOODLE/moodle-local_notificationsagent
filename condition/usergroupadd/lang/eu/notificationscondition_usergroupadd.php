@@ -43,3 +43,4 @@ $string['editrule_action_element_group'] = 'Klusterra {$a->typeelement}';
 $string['usergroupaddtext'] = 'Taldera gehitzen denean ({$a->usergroupadd})';
 $string['usergroupaddtag'] = 'Taldera gehitzen denean';
 
+$string['privacy:metadata'] = 'usergroupadd pluginak ez du datu pertsonalik gordetzen.';

@@ -40,3 +40,4 @@ $string['modname'] = 'sessionend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['sessionend_crontask'] = 'Session end cron task';
 
+$string['privacy:metadata'] = 'The sessionend plugin does not store any personal data.';

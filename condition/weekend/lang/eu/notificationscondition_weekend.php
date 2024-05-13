@@ -45,3 +45,4 @@ $string['weekend_crontask'] = 'weekend cron task';
 $string['weekendtext'] = 'Asteburua dad ({$a->weekend})';
 $string['weekendtag'] = 'Asteburu';
 
+$string['privacy:metadata'] = 'weekend pluginak ez du datu pertsonalik gordetzen.';

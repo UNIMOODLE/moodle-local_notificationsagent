@@ -41,3 +41,4 @@ $string['editrule_action_title'] = 'Kualifikazioa {$a->typeelement}:';
 $string['editrule_action_message'] = 'Mezua {$a->typeelement}';
 $string['subtype'] = 'messageagent';
 $string['messageagent_event'] = 'Mezularitzako agentea';
+$string['privacy:metadata'] = 'messageagent pluginak ez du datu pertsonalik gordetzen.';

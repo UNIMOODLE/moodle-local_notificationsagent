@@ -40,3 +40,4 @@ $string['subtype'] = 'activitysinceend';
 $string['modname'] = 'activitysinceend';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['privacy:metadata'] = 'activitysinceend pluginak ez du datu pertsonalik gordetzen.';

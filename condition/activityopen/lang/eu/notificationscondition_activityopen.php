@@ -41,3 +41,4 @@ $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
+$string['privacy:metadata'] = 'activityopen pluginak ez du datu pertsonalik gordetzen.';

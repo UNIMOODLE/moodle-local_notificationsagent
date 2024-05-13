@@ -44,3 +44,4 @@ $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['weekend_crontask'] = 'weekend cron task';
 $string['weekendtext'] = 'É fin de semana ({$a->weekend})';
 $string['weekendtag'] = 'Fin de semana';
+$string['privacy:metadata'] = 'O plugin weekend non almacena ningún dato persoal.';

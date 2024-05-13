@@ -45,3 +45,4 @@ $string['editrule_condition_element_enddate'] = 'End date';
 $string['ondates_crontask'] = 'ondates cron task';
 $string['ondatestext'] = 'It is ondates ({$a->ondates})';
 $string['ondatestag'] = 'ondates';
+$string['privacy:metadata'] = 'The ondates plugin does not store any personal data.';

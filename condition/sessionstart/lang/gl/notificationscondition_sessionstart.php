@@ -42,3 +42,4 @@ $string['modname'] = 'sessionstart';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['sessionstart_crontask'] = 'Tarefa cron de inicio de sesión';
+$string['privacy:metadata'] = 'O plugin sessionstart non almacena ningún dato persoal.';

@@ -44,3 +44,4 @@ $string['weekdays_crontask'] = 'weekdays cron task';
 $string['weekdaystext'] = 'Asteko eguna da ({$a->weekdays})';
 $string['weekdaystag'] = 'Asteguna';
 $string['weekdaysrequired'] = 'Hautatu gutxienez egun bat';
+$string['privacy:metadata'] = 'weekdays pluginak ez du datu pertsonalik gordetzen.';

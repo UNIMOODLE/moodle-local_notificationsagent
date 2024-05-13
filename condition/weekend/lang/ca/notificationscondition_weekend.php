@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició relativa a cap de semana';
@@ -44,3 +43,4 @@ $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['weekend_crontask'] = 'weekend cron task';
 $string['weekendtext'] = 'És cap de setmana ({$a->weekend})';
 $string['weekendtag'] = 'Cap de setmana';
+$string['privacy:metadata'] = 'El plugin weekend no emmagatzema cap dada personal.';

@@ -40,3 +40,4 @@ $string['editrule_action_element_title'] = 'Kualifikazioa {$a->typeelement}:';
 $string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}';
 $string['subtype'] = 'forummessage';
+$string['privacy:metadata'] = 'forummessage pluginak ez du datu pertsonalik gordetzen.';

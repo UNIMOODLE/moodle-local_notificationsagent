@@ -44,3 +44,4 @@ $string['calendarstart_crontask'] = 'Tarefa cron de inicio do calendario';
 $string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
 $string['afterend'] = 'Despois do fin do "evento"';
 $string['afterstart'] = 'Despois do inicio do "evento"';
+$string['privacy:metadata'] = 'O plugin calendarstart non almacena ningún dato persoal.';

@@ -41,3 +41,4 @@ $string['editrule_action_title'] = 'Título {$a->typeelement}:';
 $string['editrule_action_message'] = 'Mensaje {$a->typeelement}';
 $string['subtype'] = 'messageagent';
 $string['messageagent_event'] = 'Agente de mensajería';
+$string['privacy:metadata'] = 'El plugin de messageagent no almacena ningún dato personal.';

@@ -42,3 +42,4 @@ $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}';
 $string['subtype'] = 'privateforummessage';
 $string['privateforummessage_replyerror']
     = 'A publicación non se puido publicar probablemente porque non se executou a condición forumnoreply.';
+$string['privacy:metadata'] = 'O plugin privateforummessage non almacena ningún dato persoal.';

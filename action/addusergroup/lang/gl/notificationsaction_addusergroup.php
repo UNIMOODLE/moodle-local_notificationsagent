@@ -40,3 +40,4 @@ $string['addusergroup_action'] = 'Engadir usuario ao grupo [GGGG]';
 $string['subtype'] = 'addusergroup';
 $string['editrule_action_element_user'] = 'Usuario {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
+$string['privacy:metadata'] = 'O plugin addusergroup non almacena ningún dato persoal.';

@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició relativa a afegir usuari a un grup';
@@ -42,3 +41,4 @@ $string['modname'] = 'usergroupadd';
 $string['editrule_action_element_group'] = 'Grup {$a->typeelement}';
 $string['usergroupaddtext'] = 'Quan s\'afegeixi al grup ({$a->usergroupadd})';
 $string['usergroupaddtag'] = 'Quan s\'afegeixi al grup';
+$string['privacy:metadata'] = 'El plugin usergroupadd no emmagatzema cap dada personal.';

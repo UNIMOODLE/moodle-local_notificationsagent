@@ -171,8 +171,8 @@ $string['rulesaved'] = 'Araua gorde da';
 
 // Rule errors
 $string['editrule_required_error'] = 'Beharrezko eremua';
-$string['editrule_runtime_error'] = 'Ez '.$string['editrule_timesfired'].' > 0 da, tarte bat adierazi behar du';
-$string['editrule_execution_error'] = $string['editrule_timesfired'].' {$a->minimum} eta {$a->maximum} arteko eremua';
+$string['editrule_runtime_error'] = 'Ez ' . $string['editrule_timesfired'] . ' > 0 da, tarte bat adierazi behar du';
+$string['editrule_execution_error'] = $string['editrule_timesfired'] . ' {$a->minimum} eta {$a->maximum} arteko eremua';
 
 // Txartelaren edukia.
 $string['cardif'] = 'Bai:';
@@ -302,3 +302,14 @@ $string['actions'] = 'Ekintzak';
 
 // Cachea.
 $string['cachedef_launched'] = 'Errepikapena hasi den erabiltzaileen zerrenda.';
+
+// Privacy.
+$string['privacy:metadata:userid'] = 'Taula honi loturiko erabiltzailearen IDa.';
+$string['privacy:metadata:courseid'] = 'Ikastaro baten ID bat';
+$string['privacy:metadata:actionid'] = 'Ekintza baten ID bat';
+$string['privacy:metadata:ruleid'] = 'Arau baten ID bat';
+$string['privacy:metadata:actiondetail'] = 'Erabiltzaileari bidalitako ekintzaren xehetasuna.';
+$string['privacy:metadata:notificationsagentreport']
+    = 'Erabiltzaileei bidalitako mezuak erregistratzen ditu, erabiltzailearen datu batzuk eduki ditzaketenak.';
+$string['privacy:metadata:timestamp'] = 'Bidalitako ekintzaren denbora-zigilua.';
+$string['privacy:metadata:localnotificationsagentreport'] = 'Jakinarazpen-agentearen txostena.';

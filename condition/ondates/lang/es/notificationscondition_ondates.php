@@ -45,3 +45,4 @@ $string['editrule_condition_element_enddate'] = 'Fecha de fin';
 $string['ondates_crontask'] = 'ondates cron task';
 $string['ondatestext'] = 'Estamos entre fechas ({$a->ondates})';
 $string['ondatestag'] = 'Entre fechas';
+$string['privacy:metadata'] = 'El plugin de ondates no almacena ningún dato personal.';

@@ -89,7 +89,7 @@ $functions = [
         'description' => 'Create session about rules orders',
         'type' => 'write',
         'ajax' => true,
-        'capabilities' => 'local/notificationsagent:updaterulestatus',
+        'capabilities' => 'local/notificationsagent:managesessions',
     ],
 
 ];

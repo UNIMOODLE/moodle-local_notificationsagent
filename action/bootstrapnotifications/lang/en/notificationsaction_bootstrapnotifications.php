@@ -39,3 +39,4 @@ $string['messageprovider:bootstrap_notifications'] = 'Add user group Provider';
 $string['bootstrapnotifications_action'] = 'Bootstrap notification with text [TTTT]';
 $string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Text {$a->typeelement}';
+$string['privacy:metadata'] = 'The bootstrapnotifications plugin does not store any personal data.';

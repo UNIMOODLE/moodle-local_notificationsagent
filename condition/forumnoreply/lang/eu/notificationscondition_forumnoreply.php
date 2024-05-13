@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['forumnoreply_crontask'] = 'forumnoreply cron task';
 
+$string['privacy:metadata'] = 'forumnoreply pluginak ez du datu pertsonalik gordetzen.';

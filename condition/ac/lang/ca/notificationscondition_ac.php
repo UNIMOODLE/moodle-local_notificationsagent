@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Availability Condition';
@@ -40,3 +39,4 @@ $string['conditiontext'] = 'Availability Condition';
 $string['subtype'] = 'ac';
 $string['modname'] = 'ac';
 $string['ac_crontask'] = 'Availability condition cron task';
+$string['privacy:metadata'] = 'El plugin ac no emmagatzema cap dada personal.';

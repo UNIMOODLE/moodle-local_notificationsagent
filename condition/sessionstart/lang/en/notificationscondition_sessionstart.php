@@ -34,3 +34,4 @@ $string['subtype'] = 'sessionstart';
 $string['modname'] = 'sessionstart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 
+$string['privacy:metadata'] = 'The sessionstart plugin does not store any personal data.';

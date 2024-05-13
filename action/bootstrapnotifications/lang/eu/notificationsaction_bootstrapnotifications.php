@@ -39,3 +39,4 @@ $string['messageprovider:bootstrapnotifications'] = 'Bootstrap jakinarazpen horn
 $string['bootstrapnotifications_action'] = 'Bootstrap jakinarazpena testuarekin [TTTT]';
 $string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Testua {$a->typeelement}:';
+$string['privacy:metadata'] = 'bootstrapnotifications pluginak ez du datu pertsonalik gordetzen.';

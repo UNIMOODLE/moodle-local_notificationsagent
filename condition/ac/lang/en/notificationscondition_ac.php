@@ -36,3 +36,4 @@ $string['conditiontext'] = 'Availability Condition';
 $string['subtype'] = 'ac';
 $string['modname'] = 'ac';
 $string['ac_crontask'] = 'Availability condition cron task';
+$string['privacy:metadata'] = 'The ac plugin does not store any personal data.';

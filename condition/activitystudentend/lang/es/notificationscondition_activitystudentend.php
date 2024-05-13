@@ -41,4 +41,4 @@ $string['modname'] = 'activitystudentend';
 $string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['activitystudentend_crontask'] = 'Tarea cron para abrir la actividad';
-
+$string['privacy:metadata'] = 'El plugin de activitystudentend no almacena ningún dato personal.';

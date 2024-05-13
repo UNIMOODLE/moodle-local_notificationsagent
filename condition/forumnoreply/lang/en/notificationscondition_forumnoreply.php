@@ -39,3 +39,4 @@ $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['forumnoreply_crontask'] = 'Forumnoreply cron task';
 $string['editrule_condition_forum'] = 'Thread [FFFF]';
 
+$string['privacy:metadata'] = 'The forumnoreply plugin does not store any personal data.';

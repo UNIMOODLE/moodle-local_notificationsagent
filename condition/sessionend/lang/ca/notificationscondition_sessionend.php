@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició: data relativa a l\'últim accés al curs';
@@ -43,3 +42,4 @@ $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['sessionend_crontask'] = 'sessionend cron task';
 
+$string['privacy:metadata'] = 'El plugin sessionend no emmagatzema cap dada personal.';

@@ -40,3 +40,4 @@ $string['modname'] = 'activitynewcontent';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activitynewcontent_crontask'] = 'Activitynewcontent cron task';
+$string['privacy:metadata'] = 'The activitynewcontent plugin does not store any personal data.';

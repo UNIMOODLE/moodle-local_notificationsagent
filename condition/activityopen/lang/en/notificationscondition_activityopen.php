@@ -41,3 +41,4 @@ $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activityopen_crontask'] = 'Activity open cron task';
 
+$string['privacy:metadata'] = 'The activityopen plugin does not store any personal data.';

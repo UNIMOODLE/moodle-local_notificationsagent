@@ -43,3 +43,4 @@ $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
 $string['validation_editrule_form_dateend'] = 'Cal afegir una data de finalització d\'activitat/curs';
 $string['validation_editrule_form_supported_cm'] = 'Tipus d\'activitat no suportat. Contacteu amb l\'admistrador del lloc.';
+$string['privacy:metadata'] = 'El plugin activityend no emmagatzema cap dada personal.';

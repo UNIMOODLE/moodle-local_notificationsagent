@@ -50,8 +50,8 @@ const selectors = {
  * @method init
  */
 export const init = async () => {
-    await get_order_session();
-    save_order_session();
+    await getOrderSession();
+    saveOrderSessionId();
 };
 
 
@@ -60,12 +60,12 @@ export const init = async () => {
  * Save key rule ordenation.
  * 
  */
-const save_order_session = async() => {
+const saveOrderSessionId = async() => {
     let buttonapplysort = document.getElementById(selectors.sortButtonId);
     buttonapplysort.addEventListener('click', async() => {
-        let orderid = document.getElementById(selectors.selectOptionId).value;
-        let sessionname = 'orderid';
-        response = await saveOrderSession(sessionname, orderid);
+        let orderId = document.getElementById(selectors.selectOptionId).value;
+        let sessionName = 'orderId';
+        response = await saveOrderSession(sessionName, orderId);
         location.reload();
     });
 
@@ -77,11 +77,11 @@ const save_order_session = async() => {
  * Save key rule ordenation.
  * 
  */
-const get_order_session = async() => {
-        let orderid = -1;
-        let sessionname = 'orderid';
+const getOrderSession = async() => {
+        let orderId = -1;
+        let sessionName = 'orderid';
 
-        response = await saveOrderSession(sessionname, orderid);
+        response = await saveOrderSession(sessionName, orderId);
         if(response.orderid != -1) {
             let select = document.getElementById('orderrulesid');
                 let array = [];
@@ -94,7 +94,7 @@ const get_order_session = async() => {
                     select.value = array[0];
                 }
         }
-        
+
 };
 
 

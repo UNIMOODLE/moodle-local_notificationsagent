@@ -41,3 +41,4 @@ $string['modname'] = 'activityavailable';
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityavailable_crontask'] = 'activityavailable cron task';
+$string['privacy:metadata'] = 'activityavailable pluginak ez du datu pertsonalik gordetzen.';

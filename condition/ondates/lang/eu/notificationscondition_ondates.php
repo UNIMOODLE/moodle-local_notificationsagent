@@ -45,3 +45,4 @@ $string['editrule_condition_element_enddate'] = 'Amaiera data';
 $string['ondates_crontask'] = 'ondates cron task';
 $string['ondatestext'] = 'Zita artean gaude ({$a->ondates})';
 $string['ondatestag'] = 'Daten artean';
+$string['privacy:metadata'] = 'ondates pluginak ez du datu pertsonalik gordetzen.';

@@ -40,3 +40,4 @@ $string['subtype'] = 'activitysinceend';
 $string['modname'] = 'activitysinceend';
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['privacy:metadata'] = 'El plugin de activitysinceend no almacena ningún dato personal.';

@@ -42,3 +42,4 @@ $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['courseend_crontask'] = 'courseend cron task';
 $string['validation_editrule_form_dateend'] = 'Cal afegir una data de finalització del curs';
+$string['privacy:metadata'] = 'El plugin courseend no emmagatzema cap dada personal.';

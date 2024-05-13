@@ -44,3 +44,4 @@ $string['weekend_crontask'] = 'Weekend cron task';
 $string['weekendtext'] = 'It is weekend ({$a->weekend})';
 $string['weekendtag'] = 'Weekend';
 
+$string['privacy:metadata'] = 'The weekend plugin does not store any personal data.';

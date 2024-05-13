@@ -40,3 +40,4 @@ $string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
 $string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}';
 $string['subtype'] = 'forummessage';
+$string['privacy:metadata'] = 'O plugin forummessage non almacena ningún dato persoal.';

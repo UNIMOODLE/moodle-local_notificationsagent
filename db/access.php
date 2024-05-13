@@ -157,4 +157,12 @@ $capabilities = [
             'editingteacher' => CAP_ALLOW,
         ],
     ],
+    'local/notificationsagent:managesessions' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'student' => CAP_PROHIBIT,
+        ],
+    ],
 ];

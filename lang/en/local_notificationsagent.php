@@ -148,19 +148,21 @@ $string['editrule_condition_title_usercompleteactivity'] = 'User has completed t
 $string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is available';
 $string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
-$string['editrule_condition_title_forumnotanswer'] = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
+$string['editrule_condition_title_forumnotanswer']
+    = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
 
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
-$string['editrule_condition_element_date_from'] = get_string('from').' {$a->typeelement}:';
-$string['editrule_condition_element_date_to'] = get_string('to').' {$a->typeelement}:';
+$string['editrule_condition_element_date_from'] = get_string('from') . ' {$a->typeelement}:';
+$string['editrule_condition_element_date_to'] = get_string('to') . ' {$a->typeelement}:';
 
 $string['editrule_condition_error'] = 'You must add at least one condition';
 
 // Actions.
 $string['editrule_newaction'] = 'New action:';
 $string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
-$string['editrule_action_title_notificationtouser'] = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
+$string['editrule_action_title_notificationtouser']
+    = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
@@ -183,15 +185,14 @@ $string['rulesaved'] = 'Rule saved';
 
 // Rule errors
 $string['editrule_required_error'] = 'Required field';
-$string['editrule_runtime_error'] = 'If '.$string['editrule_timesfired'].' is > 0, must indicate an interval';
-$string['editrule_execution_error'] = $string['editrule_timesfired'].' between {$a->minimum} and {$a->maximum}';
+$string['editrule_runtime_error'] = 'If ' . $string['editrule_timesfired'] . ' is > 0, must indicate an interval';
+$string['editrule_execution_error'] = $string['editrule_timesfired'] . ' between {$a->minimum} and {$a->maximum}';
 
 // Card content.
 $string['cardif'] = 'If:';
 $string['cardunless'] = 'Unless:';
 $string['cardthen'] = 'Then:';
 $string['cardsharedby'] = 'Shared by {$a->username} in course {$a->coursename}';
-
 
 // Card Condition time.
 $string['card_day'] = 'day';
@@ -216,7 +217,8 @@ $string['statusactivate'] = 'Activate';
 // Delete modal.
 $string['deletetitle'] = 'Delete {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = 'You are going to delete the {$a->type} {$a->title}, do you want to continue?';
-$string['deletecontent_hascontext'] = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
+$string['deletecontent_hascontext']
+    = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
 $string['deleteaccept'] = 'Rule deleted';
 
 // Assign modal.
@@ -297,3 +299,13 @@ $string['actions'] = 'Actions';
 
 // Cache.
 $string['cachedef_launched'] = 'List of users which periodicity has started.';
+
+// Privacy.
+$string['privacy:metadata:userid'] = 'The user id linked to this table.';
+$string['privacy:metadata:courseid'] = 'An id for a course';
+$string['privacy:metadata:actionid'] = 'An id for an action';
+$string['privacy:metadata:ruleid'] = 'An id for a rule';
+$string['privacy:metadata:actiondetail'] = 'Detail of the action sent to the user.';
+$string['privacy:metadata:notificationsagentreport'] = 'Records messages sent to users which might content some user data.';
+$string['privacy:metadata:timestamp'] = 'Timestamp of the sent action.';
+$string['privacy:metadata:localnotificationsagentreport'] = 'Notifications agent report.';

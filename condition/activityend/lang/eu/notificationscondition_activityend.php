@@ -44,3 +44,4 @@ $string['activityend_crontask'] = 'activityend cron task';
 $string['validation_editrule_form_dateend'] = 'Beharrezkoa da jarduera/ikastaroaren amaiera data gehitzea';
 $string['validation_editrule_form_supported_cm']
     = 'Jarduera mota ez da onartzen. Jarri harremanetan guneko administratzailearekin.';
+$string['privacy:metadata'] = 'activityend pluginak ez du datu pertsonalik gordetzen.';

@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['numberoftimes_crontask'] = 'numberoftimes cron task';
 
+$string['privacy:metadata'] = 'O plugin numberoftimes non almacena ningún dato persoal.';

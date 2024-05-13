@@ -86,7 +86,7 @@ class manage_sessions extends \external_api {
     public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(
             [
-                'orderid' => new \external_value(PARAM_INT, 'has context', VALUE_REQUIRED),
+                'orderid' => new \external_value(PARAM_INT, 'Order id value', VALUE_REQUIRED),
             ]
         );
     }

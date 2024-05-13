@@ -46,3 +46,4 @@ $string['editrule_condition_element_enddate'] = 'Data de finalización';
 $string['ondates_crontask'] = 'ondates cron task';
 $string['ondatestext'] = 'Zita artean gaude ({$a->ondates})';
 $string['ondatestag'] = 'Daten artean';
+$string['privacy:metadata'] = 'O plugin ondates non almacena ningún dato persoal.';

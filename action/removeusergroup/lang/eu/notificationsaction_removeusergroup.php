@@ -40,3 +40,4 @@ $string['removeusergroup_action'] = 'Ezabatu erabiltzailea [AAAA] taldetik';
 $string['subtype'] = 'removeusergroup';
 $string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}:';
 $string['editrule_action_element_group'] = 'Taldea {$a->typeelement}:';
+$string['privacy:metadata'] = 'removeusergroup pluginak ez du datu pertsonalik gordetzen.';

@@ -40,3 +40,4 @@ $string['calendarstart_crontask'] = 'Calendar start cron task';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
 $string['afterend'] = 'After the end of "event"';
 $string['afterstart'] = 'After the start of "event"';
+$string['privacy:metadata'] = 'The calendarstart plugin does not store any personal data.';

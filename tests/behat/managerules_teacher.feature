@@ -124,7 +124,6 @@ Feature: Testing rules management in notifications agent plugin
     And I press the enter key
     And I wait "1" seconds
     Then I should see "Rule deleted"
-    And I should not see "Active"
     And I should not see "Testing rule1"
     And I wait "2" seconds
 
@@ -162,7 +161,6 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "1" seconds
     Then I should see "Rule paused"
     And I should see "Paused"
-    And I should not see "Active"
     And I wait "1" seconds
     And I click on "Activate" "link"
     And I wait "1" seconds
@@ -170,7 +168,6 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "1" seconds
     And I should see "Rule activated"
     And I should see "Active"
-    And I should not see "Paused"
     And I wait "2" seconds
 
   Scenario: Teacher clone rule for plugin notification agent

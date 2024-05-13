@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['sessionend_crontask'] = 'sessionend cron task';
 
+$string['privacy:metadata'] = 'sessionend pluginak ez du datu pertsonalik gordetzen.';

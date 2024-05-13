@@ -41,3 +41,4 @@ $string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}';
 $string['subtype'] = 'privateforummessage';
 $string['privateforummessage_replyerror'] = 'Mezua ezin izan da argitaratu ziurrenik forumnoreply baldintza ez zelako exekutatu.';
+$string['privacy:metadata'] = 'privateforummessage pluginak ez du datu pertsonalik gordetzen.';

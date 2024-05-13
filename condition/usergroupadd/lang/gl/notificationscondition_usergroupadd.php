@@ -42,3 +42,4 @@ $string['modname'] = 'usergroupadd';
 $string['editrule_action_element_group'] = 'Clúster {$a->typeelement}';
 $string['usergroupaddtext'] = 'Cando se engade ao grupo ({$a->usergroupadd})';
 $string['usergroupaddtag'] = 'Cando se engade ao grupo';
+$string['privacy:metadata'] = 'O plugin usergroupadd non almacena ningún dato persoal.';

@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició de data relativa des de l\'esdeveniment del calendari';
@@ -44,4 +43,4 @@ $string['calendarstart_crontask'] = 'Tasca cron d\'inici de calendari';
 $string['editrule_condition_calendar'] = 'Esdeveniment {$a->typeelement}:';
 $string['afterend'] = 'Després de la fi de "esdeveniment"';
 $string['afterstart'] = 'Després de l\'inici de "esdeveniment"';
-
+$string['privacy:metadata'] = 'El plugin calendarstart no emmagatzema cap dada personal.';

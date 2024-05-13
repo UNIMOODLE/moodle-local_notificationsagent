@@ -41,3 +41,4 @@ $string['modname'] = 'activityavailable';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activityavailable_crontask'] = 'activityavailable cron task';
+$string['privacy:metadata'] = 'El plugin activityavailable no emmagatzema cap dada personal.';

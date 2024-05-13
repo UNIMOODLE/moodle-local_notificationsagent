@@ -39,3 +39,4 @@ $string['conditiontext'] = 'Erabiltzaileak jarduera burutu du [AAAA].';
 $string['subtype'] = 'activitycompleted';
 $string['modname'] = 'activitycompleted';
 $string['editrule_condition_activity'] = '{$a->typeelement} jarduera:';
+$string['privacy:metadata'] = 'activitycompleted pluginak ez du datu pertsonalik gordetzen.';

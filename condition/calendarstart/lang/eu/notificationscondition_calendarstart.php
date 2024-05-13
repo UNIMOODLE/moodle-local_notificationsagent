@@ -44,3 +44,4 @@ $string['calendarstart_crontask'] = 'Kalendari hasiera kron lan';
 $string['editrule_condition_calendar'] = 'Ekitaldia {$a->typeelement}aren ostean:';
 $string['afterend'] = '"Ekitaldi"aren amaieran ondoren';
 $string['afterstart'] = '"Ekitaldi"aren hasieran ondoren';
+$string['privacy:metadata'] = 'calendarstart pluginak ez du datu pertsonalik gordetzen.';

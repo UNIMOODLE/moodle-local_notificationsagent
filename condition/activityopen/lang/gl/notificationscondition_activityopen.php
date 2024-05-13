@@ -41,3 +41,4 @@ $string['modname'] = 'activityopen';
 $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
+$string['privacy:metadata'] = 'O plugin activityopen non almacena ningún dato persoal.';

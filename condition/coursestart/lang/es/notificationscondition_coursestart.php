@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['coursestart_crontask'] = 'coursestart cron task';
 
+$string['privacy:metadata'] = 'El plugin de coursestart no almacena ningún dato personal.';

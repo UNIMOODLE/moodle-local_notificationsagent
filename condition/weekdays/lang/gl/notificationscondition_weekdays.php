@@ -44,3 +44,4 @@ $string['weekdays_crontask'] = 'weekdays cron task';
 $string['weekdaystext'] = 'É día da semana ({$a->weekdays})';
 $string['weekdaystag'] = 'Día da semana';
 $string['weekdaysrequired'] = 'Seleccione polo menos un día';
+$string['privacy:metadata'] = 'O plugin weekdays non almacena ningún dato persoal.';

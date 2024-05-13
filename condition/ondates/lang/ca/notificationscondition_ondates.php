@@ -32,7 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined("MOODLE_INTERNAL") || die();
 
 $string['pluginname'] = 'Condició relativa entre dates';
@@ -46,3 +45,4 @@ $string['editrule_condition_element_enddate'] = 'Data de fi';
 $string['ondates_crontask'] = 'ondates cron task';
 $string['ondatestext'] = 'Estem entre dates ({$a->ondates})';
 $string['ondatestag'] = 'Entre dates';
+$string['privacy:metadata'] = 'El plugin ondates no emmagatzema cap dada personal.';

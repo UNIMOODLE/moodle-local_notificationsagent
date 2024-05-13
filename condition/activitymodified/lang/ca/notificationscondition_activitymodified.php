@@ -41,3 +41,4 @@ $string['modname'] = 'activitymodified';
 $string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'activitymodified cron task';
+$string['privacy:metadata'] = 'El plugin activitymodified no emmagatzema cap dada personal.';

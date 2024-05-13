@@ -44,3 +44,4 @@ $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['sessionstart_crontask'] = 'saioa_hasi cron-lan';
 
 
+$string['privacy:metadata'] = 'sessionstart pluginak ez du datu pertsonalik gordetzen.';

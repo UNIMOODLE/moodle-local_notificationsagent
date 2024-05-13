@@ -41,3 +41,4 @@ $string['modname'] = 'calendareventto';
 $string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Tasca de finalització del calendari';
 $string['editrule_condition_calendar'] = 'Esdeveniment {$a->typeelement}:';
+$string['privacy:metadata'] = 'El plugin calendareventto no emmagatzema cap dada personal.';

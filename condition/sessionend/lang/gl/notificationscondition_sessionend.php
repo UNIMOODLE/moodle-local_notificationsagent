@@ -43,3 +43,4 @@ $string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['sessionend_crontask'] = 'sessionend cron task';
 
+$string['privacy:metadata'] = 'O plugin sessionend non almacena ningún dato persoal.';

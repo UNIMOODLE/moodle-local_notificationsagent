@@ -38,3 +38,4 @@ $string['modname'] = 'calendareventto';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Calendar end cron task';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
+$string['privacy:metadata'] = 'The calendareventto plugin does not store any personal data.';

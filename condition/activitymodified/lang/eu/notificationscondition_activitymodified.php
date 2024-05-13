@@ -41,3 +41,4 @@ $string['modname'] = 'activitymodified';
 $string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'Jarduera amaitzeko krono-lan';
+$string['privacy:metadata'] = 'activitymodified pluginak ez du datu pertsonalik gordetzen.';

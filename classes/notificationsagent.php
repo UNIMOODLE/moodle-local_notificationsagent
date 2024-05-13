@@ -147,11 +147,12 @@ class notificationsagent {
         $conditionssql = 'SELECT nc.id, nc.ruleid, nr.timesfired AS ruletimesfired, nc.parameters, nc.pluginname, nc.cmid
                             FROM {notificationsagent_rule} nr
                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0 AND nctx.contextid = :coursecontextid
+                             AND nctx.contextid = :coursecontextid AND nctx.objectid = :courseid
                             JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           WHERE pluginname = :pluginname
-                             AND nctx.objectid = :courseid
-                             AND nc.cmid = :cmid
+                             AND nc.cmid = :cmid AND nc.pluginname = :pluginname
+                           WHERE nr.status = 0
+                             AND nr.template = 1
+                             AND nr.deleted = 0
         ';
         $conditions = $DB->get_records_sql(
             $conditionssql,

@@ -41,3 +41,4 @@ $string['subtype'] = 'usermessageagent';
 $string['editrule_action_element_title'] = 'Titol {$a->typeelement}:';
 $string['editrule_action_element_user'] = 'Usuari {$a->typeelement}';
 $string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
+$string['privacy:metadata'] = 'El plugin usermessageagent no emmagatzema cap dada personal.';
