@@ -361,9 +361,9 @@ abstract class notificationplugin {
      */
     protected function select_date_to_unix($params) {
         $timevalues = [
-            'days' => $params[$this->get_name_ui(self::UI_DAYS)] ?? 0,
-            'hours' => $params[$this->get_name_ui(self::UI_HOURS)] ?? 0,
-            'minutes' => $params[$this->get_name_ui(self::UI_MINUTES)] ?? 0,
+            'days' => !empty($params[$this->get_name_ui(self::UI_DAYS)]) ? $params[$this->get_name_ui(self::UI_DAYS)] : 0,
+            'hours' => !empty($params[$this->get_name_ui(self::UI_HOURS)]) ? $params[$this->get_name_ui(self::UI_HOURS)] : 0,
+            'minutes' => !empty($params[$this->get_name_ui(self::UI_MINUTES)]) ? $params[$this->get_name_ui(self::UI_MINUTES)] : 0,
         ];
         return ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
             + ($timevalues['minutes'] * 60);

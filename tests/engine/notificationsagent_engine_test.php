@@ -153,6 +153,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
         $USER->id = self::$user->id;
         $ruleid = self::$rule->create($dataform);
+        $this->assertIsNumeric($ruleid);
         self::$rule->set_id($ruleid);
         self::$cmteste->cmid = self::$cmteste->id;
         $userid = $genericuser ? -1 : self::$user->id;
@@ -176,6 +177,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
             $objdb->cmid = self::$cmteste->id;
             // Insert.
             $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+            $this->assertIsNumeric($conditionid);
             $context->set_triggercondition($conditionid);
             $conditions[] = $condition;
         }
@@ -193,7 +195,8 @@ class notificationsagent_engine_test extends \advanced_testcase {
             $objdb->cmid = self::$cmteste->id;
             $objdb->complementary = notificationplugin::COMPLEMENTARY_EXCEPTION;
             // Insert.
-            $DB->insert_record('notificationsagent_condition', $objdb);
+            $exceptionid = $DB->insert_record('notificationsagent_condition', $objdb);
+            $this->assertIsNumeric($exceptionid);
             $exceptions[] = $exception;
         }
 
@@ -216,7 +219,8 @@ class notificationsagent_engine_test extends \advanced_testcase {
             $objdb->pluginname = $action['pluginname'];
             $objdb->parameters = $action['params'];
             // Insert.
-            $DB->insert_record('notificationsagent_action', $objdb);
+            $actionid = $DB->insert_record('notificationsagent_action', $objdb);
+            $this->assertIsNumeric($actionid);
         }
 
         self::$rule::create_instance($ruleid);

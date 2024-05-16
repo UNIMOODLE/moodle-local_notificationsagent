@@ -62,10 +62,17 @@ export const init = async () => {
  */
 const saveOrderSessionId = async() => {
     let buttonapplysort = document.getElementById(selectors.sortButtonId);
+    let urlparams = new URLSearchParams(window.location.search);
+    let courseid = null;
+    if (urlparams.has('courseid')) {
+        courseid = urlparams.get('courseid');
+    }
+
+
     buttonapplysort.addEventListener('click', async() => {
-        let orderId = document.getElementById(selectors.selectOptionId).value;
-        let sessionName = 'orderId';
-        response = await saveOrderSession(sessionName, orderId);
+        let orderid = document.getElementById(selectors.selectOptionId).value;
+        let sessionname = 'orderid';
+        response = await saveOrderSession(sessionname, orderid, courseid);
         location.reload();
     });
 
@@ -78,11 +85,15 @@ const saveOrderSessionId = async() => {
  * 
  */
 const getOrderSession = async() => {
-        let orderId = -1;
-        let sessionName = 'orderid';
-
-        response = await saveOrderSession(sessionName, orderId);
-        if(response.orderid != -1) {
+        let orderid = -1;
+        let sessionname = 'orderid';
+        let urlparams = new URLSearchParams(window.location.search);
+        let courseid = null;
+        if (urlparams.has('courseid')) {
+            courseid = urlparams.get('courseid');
+        }
+        response = await saveOrderSession(sessionname, orderid, courseid);
+        if (response.orderid != -1) {
             let select = document.getElementById('orderrulesid');
                 let array = [];
                 select.options.forEach((element) => {

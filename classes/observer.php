@@ -32,11 +32,14 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
 use core\event\config_log_created;
-use core\event\course_module_deleted;
 use core\event\course_deleted;
+use core\event\course_module_deleted;
 use local_notificationsagent\external\update_rule_status;
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
+use notificationscondition_ac\ac;
 
 /**
  * Observer for the notificationscondition_sessionstart plugin.
@@ -56,10 +59,11 @@ class local_notificationsagent_observer {
         // Get rules with conditions with cmid.
         $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid, mnc.pluginname
                   FROM {notificationsagent_condition} mnc
-                 WHERE mnc.cmid = :cmid';
+                 WHERE (mnc.cmid = :cmid) OR (pluginname = :acname)';
 
         $dataobj = $DB->get_records_sql($sql, [
             'cmid' => $cmid,
+            'acname' => ac::NAME,
         ]);
 
         foreach ($dataobj as $data) {
@@ -71,6 +75,7 @@ class local_notificationsagent_observer {
                 update_rule_status::execute(
                     $data->ruleid, rule::PAUSE_RULE,
                 );
+                helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
         }
     }
@@ -104,9 +109,6 @@ class local_notificationsagent_observer {
      * @return void
      */
     public static function course_deleted(course_deleted $event) {
-        global $DB;
-        $DB->delete_records_list('notificationsagent_report', 'courseid', [$event->courseid]);
-        $DB->delete_records_list('notificationsagent_triggers', 'courseid', [$event->courseid]);
-
+        notificationsagent::delete_all_by_course($event->courseid);
     }
 }

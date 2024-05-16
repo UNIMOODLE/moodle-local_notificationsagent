@@ -203,4 +203,63 @@ class calendarstart_observer_test extends \advanced_testcase {
         ];
     }
 
+    /**
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers       \notificationscondition_calendarstart_observer::calendar_event_deleted
+     */
+
+     public function test_calendar_event_deleted() {
+        global $DB;
+        \uopz_set_return('time', self::COURSE_DATESTART);
+
+        self::setUser(2);//admin
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        
+        $ruleid = self::$rule->create($dataform);
+        self::$rule->set_id($ruleid);
+
+        $pluginname = calendarstart::NAME;
+        $objdb = new \stdClass();
+        $objdb->ruleid = self::$rule->get_id();
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"60", "cmid":"' . self::$calendarevent->id . '"}';
+        $objdb->cmid = self::$calendarevent->id;
+        // Insert.
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+        $this->assertIsInt($conditionid);
+
+        // Delete the event.
+        $DB->delete_records('event', array('id' => self::$calendarevent->id));
+
+        // Trigger an event for the delete action.
+        $eventargs = array(
+            'context' => \context_course::instance(self::$course->id),
+            'userid' => self::$user->id,
+            'courseid' => self::$course->id,
+            'objectid' => self::$calendarevent->id,
+            'other' => [
+                'repeatid' => 0,
+                'name' => 'Calendar event',
+                'timestart' => self::COURSE_DATESTART,
+                'timeduration' => self::DURATION,
+            ],
+        );
+        $event = \core\event\calendar_event_deleted::create($eventargs);
+        $event->trigger();
+        $rule = self::$rule::create_instance($ruleid);
+        
+        $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
+        \uopz_unset_return('time');
+    }
+
 }

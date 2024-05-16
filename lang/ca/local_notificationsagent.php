@@ -313,3 +313,7 @@ $string['privacy:metadata:notificationsagentreport']
     = 'Enregistra missatges enviats als usuaris que poden contenir algunes dades d\'usuari.';
 $string['privacy:metadata:timestamp'] = 'Marca de temps de l\'acció enviada.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Informe de l\'agent de notificacions.';
+
+// Message provider.
+$string['messageprovider:notificationsagent_message'] = 'Notificacions de regles no vàlides';
+$string['brokenrulebody'] = 'La regla: {$a->rule} del curs :{$a->course} s\'ha pausat.';

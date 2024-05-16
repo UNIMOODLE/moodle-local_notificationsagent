@@ -32,7 +32,6 @@ namespace notificationscondition_ac;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationconditionplugin;
-use notificationscondition_ac\mod_ac_availability_info;
 use local_notificationsagent\form\editrule_form;
 
 /**
@@ -72,7 +71,7 @@ class ac extends notificationconditionplugin {
         $courseid = $context->get_courseid();
         $params = $context->get_params();
         $userid = $context->get_userid();
-        $info = new mod_ac_availability_info($courseid, $params);
+        $info = new custominfo($courseid, $params);
         $information = "";
         return $info->is_available($information, false, $userid);
     }
@@ -100,6 +99,32 @@ class ac extends notificationconditionplugin {
      */
     public function get_ui($mform, $courseid, $exception) {
         return '';
+    }
+
+    /**
+     * Validation subplugin
+     * If this method overrides, call to parent::validation
+     *
+     * @param int   $courseid           Course id
+     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     *                                  and return directly
+     * @param bool  $onlyverifysiteid   Default TRUE
+     * 
+     * @return bool
+     */
+    public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
+        if (($validation = parent::validation($courseid, $array, $onlyverifysiteid)) === 'break') {
+            return true;
+        }
+
+        // If false from parent and $array is null, return
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
+        
+        $info = new custominfo($courseid, $this->get_parameters());
+
+        return $info->validation();
     }
 
     /**
@@ -139,7 +164,7 @@ class ac extends notificationconditionplugin {
      *
      */
     public function process_markups(&$content, $courseid, $complementary = null) {
-        $info = new mod_ac_availability_info($courseid, $this->get_parameters());
+        $info = new custominfo($courseid, $this->get_parameters());
         $html = $info->get_full_information_format($complementary);
         if (!empty($html)) {
             $content = array_merge($content, $html);
@@ -177,10 +202,10 @@ class ac extends notificationconditionplugin {
         // Get data from form.
         $this->convert_parameters($data);
         // If availability json is empty and row exists (UPDATE) then $action = delete
-        if (mod_ac_availability_info::is_empty($this->get_parameters()) && $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
+        if (custominfo::is_empty($this->get_parameters()) && $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
             $action = editrule_form::FORM_JSON_ACTION_DELETE;
             parent::save($action, $data, $complementary, $timer, $students);
-        } else if (!mod_ac_availability_info::is_empty($this->get_parameters())) {
+        } else if (!custominfo::is_empty($this->get_parameters())) {
             parent::save($action, $data, $complementary, $timer, $students);
         }
     }

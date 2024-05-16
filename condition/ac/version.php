@@ -29,6 +29,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2024021200;
+$plugin->version = 2024051400;
 $plugin->requires = 2020061500;
 $plugin->component = 'notificationscondition_ac';

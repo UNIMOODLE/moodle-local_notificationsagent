@@ -311,3 +311,7 @@ $string['privacy:metadata:notificationsagentreport']
     = 'Rexistra as mensaxes enviadas aos usuarios que poden conter algúns datos do usuario.';
 $string['privacy:metadata:timestamp'] = 'Marca de tempo da acción enviada.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Informe do axente de notificacións.';
+
+// Message provider.
+$string['messageprovider:notificationsagent_message'] = 'Notificacións de regras non válidas';
+$string['brokenrulebody'] = 'A regra: {$a->rule} do curso :{$a->course} foi detida.';

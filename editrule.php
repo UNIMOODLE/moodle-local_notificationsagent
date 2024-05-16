@@ -37,9 +37,7 @@ require_once("../../lib/modinfolib.php");
 require_once("lib.php");
 
 use local_notificationsagent\rule;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\form\editrule_form;
-use notificationscondition_ac\mod_ac_availability_info;
 
 global $DB, $PAGE, $COURSE;
 $isroleadmin = false;

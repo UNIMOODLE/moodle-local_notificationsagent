@@ -300,12 +300,12 @@ class calendarstart extends notificationconditionplugin {
      * @param int   $courseid           Course id
      * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
+     * @param bool  $onlyverifysiteid   Default TRUE
      * 
      * @return bool
      */
-    public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
-        if (($validation = parent::validation($courseid, $array)) === 'break') {
+    public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
+        if (($validation = parent::validation($courseid, $array, $onlyverifysiteid)) === 'break') {
             return true;
         }
 

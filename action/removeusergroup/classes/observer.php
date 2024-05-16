@@ -31,8 +31,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\external\update_rule_status;
+use local_notificationsagent\helper\helper;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
 use notificationsaction_removeusergroup\removeusergroup;
 
@@ -61,13 +62,14 @@ class notificationsaction_removeusergroup_observer {
 
         foreach ($dataobj as $data) {
             $subplugin = new removeusergroup($data->ruleid, $data->id);
-            $params[removeusergroup::UI_ACTIVITY] = $groupid;
+            $params[notificationplugin::UI_ACTIVITY] = $groupid;
             if ($subplugin->check_event_observer($params)) {
                 $result = $subplugin->validation($event->courseid);
                 if (!$result) {
                     update_rule_status::execute(
                         $data->ruleid, rule::PAUSE_RULE,
                     );
+                    helper::broken_rule_notify($event->courseid, $data->ruleid);
                 }
             }
         }

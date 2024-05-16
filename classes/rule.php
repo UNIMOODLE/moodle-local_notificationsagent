@@ -147,6 +147,8 @@ class rule {
     public const RULE_EDIT = 'edit';
     /** @var string Rule type identifier */
     public const RULE_CLONE = 'clone';
+    /** @var string Rule type identifier */
+    public const RULE_ONLY = 'only';
 
     /** @var int Status of a rule that is enabled */
     public const RESUME_RULE = 0;
@@ -194,8 +196,8 @@ class rule {
         $rule = $DB->get_record('notificationsagent_rule', ['id' => $id]);
         $this->set_id($rule->id);
 
-        // Only set all properties if ruleaction is add or edit.
-        if ($this->ruleaction != self::RULE_CLONE) {
+        // Set all properties if ruleaction is not RULE_CLONE
+        if (in_array($this->ruleaction, [self::RULE_ADD, self::RULE_EDIT, self::RULE_ONLY])) {
             // Set the properties of the rule object.
             $this->set_name($rule->name);
             $this->set_description($rule->description);
@@ -210,13 +212,15 @@ class rule {
             $this->set_runtime($rule->runtime);
         }
 
-        // Load additional rule details.
-        $this->load_ac(); // Load access control settings.
-        $this->load_conditions(); // Load rule conditions.
-        $this->load_exceptions(); // Load rule exceptions.
-        $this->load_actions(); // Load rule actions.
-        $this->is_generic(); // Check if the rule is generic.
-        $this->load_dataform(); // Load the data form associated with the rule.
+        // Set load additional rule details if ruleaction is not RULE_ONLY.
+        if ($this->ruleaction != self::RULE_ONLY) {
+            $this->load_ac(); // Load access control settings.
+            $this->load_conditions(); // Load rule conditions.
+            $this->load_exceptions(); // Load rule exceptions.
+            $this->load_actions(); // Load rule actions.
+            $this->is_generic(); // Check if the rule is generic.
+            $this->load_dataform(); // Load the data form associated with the rule.
+        }
     }
 
     /**
@@ -449,7 +453,7 @@ class rule {
      * @param int $courseid
      */
     public function validation($courseid): bool {
-        foreach ($this->get_conditions() as $condition) {
+        foreach ($this->get_conditions_to_evaluate() as $condition) {
             if (!$condition->validation($courseid)) {
                 return false;
             }
@@ -704,12 +708,18 @@ class rule {
     /**
      * Delete all triggers records of the rule
      *
+     * @param int $courseid
+     * 
      * @return void
      */
-    private function delete_triggers() {
+    private function delete_triggers($courseid = null) {
         global $DB;
 
-        $DB->delete_records('notificationsagent_triggers', ['ruleid' => $this->get_id()]);
+        $where['ruleid'] = $this->get_id();
+        if ($courseid) {
+            $where['courseid'] = $courseid;
+        }
+        $DB->delete_records('notificationsagent_triggers', $where);
     }
 
     /**
@@ -1373,7 +1383,7 @@ class rule {
             }
         }
 
-        $this->delete_triggers();
+        $this->delete_triggers($courseid);
         $this->save_form_triggers($data, $arraytimer, $context);
     }
 
@@ -1544,7 +1554,7 @@ class rule {
             ['ruleid' => $this->get_id(), 'contextid' => CONTEXT_COURSE], '', 'objectid', 0, 1
         );
 
-        return reset($data)->objectid;
+        return reset($data)->objectid??0;
     }
 
     /**
@@ -1935,8 +1945,8 @@ class rule {
         global $USER;
         $hasdelete = false;
 
-        $context = \context_course::instance($this->get_default_context());
-        if ($this->get_createdby() == $USER->id || has_capability('local/notificationsagent:managesiterule', $context)) {
+        $context = \context_course::instance($this->get_default_context(), IGNORE_MISSING);
+        if ($this->get_createdby() == $USER->id || ($context && has_capability('local/notificationsagent:managesiterule', $context))) {
             $hasdelete = true;
         }
 
@@ -2189,11 +2199,29 @@ class rule {
             });
         } else {
             if ($desc == 1) {
-                usort($rules, function($a, $b) use ($field) {
+                usort($rules, function($a, $b) use ($field, $courseid) {
+                    if ($b->$field - $a->$field == 0){
+                        if ($a->validation($courseid) && !$b->validation($courseid)) {
+                            return -1;
+                        } else if (!$a->validation($courseid) && $b->validation($courseid)) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
                     return $b->$field - $a->$field;
                 });
             } else {
-                usort($rules, function($a, $b) use ($field) {
+                usort($rules, function($a, $b) use ($field, $courseid) {
+                    if ($b->$field - $a->$field == 0){
+                        if ($a->validation($courseid) && !$b->validation($courseid)) {
+                            return -1;
+                        } else if (!$a->validation($courseid) && $b->validation($courseid)) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
                     return $a->$field - $b->$field;
                 });
             }

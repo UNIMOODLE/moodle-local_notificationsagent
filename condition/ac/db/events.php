@@ -24,17 +24,22 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Used for updating temporary triggers in case of delete in a group/grouping.
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'local_notificationsagent';
-$plugin->release = '0.6.0';
-$plugin->version = 2024043005;
-$plugin->requires = 2022041900;
-$plugin->maturity = MATURITY_BETA;
+$observers = [
+    [
+        'eventname' => '\core\event\group_deleted',
+        'callback' => 'notificationscondition_ac_observer::group_deleted',
+    ],
+    [
+        'eventname' => '\core\event\grouping_deleted',
+        'callback' => 'notificationscondition_ac_observer::grouping_deleted',
+    ],
+];

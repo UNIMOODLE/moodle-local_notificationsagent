@@ -90,10 +90,10 @@ class update_rule_share extends \external_api {
                 return $result;
             }
         }
-        $context = \context_course::instance($instance->get_default_context());
+        $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
 
         try {
-            if (has_capability('local/notificationsagent:updateruleshare', $context)) {
+            if ($context && has_capability('local/notificationsagent:updateruleshare', $context)) {
                 if ($instance->get_template()) {
                     $request = new \stdClass();
                     $request->id = $instance->get_id();

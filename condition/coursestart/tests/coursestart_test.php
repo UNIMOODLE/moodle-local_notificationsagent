@@ -244,7 +244,7 @@ class coursestart_test extends \advanced_testcase {
                     $params->{notificationplugin::UI_TIME})
             ) {
                 self::assertEquals(
-                    self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME},
+                    max(time(), self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME}),
                     self::$subplugin->estimate_next_time(self::$context)
                 );
             } else {
@@ -318,7 +318,10 @@ class coursestart_test extends \advanced_testcase {
         $time = self::$coursetest->enddate;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(
+            self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)],
+            self::$subplugin->get_title()
+        );
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);

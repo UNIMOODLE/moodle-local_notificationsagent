@@ -32,11 +32,13 @@
  */
 
 use core\event\calendar_event_deleted;
+use core\event\calendar_event_updated;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_calendarstart\calendarstart;
+use local_notificationsagent\helper\helper;
 
 /**
  * Class notificationscondition_calendarstart_observer
@@ -46,9 +48,9 @@ class notificationscondition_calendarstart_observer {
     /**
      * Updates the calendar when a calendar event is updated.
      *
-     * @param \core\event\calendar_event_updated $event The calendar event update event.
+     * @param calendar_event_updated $event The calendar event update event.
      */
-    public static function calendar_updated(\core\event\calendar_event_updated $event) {
+    public static function calendar_updated(calendar_event_updated $event) {
         $pluginname = calendarstart::NAME;
         $cmid = $event->objectid;
         $courseid = $event->courseid;
@@ -93,6 +95,7 @@ class notificationscondition_calendarstart_observer {
                 update_rule_status::execute(
                     $data->ruleid, rule::PAUSE_RULE,
                 );
+                helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
         }
     }

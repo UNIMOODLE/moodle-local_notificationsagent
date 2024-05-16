@@ -36,7 +36,7 @@ namespace local_notificationsagent\form;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_ac\mod_ac_availability_info;
+use notificationscondition_ac\custominfo;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -501,13 +501,17 @@ class editrule_form extends \moodleform {
         $countcondition = $this->validationJsonContent(notificationplugin::TYPE_CONDITION, $jsoncondition, $data, $errors);
         $this->validationJsonContent(notificationplugin::TYPE_EXCEPTION, $jsonexception, $data, $errors);
         $countaction = $this->validationJsonContent(notificationplugin::TYPE_ACTION, $jsonaction, $data, $errors);
-
-        if (empty($countcondition) && mod_ac_availability_info::is_empty($ac)) {
+        
+        if (empty($countcondition) && custominfo::is_empty($ac)) {
             $errors["newcondition_group"] = get_string('editrule_condition_error', 'local_notificationsagent');
         }
         
-        if (empty($countaction) && empty($jsonaction)) {
+        if (empty($countaction)) {
             $errors["newaction_group"] = get_string('editrule_action_error', 'local_notificationsagent');
+        }
+
+        if(!empty($errors)){
+            \core\notification::add(implode('<br />', $errors),\core\notification::ERROR);
         }
 
         return $errors;
@@ -724,7 +728,7 @@ class frontendCustom extends \core_availability\frontend {
      */
     public static function report_validation_errors($ac, array &$errors) {
         // Empty value is allowed!
-        if (mod_ac_availability_info::is_empty($ac)) {
+        if (custominfo::is_empty($ac)) {
             return;
         }
 

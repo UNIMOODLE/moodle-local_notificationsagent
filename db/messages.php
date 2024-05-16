@@ -24,20 +24,20 @@
 /**
  * Version details
  *
- * @package    notificationscondition_ac
+ * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_ac;
+defined('MOODLE_INTERNAL') || die();
+$messageproviders = [
+    'notificationsagent_message' => [
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
 
-use local_notificationsagent\notificationacplugin;
-
-/**
- * Class mod_ac_availability_info
- */
-class mod_ac_availability_info extends notificationacplugin {
-
-}
+];

@@ -309,3 +309,7 @@ $string['privacy:metadata:actiondetail'] = 'Detail of the action sent to the use
 $string['privacy:metadata:notificationsagentreport'] = 'Records messages sent to users which might content some user data.';
 $string['privacy:metadata:timestamp'] = 'Timestamp of the sent action.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Notifications agent report.';
+
+// Message provider.
+$string['messageprovider:notificationsagent_message'] = 'Broken rules notifications';
+$string['brokenrulebody'] = 'Rule:  {$a->rule} of the course :{$a->course} has been paused,';

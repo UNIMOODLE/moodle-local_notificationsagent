@@ -179,7 +179,7 @@ class messageagent extends notificationactionplugin {
         $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
-        $message->smallmessage = 'small message';
+        $message->smallmessage = shorten_text(format_text($sendmessage));
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
         $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
             false

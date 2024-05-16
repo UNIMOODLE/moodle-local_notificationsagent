@@ -149,14 +149,16 @@
                 <div class="card-assignment d-flex justify-content-between align-items-center">
                     {{#capabilities.resume}}
                         {{#isrule}}
-                            <a data-toggle="modal"{{^ iscontextsite}}{{^ forced }} class="disabled"{{/ forced}}{{/ iscontextsite}} id="status-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-status="{{{ status }}}" href="#">
-                                {{^status}}
-                                    <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
-                                {{/status}}
-                                {{#status}}
-                                    <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
-                                {{/status}}
-                            </a>
+                            {{#validation}}
+                                <a data-toggle="modal"{{^ iscontextsite}}{{^ forced }} class="disabled"{{/ forced}}{{/ iscontextsite}} id="status-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-status="{{{ status }}}" href="#">
+                                    {{^status}}
+                                        <i class="fa fa-pause mr-2"></i>{{#str}}editrule_pauserule, local_notificationsagent{{/str}}
+                                    {{/status}}
+                                    {{#status}}
+                                        <i class="fa fa-play mr-2"></i>{{#str}}editrule_activaterule, local_notificationsagent{{/str}}
+                                    {{/status}}
+                                </a>
+                            {{/validation}}
                         {{/isrule}}
                     {{/capabilities.resume}}
                     {{#capabilities.edit}}
@@ -171,7 +173,9 @@
                     {{/capabilities.edit}}
                     {{#capabilities.report}}
                         {{# isrule}}
-                            <a href="{{{reporturl}}}"><i class="fa fa-file mr-2"></i>{{#str}}editrule_reportrule, local_notificationsagent{{/str}}</a>
+                            {{#validation}}
+                                <a href="{{{reporturl}}}"><i class="fa fa-file mr-2"></i>{{#str}}editrule_reportrule, local_notificationsagent{{/str}}</a>
+                            {{/validation}}
                         {{/ isrule}}
                     {{/capabilities.report}}
                     {{#capabilities.export}}
@@ -180,7 +184,9 @@
                         {{/ iscontextsite}}
                         {{^ iscontextsite}}
                             {{# isrule}}
-                                <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
+                                {{#validation}}
+                                    <a href="{{{exporturl}}}"><i class="fa fa-download mr-2"></i>{{#str}}export, local_notificationsagent{{/str}}</a>
+                                {{/validation}}
                             {{/ isrule}}
                         {{/ iscontextsite}}
                     {{/capabilities.export}}
@@ -192,18 +198,20 @@
                     {{#capabilities.share}}
                         {{^ iscontextsite}}
                             {{# isrule}}
-                                {{# canshare}}
-                                    {{# isallshared}}
-                                        <a data-toggle="modal" {{^ forced }} class="disabled"{{/ forced}} id="share-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-shared="{{{ shared }}}" href="#">
-                                            {{^ shared}}
-                                                <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unsharerule, local_notificationsagent{{/str}}
-                                            {{/ shared}}
-                                            {{# shared}}
-                                                <i class="fa fa-link mr-2"></i>{{#str}}editrule_sharerule, local_notificationsagent{{/str}}
-                                            {{/ shared}}
-                                        </a>
-                                    {{/ isallshared}}
-                                {{/ canshare}}
+                                {{#validation}}
+                                    {{# canshare}}
+                                        {{# isallshared}}
+                                            <a data-toggle="modal" {{^ forced }} class="disabled"{{/ forced}} id="share-rule-{{{ id }}}" data-ruleid="{{{ id }}}" data-shared="{{{ shared }}}" href="#">
+                                                {{^ shared}}
+                                                    <i class="fa fa-chain-broken mr-2"></i>{{#str}}editrule_unsharerule, local_notificationsagent{{/str}}
+                                                {{/ shared}}
+                                                {{# shared}}
+                                                    <i class="fa fa-link mr-2"></i>{{#str}}editrule_sharerule, local_notificationsagent{{/str}}
+                                                {{/ shared}}
+                                            </a>
+                                        {{/ isallshared}}
+                                    {{/ canshare}}
+                                {{/validation}}
                             {{/ isrule}}
                         {{/ iscontextsite}}
                         {{# iscontextsite}}

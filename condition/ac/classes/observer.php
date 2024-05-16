@@ -24,49 +24,22 @@
 /**
  * Version details
  *
- * @package    notificationscondition_usergroupadd
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\external\update_rule_status;
-use local_notificationsagent\notificationsagent;
-use local_notificationsagent\rule;
-use notificationscondition_usergroupadd\usergroupadd;
 use local_notificationsagent\helper\helper;
+use local_notificationsagent\rule;
+use notificationscondition_ac\ac;
 
 /**
- * Event handler for usergroupadd subplugin.
+ * Event handler for ac subplugin.
  */
-class notificationscondition_usergroupadd_observer {
-
-    /**
-     * Triggered when 'group_member_added' event is triggered.
-     *
-     * @param \core\event\group_member_added $event
-     */
-    public static function group_member_added(\core\event\group_member_added $event) {
-        $pluginname = usergroupadd::NAME;
-        $courseid = $event->courseid;
-        $userid = $event->relateduserid;
-        $groupid = $event->objectid;
-
-        $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $groupid);
-        foreach ($conditions as $condition) {
-            $subplugin = new usergroupadd($condition->ruleid, $condition->id);
-            $context = new evaluationcontext();
-            $context->set_params($subplugin->get_parameters());
-            $context->set_complementary($subplugin->get_iscomplementary());
-            $context->set_timeaccess($event->timecreated);
-            $context->set_courseid($courseid);
-            $context->set_userid($userid);
-
-            notificationsagent::generate_cache_triggers($subplugin, $context);
-        }
-    }
+class notificationscondition_ac_observer {
 
     /**
      * Triggered when 'group_deleted' event is triggered.
@@ -76,20 +49,44 @@ class notificationscondition_usergroupadd_observer {
     public static function group_deleted(\core\event\group_deleted $event) {
         global $DB;
 
-        $groupid = $event->objectid;
-
         $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid
                   FROM {notificationsagent_condition} mnc
-                 WHERE mnc.pluginname = :name
-                   AND mnc.cmid = :cmid';
+                 WHERE mnc.pluginname = :name';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => usergroupadd::NAME,
-            'cmid' => $groupid,
+            'name' => ac::NAME,
         ]);
 
         foreach ($dataobj as $data) {
-            $subplugin = new usergroupadd($data->ruleid, $data->id);
+            $subplugin = new ac($data->ruleid, $data->id);
+            $result = $subplugin->validation($event->courseid);
+            if (!$result) {
+                update_rule_status::execute(
+                    $data->ruleid, rule::PAUSE_RULE,
+                );
+                helper::broken_rule_notify($event->courseid, $data->ruleid);
+            }
+        }
+    }
+
+        /**
+     * Triggered when 'grouping_deleted' event is triggered.
+     *
+     * @param \core\event\grouping_deleted $event
+     */
+    public static function grouping_deleted(\core\event\grouping_deleted $event) {
+        global $DB;
+
+        $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid
+                  FROM {notificationsagent_condition} mnc
+                 WHERE mnc.pluginname = :name';
+
+        $dataobj = $DB->get_records_sql($sql, [
+            'name' => ac::NAME,
+        ]);
+
+        foreach ($dataobj as $data) {
+            $subplugin = new ac($data->ruleid, $data->id);
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(

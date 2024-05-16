@@ -35,12 +35,12 @@ namespace local_notificationsagent\helper;
 
 use html_writer;
 use moodle_url;
+use local_notificationsagent\rule;
 
 /**
  *  Helper class for plugin
  */
-class helper
-{
+class helper {
 
     /**
      * Trace for scheduled tasks. Only meant for debugging
@@ -50,8 +50,7 @@ class helper
      *
      * @return void
      */
-    public static function custom_mtrace($message)
-    {
+    public static function custom_mtrace($message) {
         $tracelog = get_config('local_notificationsagent', 'tracelog');
         if ($tracelog) {
             mtrace($message);
@@ -66,20 +65,19 @@ class helper
      *
      * @return array|string $data Time in days, hours, minutes and seconds
      */
-    public static function to_human_format($seconds, $toshow = false)
-    {
+    public static function to_human_format($seconds, $toshow = false) {
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@$seconds");
 
         $stringtoshow = [];
         $a = $dtF->diff($dtT)->format('%a') and
-            $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
+        $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
         $h = $dtF->diff($dtT)->format('%h') and
-            $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
+        $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
         $i = $dtF->diff($dtT)->format('%i') and
-            $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
+        $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
         $s = $dtF->diff($dtT)->format('%s') and
-            $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
+        $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
 
         if (empty($stringtoshow)) {
             $stringtoshow[] = "0 " . get_string('card_second', 'local_notificationsagent');
@@ -99,8 +97,7 @@ class helper
      *
      * @return moodle_url
      */
-    public static function get_course_url($id)
-    {
+    public static function get_course_url($id) {
         return new moodle_url('/course/view.php', ['id' => $id]);
     }
 
@@ -112,8 +109,7 @@ class helper
      *
      * @return moodle_url The URL of the course module.
      */
-    public static function get_module_url($courseid, $cmid)
-    {
+    public static function get_module_url($courseid, $cmid) {
         return new moodle_url(
             get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
             ['id' => $cmid]
@@ -128,13 +124,16 @@ class helper
      * @return string The URL of the module or course
      * @throws moodle_exception When there is an error with the condition ID
      */
-    public static function get_follow_link($context)
-    {
+    public static function get_follow_link($context) {
         $conditions = $context->get_rule()->get_conditions();
         $condition = $conditions[$context->get_triggercondition()] ?? '';
         $cmid = !empty($condition) ? ((json_decode($condition->get_parameters()))->cmid ?? '') : '';
 
-        return !empty($cmid) ? self::get_module_url($context->get_courseid(), $cmid) : self::get_course_url($context->get_courseid());
+        return !empty($cmid)
+            ? self::get_module_url($context->get_courseid(), $cmid)
+            : self::get_course_url(
+                $context->get_courseid()
+            );
     }
 
     /**
@@ -144,8 +143,7 @@ class helper
      *
      * @return integer $seconds Seconds
      */
-    public static function to_seconds_format($time)
-    {
+    public static function to_seconds_format($time) {
         $seconds = 0;
 
         if (isset($time['days']) && $time['days'] != "") {
@@ -173,8 +171,7 @@ class helper
      *
      * @return array
      */
-    public static function build_category_array($category, $ruleid)
-    {
+    public static function build_category_array($category, $ruleid) {
         global $DB;
         $courses = $category->get_courses();
         $count = $category->coursecount;
@@ -215,8 +212,7 @@ class helper
      *
      * @return array
      */
-    public static function count_category_courses($category)
-    {
+    public static function count_category_courses($category) {
         $countcategorycourses = $category->coursecount;
 
         $subcategories = $category->get_children();
@@ -235,8 +231,7 @@ class helper
      *
      * @return string
      */
-    public static function build_output_categories($arraycategories, $categoryid = 0)
-    {
+    public static function build_output_categories($arraycategories, $categoryid = 0) {
         $output = "";
         foreach ($arraycategories as $key => $category) {
             $output .= html_writer::start_tag("li", [
@@ -315,5 +310,39 @@ class helper
             $output .= html_writer::end_tag("li"); // ... .listitem.listitem-category.list-group-item
         }
         return $output;
+    }
+
+    public static function broken_rule_notify($courseid, $ruleid) {
+        $rule = new rule($ruleid);
+        $userid = $rule->get_createdby();
+        $title = $rule->get_name() . " " . get_string('status_broken', 'local_notificationsagent');
+        $text = get_string(
+            'brokenrulebody', 'local_notificationsagent',
+            [
+                'course' => get_course($courseid)->fullname,
+                'rule' => $rule->get_name(),
+            ]
+        );
+        $message = new \core\message\message();
+        $message->component = 'local_notificationsagent'; // Your plugin's name.
+        $message->name = 'notificationsagent_message'; // Your notification name from message.php.
+        $message->userfrom = \core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
+        $message->userto = $userid;
+        $message->subject = $title;
+        $message->fullmessage = format_text($text); // Será nuestro BBBB.
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessagehtml = format_text('<p>' . $text . '</p>');
+        $message->smallmessage = shorten_text(format_text($text));
+        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
+        $message->contexturl = (new \moodle_url(
+            '/local/notificationsagent/editrule.php?courseid=' . $courseid . '&action=edit&ruleid=' . $ruleid
+        ))->out(
+            false
+        ); // A relevant URL for the notification.
+        $message->contexturlname = get_string('fullrule', 'local_notificationsagent'); // Link title explaining where users get
+        // to  for the contexturl.
+        // The integer ID of the new message or false if there was a problem (with submitted data or sending the message to the
+        // message processor).
+        return message_send($message);
     }
 }

@@ -119,6 +119,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
         );
         self::$group = $this->getDataGenerator()->create_group(['courseid' => self::$course->id]);
         self::$activity = self::getDataGenerator()->create_module('assign', ['course' => self::$course->id]);
+        self::$user = self::getDataGenerator()->create_user();
     }
 
     /**
@@ -196,6 +197,45 @@ class usergroupadd_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Check if the group has been deleted.
+     *
+     * @covers       \notificationscondition_usergroupadd_observer::group_deleted
+     */
+    public function test_group_deleted() {
+        global $DB;
+        $pluginname = usergroupadd::NAME;
+
+        self::setUser(2);//admin
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0, 'runtime_seconds' => 30];
+        $ruleid = self::$rule->create($dataform);
+        self::$rule->set_id($ruleid);
+
+        $objparameters = new \stdClass();
+        $objparameters->cmid = self::$group->id;
+
+        $objcondition = new \stdClass();
+        $objcondition->ruleid = self::$rule->get_id();
+        $objcondition->courseid = self::$course->id;
+        $objcondition->type = 'condition';
+        $objcondition->pluginname = $pluginname;
+        $objcondition->parameters = json_encode($objparameters);
+        $objcondition->cmid = self::$group->id;
+
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objcondition);
+        $this->assertIsInt($conditionid);
+        
+        groups_delete_group(self::$group->id);
+
+        $rule = self::$rule::create_instance($ruleid);
+        $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
+    }
 
     /**
      * Set up the data to be used in the test execution.

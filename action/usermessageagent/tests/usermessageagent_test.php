@@ -101,15 +101,29 @@ class usermessageagent_test extends \advanced_testcase {
      * This method is called before a test is executed.
      */
     public function setUp(): void {
+        global $USER;
+
         parent::setUp();
         $this->resetAfterTest(true);
-        self::$rule = new rule();
 
-        self::$subplugin = new usermessageagent(self::$rule->to_record());
-        self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
+
+        $rule = new rule();
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$coursetest->id;
+        $dataform->timesfired = 1;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $usertutor = self::getDataGenerator()->create_user();
+        $USER->id = $usertutor->id;
+        $ruleid = $rule->create($dataform);
+        self::$rule = rule::create_instance($ruleid);
+
+        self::$subplugin = new usermessageagent(self::$rule->to_record());
+        self::$subplugin->set_id(5);
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
         self::$context = new evaluationcontext();

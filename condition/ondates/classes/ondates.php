@@ -310,4 +310,17 @@ class ondates extends notificationconditionplugin {
         return $arrayparams;
     }
 
+    /**
+     * Update any necessary ids and json parameters in the database.
+     * It is called near the completion of course restoration.
+     *
+     * @param string       $restoreid Restore identifier
+     * @param integer      $courseid  Course identifier
+     * @param \base_logger $logger    Logger if any warnings
+     *
+     * @return bool False if restore is not required
+     */
+    public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
+        return false;
+    }
 }

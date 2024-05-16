@@ -123,7 +123,7 @@ class coursestart extends notificationconditionplugin {
         // Condition.
         if (!$context->is_complementary()) {
             if ($timeaccess <= ($course->startdate + $params->{self::UI_TIME})) {
-                $timestart = $course->startdate + $params->{self::UI_TIME};
+                $timestart = max(time(), $course->startdate + $params->{self::UI_TIME});
             } else {
                 return time();
             }

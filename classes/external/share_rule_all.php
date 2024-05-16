@@ -85,10 +85,10 @@ class share_rule_all extends \external_api {
             }
         }
 
-        $context = \context_course::instance($instance->get_default_context());
+        $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
 
         try {
-            if (has_capability('local/notificationsagent:shareruleall', $context)) {
+            if ($context && has_capability('local/notificationsagent:shareruleall', $context)) {
                 if ($instance->get_template()) {
                     $instance->clone($instance->get_id());
                 } else {

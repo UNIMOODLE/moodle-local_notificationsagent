@@ -34,8 +34,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Notificació individual a usuaris';
-$string['messageprovider:individual_message'] = 'Proveïdor de missatges';
+$string['pluginname'] = 'El meu assistent de notificacions';
+$string['messageprovider:individual_message'] = 'Notificació de la meva pròpia activitat.';
 $string['messageagent_action'] = 'Enviar notificació individual amb títol [TTTT] i missatge [BBBB]';
 $string['editrule_action_title'] = 'Títol {$a->typeelement}:';
 $string['editrule_action_message'] = 'Missatge {$a->typeelement}';

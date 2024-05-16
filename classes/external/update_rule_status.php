@@ -36,6 +36,10 @@ namespace local_notificationsagent\external;
 
 use local_notificationsagent\rule;
 
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/lib/externallib.php');
+
 /**
  * Rule external API for updating the rule's status.
  *
@@ -93,10 +97,10 @@ class update_rule_status extends \external_api {
                 return $result;
             }
         }
-        $context = \context_course::instance($instance->get_default_context());
+        $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
 
         try {
-            if (has_capability('local/notificationsagent:updaterulestatus', $context)) {
+            if ($context && has_capability('local/notificationsagent:updaterulestatus', $context)) {
                 $request = new \stdClass();
                 $request->id = $instance->get_id();
                 if (!$status) {
@@ -136,4 +140,3 @@ class update_rule_status extends \external_api {
         );
     }
 }
-

@@ -217,5 +217,64 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024043002, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024043005) {
+        // Define index idx_idstatustemplate (unique) to be added to notificationsagent_rule.
+        $table = new xmldb_table('notificationsagent_rule');
+        $index = new xmldb_index('idx_idstatustemplate', XMLDB_INDEX_UNIQUE, ['id', 'status', 'template']);
+
+        // Conditionally launch add index idx_idstatustemplate.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index idx_ruleidcontextidobjectid (unique) to be added to notificationsagent_context.
+        $table = new xmldb_table('notificationsagent_context');
+        $index = new xmldb_index('idx_ruleidcontextidobjectid', XMLDB_INDEX_UNIQUE, ['ruleid', 'contextid', 'objectid']);
+
+        // Conditionally launch add index idx_ruleidcontextidobjectid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index idx_ruleidpluginname (not unique) to be added to notificationsagent_condition.
+        $table = new xmldb_table('notificationsagent_condition');
+        $index = new xmldb_index('idx_ruleidpluginname', XMLDB_INDEX_NOTUNIQUE, ['ruleid', 'pluginname']);
+
+        // Conditionally launch add index idx_ruleidpluginname.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index idx_ruleidstartdate (not unique) to be added to notificationsagent_triggers.
+        $table = new xmldb_table('notificationsagent_triggers');
+        $index = new xmldb_index('idx_ruleidstartdate', XMLDB_INDEX_NOTUNIQUE, ['ruleid', 'startdate']);
+
+        // Conditionally launch add index idx_ruleidstartdate.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index idx_ruleidcourseiduserid (unique) to be added to notificationsagent_launched.
+        $table = new xmldb_table('notificationsagent_launched');
+        $index = new xmldb_index('idx_ruleidcourseiduserid', XMLDB_INDEX_UNIQUE, ['ruleid', 'courseid', 'userid']);
+
+        // Conditionally launch add index idx_ruleidcourseiduserid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        // Define index idx_ruleiduserid (not unique) to be added to notificationsagent_launched.
+        $table = new xmldb_table('notificationsagent_launched');
+        $index = new xmldb_index('idx_ruleiduserid', XMLDB_INDEX_NOTUNIQUE, ['ruleid', 'userid']);
+
+        // Conditionally launch add index idx_ruleiduserid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043005, 'local', 'notificationsagent');
+    }
+
     return true;
 }

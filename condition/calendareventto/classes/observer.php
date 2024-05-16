@@ -37,6 +37,7 @@ use local_notificationsagent\external\update_rule_status;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_calendareventto\calendareventto;
+use local_notificationsagent\helper\helper;
 
 /**
  * Observer for calendareventto condition
@@ -103,6 +104,7 @@ class notificationscondition_calendareventto_observer {
                 update_rule_status::execute(
                     $data->ruleid, rule::PAUSE_RULE,
                 );
+                helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
         }
     }

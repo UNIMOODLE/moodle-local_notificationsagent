@@ -31,6 +31,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\rule;
 use notificationscondition_ac\ac;
 use notificationscondition_sessionend\sessionend;
 use notificationscondition_sessionstart\sessionstart;
@@ -108,10 +109,29 @@ class notificationsagent_observer_test extends \advanced_testcase {
 
     /**
      * @covers \local_notificationsagent_observer::course_deleted
+     * @covers \local_notificationsagent\notificationsagent::delete_all_by_course
      * @return void
      */
     public function test_course_deleted() {
-        global $DB;
+        global $DB, $USER;
+
+        $rule = new rule();
+        $rule->set_name("Rule Test");
+        $rule->set_id(246000);
+        $rule->set_runtime(['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0]);
+        $rule->set_status(0);
+        $rule->set_template(1);
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = $rule->create($dataform);
+        $this->assertIsInt($ruleid);
+
         $report = new \stdClass();
         $report->ruleid = 1;
         $report->userid = self::$user->id;

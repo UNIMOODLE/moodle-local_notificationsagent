@@ -33,10 +33,10 @@
 
 namespace notificationscondition_activityavailable;
 
-use local_notificationsagent\notificationacplugin;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
+use notificationscondition_ac\custominfo;
 
 /**
  * Class activityavailable.
@@ -79,7 +79,7 @@ class activityavailable extends notificationconditionplugin {
 
         $available = false;
         if ($cmid && ($cm = get_fast_modinfo($courseid)->get_cm($cmid)) && $cm->visible) {
-            $infoclass = new notificationacplugin($courseid, $cm->availability);
+            $infoclass = new custominfo($courseid, $cm->availability);
             $variable = '';
             $available = $infoclass->is_available($variable, false, $userid);
         }

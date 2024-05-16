@@ -89,10 +89,10 @@ class delete_rule extends \external_api {
             }
         }
 
-        $context = \context_course::instance($instance->get_default_context());
+        $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
 
         try {
-            if (has_capability('local/notificationsagent:deleterule', $context)) {
+            if ($context && has_capability('local/notificationsagent:deleterule', $context)) {
                 $instance->delete();
             } else {
                 throw new \moodle_exception('nopermissions', '', '', get_capability_string('local/notificationsagent:deleterule'));

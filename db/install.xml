@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notificationsagent/db" VERSION="20240507" COMMENT="XMLDB file for Moodle local/notificationsagent"
+<XMLDB PATH="local/notificationsagent/db" VERSION="20240514" COMMENT="XMLDB file for Moodle local/notificationsagent"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -23,6 +23,9 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_idstatustemplate" UNIQUE="true" FIELDS="id, status, template"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="notificationsagent_condition" COMMENT="Data for subplugins">
       <FIELDS>
@@ -38,6 +41,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidpluginname" UNIQUE="false" FIELDS="ruleid, pluginname"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="notificationsagent_action" COMMENT="Data for action subplugins">
       <FIELDS>
@@ -67,6 +73,9 @@
         <KEY NAME="fk_conditionid" TYPE="foreign" FIELDS="conditionid" REFTABLE="notificationsagent_condition" REFFIELDS="id"/>
         <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidstartdate" UNIQUE="false" FIELDS="ruleid, startdate"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="notificationsagent_cache" COMMENT="Data for timecache">
       <FIELDS>
@@ -111,6 +120,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidcontextidobjectid" UNIQUE="true" FIELDS="ruleid, contextid, objectid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="notificationsagent_launched" COMMENT="Number of times a rule was executed">
       <FIELDS>
@@ -126,6 +138,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_ruleid" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ruleidcourseiduserid" UNIQUE="true" FIELDS="ruleid, courseid, userid"/>
+        <INDEX NAME="idx_ruleiduserid" UNIQUE="false" FIELDS="ruleid, userid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

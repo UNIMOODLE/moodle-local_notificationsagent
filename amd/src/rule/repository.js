@@ -130,12 +130,13 @@ const unshareAllRule = (ruleid) => {
  * @param {Number} orderid The order ID.
  * @returns {object} jQuery promise
  */
-const saveOrderSession = (sessionname, orderid) => {
+const saveOrderSession = (sessionname, orderid, courseid) => {
     const request = {
         methodname: 'local_notificationsagent_manage_sessions',
         args: {
             sessionname,
-            orderid
+            orderid,
+            courseid
         }
     };
     return Ajax.call([request])[0];

@@ -50,6 +50,7 @@ class manage_sessions extends \external_api {
         return new \external_function_parameters([
             'sessionname' => new \external_value(PARAM_TEXT, 'The session name', VALUE_REQUIRED),
             'orderid' => new \external_value(PARAM_INT, 'Option order', VALUE_REQUIRED),
+            'courseid' => new \external_value(PARAM_INT, 'Course id', VALUE_REQUIRED),
         ]);
     }
 
@@ -58,19 +59,28 @@ class manage_sessions extends \external_api {
      *
      * @param string $sessionname The session name
      * @param int $orderid The rule order id
+     * @param int $courseid The course id
      *
      * @return array
      */
-    public static function execute($sessionname, $orderid) {
+    public static function execute($sessionname, $orderid, $courseid) {
         global $USER;
         $params = self::validate_parameters(
             self::execute_parameters(), ["sessionname" => $sessionname,
-                "orderid" => $orderid, ]
+                "orderid" => $orderid, "courseid" => $courseid,]
         );
-        if ($orderid != -1) {
-            set_user_preference($sessionname, $orderid);
+        if ($courseid != null) {
+            $context = \context_course::instance($courseid);
         } else {
-            isset($USER->preference['orderid']) ? $orderid = $USER->preference['orderid'] : '';
+            $context = \context_system::instance();
+        }
+
+        if (has_capability('local/notificationsagent:managecourserule', $context)) {
+            if ($orderid != -1) {
+                set_user_preference($sessionname, $orderid, $USER);
+            } else {
+                isset($USER->preference['orderid']) ? $orderid = $USER->preference['orderid'] : '';
+            }
         }
 
         $result['orderid'] = $orderid;

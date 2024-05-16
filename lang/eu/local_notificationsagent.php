@@ -313,3 +313,7 @@ $string['privacy:metadata:notificationsagentreport']
     = 'Erabiltzaileei bidalitako mezuak erregistratzen ditu, erabiltzailearen datu batzuk eduki ditzaketenak.';
 $string['privacy:metadata:timestamp'] = 'Bidalitako ekintzaren denbora-zigilua.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Jakinarazpen-agentearen txostena.';
+
+// Message provider.
+$string['messageprovider:notificationsagent_message'] = 'Arau baliogabeen jakinarazpenak';
+$string['brokenrulebody'] = 'Araua: {$a->rule} ikastaroaren :{$a->course} pausatu egin da';
