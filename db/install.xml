@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notificationsagent/db" VERSION="20240514" COMMENT="XMLDB file for Moodle local/notificationsagent"
+<XMLDB PATH="local/notificationsagent/db" VERSION="20240516" COMMENT="XMLDB file for Moodle local/notificationsagent"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -24,7 +24,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="idx_idstatustemplate" UNIQUE="true" FIELDS="id, status, template"/>
+        <INDEX NAME="idx_idstatustemplatedeleted" UNIQUE="true" FIELDS="id, status, template, deleted"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="notificationsagent_condition" COMMENT="Data for subplugins">

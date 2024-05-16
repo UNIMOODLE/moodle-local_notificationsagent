@@ -276,5 +276,28 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024043005, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2024043006) {
+        // Define index idx_idstatustemplate (unique) to be dropped form notificationsagent_rule.
+        $table = new xmldb_table('notificationsagent_rule');
+        $index = new xmldb_index('idx_idstatustemplate', XMLDB_INDEX_UNIQUE, ['id', 'status', 'template']);
+
+        // Conditionally launch drop index idx_idstatustemplate.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define index idx_idstatustemplatedeleted (unique) to be added to notificationsagent_rule.
+        $table = new xmldb_table('notificationsagent_rule');
+        $index = new xmldb_index('idx_idstatustemplatedeleted', XMLDB_INDEX_UNIQUE, ['id', 'status', 'template', 'deleted']);
+
+        // Conditionally launch add index idx_idstatustemplatedeleted.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043006, 'local', 'notificationsagent');
+    }
+
     return true;
 }
