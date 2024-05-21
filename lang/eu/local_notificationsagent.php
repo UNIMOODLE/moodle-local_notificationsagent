@@ -267,6 +267,9 @@ $string['notificationsagent:numberoftimes'] = 'Baldintza kopurua erabiltzeko gai
 $string['notificationsagent:sessionend'] = 'Saio amaierako baldintza erabiltzeko gaitasuna behar da';
 $string['notificationsagent:weekend'] = 'Asteburuko baldintza erabiltzeko gaitasuna behar da';
 $string['notificationsagent:itemgraded'] = 'Elementu kalifikatzaile-baldintza erabiltzeko beharrezkoa den gaitasuna';
+$string['notificationsagent:weekdays'] = 'Asteko egunak baldintza erabiltzeko beharrezko gaitasuna';
+$string['notificationsagent:ondates'] = 'Daten artean baldintza erabiltzeko beharrezko gaitasuna';
+$string['notificationsagent:usergroupadd'] = 'Erabiltzailea talde-baldintza batera erabiltzeko beharrezko gaitasuna';
 
 $string['notificationsagent:addusergroup'] = 'Addusergroup ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:bootstrapnotifications'] = 'Bootstrapnotifications ekintza erabiltzeko gaitasuna';
@@ -275,6 +278,10 @@ $string['notificationsagent:messageagent'] = 'Messageagent ekintza erabiltzeko g
 $string['notificationsagent:removeusergroup'] = 'removeusergroup ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:usermessageagent'] = 'Usermessageagent ekintza erabiltzeko gaitasuna';
 $string['notificationsagent:privateforummessage'] = 'Privateforummessage ekintza erabiltzeko gaitasuna';
+
+$string['notificationsagent:viewcourserule'] = 'Ikastaroaren arauak ikusteko gaitasuna';
+$string['notificationsagent:manageallrule'] = 'Arau guztiak kudeatzeko gaitasuna';
+$string['notificationsagent:managesessions'] = 'Arau-ordena gordetzeko gaitasuna';
 
 // Webzerbitzuak.
 $string['nosuchinstance'] = 'Instantzia hau ez da aurkitu.';

@@ -267,6 +267,9 @@ $string['notificationsagent:numberoftimes'] = 'Capacitat necessària per utilitz
 $string['notificationsagent:sessionend'] = 'Capacitat necessària per utilitzar la condició de finalització de la sessió';
 $string['notificationsagent:weekend'] = 'Capacitat necessària per utilitzar la condició del cap de setmana';
 $string['notificationsagent:itemgraded'] = 'Capacitat necessària per utilitzar la condició de element de qualificació';
+$string['notificationsagent:weekdays'] = 'Capacitat necessària per utilitzar la condició de dies de la setmana';
+$string['notificationsagent:ondates'] = 'Capacitat necessària per utilitzar la condició entre dates';
+$string['notificationsagent:usergroupadd'] = 'Capacitat necessària per utilitzar la condició dafegir usuari a grup';
 
 $string['notificationsagent:addusergroup'] = 'Capacitat per utilitzar l\'acció addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacitat per utilitzar l\'acció bootstrapnotifications';
@@ -275,6 +278,10 @@ $string['notificationsagent:messageagent'] = 'Capacitat per utilitzar l\'acció 
 $string['notificationsagent:removeusergroup'] = 'Capacitat per utilitzar l\'acció removeusergroup';
 $string['notificationsagent:usermessageagent'] = 'Capacitat per utilitzar l\'acció usermessageagent';
 $string['notificationsagent:privateforummessage'] = 'Capacitat per utilitzar l\'acció privateforummessage';
+
+$string['notificationsagent:viewcourserule'] = 'Capacitat per veure les regles d\'un curs';
+$string['notificationsagent:manageallrule'] = 'Capacitat de gestionar totes les regles';
+$string['notificationsagent:managesessions'] = 'Capacitat per desar l\'ordre de les regles';
 
 // Webservices.
 $string['nosuchinstance'] = 'No s\'ha trobat aquesta instància.';

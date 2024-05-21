@@ -264,6 +264,9 @@ $string['notificationsagent:numberoftimes'] = 'Capability needed in order to use
 $string['notificationsagent:sessionend'] = 'Capability needed in order to use session end condition';
 $string['notificationsagent:weekend'] = 'Capability needed in order to use weekend condition';
 $string['notificationsagent:itemgraded'] = 'Capability needed in order to use grade item condition';
+$string['notificationsagent:weekdays'] = 'Capability needed in order to use weekdays condition';
+$string['notificationsagent:ondates'] = 'Capability needed in order to use ondates condition';
+$string['notificationsagent:usergroupadd'] = 'Capability needed in order to use usergroupadd condition';
 
 $string['notificationsagent:addusergroup'] = 'Capability needed in order to use addusergroup action';
 $string['notificationsagent:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
@@ -272,6 +275,10 @@ $string['notificationsagent:messageagent'] = 'Capability needed in order to use 
 $string['notificationsagent:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
 $string['notificationsagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
 $string['notificationsagent:privateforummessage'] = 'Capability needed in order to use privateforummessage action';
+
+$string['notificationsagent:viewcourserule'] = 'Cability to view course rules';
+$string['notificationsagent:manageallrule'] = 'Cability to manage all rules';
+$string['notificationsagent:managesessions'] = 'Cability to save rule order';
 
 // Webservices.
 $string['notificationsagent:nosuchinstance'] = 'No such instance was found.';
