@@ -35,10 +35,10 @@ namespace notificationscondition_weekdays;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationplugin;
+use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-use notificationscondition_weekdays\weekdays;
 
 /**
  * Tests for the weekdays condition.
@@ -395,6 +395,17 @@ class weekdays_test extends \advanced_testcase {
         $params = '{"weekdays":[4]}';
         self::$subplugin->set_parameters($params);
         $this->assertIsArray(self::$subplugin->load_dataform());
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_weekdays\weekdays::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 
 }

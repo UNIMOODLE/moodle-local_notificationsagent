@@ -102,7 +102,7 @@ class ondates_crontask_test extends \advanced_testcase {
      * @covers       \notificationscondition_ondates\task\ondates_crontask::execute
      * @dataProvider dataprovider
      */
-    public function test_execute($date) {
+    public function test_execute($date, $user) {
         global $DB, $USER;
         $pluginname = ondates::NAME;
         \uopz_set_return('time', $date);
@@ -112,7 +112,7 @@ class ondates_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
+        $USER->id = $user ? 2 : self::$user->id;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -139,7 +139,11 @@ class ondates_crontask_test extends \advanced_testcase {
         } else {
             $this->assertEquals(self::$course->id, $trigger->courseid);
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
-            $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+            if ($user) {
+                $this->assertEquals(notificationsagent::GENERIC_USERID, $trigger->userid);
+            } else {
+                $this->assertEquals(self::$user->id, $trigger->userid);
+            }
         }
 
         \uopz_unset_return('time');
@@ -147,11 +151,13 @@ class ondates_crontask_test extends \advanced_testcase {
 
     public static function dataprovider(): array {
         return [
-            [1706182049],
-            [1705741200],
-            [1705827600],
-            [1716587999],
-            [1716847199],
+            [1706182049, 2],
+            [1705741200, 2],
+            [1705827600, 2],
+            [1716587999, 0],
+            [1716847199, 0],
+            [1716587999, 2],
+            [1716847199, 2],
         ];
     }
 
