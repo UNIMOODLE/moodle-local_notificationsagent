@@ -204,7 +204,6 @@ foreach ($rules as $rule) {
         'content' => $actionscontent,
     ];
 
-    $datanamerule = rule::get_coursename_and_username_by_rule_id($rule->get_id());
     $rulecontent[] = [
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
@@ -228,7 +227,7 @@ foreach ($rules as $rule) {
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
             ? ($rule->get_shared() == 0
-            ? ($courseid == 1 ? get_string('cardsharedby', 'local_notificationsagent', $datanamerule) : get_string('type_sharedrule','local_notificationsagent'))
+            ? ($courseid == 1 ? get_string('cardsharedby', 'local_notificationsagent', rule::get_coursename_and_username_by_rule_id($rule->get_id())) : get_string('type_sharedrule','local_notificationsagent'))
             : get_string('type_rule', 'local_notificationsagent')
             )
             : get_string('type_template', 'local_notificationsagent'),

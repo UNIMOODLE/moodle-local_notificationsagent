@@ -197,6 +197,10 @@ abstract class notificationconditionplugin extends notificationplugin {
         }
 
         if (parent::insert_update_delete($action, $dataplugin)) {
+            if ($courseid == SITEID) {
+                return;
+            }
+            
             // Delete cache for this condition
             notificationsagent::set_timer_cache(
                 ["(courseid= $courseid AND conditionid= {$dataplugin->id})"], []

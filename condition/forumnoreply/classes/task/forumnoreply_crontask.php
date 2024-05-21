@@ -64,26 +64,31 @@ class forumnoreply_crontask extends scheduled_task {
         $pluginname = forumnoreply::NAME;
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
         foreach ($conditions as $condition) {
+            $courses = $condition->courses;
             $decode = $condition->parameters;
             $param = json_decode($decode, true);
 
-            $threads = forumnoreply::get_unanswered_threads(
-                $param[notificationplugin::UI_ACTIVITY],
-                $condition->courseid,
-                $this->get_timestarted(),
-                $param[notificationplugin::UI_TIME],
-            );
+            if (!empty($courses)) {
+                foreach ($courses as $courseid) {
+                    $threads = forumnoreply::get_unanswered_threads(
+                        $param[notificationplugin::UI_ACTIVITY],
+                        $courseid,
+                        $this->get_timestarted(),
+                        $param[notificationplugin::UI_TIME],
+                    );
 
-            foreach ($threads as $thread) {
-                $subplugin = new forumnoreply($condition->ruleid, $condition->id);
-                $context = new evaluationcontext();
-                $context->set_params($subplugin->get_parameters());
-                $context->set_complementary($subplugin->get_iscomplementary());
-                $context->set_timeaccess($this->get_timestarted());
-                $context->set_courseid($condition->courseid);
-                $context->set_userid($thread->userid);
+                    foreach ($threads as $thread) {
+                        $subplugin = new forumnoreply($condition->ruleid, $condition->id);
+                        $context = new evaluationcontext();
+                        $context->set_params($subplugin->get_parameters());
+                        $context->set_complementary($subplugin->get_iscomplementary());
+                        $context->set_timeaccess($this->get_timestarted());
+                        $context->set_courseid($courseid);
+                        $context->set_userid($thread->userid);
 
-                notificationsagent::generate_cache_triggers($subplugin, $context);
+                        notificationsagent::generate_cache_triggers($subplugin, $context);
+                    }
+                }
             }
         }
 

@@ -40,6 +40,7 @@ $capabilities = [
         'archetypes' => [
             'guest' => CAP_PROHIBIT,
             'editingteacher' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
             'student' => CAP_PROHIBIT,
         ],
     ],
@@ -55,13 +56,34 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
+        ],
+    ],
+    'local/notificationsagent:viewcourserule' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+        ],
+    ],
+    'local/notificationsagent:manageallrule' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
+            'student' => CAP_PROHIBIT,
         ],
     ],
     'local/notificationsagent:createrule' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
         ],
@@ -70,6 +92,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
         ],
@@ -78,6 +101,7 @@ $capabilities = [
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
         ],
@@ -86,6 +110,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
         ],
@@ -94,6 +119,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
         ],
@@ -102,6 +128,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_PROHIBIT,
         ],
@@ -110,6 +137,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'student' => CAP_PROHIBIT,
         ],
@@ -133,6 +161,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         ],
     ],
@@ -156,6 +185,7 @@ $capabilities = [
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         ],
     ],
@@ -163,8 +193,9 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'student' => CAP_PROHIBIT,
+            'student' => CAP_ALLOW,
         ],
     ],
 ];

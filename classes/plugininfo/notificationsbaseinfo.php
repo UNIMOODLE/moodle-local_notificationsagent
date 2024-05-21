@@ -51,14 +51,15 @@ class notificationsbaseinfo extends base {
      * Finds all system-wide enabled plugins, the result may include missing plugins.
      * First conditions, then actions.
      *
-     * @param \stdClass $rule record of the instance for innitiallizing plugins
      *
-     * @return array
+     * @return void
      */
     public static function get_all_enabled_plugins() {
         $cachecondition = \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION);
-        self::$pluginscondition = $cachecondition->get(notificationplugin::TYPE_CONDITION) ? $cachecondition->get(notificationplugin::TYPE_CONDITION) : [];
-        if(empty(self::$pluginscondition)){
+        self::$pluginscondition = $cachecondition->get(notificationplugin::TYPE_CONDITION) ? $cachecondition->get(
+            notificationplugin::TYPE_CONDITION
+        ) : [];
+        if (empty(self::$pluginscondition)) {
             $notificationscondition = core_plugin_manager::instance()->get_enabled_plugins('notificationscondition');
             foreach ($notificationscondition as $pluginname) {
                 if ($pluginobj = notificationplugin::create_instance(null, notificationplugin::TYPE_CONDITION, $pluginname)) {
@@ -69,8 +70,10 @@ class notificationsbaseinfo extends base {
         }
 
         $cacheaction = \cache::make('local_notificationsagent', notificationplugin::TYPE_ACTION);
-        self::$pluginsaction = $cacheaction->get(notificationplugin::TYPE_ACTION) ? $cacheaction->get(notificationplugin::TYPE_ACTION) : [];
-        if(empty(self::$pluginsaction)){
+        self::$pluginsaction = $cacheaction->get(notificationplugin::TYPE_ACTION) ? $cacheaction->get(
+            notificationplugin::TYPE_ACTION
+        ) : [];
+        if (empty(self::$pluginsaction)) {
             $notificationsaction = core_plugin_manager::instance()->get_enabled_plugins('notificationsaction');
             foreach ($notificationsaction as $pluginname) {
                 if ($pluginobj = notificationplugin::create_instance(null, notificationplugin::TYPE_ACTION, $pluginname)) {
@@ -79,7 +82,7 @@ class notificationsbaseinfo extends base {
             }
             $cacheaction->set(notificationplugin::TYPE_ACTION, self::$pluginsaction);
         }
-        
+
     }
 
     /**
@@ -94,7 +97,7 @@ class notificationsbaseinfo extends base {
         self::get_all_enabled_plugins();
         $context = \context_course::instance($courseid);
 
-        if($subtype == notificationplugin::TYPE_CONDITION){
+        if ($subtype == notificationplugin::TYPE_CONDITION) {
             $list = [];
             foreach (self::$pluginscondition as $pluginobj) {
                 // Check subplugin capability for current user in course.
@@ -105,7 +108,7 @@ class notificationsbaseinfo extends base {
             return $list;
         }
 
-        if($subtype == notificationplugin::TYPE_ACTION){
+        if ($subtype == notificationplugin::TYPE_ACTION) {
             $list = [];
             foreach (self::$pluginsaction as $pluginobj) {
                 // Check subplugin capability for current user in course.

@@ -166,33 +166,6 @@ class weekdays_test extends \advanced_testcase {
     }
 
     /**
-     * Test is can share.
-     *
-     * @covers \notificationscondition_weekdays\weekdays::canshare
-     */
-    public function test_canshare() {
-        $this->assertTrue(self::$rule->can_share());
-    }
-
-    /**
-     * Test is use template.
-     *
-     * @covers \notificationscondition_weekdays\weekdays::gettype
-     */
-    public function test_gettype() {
-        $this->assertSame(self::$rule->get_type(), 'rule');
-    }
-
-    /**
-     * Test is use template.
-     *
-     * @covers \notificationscondition_weekdays\weekdays::test_isusetemplate
-     */
-    public function test_isusetemplate() {
-        $this->assertFalse(self::$rule->is_use_template(self::$coursetest, self::$coursecontext));
-    }
-
-    /**
      * Test get elements.
      *
      * @covers \notificationscondition_weekdays\weekdays::get_elements

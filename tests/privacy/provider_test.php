@@ -34,12 +34,11 @@
 namespace local_notificationsagent\privacy;
 
 use core_privacy\local\metadata\collection;
+use core_privacy\local\request;
 use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
-use local_notificationsagent\engine\notificationsagent_engine;
-use local_notificationsagent\evaluationcontext;
-use local_notificationsagent\notificationplugin;
+use core_privacy\local\request\writer;
 use local_notificationsagent\rule;
 
 /**
@@ -61,36 +60,6 @@ class provider_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
-
-    /**
-     * @var \stdClass
-     */
-    private static $cmteste;
-    /**
-     * Date start for the course
-     */
-    public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
-
-    /**
-     * Date end for the course
-     */
-    public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
-    /**
-     * Activity date start
-     */
-    public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
-    /**
-     * Activity date end
-     */
-    public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
-    /**
-     * User first access to a course
-     */
-    public const USER_FIRSTACCESS = 1704099600; // 30/01/2024 10:00:00,
-    /**
-     * User last access to a course
-     */
-    public const USER_LASTACCESS = 1704099600; // 01/01/2024 10:00:00.
     /**
      *  Random id for activity
      */
@@ -102,7 +71,6 @@ class provider_test extends \advanced_testcase {
      * Settin up test context
      *
      * @return void
-     * @throws \coding_exception
      */
     final public function setUp(): void {
         parent::setUp();
@@ -122,8 +90,8 @@ class provider_test extends \advanced_testcase {
         $report->actiondetail = '{"title":"Tïtulo","message":"mensaje"}';
         $report->timestamp = time();
 
-        $DB->insert_record('notificationsagent_report', $report);
-
+        $result = $DB->insert_record('notificationsagent_report', $report);
+        $this->assertIsInt($result);
     }
 
     /**
@@ -212,5 +180,51 @@ class provider_test extends \advanced_testcase {
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
         $this->assertEmpty($deletereport);
 
+    }
+
+    /**
+     * @covers \local_notificationsagent\privacy\provider::delete_data_for_users
+     * @return void
+     */
+    public function test_delete_data_for_users() {
+        global $DB;
+        $context = \context_course::instance(self::$course->id);
+        $apprvlist = new approved_userlist($context, self::COMPONENT, [self::$user->id]);
+        $this->assertNotEmpty($apprvlist);
+        provider::delete_data_for_users($apprvlist);
+        $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $this->assertEmpty($deletereport);
+
+    }
+
+    /**
+     * @covers \local_notificationsagent\privacy\provider::export_user_data
+     * @return void
+     */
+    public function test_export_user_data() {
+        $contextlist = provider::get_contexts_for_userid(self::$user->id,);
+        $apprvlist = new approved_contextlist(self::$user, self::COMPONENT, [$contextlist->get_contexts()[0]->id]);
+        $this->assertNotEmpty($apprvlist);
+        $this->assertEquals(self::COMPONENT, $apprvlist->get_component());
+
+        provider::export_user_data($apprvlist);
+
+        foreach ($contextlist as $context) {
+            $data = writer::with_context($context)->get_data(
+                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
+            );
+            $this->assertNotEmpty($data);
+            foreach ($data as $datoreport) {
+                $this->assertEquals(1, $datoreport['ruleid']);
+                $this->assertEquals(self::$user->id, $datoreport['userid']);
+                $this->assertEquals(self::$course->id, $datoreport['courseid']);
+                $this->assertEquals(self::CMID, $datoreport['actionid']);
+            }
+        }
+
+        $delapprvlist = new approved_contextlist(self::$user, 'mod_quiz', [$contextlist->get_contexts()[0]->id]);
+        provider::export_user_data($delapprvlist);
+        $this->assertEquals('mod_quiz', $delapprvlist->get_component());
+        $this->assertNotEmpty($delapprvlist);
     }
 }

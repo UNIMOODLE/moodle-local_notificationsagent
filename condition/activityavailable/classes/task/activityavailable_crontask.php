@@ -62,15 +62,18 @@ class activityavailable_crontask extends scheduled_task {
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
+            $courses = $condition->courses;
             $subplugin = new activityavailable($condition->ruleid, $condition->id);
             $context = new evaluationcontext();
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $context->set_courseid($courseid);
-
-            notificationsagent::generate_cache_triggers($subplugin, $context);
+            if (!empty($courses)) {
+                foreach ($courses as $courseid) {
+                    $context->set_courseid($courseid);
+                    notificationsagent::generate_cache_triggers($subplugin, $context);
+                }
+            }
 
         }
         \local_notificationsagent\helper\helper::custom_mtrace("Activityavailable end ");

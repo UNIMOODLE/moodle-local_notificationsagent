@@ -28,8 +28,6 @@
 
 namespace local_notificationsagent\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
@@ -98,9 +96,10 @@ class provider implements \core_privacy\local\metadata\provider,
         if ($contextlist->get_component() != 'local_notificationsagent') {
             return;
         }
-        $userid = $contextlist->get_user()->id;
-        $contexts = array_filter($contextlist->get_contexts(), function($context) use ($userid) {
-            return $context->contextlevel == CONTEXT_USER && $context->instanceid == $userid;
+        $contexts = array_filter($contextlist->get_contexts(), function($context) {
+            if ($context->contextlevel == CONTEXT_COURSE) {
+                return $context;
+            }
         });
 
         foreach ($contexts as $context) {

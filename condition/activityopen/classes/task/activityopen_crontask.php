@@ -64,7 +64,7 @@ class activityopen_crontask extends scheduled_task {
         $conditions = notificationsagent::get_conditions_by_plugin($pluginname);
 
         foreach ($conditions as $condition) {
-            $courseid = $condition->courseid;
+            $courses = $condition->courses;
             $conditionid = $condition->id;
 
             $subplugin = new activityopen($condition->ruleid, $conditionid);
@@ -72,9 +72,12 @@ class activityopen_crontask extends scheduled_task {
             $context->set_params($subplugin->get_parameters());
             $context->set_complementary($subplugin->get_iscomplementary());
             $context->set_timeaccess($this->get_timestarted());
-            $context->set_courseid($courseid);
-
-            notificationsagent::generate_cache_triggers($subplugin, $context);
+            if (!empty($courses)) {
+                foreach ($courses as $courseid) {
+                    $context->set_courseid($courseid);
+                    notificationsagent::generate_cache_triggers($subplugin, $context);
+                }
+            }
         }
 
         \local_notificationsagent\helper\helper::custom_mtrace("Activity open end ");

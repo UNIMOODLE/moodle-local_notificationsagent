@@ -273,7 +273,8 @@ class rule {
      * Get the rules from index view
      *
      * @param context $context  context object
-     * @param integer $courseid course id
+     * @param int     $courseid course id
+     * @param int     $orderid  if of order
      *
      * @return array $instances Rule object
      */
@@ -281,17 +282,21 @@ class rule {
         $rules = [];
         $instances = [];
 
-        if ($courseid == SITEID) {
-            if (has_capability('local/notificationsagent:managesiterule', $context)) {
-                $rules = self::get_administrator_rules($courseid);
-            }
-        } else {
-            if (has_capability('local/notificationsagent:managecourserule', $context)) {
-                $rules = self::get_teacher_rules_index($courseid);
-            } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
-                $rules = self::get_owner_rules_by_course($courseid);
-            }
+        if (has_capability('local/notificationsagent:manageownrule', $context)) {
+            $rules = [...$rules, ...self::get_owner_rules()];
         }
+        if (has_capability('local/notificationsagent:viewcourserule', $context)
+            || has_capability(
+                'local/notificationsagent:managecourserule', $context
+            )
+        ) {
+            $rules = [...$rules, ...self::get_course_rules($courseid, true), ...self::get_course_rules_forced($courseid)];
+        }
+        if (has_capability('local/notificationsagent:manageallrule', $context)) {
+            $rules = [...$rules, ...self::get_course_rules($courseid), ...self::get_course_rules_forced($courseid)];
+        }
+
+        $rules = array_unique($rules, SORT_REGULAR);
 
         if (!empty($rules)) {
             foreach ($rules as $rule) {
@@ -300,7 +305,7 @@ class rule {
         }
         $order = 0;
         if ($orderid) {
-            switch($orderid) {
+            switch ($orderid) {
                 case 1:
                     $orderstring = 'status';
                     break;
@@ -343,7 +348,7 @@ class rule {
         $instances = [];
 
         if ($courseid != SITEID && has_capability('local/notificationsagent:managecourserule', $context)) {
-            $rules = self::get_teacher_rules_assign($courseid);
+            $rules = array_unique([...self::get_owner_rules(), ...self::get_course_rules_forced($courseid, 1)], SORT_REGULAR);
         }
 
         if (!empty($rules)) {
@@ -709,7 +714,7 @@ class rule {
      * Delete all triggers records of the rule
      *
      * @param int $courseid
-     * 
+     *
      * @return void
      */
     private function delete_triggers($courseid = null) {
@@ -1323,6 +1328,11 @@ class rule {
 
         $this->save_form_conditions_exceptions($data);
         $this->save_form_actions($data);
+
+        if ($data->courseid == SITEID) {
+            $this->delete_triggers();
+            $this->delete_cache();
+        }
         $transaction->allow_commit();
     }
 
@@ -1383,7 +1393,11 @@ class rule {
             }
         }
 
-        $this->delete_triggers($courseid);
+        // Delete triggers from concrete courseid, only if not SITEID
+        if ($courseid != SITEID) {
+            $this->delete_triggers($courseid);
+        }
+
         $this->save_form_triggers($data, $arraytimer, $context);
     }
 
@@ -1416,6 +1430,10 @@ class rule {
         global $USER;
 
         $courseid = $data->courseid;
+        if ($courseid == SITEID) {
+            return;
+        }
+
         if (!empty($arraytimer)) {
             $generictimer = $arraytimer[notificationsagent::GENERIC_USERID]["timer"] ?? null;
             $genericconditionid = $arraytimer[notificationsagent::GENERIC_USERID]["conditionid"] ?? null;
@@ -1554,7 +1572,7 @@ class rule {
             ['ruleid' => $this->get_id(), 'contextid' => CONTEXT_COURSE], '', 'objectid', 0, 1
         );
 
-        return reset($data)->objectid??0;
+        return reset($data)->objectid ?? 0;
     }
 
     /**
@@ -1663,19 +1681,6 @@ class rule {
     }
 
     /**
-     * Retrieves the administrator rules.
-     *
-     * @return array The administrator rules.
-     */
-    private static function get_administrator_rules() {
-        $siterules = self::get_site_rules();
-        $sharedrules = self::get_shared_rules();
-        $data = array_unique([...$siterules, ...$sharedrules], SORT_REGULAR);
-
-        return $data;
-    }
-
-    /**
      * Get the rules created in a site context
      *
      * @return array $data rules
@@ -1720,20 +1725,33 @@ class rule {
     /**
      * Get all rules related to a given course
      *
-     * @param integer $courseid Course id
+     * @param integer $courseid   Course id
+     * @param bool    $notstudent Filter
      *
      * @return array $data rules
      */
-    private static function get_course_rules($courseid) {
+    private static function get_course_rules($courseid, $notstudent = false) {
         global $DB;
 
         $data = [];
 
-        $sql = 'SELECT nr.id
+        $notstudentjoin = '';
+        if ($notstudent) {
+            $notstudentjoin = "JOIN {user} u ON nr.createdby = u.id AND u.suspended = 0 AND u.deleted = 0 
+                                JOIN {user_enrolments} ue ON ue.userid = u.id AND ue.status = 0
+                                JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = c.id AND e.status = 0
+                                JOIN {role_assignments} ra ON ra.userid = u.id
+                                JOIN {context} ct ON ct.id = ra.contextid AND ct.contextlevel = 50 AND ct.instanceid = c.id
+                                JOIN {role} r ON r.id = ra.roleid AND r.id != 5";
+        }
+
+        $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid  AND nr.deleted = 0
-                 WHERE nctx.objectid = :coursecontext
+                  JOIN {course} c ON nctx.objectid = c.id
+                  $notstudentjoin
+                 WHERE c.id = :coursecontext
                  UNION
                 SELECT nr.id
                   FROM {notificationsagent_rule} nr
@@ -1741,8 +1759,9 @@ class rule {
                    AND nctx.contextid = :categorycontextid AND nr.deleted = 0
                   JOIN {course_categories} cc ON nctx.objectid = cc.id
                   JOIN {course} c ON cc.id = c.category
+                  $notstudentjoin
                  WHERE c.id = :categorycontext
-        ';
+        ";
 
         $data = $DB->get_records_sql($sql, [
             'coursecontextid' => CONTEXT_COURSE,
@@ -1797,32 +1816,6 @@ class rule {
     }
 
     /**
-     * Get the teacher rules in index view
-     *
-     * @param integer $courseid Course id
-     *
-     * @return array $data rules
-     */
-    private static function get_teacher_rules_index($courseid) {
-        $ownerrulesbycourse = self::get_owner_rules_by_course($courseid);
-        $courserulesforced = self::get_course_rules_forced($courseid);// Only assign and forced.
-        return array_unique([...$ownerrulesbycourse, ...$courserulesforced], SORT_REGULAR);
-    }
-
-    /**
-     * Get the teacher rules in assign view
-     *
-     * @param integer $courseid Course id
-     *
-     * @return array $data rules
-     */
-    private static function get_teacher_rules_assign($courseid) {
-        $ownerrules = self::get_owner_rules();
-        $courserules = self::get_course_rules_forced($courseid, 1); // Only assign, not forced.
-        return array_unique([...$ownerrules, ...$courserules], SORT_REGULAR);
-    }
-
-    /**
      * Get the owner rules in a course
      *
      * @param integer $courseid Course id
@@ -1868,6 +1861,25 @@ class rule {
         $data = $DB->get_records_sql($sql, [
             'createdby' => $USER->id,
         ]);
+
+        return $data;
+    }
+
+    /**
+     * Get all rules.
+     *
+     * @return array An array containing all rules.
+     */
+    private static function get_all_rules() {
+        global $DB;
+
+        $data = [];
+
+        $sql = 'SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                 WHERE nr.deleted = 0
+        ';
+        $data = $DB->get_records_sql($sql);
 
         return $data;
     }
@@ -1946,7 +1958,12 @@ class rule {
         $hasdelete = false;
 
         $context = \context_course::instance($this->get_default_context(), IGNORE_MISSING);
-        if ($this->get_createdby() == $USER->id || ($context && has_capability('local/notificationsagent:managesiterule', $context))) {
+        if ($this->get_createdby() == $USER->id
+            || ($context
+                && has_capability(
+                    'local/notificationsagent:managesiterule', $context
+                ))
+        ) {
             $hasdelete = true;
         }
 
@@ -1979,7 +1996,7 @@ class rule {
                 'hours' => $hours,
                 'minutes' => $minutes,
             ]);
-        }else{
+        } else {
             $data = \local_notificationsagent\helper\helper::to_seconds_format(['days' => self::MINIMUM_RUNTIME]);
         }
 
@@ -2083,8 +2100,10 @@ class rule {
     /**
      * Check if the rule has been launched the maximum number of times given a course and userids.
      *
-     * @param integer $courseid Course identifier
-     * @param array   $userids  Users identifiers
+     * @param integer $courseid   Course identifier
+     * @param int     $ruleid     Id of rule
+     * @param int     $timesfired Fired times
+     * @param array   $userids    Users identifiers
      *
      * @return array  $users    Has the rule been launched the max. number of times by each user?
      */
@@ -2178,15 +2197,14 @@ class rule {
     /**
      * Order rules by field
      *
-     * @param array $rules 
+     * @param array  $rules
      * @param string $field Field order by.
-     * @param int $desc Desc or Asc.
-     * @param int $courseid
+     * @param int    $desc  Desc or Asc.
+     * @param int    $courseid
      *
      * @return array
      */
     public static function order_rules_by_field($rules, $field, $desc, $courseid) {
-
         if ($field == "broken") {
             usort($rules, function($a, $b) use ($courseid) {
                 if ($a->validation($courseid) && !$b->validation($courseid)) {
@@ -2200,7 +2218,7 @@ class rule {
         } else {
             if ($desc == 1) {
                 usort($rules, function($a, $b) use ($field, $courseid) {
-                    if ($b->$field - $a->$field == 0){
+                    if ($b->$field - $a->$field == 0) {
                         if ($a->validation($courseid) && !$b->validation($courseid)) {
                             return -1;
                         } else if (!$a->validation($courseid) && $b->validation($courseid)) {
@@ -2213,7 +2231,7 @@ class rule {
                 });
             } else {
                 usort($rules, function($a, $b) use ($field, $courseid) {
-                    if ($b->$field - $a->$field == 0){
+                    if ($b->$field - $a->$field == 0) {
                         if ($a->validation($courseid) && !$b->validation($courseid)) {
                             return -1;
                         } else if (!$a->validation($courseid) && $b->validation($courseid)) {
@@ -2242,13 +2260,12 @@ class rule {
         $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleid], '*', IGNORE_MISSING);
         $username = \core_user::get_user($rule->createdby)->firstname;
         $courseid = $DB->get_record('notificationsagent_context', ['ruleid' => $ruleid], '*', IGNORE_MULTIPLE
-        , MUST_EXIST, 0 , 1)->objectid;
+            , MUST_EXIST, 0, 1)->objectid;
         $coursename = $DB->get_record('course', ['id' => $courseid], 'shortname')->shortname;
         return [
             'username' => $username,
-            'coursename' => $coursename
+            'coursename' => $coursename,
         ];
     }
-
 
 }

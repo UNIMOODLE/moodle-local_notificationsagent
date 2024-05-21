@@ -53,9 +53,7 @@ return new class extends phpunit_coverage_info {
         = [
             'lang',
             'condition/*/lang',
-            'condition/*/classes/privacy',
             'action/*/lang',
-            'action/*/classes/privacy',
             'classes/helper/test',
         ];
 

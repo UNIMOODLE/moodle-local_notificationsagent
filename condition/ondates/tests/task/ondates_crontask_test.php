@@ -121,7 +121,7 @@ class ondates_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = null;
+        $objdb->parameters = '{"startdate":1715292000,"enddate":1717192799}';
         $objdb->cmid = 3;
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
@@ -132,10 +132,9 @@ class ondates_crontask_test extends \advanced_testcase {
         $task->set_timestarted($date);
         $result = $task->execute();
 
-        $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
 
-        if (!ondates::is_ondates($date)) {
+        if (!ondates::is_ondates($date, 1715292000, 1717192799)) {
             $this->assertNull($result);
         } else {
             $this->assertEquals(self::$course->id, $trigger->courseid);
@@ -151,6 +150,8 @@ class ondates_crontask_test extends \advanced_testcase {
             [1706182049],
             [1705741200],
             [1705827600],
+            [1716587999],
+            [1716847199],
         ];
     }
 

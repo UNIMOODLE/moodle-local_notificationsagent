@@ -60,74 +60,57 @@ class notificationsagent {
     public static function get_conditions_by_course($pluginname, $courseid) {
         global $DB;
 
+        $coursesbycategory = [];
         $data = [];
 
-        $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname
-                                     FROM {notificationsagent_rule} nr
-                                     JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                                      AND nr.status = 0 AND nr.template = 1 AND nr.deleted = 0
-                                     JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
-                                    WHERE nc.pluginname = :pluginname
-                                      AND (nctx.contextid = :categorycontextid
-                                       OR (nctx.contextid = :coursecontextid
-                                      AND nctx.objectid != :siteid))
+        $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname, nctx.contextid, nctx.objectid
+                            FROM {notificationsagent_condition} nc
+                            JOIN {notificationsagent_rule} nr ON nc.ruleid = nr.id
+                             AND nr.status = 0 AND nr.template = 1 AND nr.deleted = 0
+                            JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
+                             AND ((nctx.contextid = :categorycontextid)
+                              OR (nctx.contextid = :coursecontextid AND nctx.objectid = :courseid))
+                            JOIN {course} c ON nctx.objectid = c.id
+                           WHERE nc.pluginname = :pluginname
         ';
-        $conditions = $DB->get_records_sql(
+        $conditions = $DB->get_recordset_sql(
             $conditionssql, [
                 'pluginname' => $pluginname,
                 'categorycontextid' => CONTEXT_COURSECAT,
                 'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
+                'courseid' => $courseid,
             ]
         );
 
-        foreach ($conditions as $condition) {
-            $coursesql = '';
-            $categorysql = '';
+        if ($conditions->valid()) {
+            foreach ($conditions as $condition) {
+                $conditionid = $condition->id;
+                
+                if (isset($data[$conditionid])) {
+                    continue;
+                }
+                
+                $contextid = $condition->contextid;
+                $objectid = $condition->objectid;
+                if ($contextid == CONTEXT_COURSE) {
+                    $data[$conditionid] = $condition;
+                    continue;
+                }
+                
+                // If is category, search the courses inside it
+                if (!isset($coursesbycategory[$objectid])) {
+                    $coursecat = \core_course_category::get($objectid);
+                    $coursecategories = $coursecat->get_courses(['recursive' => 1]);
+                    $coursesbycategory[$objectid] = array_column($coursecategories, 'id');
+                }
 
-            $coursecategories = self::get_course_category_context_byruleid($condition->ruleid);
-            $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'nctx.objectid');
-            $coursesql = "SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid, nc.parameters,
-                                 nr.timesfired AS ruletimesfired,
-                                 nc.pluginname, nctx.objectid AS courseid
-                            FROM {notificationsagent_rule} nr
-                            JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
-                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           WHERE nc.id = :courseconditionid
-                             AND nctx.contextid = :coursecontextid
-                             AND nctx.objectid = :coursecontext
-            ";
-            $params = [
-                'courseconditionid' => $condition->id,
-                'coursecontextid' => CONTEXT_COURSE,
-                'coursecontext' => $courseid,
-            ];
-
-            if (in_array($courseid, $coursecategories)) {
-                $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'data.courseid');
-                $categorysql = "UNION
-                               SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid, nc.parameters,
-                                      nr.timesfired AS ruletimesfired,
-                                      nc.pluginname, data.courseid AS courseid
-                                 FROM {notificationsagent_rule} nr
-                                 JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           CROSS JOIN (
-                               SELECT c.id AS courseid
-                                 FROM {course} c
-                                WHERE c.id = :categorycontext
-                            ) AS data
-                                WHERE nc.id = :categoryconditionid";
-                $params['courseconditionid'] = $condition->id;
-                $params['coursecontextid'] = CONTEXT_COURSE;
-                $params['coursecontext'] = $courseid;
-                $params['categorycontext'] = $courseid;
-                $params['categoryconditionid'] = $condition->id;
+                if (in_array($courseid, $coursesbycategory[$objectid])) {
+                    $data[$conditionid] = $condition;
+                }
             }
-            $result = $DB->get_records_sql($coursesql . $categorysql, $params);
-
-            $data = array_merge($data, $result);
         }
+
+        $conditions->close();
 
         return $data;
     }
@@ -144,27 +127,62 @@ class notificationsagent {
     public static function get_conditions_by_cm($pluginname, $courseid, $cmid) {
         global $DB;
 
-        $conditionssql = 'SELECT nc.id, nc.ruleid, nr.timesfired AS ruletimesfired, nc.parameters, nc.pluginname, nc.cmid
-                            FROM {notificationsagent_rule} nr
-                            JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nctx.contextid = :coursecontextid AND nctx.objectid = :courseid
-                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                             AND nc.cmid = :cmid AND nc.pluginname = :pluginname
-                           WHERE nr.status = 0
-                             AND nr.template = 1
-                             AND nr.deleted = 0
+        $coursesbycategory = [];
+        $data = [];
+
+        $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname, nctx.contextid, nctx.objectid
+                            FROM {notificationsagent_condition} nc
+                            JOIN {notificationsagent_rule} nr ON nc.ruleid = nr.id
+                             AND nr.status = 0 AND nr.template = 1 AND nr.deleted = 0
+                            JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
+                             AND ((nctx.contextid = :categorycontextid)
+                              OR (nctx.contextid = :coursecontextid AND nctx.objectid = :courseid))
+                            JOIN {course} c ON nctx.objectid = c.id
+                           WHERE nc.pluginname = :pluginname
+                             AND nc.cmid = :cmid
         ';
-        $conditions = $DB->get_records_sql(
-            $conditionssql,
-            [
-                'coursecontextid' => CONTEXT_COURSE,
+        $conditions = $DB->get_recordset_sql(
+            $conditionssql, [
                 'pluginname' => $pluginname,
+                'categorycontextid' => CONTEXT_COURSECAT,
+                'coursecontextid' => CONTEXT_COURSE,
                 'courseid' => $courseid,
                 'cmid' => $cmid,
             ]
         );
 
-        return $conditions;
+        if ($conditions->valid()) {
+            foreach ($conditions as $condition) {
+                $conditionid = $condition->id;
+
+                if (isset($data[$conditionid])) {
+                    continue;
+                }
+
+                $contextid = $condition->contextid;
+                $objectid = $condition->objectid;
+                
+                if ($contextid == CONTEXT_COURSE) {
+                    $data[$conditionid] = $condition;
+                    continue;
+                }
+                
+                // If is category, search the courses inside it
+                if (!isset($coursesbycategory[$objectid])) {
+                    $coursecat = \core_course_category::get($objectid);
+                    $coursecategories = $coursecat->get_courses(['recursive' => 1]);
+                    $coursesbycategory[$objectid] = array_column($coursecategories, 'id');
+                }
+
+                if (in_array($courseid, $coursesbycategory[$objectid])) {
+                    $data[$conditionid] = $condition;
+                }
+            }
+        }
+
+        $conditions->close();
+
+        return $data;
     }
 
     /**
@@ -179,70 +197,33 @@ class notificationsagent {
 
         $data = [];
 
-        $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname
-                                     FROM {notificationsagent_rule} nr
-                                     JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                                      AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
-                                     JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
-                                    WHERE nc.pluginname = :pluginname
-                                      AND (nctx.contextid = :categorycontextid
-                                       OR (nctx.contextid = :coursecontextid
-                                      AND nctx.objectid != :siteid))
+        $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters
+                            FROM {notificationsagent_rule} nr
+                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
+                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
+                           WHERE nc.pluginname = :pluginname
         ';
-        $conditions = $DB->get_records_sql(
+        $conditions = $DB->get_recordset_sql(
             $conditionssql, [
                 'pluginname' => $pluginname,
-                'categorycontextid' => CONTEXT_COURSECAT,
-                'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
             ]
         );
 
-        foreach ($conditions as $condition) {
-            $coursesql = '';
-            $categorysql = '';
-            $coursecategories = self::get_course_category_context_byruleid($condition->ruleid);
-            $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'nctx.objectid');
-            $coursesql = "SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid,
-                                 nr.timesfired AS ruletimesfired,
-                                 nc.parameters, nc.pluginname, nctx.objectid AS courseid
-                            FROM {notificationsagent_rule} nr
-                            JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1 AND nr.deleted = 0
-                             AND (nctx.contextid = :coursecontextid AND nctx.objectid != :siteid)
-                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                             AND nc.id = :courseconditionid
-            ";
-            $params = [
-                'courseconditionid' => $condition->id,
-                'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
-            ];
+        $coursesbyrule = [];
 
-            if (!empty($coursecategories)) {
-                [$incourses, $params] = $DB->get_in_or_equal($coursecategories, SQL_PARAMS_NAMED);
-                $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'data.courseid');
-                $categorysql = "UNION
-                               SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid,
-                                      nr.timesfired AS ruletimesfired,
-                                      nc.parameters, nc.pluginname, data.courseid
-                                 FROM {notificationsagent_rule} nr
-                                 JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           CROSS JOIN (
-                               SELECT c.id AS courseid
-                                 FROM {course} c
-                                WHERE c.id $incourses
-                            ) AS data
-                                WHERE nc.id = :categoryconditionid";
-                $params['courseconditionid'] = $condition->id;
-                $params['coursecontextid'] = CONTEXT_COURSE;
-                $params['siteid'] = SITEID;
-                $params['categoryconditionid'] = $condition->id;
+        if ($conditions->valid()) {
+            foreach ($conditions as $condition) {
+                $conditionid = $condition->id;
+                $ruleid = $condition->ruleid;
+                if(!isset($coursesbyrule[$ruleid])){
+                    $coursesbyrule[$ruleid] = self::get_all_courses_by_ruleid($ruleid);
+                }
+                $condition->courses = $coursesbyrule[$ruleid];
+                $data[$conditionid] = $condition;
             }
-            $result = $DB->get_records_sql($coursesql . $categorysql, $params);
-
-            $data = array_merge($data, $result);
         }
+
+        $conditions->close();
 
         return $data;
     }
@@ -257,76 +238,40 @@ class notificationsagent {
 
         $data = [];
 
-        $conditionssql = 'SELECT DISTINCT nc.id, nr.id AS ruleid, nc.pluginname
-                            FROM {notificationsagent_rule} nr
-                            JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
-                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
-                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           WHERE (nctx.contextid = :categorycontextid
-                              OR (nctx.contextid = :coursecontextid
-                             AND nctx.objectid != :siteid))
-                             AND nc.pluginname = :plugin
-                             AND NOT EXISTS (
-                                SELECT ncaux.id, nraux.id AS ruleid
-                                FROM {notificationsagent_rule} nraux
-                                JOIN {notificationsagent_condition} ncaux ON nraux.id = ncaux.ruleid
-                                WHERE nraux.id = nr.id AND ncaux.pluginname != :pluginaux
-                            )
+        $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters
+                                     FROM {notificationsagent_rule} nr
+                                     JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
+                                      AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
+                                    WHERE nc.pluginname = :pluginname
+                                    AND NOT EXISTS (
+                                        SELECT ncaux.id, nraux.id AS ruleid
+                                        FROM {notificationsagent_rule} nraux
+                                        JOIN {notificationsagent_condition} ncaux ON nraux.id = ncaux.ruleid
+                                        WHERE nraux.id = nr.id AND ncaux.pluginname != :pluginnameaux
+                                    )
         ';
-        $conditions = $DB->get_records_sql(
+        $conditions = $DB->get_recordset_sql(
             $conditionssql, [
-                'categorycontextid' => CONTEXT_COURSECAT,
-                'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
-                'plugin' => self::CONDITION_AVAILABILITY,
-                'pluginaux' => self::CONDITION_AVAILABILITY,
+                'pluginname' => self::CONDITION_AVAILABILITY,
+                'pluginnameaux' => self::CONDITION_AVAILABILITY,
             ]
         );
 
-        foreach ($conditions as $condition) {
-            $coursesql = '';
-            $categorysql = '';
-            $coursecategories = self::get_course_category_context_byruleid($condition->ruleid);
-            $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'nctx.objectid');
-            $coursesql = "SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid,
-                                 nr.timesfired AS ruletimesfired, nctx.objectid AS courseid
-                            FROM {notificationsagent_rule} nr
-                            JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                             AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
-                            JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           WHERE nc.id = :courseconditionid
-                             AND (nctx.contextid = :coursecontextid
-                             AND nctx.objectid != :siteid)
-            ";
-            $params = [
-                'courseconditionid' => $condition->id,
-                'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
-            ];
+        $coursesbyrule = [];
 
-            if (!empty($coursecategories)) {
-                [$incourses, $params] = $DB->get_in_or_equal($coursecategories, SQL_PARAMS_NAMED);
-                $uniqueidsql = $DB->sql_concat('nr.id', "'_'", 'nc.id', "'_'", 'data.courseid');
-                $categorysql = "UNION
-                               SELECT $uniqueidsql AS uniqueid, nc.id, nr.id AS ruleid,
-                                      nr.timesfired AS ruletimesfired, data.courseid
-                                 FROM {notificationsagent_rule} nr
-                                 JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
-                           CROSS JOIN (
-                               SELECT c.id AS courseid
-                                 FROM {course} c
-                                WHERE c.id $incourses
-                            ) AS data
-                                WHERE nc.id = :categoryconditionid";
-                $params['courseconditionid'] = $condition->id;
-                $params['coursecontextid'] = CONTEXT_COURSE;
-                $params['siteid'] = SITEID;
-                $params['categoryconditionid'] = $condition->id;
+        if ($conditions->valid()) {
+            foreach ($conditions as $condition) {
+                $conditionid = $condition->id;
+                $ruleid = $condition->ruleid;
+                if(!isset($coursesbyrule[$ruleid])){
+                    $coursesbyrule[$ruleid] = self::get_all_courses_by_ruleid($ruleid);
+                }
+                $condition->courses = $coursesbyrule[$ruleid];
+                $data[$conditionid] = $condition;
             }
-            $result = $DB->get_records_sql($coursesql . $categorysql, $params);
-
-            $data = array_merge($data, $result);
         }
+
+        $conditions->close();
 
         return $data;
     }
@@ -366,6 +311,56 @@ class notificationsagent {
     }
 
     /**
+     * Get the courses associated with the category context given a ruleid
+     *
+     * @param int $id Rule id
+     *
+     * @return array $data Courses where the rule is applied
+     */
+    public static function get_all_courses_by_ruleid($id) {
+        global $DB;
+
+        $data = [];
+
+        $sqlcategoryctx = 'SELECT nctx.contextid, nctx.objectid
+                             FROM {notificationsagent_rule} nr
+                             JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                          AND NOT (nctx.contextid = :coursecontextid AND nctx.objectid = :siteid)
+                            WHERE nr.id = :ruleid
+                              AND nr.status = 0 AND nr.template = 1  AND nr.deleted = 0
+        ';
+        $contexts = $DB->get_records_sql($sqlcategoryctx, [
+            'coursecontextid' => CONTEXT_COURSE,
+            'siteid' => SITEID,
+            'ruleid' => $id,
+        ]);
+
+        if (!empty($contexts)) {
+            foreach ($contexts as $context) {
+                $contextid = $context->contextid;
+                $objectid = $context->objectid;
+                if ($contextid == CONTEXT_COURSE) {
+                    $data[$objectid] = $objectid;
+                    continue;
+                }
+
+                if ($contextid == CONTEXT_COURSECAT) {
+                    $coursecat = \core_course_category::get($objectid);
+                    $coursecategories = $coursecat->get_courses(['recursive' => 1]);
+                    $coursesid = array_column($coursecategories, 'id');
+                    if (!empty($coursesid)) {
+                        foreach ($coursesid as $courseid) {
+                            $data[$courseid] = $courseid;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Retrieves users by course from the database.
      *
      * @param mixed $context
@@ -380,10 +375,13 @@ class notificationsagent {
     }
 
     /**
+     *
      * Set timer cache in the notifications agent cache table.
      *
+     * @param array $deletedata
+     * @param array $insertdata
      *
-     * @return int|null The ID of the inserted or updated record, or null if no action was taken.
+     * @return void
      */
     public static function set_timer_cache($deletedata, $insertdata) {
         global $DB;
@@ -399,6 +397,10 @@ class notificationsagent {
     /**
      * Set a time trigger for a specific rule, condition, user, and course.
      *
+     * @param array $deletedata
+     * @param array $insertdata
+     *
+     * @return void
      */
     public static function set_time_trigger($deletedata, $insertdata) {
         global $DB;
@@ -440,7 +442,7 @@ class notificationsagent {
                 [$userid]
             );
             if (!$userslimit[$userid]
-                && !self::is_ruleoff($subplugin->rule->id, $userid)
+                && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
                 $cache = $subplugin->estimate_next_time($context);
@@ -484,7 +486,7 @@ class notificationsagent {
             foreach ($users as $user) {
                 if (
                     !$userslimit[$user->id]
-                    && !self::is_ruleoff($subplugin->rule->id, $user->id)
+                    && !self::is_ruleoff($subplugin->rule->id, $user->id, $courseid)
                 ) {
                     $context->set_userid($user->id);
                     $cache = $subplugin->estimate_next_time($context);
@@ -526,7 +528,7 @@ class notificationsagent {
             );
 
             if (!$userslimit[$userid]
-                && !self::is_ruleoff($subplugin->rule->id, $userid)
+                && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
                 $cache = $subplugin->estimate_next_time($context);
@@ -620,16 +622,18 @@ class notificationsagent {
      *
      * @param int $ruleid Rule id
      * @param int $userid User id
+     * @param int $courseid Course id
      *
      * @return bool
      */
-    public static function is_ruleoff($ruleid, $userid) {
+    public static function is_ruleoff($ruleid, $userid, $courseid) {
         global $DB;
         $ruleoff = $DB->get_field(
             'notificationsagent_triggers', 'MAX(ruleoff)',
             [
                 'ruleid' => $ruleid,
                 'userid' => $userid,
+                'courseid' => $courseid,
             ]
         );
 

@@ -534,9 +534,8 @@ class notificationsagent_test extends \advanced_testcase {
 
         $data = $data[key($data)];
         $this->assertEquals(self::$rule->get_id(), $data->ruleid);
-        $this->assertEquals(self::$course->id, $data->courseid);
         $this->assertEquals($pluginname, $data->pluginname);
-
+        $this->assertEquals(self::$course->category, $data->objectid);
     }
 
     /**
@@ -578,10 +577,8 @@ class notificationsagent_test extends \advanced_testcase {
 
         $this->assertEquals($instance->get_id(), $conditions->ruleid);
         $this->assertEquals($pluginname, $conditions->pluginname);
-        $this->assertEquals(self::CMID, $conditions->cmid);
-        $this->assertEquals($instance->get_timesfired(), $conditions->ruletimesfired);
+        $this->assertEquals(self::$course->id, $conditions->objectid);
         $this->assertEquals($instance->get_conditions($pluginname)[$conditionid]->get_parameters(), $conditions->parameters);
-
     }
 
     /**
@@ -631,9 +628,7 @@ class notificationsagent_test extends \advanced_testcase {
         $result = $result[key($result)];
 
         $this->assertEquals($instance->get_id(), $result->ruleid);
-        $this->assertEquals(self::$course->id, $result->courseid);
-        $this->assertEquals($pluginname, $result->pluginname);
-        $this->assertEquals($instance->get_timesfired(), $result->ruletimesfired);
+        $this->assertTrue(in_array(self::$course->id, $result->courses));
         $this->assertEquals($instance->get_conditions($pluginname)[$conditionid]->get_parameters(), $result->parameters);
 
     }
@@ -683,8 +678,7 @@ class notificationsagent_test extends \advanced_testcase {
         $data = $data[key($data)];
 
         $this->assertEquals($rule->get_id(), $data->ruleid);
-        $this->assertEquals(self::$course->id, $data->courseid);
-        $this->assertEquals($rule->get_timesfired(), $data->ruletimesfired);
+        $this->assertTrue(in_array(self::$course->id, $data->courses));
 
     }
 
@@ -759,7 +753,7 @@ class notificationsagent_test extends \advanced_testcase {
         $cacheid = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
         $this->assertIsNumeric($cacheid);
 
-        $this->assertSame($expected, notificationsagent::is_ruleoff(self::$rule->get_id(), self::$user->id));
+        $this->assertSame($expected, notificationsagent::is_ruleoff(self::$rule->get_id(), self::$user->id, $courseid));
 
     }
 

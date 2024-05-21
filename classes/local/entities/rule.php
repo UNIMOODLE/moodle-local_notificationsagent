@@ -137,8 +137,8 @@ class rule extends base {
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(true)
             ->add_field("{$actionealias}.pluginname")
-            ->add_callback(static function(string $plugigname): string {
-                return get_string('pluginname', 'notificationsaction_' . $plugigname);
+            ->add_callback(static function(string $pluginname): string {
+                return get_string('pluginname', 'notificationsaction_' . $pluginname);
             });
 
         $columns[] = (new column(
@@ -152,8 +152,8 @@ class rule extends base {
             ->add_callback(static function($str): string {
                 $json = json_decode($str, true);
                 $result = '';
-                if($json == null){
-                   return $result ;
+                if ($json == null) {
+                    return $result;
                 }
                 foreach ($json as $key => $value) {
                     $result .= "  " . $key . " : " . mb_convert_encoding($value, 'UTF-8');
