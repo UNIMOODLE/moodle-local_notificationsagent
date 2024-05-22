@@ -707,17 +707,19 @@ class notificationsagent {
     public static function bulk_delete_conditions_by_userid($conditionids, $userid) {
         global $DB;
 
-        list($conditionsql, $params) = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
-        $params = ['userid' => $userid] + $params;
+        if (!empty($conditionids)) {
+            list($conditionsql, $params) = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
+            $params = ['userid' => $userid] + $params;
 
-        $DB->delete_records_select(
-            'notificationsagent_cache',
-            "userid = :userid AND conditionid {$conditionsql}", $params
-        );
-        $DB->delete_records_select(
-            'notificationsagent_triggers',
-            "userid = :userid AND conditionid {$conditionsql}", $params
-        );
+            $DB->delete_records_select(
+                'notificationsagent_cache',
+                "userid = :userid AND conditionid {$conditionsql}", $params
+            );
+            $DB->delete_records_select(
+                'notificationsagent_triggers',
+                "userid = :userid AND conditionid {$conditionsql}", $params
+            );
+        }
     }
 
     /**
