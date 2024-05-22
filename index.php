@@ -207,6 +207,7 @@ foreach ($rules as $rule) {
     $rulecontent[] = [
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
+        'owner' => $rule->get_owner(),
         'status' => $rule->get_status(),
         'status_lang' => 
             !$rule->validation($courseid) ? get_string('status_broken', 'local_notificationsagent') :

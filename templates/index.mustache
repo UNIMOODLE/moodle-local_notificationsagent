@@ -65,10 +65,10 @@
         <a href="{{{url.reporturl}}}" class="btn btn-outline-primary mr-3">{{#str}}editrule_reports, local_notificationsagent{{/str}}</a>
     {{/capabilities.report}}
     <div class="d-flex flex-wrap ml-auto align-items-end">
-        <button type="button" id="applyordergroupbtn" class="btn btn-outline-primary mr-3">
+        <button type="button" id="applyordergroupbtn" class="btn btn-outline-primary mr-2">
             {{#str}}editrule_orderby, local_notificationsagent{{/str}}
         </button>
-        <select id="orderrulesid" class="select custom-select mr-3">
+        <select id="orderrulesid" class="select custom-select">
             <option value="1">{{#str}}status_active, local_notificationsagent{{/str}}</option>
             <option value="2">{{#str}}status_paused, local_notificationsagent{{/str}}</option>
             <option value="3">{{#str}}status_required, local_notificationsagent{{/str}}</option>
@@ -100,7 +100,10 @@
                         </div>
                     {{/isrule}}
                 </div>
-                <h5 class="name mt-4">{{{ name }}}</h5>
+                <div class="d-flex flex-column justify-content-between">
+                    <h5 class="name mt-4 mb-1">{{{ name }}}</h5>
+                    <span class="createby d-flex align-items-center"><i class="fa fa-user mr-1"></i>{{{ owner }}}</span>
+                </div>
             </div>
             <div class="card-body d-flex flex-column mx-3 my-2 p-0">
                 <div class="card-content">

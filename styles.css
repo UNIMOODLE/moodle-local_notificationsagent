@@ -68,6 +68,15 @@ body.path-local-notificationsagent .d-flex>.card[id^="card-"] .name{
     font-weight: 600;
 }
 
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .createby{
+    font-size: 14px;
+    color: gray;
+}
+
+body.path-local-notificationsagent .d-flex>.card[id^="card-"] .createby > i.fa-user{
+    line-height: 13px;
+}
+
 body.path-local-notificationsagent .d-flex>.card[id^="card-"] .card-body{
     overflow-y: auto;
 }

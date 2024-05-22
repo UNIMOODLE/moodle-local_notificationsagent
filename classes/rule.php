@@ -1583,7 +1583,7 @@ class rule {
      * @return void
      */
     public function update($data) {
-        global $DB;
+        global $DB, $USER;
 
         $this->set_name($data->title);
 
@@ -1599,6 +1599,10 @@ class rule {
         $record->name = $this->get_name();
         $record->timesfired = $this->get_timesfired();
         $record->runtime = $this->get_runtime();
+
+        if (!has_capability('local/notificationsagent:manageallrule', context_course::instance($data->courseid), $USER->id)) {
+            $record->createdby = $USER->id;
+        }
 
         $DB->update_record('notificationsagent_rule', $record);
     }
@@ -2268,4 +2272,12 @@ class rule {
         ];
     }
 
+    /**
+     * Get the owner of the rule
+     *
+     * @return string $owner owner's fullname
+     */
+    public function get_owner() {
+        return fullname(\core_user::get_user($this->get_createdby(), '*', MUST_EXIST));
+    }
 }
