@@ -329,8 +329,8 @@ class helper {
         $message->userfrom = \core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
         $message->userto = $userid;
         $message->subject = $title;
-        $message->fullmessage = format_text($text); // Será nuestro BBBB.
-        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessage = format_text($text);
+        $message->fullmessageformat = FORMAT_MOODLE;
         $message->fullmessagehtml = format_text('<p>' . $text . '</p>');
         $message->smallmessage = shorten_text(format_text($text));
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
@@ -344,5 +344,39 @@ class helper {
         // The integer ID of the new message or false if there was a problem (with submitted data or sending the message to the
         // message processor).
         return message_send($message);
+    }
+
+    /**
+     * Get default capabilities.
+     *
+     * @param \context $context The course context in which to check the capability.
+     * 
+     * @return array $capabilities Default value for capabilities.
+     */
+    public static function get_default_capabilities($context) {
+        return [
+            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
+            'export' => has_capability('local/notificationsagent:exportrule', $context),
+        ];
+    }
+
+    /**
+     * Get capabilities for a given context.
+     *
+     * @param \context $context The course context in which to check the capability.
+     *
+     * @return array $capabilities The capabilities of the rule.
+     */
+    public static function get_capabilities($context) {
+        return [
+            'resume' => has_capability('local/notificationsagent:updaterulestatus', $context),
+            'edit' => has_capability('local/notificationsagent:editrule', $context),
+            'delete' => has_capability('local/notificationsagent:deleterule', $context),
+            'assign' => has_capability('local/notificationsagent:assignrule', $context),
+            'export' => has_capability('local/notificationsagent:exportrule', $context),
+            'force' => has_capability('local/notificationsagent:forcerule', $context),
+            'share' => has_capability('local/notificationsagent:updateruleshare', $context),
+            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
+        ];
     }
 }

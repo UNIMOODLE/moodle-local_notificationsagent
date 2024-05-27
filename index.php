@@ -227,8 +227,8 @@ foreach ($rules as $rule) {
         'candelete' => $rule->can_delete(),
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
-            ? ($rule->get_shared() == 0
-            ? ($courseid == 1 ? get_string('cardsharedby', 'local_notificationsagent', rule::get_coursename_and_username_by_rule_id($rule->get_id())) : get_string('type_sharedrule','local_notificationsagent'))
+            ? (($rule->get_shared() == 0 && !empty($rule->get_coursename_and_username_by_rule()))
+            ? ($courseid == SITEID ? $rule->get_coursename_and_username_by_rule() : get_string('type_sharedrule','local_notificationsagent'))
             : get_string('type_rule', 'local_notificationsagent')
             )
             : get_string('type_template', 'local_notificationsagent'),
@@ -246,16 +246,7 @@ foreach ($rules as $rule) {
         'exporturl' => new moodle_url(
             "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
         ),
-        'capabilities' => [
-            'edit' => has_capability('local/notificationsagent:editrule', $context),
-            'delete' => has_capability('local/notificationsagent:deleterule', $context),
-            'resume' => has_capability('local/notificationsagent:updaterulestatus', $context),
-            'assign' => has_capability('local/notificationsagent:assignrule', $context),
-            'export' => has_capability('local/notificationsagent:exportrule', $context),
-            'force' => has_capability('local/notificationsagent:forcerule', $context),
-            'share' => has_capability('local/notificationsagent:updateruleshare', $context),
-            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
-        ],
+        'capabilities' => $rule->get_card_options($courseid)
     ];
 }
 

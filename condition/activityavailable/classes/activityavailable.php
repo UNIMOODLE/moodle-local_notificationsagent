@@ -76,14 +76,13 @@ class activityavailable extends notificationconditionplugin {
         $userid = $context->get_userid();
         $params = json_decode($context->get_params());
         $cmid = $params->{self::UI_ACTIVITY};
-
         $available = false;
-        if ($cmid && ($cm = get_fast_modinfo($courseid)->get_cm($cmid)) && $cm->visible) {
-            $infoclass = new custominfo($courseid, $cm->availability);
-            $variable = '';
-            $available = $infoclass->is_available($variable, false, $userid);
+        if ($cmid) {
+            $cm = get_fast_modinfo($courseid, $userid)->get_cm($cmid);
+            if ($cm->visible && $cm->available) {
+                $available = true;
+            }
         }
-
         return $available;
     }
 

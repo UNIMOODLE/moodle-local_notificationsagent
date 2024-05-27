@@ -282,8 +282,12 @@ class rule {
         $rules = [];
         $instances = [];
 
+        if ($courseid == SITEID && has_capability('local/notificationsagent:managesiterule', $context)) {
+            $rules = [...$rules, ...self::get_shared_rules()];
+        }
+
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
-            $rules = [...$rules, ...self::get_owner_rules()];
+            $rules = [...$rules, ...self::get_course_rules($courseid)];
         }
         if (has_capability('local/notificationsagent:viewcourserule', $context)
             || has_capability(
@@ -2253,23 +2257,23 @@ class rule {
     }
 
     /**
-     * Return username and coursename by rule id
-     *
-     * @param int $ruleid The rule id.
+     * Return username and coursename by rule.
      *
      * @return array
      */
-    public static function get_coursename_and_username_by_rule_id($ruleid) {
-        global $DB;
-        $rule = $DB->get_record('notificationsagent_rule', ['id' => $ruleid], '*', IGNORE_MISSING);
-        $username = \core_user::get_user($rule->createdby)->firstname;
-        $courseid = $DB->get_record('notificationsagent_context', ['ruleid' => $ruleid], '*', IGNORE_MULTIPLE
-            , MUST_EXIST, 0, 1)->objectid;
-        $coursename = $DB->get_record('course', ['id' => $courseid], 'shortname')->shortname;
-        return [
-            'username' => $username,
-            'coursename' => $coursename,
-        ];
+    public function get_coursename_and_username_by_rule() {
+        $username = $this->get_owner();
+        //$coursename = get_course($this->get_default_context())->shortname;
+        $data = [];
+        if ($coursename = get_course($this->get_default_context())) {
+            $data = [
+                'username' => $username,
+                'coursename' => $coursename->shortname,
+            ];
+            return get_string('cardsharedby', 'local_notificationsagent', $data);
+        }
+        return '';
+        
     }
 
     /**
@@ -2279,5 +2283,26 @@ class rule {
      */
     public function get_owner() {
         return fullname(\core_user::get_user($this->get_createdby(), '*', MUST_EXIST));
+    }
+
+    /**
+     * Get the capabilities of the rule.
+     *
+     * @param int $courseid The course id.
+     *
+     * @return array $capabilities The capabilities of the rule.
+     */
+    public function get_card_options($courseid) {
+        global $USER;
+
+        $context = \context_course::instance($courseid);
+        $isownrule = $this->get_createdby() == $USER->id;
+        $hasmanagecourserule = has_capability('local/notificationsagent:managecourserule', $context);
+
+        $capabilities = $isownrule || $hasmanagecourserule
+            ? \local_notificationsagent\helper\helper::get_capabilities($context)
+            : \local_notificationsagent\helper\helper::get_default_capabilities($context);
+
+        return $capabilities;
     }
 }
