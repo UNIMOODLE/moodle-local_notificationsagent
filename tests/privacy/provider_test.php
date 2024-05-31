@@ -22,7 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version details
+  * Version details
  *
  * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE

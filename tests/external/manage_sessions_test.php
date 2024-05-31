@@ -145,6 +145,7 @@ class manage_sessions_test extends \advanced_testcase {
      *
      * @param int    $user
      * @param int    $useinstance
+     * @param int    $orderid
      * @param string $expected
      *
      * @return void
@@ -173,7 +174,7 @@ class manage_sessions_test extends \advanced_testcase {
         $result = external_api::clean_returnvalue(manage_sessions::execute_returns(), $result);
 
         $this->assertEquals($expected, $result['orderid']);
-        
+
     }
 
     /**

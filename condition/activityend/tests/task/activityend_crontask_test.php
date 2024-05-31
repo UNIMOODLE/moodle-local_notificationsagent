@@ -105,6 +105,7 @@ class activityend_crontask_test extends \advanced_testcase {
      * Execute test
      *
      * @param int $date
+     * @param int $user
      *
      * @covers       \notificationscondition_activityend\task\activityend_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace

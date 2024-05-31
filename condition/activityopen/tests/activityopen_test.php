@@ -440,4 +440,24 @@ class activityopen_test extends \advanced_testcase {
             isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_activityopen\activityopen::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestaa = $quizgenerator->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            'visible' => true,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmtestaa->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
+
 }

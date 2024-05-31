@@ -488,4 +488,23 @@ class activitylastsend_test extends \advanced_testcase {
         ];
     }
 
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_activitylastsend\activitylastsend::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestaa = $quizgenerator->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            'visible' => true,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmtestaa->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
+
 }

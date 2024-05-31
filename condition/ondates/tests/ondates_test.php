@@ -122,6 +122,7 @@ class ondates_test extends \advanced_testcase {
      * @param bool $usecache      usecache
      * @param bool $complementary complementary
      * @param bool $expected      expected
+     * @param array $params       params
      *
      *
      * @covers       \notificationscondition_ondates\ondates::evaluate
@@ -228,6 +229,7 @@ class ondates_test extends \advanced_testcase {
      *
      * @param int $timeaccess
      * @param int $expected
+     * @param array $params
      * @param int $complementary
      *
      * @return void
@@ -354,6 +356,10 @@ class ondates_test extends \advanced_testcase {
     /**
      * Test whether is ondates
      *
+     * @param int    $timeaccess
+     * @param string $params
+     * @param bool   $expected
+     *
      * @covers       \notificationscondition_ondates\ondates::is_ondates()
      * @dataProvider dataproviderwe
      */
@@ -414,12 +420,14 @@ class ondates_test extends \advanced_testcase {
     /**
      * Test validate form.
      *
+     * @param array $params
+     * @param bool  $expected
      * @dataProvider datavalidation
      * @covers       \notificationscondition_ondates\ondates::validation
      */
     public function test_validation($params, $expected) {
         self::$subplugin->set_parameters($params);
-        $this->assertSame(self::$subplugin->validation(self::$coursetest->id), $expected);
+        $this->assertSame($expected, self::$subplugin->validation(self::$coursetest->id));
     }
 
     /**
@@ -429,7 +437,7 @@ class ondates_test extends \advanced_testcase {
      */
     public static function datavalidation(): array {
         return [
-            'Startdate(May 02 2024) Enddate(Jan 13 2027)' => ['{"startdate": 1714627363, "enddate": 1799827363}', true],
+            'Startdate(May 02 2024) Enddate(Jan 13 3000)' => ['{"startdate": 1714627363, "enddate": 32504765577}', true],
             'Startdate(May 04 2024) Enddate(May 02 2024)' => ['{"startdate": 1714827363, "enddate": 1714627363}', false],
             'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', false],
         ];

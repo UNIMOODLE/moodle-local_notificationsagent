@@ -104,6 +104,7 @@ class activityopen_crontask_test extends \advanced_testcase {
      * Test for the activityopen_crontask task.
      *
      * @param int $date
+     * @param int $user
      *
      * @covers       \notificationscondition_activityopen\task\activityopen_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace

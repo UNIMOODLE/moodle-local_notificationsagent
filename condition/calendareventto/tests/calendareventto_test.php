@@ -463,4 +463,23 @@ class calendareventto_test extends \advanced_testcase {
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
     }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_calendareventto\calendareventto::validation
+     */
+    public function test_validation() {
+        self::setUser(2);//admin
+        $event = self::getDataGenerator()->create_event([
+            'eventtype' => 'course',
+            'courseid' => self::$coursetest->id,
+        ]);
+
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $event->id;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
 }

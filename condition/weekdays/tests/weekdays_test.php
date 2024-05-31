@@ -366,12 +366,14 @@ class weekdays_test extends \advanced_testcase {
     /**
      * Test validate form.
      *
+     * @param string $params
+     * @param bool $expected
      * @dataProvider datavalidation
      * @covers       \notificationscondition_weekdays\weekdays::validation
      */
-    public function test_validation($params) {
+    public function test_validation($params, $expected) {
         self::$subplugin->set_parameters($params);
-        $this->assertIsBool(self::$subplugin->validation(self::$coursetest->id));
+        $this->assertSame($expected, self::$subplugin->validation(self::$coursetest->id));
     }
 
     /**
@@ -381,8 +383,8 @@ class weekdays_test extends \advanced_testcase {
      */
     public static function datavalidation(): array {
         return [
-            '2 days selected' => ['{"weekdays":[]}'],
-            '0 days selected' => ['{"weekdays":[4, 5]}'],
+            '0 days selected' => ['{"weekdays":[]}', false],
+            '2 days selected' => ['{"weekdays":[4, 5]}', true],
         ];
     }
 

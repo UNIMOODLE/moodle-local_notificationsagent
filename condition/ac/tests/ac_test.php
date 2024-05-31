@@ -24,35 +24,36 @@
 /**
  * Version details
  *
- * @package    notificationscondition_activitycompleted
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_activitycompleted;
+namespace notificationscondition_ac;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
-use notificationscondition_activitycompleted\activitycompleted;
+use notificationscondition_ac\ac;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
- * Class for testing the activitycompleted.
+ * Class for testing the ac.
  *
  * @group notificationsagent
  */
-class activitycompleted_test extends \advanced_testcase {
+class ac_test extends \advanced_testcase {
 
     /**
      * @var rule
      */
     private static $rule;
     /**
-     * @var activitycompleted
+     * @var ac
      */
     private static $subplugin;
     /**
@@ -104,7 +105,7 @@ class activitycompleted_test extends \advanced_testcase {
         $this->resetAfterTest();
         self::$rule = new rule();
 
-        self::$subplugin = new activitycompleted(self::$rule->to_record());
+        self::$subplugin = new ac(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
             ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
@@ -115,39 +116,22 @@ class activitycompleted_test extends \advanced_testcase {
         self::$context = new evaluationcontext();
         self::$context->set_userid(self::$user->id);
         self::$context->set_courseid(self::$coursetest->id);
-        self::$subtype = 'activitycompleted';
-        self::$elements = ['[AAAA]'];
+        self::$subtype = 'ac';
+        self::$elements = null;
     }
 
     /**
      * Test evaluate.
      *
      * @param string $conditionjson
-     * @param int    $completed
      * @param bool   $expected
      *
-     * @covers       \notificationscondition_activitycompleted\activitycompleted::evaluate
+     * @covers       \notificationscondition_ac\ac::evaluate
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate(string $conditionjson, int $completed, bool $expected) {
-        global $DB;
-        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
-
-        ]);
-
-        self::$context->set_params(json_encode(['cmid' => $cmtestaa->cmid]));
-
-        if ($expected) {
-            $DB->insert_record('course_modules_completion', ['coursemoduleid' => $cmtestaa->cmid
-        , 'userid' => self::$user->id, 'completionstate' => 1, 'timemodified' => time()]);
-        }
-
+    public function test_evaluate(string $conditionjson, bool $expected) {
+        self::$context->set_params($conditionjson);
 
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
@@ -161,13 +145,10 @@ class activitycompleted_test extends \advanced_testcase {
     public static function dataprovider(): array {
         return [
             [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 1, true,
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', true,
             ],
             [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 1, false,
-            ],
-            [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}', 0, false,
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', false,
             ],
         ];
     }
@@ -175,7 +156,7 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test get subtype.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::get_subtype
+     * @covers \notificationscondition_ac\ac::get_subtype
      */
     public function test_getsubtype() {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
@@ -184,7 +165,7 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test is generic.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::is_generic
+     * @covers \notificationscondition_ac\ac::is_generic
      */
     public function test_isgeneric() {
         $this->assertFalse(self::$subplugin->is_generic());
@@ -193,7 +174,7 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test get elements.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::get_elements
+     * @covers \notificationscondition_ac\ac::get_elements
      */
     public function test_getelements() {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
@@ -202,46 +183,28 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test check capability.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::check_capability
+     * @covers \notificationscondition_ac\ac::check_capability
      */
     public function test_checkcapability() {
-        $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
-        );
+        $this->assertFalse(self::$subplugin->check_capability(self::$coursecontext));
     }
 
     /**
      * Test estimate next time
      *
-     * @covers       \notificationscondition_activitycompleted\activitycompleted::estimate_next_time
+     * @covers       \notificationscondition_ac\ac::estimate_next_time
      * @dataProvider dataestimate
      *
      * @param string   $conditionjson
-     * @param int      $complementary
      * @param int|null $expected
-     * @param int      $completed
      *
      * @return void
      * @throws \coding_exception
      */
-    public function test_estimatenexttime($conditionjson, $complementary, $expected, $completed) {
-        global $DB;
+    public function test_estimatenexttime($conditionjson, $expected) {
         \uopz_set_return('time', 1704099600);
-        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmtestent = $quizgen->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'availability' => $conditionjson,
-        ]);
 
-        self::$context->set_params(json_encode(['cmid' => $cmtestent->cmid]));
-        self::$context->set_complementary($complementary);
-
-        if ($completed) {
-            $DB->insert_record('course_modules_completion', ['coursemoduleid' => $cmtestent->cmid
-        , 'userid' => self::$user->id, 'completionstate' => 1, 'timemodified' => time()]);
-        }
+        self::$context->set_params($conditionjson);
 
         $result = self::$subplugin->estimate_next_time(self::$context);
 
@@ -257,21 +220,13 @@ class activitycompleted_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-            'condition. completed' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_CONDITION, 1704099600, true
+            'condition. available' => [
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                1704099600,
             ],
-            'condition. not completed' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_CONDITION, null, false
-            ],
-            'exception. completed' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_EXCEPTION, null, true
-            ],
-            'exception. not completed' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_EXCEPTION, 1704099600, false
+            'condition. not available' => [
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                null,
             ],
         ];
     }
@@ -279,19 +234,17 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test get title.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::get_title
+     * @covers \notificationscondition_ac\ac::get_title
      */
     public function test_gettitle() {
         $this->assertNotNull(self::$subplugin->get_title());
-        foreach (self::$elements as $element) {
-            $this->assertStringContainsString($element, self::$subplugin->get_title());
-        }
+        $this->assertIsString(self::$subplugin->get_title());
     }
 
     /**
      * Test get description.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::get_description
+     * @covers \notificationscondition_ac\ac::get_description
      */
     public function test_getdescription() {
         $this->assertSame(
@@ -306,44 +259,37 @@ class activitycompleted_test extends \advanced_testcase {
     /**
      * Test convert parameters.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::convert_parameters
+     * @covers \notificationscondition_ac\ac::convert_parameters
      */
     public function test_convertparameters() {
-        $id = self::$subplugin->get_id();
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         $params = [
-            $id . "_activitycompleted_cmid" => "7",
+            editrule_form::FORM_JSON_AC => $json,
         ];
-        $expected = '{"cmid":7}';
+        $expected = $json;
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
-
     }
 
     /**
      * Test process markups.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::process_markups
+     * @covers \notificationscondition_ac\ac::process_markups
      */
     public function test_processmarkups() {
-        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
-        ]);
-        $expected = str_replace(self::$subplugin->get_elements(), [$cmgen->name], self::$subplugin->get_title());
-        $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
-        $params = json_encode($params);
-
-        self::$subplugin->set_parameters($params);
+        $expected = 'Your First name is Fernando';
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        self::$subplugin->set_parameters($json);
         $content = [];
-        self::$subplugin->process_markups($content, self::$coursetest->id);
+        self::$subplugin->process_markups($content, self::$coursetest->id, false);
         $this->assertSame([$expected], $content);
     }
 
     /**
      * Test get ui.
      *
-     * @covers \notificationscondition_activitycompleted\activitycompleted::get_ui
+     * @covers \notificationscondition_ac\ac::get_ui
      */
     public function test_getui() {
         $courseid = self::$coursetest->id;
@@ -361,19 +307,29 @@ class activitycompleted_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $subtype = notificationplugin::TYPE_CONDITION;
         self::$subplugin->get_ui($mform, $courseid, $subtype);
+        $this->assertEmpty(self::$subplugin->get_ui($mform, $courseid, $subtype));
+    }
 
-        $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
-        $uiactivityname = $method->invoke(self::$subplugin, self::$subplugin::UI_ACTIVITY);
-
-        $this->assertTrue($mform->elementExists($uiactivityname));
+    /**
+     * Test update after restore method
+     *
+     * @return void
+     * @covers \notificationscondition_ac\ac::update_after_restore
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 
     /**
      * Test validation.
      *
-     * @covers       \notificationscondition_activitycompleted\activitycompleted::validation
+     * @param array $params
+     * @param bool  $expected
+     * @dataProvider datavalidation
+     * @covers       \notificationscondition_ac\ac::validation
      */
-    public function test_validation() {
+    public function test_validation($params, $expected) {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
             'name' => 'Quiz unittest',
@@ -382,10 +338,36 @@ class activitycompleted_test extends \advanced_testcase {
             "timeclose" => self::CM_DATEEND,
             'visible' => true,
         ]);
-        $objparameters = new \stdClass();
-        $objparameters->cmid = $cmtestaa->cmid;
+        $params = str_replace('|CMID|', $cmtestaa->cmid, $params);
+        self::$subplugin->set_parameters($params);
+        $this->assertSame(self::$subplugin->validation(self::$coursetest->id), $expected);
+    }
 
-        self::$subplugin->set_parameters(json_encode($objparameters));
-        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    /**
+     * Dataprovider for validation
+     *
+     * @return array[]
+     */
+    public static function datavalidation(): array {
+        return [
+            'Activity completion' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":|CMID|,"e":1}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', true],
+            'Activity completion2' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":100,"e":1}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', false],
+        ];
+    }
+
+    /**
+     * Test load_dataform.
+     *
+     * @covers \notificationscondition_ac\ac::load_dataform
+     */
+    public function test_loaddataform() {
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        self::$subplugin->set_parameters($json);
+
+        $expected = [
+            editrule_form::FORM_JSON_AC => $json,
+        ];
+
+        $this->assertSame($expected, self::$subplugin->load_dataform());
     }
 }

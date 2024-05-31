@@ -117,6 +117,7 @@ class forumnoreply_test extends \advanced_testcase {
      * @param int    $timeaccess
      * @param string $param
      * @param bool   $expected
+     * @param bool   $complementary
      *
      * @covers       \notificationscondition_forumnoreply\forumnoreply::evaluate
      * @covers       \notificationscondition_forumnoreply\forumnoreply::estimate_next_time
@@ -375,6 +376,23 @@ class forumnoreply_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_forumnoreply\forumnoreply::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
+        $cmgen = $quizgenerator->create_instance([
+            'course' => self::$coursetest->id,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmgen->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
 
 }

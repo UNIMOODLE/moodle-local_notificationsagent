@@ -104,7 +104,10 @@ class custominfo extends info
     }
 
     /**
+     *
      * Set module information for the PHP function.
+     *
+     * @param int $nouser
      */
     private function set_mod_info($nouser = 0)
     {
@@ -150,7 +153,7 @@ class custominfo extends info
 
     /**
      * Validation subplugin only for AC
-     * 
+     *
      * @return bool
      */
     public function validation()
@@ -175,7 +178,7 @@ class custominfo extends info
             $classname = '\availability_' . $type . '\condition';
             try {
                 $instance = new $classname($child);
-                
+
                 if ($type == 'completion') {
                     list($selfcmid, $selfsectionid) = $instance->get_selfids($this);
                     $cmid = $instance->get_cmid($course, $selfcmid, $selfsectionid);
@@ -194,7 +197,7 @@ class custominfo extends info
                         $cacheditems = $DB->get_records('grade_items', array('courseid' => $courseid));
                         $cache->set($courseid, $cacheditems);
                     }
-    
+
                     // Return name from cached item or a lang string.
                     if (!array_key_exists($gradeitemid, $cacheditems)) {
                         return false;
@@ -252,7 +255,7 @@ class custominfo extends info
 class customtree extends \core_availability\tree
 {
     /** @var array Children obj conditions
-     * 
+     *
      */
     public static $customchildren;
 

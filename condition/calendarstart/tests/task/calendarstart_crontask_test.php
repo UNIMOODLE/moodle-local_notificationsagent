@@ -125,6 +125,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      *
      * @param int $date
      * @param int $radio
+     * @param int $user
      *
      * @covers       \notificationscondition_calendarstart\task\calendarstart_crontask::execute
      * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time

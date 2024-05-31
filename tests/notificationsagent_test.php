@@ -922,6 +922,10 @@ class notificationsagent_test extends \advanced_testcase {
     /**
      * Test Evaluate expression
      *
+     * @param string $operator
+     * @param int    $a
+     * @param int    $b
+     * @param bool   $expected
      * @dataProvider dataexpresion
      * @return void
      */

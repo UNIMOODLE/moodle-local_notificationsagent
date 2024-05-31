@@ -102,6 +102,8 @@ class weekdays_crontask_test extends \advanced_testcase {
      * Test for weekdays cron task
      *
      * @param int $date
+     * @param int $user
+     * @param string $parameters
      *
      * @covers       \notificationscondition_weekdays\task\weekdays_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace

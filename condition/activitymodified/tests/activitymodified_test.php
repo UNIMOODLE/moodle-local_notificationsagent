@@ -128,6 +128,7 @@ class activitymodified_test extends \advanced_testcase {
      * @param bool $usecache      use cache or not
      * @param bool $useuploadfile use upload file or not
      * @param bool $expected      expected result
+     * @param array $complementary
      *
      * @dataProvider dataprovider
      * @covers       \notificationscondition_activitymodified\activitymodified::evaluate
@@ -382,5 +383,24 @@ class activitymodified_test extends \advanced_testcase {
             'Testing a file that was uploaded 7 minutes ago' => [1709880112, 1709880532, false],
             'Testing a file that was uploaded several days ago' => [1709966932, 1711443119, false],
         ];
+    }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_activitymodified\activitymodified::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestaa = $quizgenerator->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            'visible' => true,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmtestaa->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
 }

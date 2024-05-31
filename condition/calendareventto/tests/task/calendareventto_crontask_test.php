@@ -121,6 +121,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * Test the execute method.
      *
      * @param int $date
+     * @param int $user
      *
      * @covers       \notificationscondition_calendareventto\task\calendareventto_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace

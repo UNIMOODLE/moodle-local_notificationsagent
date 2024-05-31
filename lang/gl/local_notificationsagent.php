@@ -267,7 +267,8 @@ $string['notificationsagent:weekend'] = 'Capacidade necesaria para usar a condic
 $string['notificationsagent:itemgraded'] = 'Capacidade necesaria para utilizar a condición de elemento cualificativo';
 $string['notificationsagent:weekdays'] = 'Capacidade necesaria para usar a condición dos días da semana';
 $string['notificationsagent:ondates'] = 'Capacidade necesaria para usar a condición entre datas';
-$string['notificationsagent:usergroupadd'] = 'Capacidade necesaria para usar a condición de engadir usuario a unha condición de grupo';
+$string['notificationsagent:usergroupadd']
+    = 'Capacidade necesaria para usar a condición de engadir usuario a unha condición de grupo';
 
 $string['notificationsagent:addusergroup'] = 'Capacidade de usar a acción addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacidade de usar a acción bootstrapnotifications';
@@ -322,3 +323,6 @@ $string['privacy:metadata:localnotificationsagentreport'] = 'Informe do axente d
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Notificacións de regras non válidas';
 $string['brokenrulebody'] = 'A regra: {$a->rule} do curso :{$a->course} foi detida.';
+
+// Engine.
+$string['actionerror'] = 'Erro ao realizar a acción ';

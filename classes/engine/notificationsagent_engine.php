@@ -107,13 +107,14 @@ class notificationsagent_engine {
                                 );
                                 $result = $action->execute_action($context, $parameters);
                                 if (!$result) {
-                                    $parameters = "ERROR" . $parameters;
+                                    $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
                                 }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
                                     $parameters, $timeaccess
                                 );
                             }
+
                         }
                     }
                     $transaction->allow_commit();
@@ -151,7 +152,7 @@ class notificationsagent_engine {
                                 );
                                 $result = $action->execute_action($context, $parameters);
                                 if (!$result) {
-                                    $parameters = "ERROR to perfom action";
+                                    $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
                                 }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid() == notificationsagent::GENERIC_USERID ? get_admin()->id
@@ -162,7 +163,6 @@ class notificationsagent_engine {
                                 $coursecontext = \context_course::instance($context->get_courseid());
                                 $users = notificationsagent::get_usersbycourse($coursecontext);
                                 foreach ($users as $user) {
-
                                     $context->set_userid($user->id);
                                     $actionparams = json_decode($action->get_parameters(), true);
                                     $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
@@ -186,7 +186,7 @@ class notificationsagent_engine {
                                     );
                                     $result = $action->execute_action($context, $parameters);
                                     if (!$result) {
-                                        $parameters = "ERROR to perfom action";
+                                        $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
                                     }
                                     $rule->record_report(
                                         $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
@@ -195,6 +195,7 @@ class notificationsagent_engine {
                                 }
                             }
                         }
+
                         $transaction->allow_commit();
                     }
                 }

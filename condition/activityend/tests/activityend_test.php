@@ -430,4 +430,25 @@ class activityend_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_activityend\activityend::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestaa = $quizgenerator->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            "timeopen" => self::CM_DATESTART,
+            "timeclose" => self::CM_DATEEND,
+            'visible' => true,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmtestaa->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
+
 }

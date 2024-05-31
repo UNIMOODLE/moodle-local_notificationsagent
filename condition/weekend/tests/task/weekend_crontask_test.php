@@ -102,6 +102,7 @@ class weekend_crontask_test extends \advanced_testcase {
      * Test for weekend cron task
      *
      * @param int $date
+     * @param int $user
      *
      * @covers       \notificationscondition_weekend\task\weekend_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace

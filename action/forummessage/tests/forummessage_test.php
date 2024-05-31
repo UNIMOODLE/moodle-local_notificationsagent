@@ -346,4 +346,21 @@ class forummessage_test extends \advanced_testcase {
         $this->assertFalse(self::$subplugin->show_user_placeholders());
     }
 
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationsaction_forummessage\forummessage::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
+        $cmgen = $quizgenerator->create_instance([
+            'course' => self::$coursetest->id,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmgen->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
+
 }

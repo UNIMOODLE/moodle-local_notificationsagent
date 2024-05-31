@@ -24,26 +24,28 @@
 /**
  * Version details
  *
- * @package    notificationscondition_coursestart
+ * @package    notificationscondition_ac
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace notificationscondition_coursestart\task;
+namespace notificationscondition_ac\task;
 
-use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_coursestart\coursestart;
+use local_notificationsagent\task\notificationsagent_trigger_cron;
+use notificationscondition_ac\ac;
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
- * Class coursestart_crontask_test
+ * Class for testing the ac_crontask task.
  *
- * @covers \notificationscondition_coursestart\task\coursestart_crontask
- * @group  notificationsagent
+ * @group notificationsagent
  */
-class coursestart_crontask_test extends \advanced_testcase {
+class ac_crontask_test extends \advanced_testcase {
 
     /**
      * @var rule
@@ -87,7 +89,7 @@ class coursestart_crontask_test extends \advanced_testcase {
         $this->resetAfterTest();
         $rule = new rule();
         self::$rule = $rule;
-        self::$user = self::getDataGenerator()->create_user();
+        self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
         self::$course = self::getDataGenerator()->create_course(
             ([
                 'startdate' => self::COURSE_DATESTART,
@@ -99,24 +101,16 @@ class coursestart_crontask_test extends \advanced_testcase {
     }
 
     /**
-     * Set up test environment before each test.
+     *  Testing excute method from task.
      *
-     * @param int $date
-     * @param int $user
+     * @covers       \notificationscondition_ac\task\ac_crontask::execute
+     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      *
-     * @dataProvider dataprovider
-     * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
      */
-    public function test_execute($date, $user) {
-        global $DB, $USER;
-        $pluginname = coursestart::NAME;
+    public function test_execute() {
+        global $DB;
 
-        $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
-        $cmtestcsct = $quizgen->create_instance([
-            'course' => self::$course->id,
-            'timeopen' => self::CM_DATESTART,
-            'timeclose' => self::CM_DATEEND,
-        ]);
+        $pluginname = ac::NAME;
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -124,7 +118,7 @@ class coursestart_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = empty($user) ? self::$user->id : $user;
+        self::setUser(2);//admin
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -133,49 +127,43 @@ class coursestart_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters = '{"time":"' . $date . '", "cmid":"' . $cmtestcsct->cmid . '"}';
-        $objdb->cmid = $cmtestcsct->id;
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $objdb->parameters = $json;
+        $objdb->cmid = null;
 
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
         self::$rule::create_instance($ruleid);
 
-        $task = \core\task\manager::get_scheduled_task(coursestart_crontask::class);
+        $task = \core\task\manager::get_scheduled_task(ac_crontask::class);
         $task->execute();
+        $trigger = $DB->get_record(
+            'notificationsagent_triggers',
+            [
+                'conditionid' => $conditionid,
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'ruleid' => self::$rule->get_id(),
+            ]
+        );
 
-        $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
-
-        $this->assertEquals($pluginname, $cache->pluginname);
-        $this->assertEquals(self::$course->id, $cache->courseid);
-        $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
-
-    }
-
-    /**
-     * Generate a data provider for testing the `dataprovider` method.
-     *
-     * @return array The data provider array.
-     */
-    public static function dataprovider(): array {
-        return [
-            [86400, 0],
-            [86400 * 3, 0],
-            [86400, 2],
-            [86400 * 3, 2],
-        ];
+        $this->assertEquals(self::$course->id, $trigger->courseid);
+        $this->assertEquals(self::$user->id, $trigger->userid);
+        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
     }
 
     /**
      * Get name test
      *
-     * @covers \notificationscondition_coursestart\task\coursestart_crontask::get_name
+     * @covers \notificationscondition_ac\task\ac_crontask::get_name
      * @return void
      */
     public function test_get_name() {
-        $task = \core\task\manager::get_scheduled_task(coursestart_crontask::class);
+        $task = \core\task\manager::get_scheduled_task(ac_crontask::class);
 
         $this->assertIsString($task->get_name());
 
     }
+
 }

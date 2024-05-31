@@ -370,4 +370,17 @@ class usergroupadd_test extends \advanced_testcase {
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_usergroupadd\usergroupadd::validation
+     */
+    public function test_validation() {
+        $objparameters = new \stdClass();
+        $objparameters->cmid = self::$group->id;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$course->id));
+    }
+
 }

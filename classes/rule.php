@@ -287,7 +287,7 @@ class rule {
         }
 
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
-            $rules = [...$rules, ...self::get_course_rules($courseid)];
+            $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
         if (has_capability('local/notificationsagent:viewcourserule', $context)
             || has_capability(
@@ -1835,7 +1835,7 @@ class rule {
 
         $data = [];
 
-        $sql = 'SELECT nctx.id as ctxid, nr.id
+        $sql = 'SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid AND nctx.objectid = :objectid

@@ -123,6 +123,7 @@ class activityavailable_test extends \advanced_testcase {
      * Test evaluate.
      *
      * @param string $conditionjson
+     * @param int    $visible
      * @param bool   $expected
      *
      * @covers       \notificationscondition_activityavailable\activityavailable::evaluate
@@ -353,4 +354,26 @@ class activityavailable_test extends \advanced_testcase {
 
         $this->assertTrue($mform->elementExists($uiactivityname));
     }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_activityavailable\activityavailable::validation
+     */
+    public function test_validation() {
+        $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
+        $cmtestaa = $quizgenerator->create_instance([
+            'name' => 'Quiz unittest',
+            'course' => self::$coursetest->id,
+            "timeopen" => self::CM_DATESTART,
+            "timeclose" => self::CM_DATEEND,
+            'visible' => true,
+        ]);
+        $objparameters = new \stdClass();
+        $objparameters->cmid = $cmtestaa->cmid;
+
+        self::$subplugin->set_parameters(json_encode($objparameters));
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
+
 }

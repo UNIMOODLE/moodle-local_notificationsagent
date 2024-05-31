@@ -439,4 +439,13 @@ class coursestart_test extends \advanced_testcase {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
+
+    /**
+     * Test validation.
+     *
+     * @covers       \notificationscondition_courseend\courseend::validation
+     */
+    public function test_validation() {
+        $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
+    }
 }

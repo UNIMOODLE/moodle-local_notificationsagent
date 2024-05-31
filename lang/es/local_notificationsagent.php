@@ -324,3 +324,6 @@ $string['privacy:metadata:localnotificationsagentreport'] = 'Informe del agente 
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Notificactions de reglas inválidas';
 $string['brokenrulebody'] = 'La regla:  {$a->rule} del curso :{$a->course} se ha pausado.';
+
+// Engine.
+$string['actionerror'] = 'Error al ejecutar la acción ';

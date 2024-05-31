@@ -324,3 +324,6 @@ $string['privacy:metadata:localnotificationsagentreport'] = 'Jakinarazpen-agente
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Arau baliogabeen jakinarazpenak';
 $string['brokenrulebody'] = 'Araua: {$a->rule} ikastaroaren :{$a->course} pausatu egin da';
+
+// Engine.
+$string['actionerror'] = 'Errorea ekintza burutzean ';

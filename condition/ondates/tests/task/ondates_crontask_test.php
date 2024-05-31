@@ -98,6 +98,8 @@ class ondates_crontask_test extends \advanced_testcase {
 
     /**
      * Test execute.
+     * @param int $date
+     * @param int $user
      *
      * @covers       \notificationscondition_ondates\task\ondates_crontask::execute
      * @dataProvider dataprovider

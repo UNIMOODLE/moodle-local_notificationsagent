@@ -320,3 +320,6 @@ $string['privacy:metadata:localnotificationsagentreport'] = 'Notifications agent
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Broken rules notifications';
 $string['brokenrulebody'] = 'Rule:  {$a->rule} of the course :{$a->course} has been paused,';
+
+// Engine.
+$string['actionerror'] = 'Error while performing the action ';

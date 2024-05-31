@@ -206,14 +206,14 @@ class activityend extends notificationconditionplugin {
         $cmid = $data[self::UI_ACTIVITY];
         if (!$validation = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend) {
             if (is_null($array)) {
-                return $validation;
+                return false;
             }
             $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
                 'validation_editrule_form_dateend', 'notificationscondition_activityend'
             );
         }
 
-        return $validation;
+        return true;
     }
 
     /**
