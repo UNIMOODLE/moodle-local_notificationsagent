@@ -169,11 +169,13 @@ class messageagent extends notificationactionplugin {
     public function execute_action($context, $params) {
         $placeholdershuman = json_decode($params);
         $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
-
+        $userfrom = $context->get_rule()->get_createdby();
+        $userto = $context->get_userid();
         $message = new \core\message\message();
         $message->name = 'individual_message'; // Your notification name from message.php.
         $message->userto = $context->get_userid();
-        $message->userfrom = \core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
+        $message->userfrom = $userfrom == $userto ? \core_user::get_noreply_user()
+            : $userto; // If the message is 'from' a specific user you can set them here.
         $message->component = 'notificationsaction_messageagent'; // Your plugin's name.
         $message->subject = format_text($placeholdershuman->{self::UI_TITLE}); // Será nuestro TTTT.
         $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
