@@ -243,7 +243,7 @@ class usermessageagent extends notificationactionplugin {
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $message->fullmessagehtml = format_text('<p>' . $sendmessage . '</p>');
         $message->smallmessage = shorten_text(format_text($sendmessage));
-        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
+        $message->notification = $userfrom == $userto ? 1 : 0;
         $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
             false
         ); // A relevant URL for the notification.
