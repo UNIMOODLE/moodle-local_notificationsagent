@@ -205,6 +205,7 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
         ],
     ],
     'local/notificationsagent:managesessions' => [

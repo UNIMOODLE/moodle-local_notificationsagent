@@ -262,7 +262,7 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         // Define index idx_ruleiduserid (not unique) to be added to notificationsagent_launched.
         $table = new xmldb_table('notificationsagent_launched');
         $index = new xmldb_index('idx_ruleiduserid', XMLDB_INDEX_NOTUNIQUE, ['ruleid', 'userid']);
@@ -297,6 +297,48 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
 
         // Notificationsagent savepoint reached.
         upgrade_plugin_savepoint(true, 2024043006, 'local', 'notificationsagent');
+    }
+
+    if ($oldversion < 2024043009) {
+        // Define index idx_userid (not unique) to be added to notificationsagent_report.
+        $table = new xmldb_table('notificationsagent_report');
+        $index = new xmldb_index('idx_userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+
+        // Conditionally launch add index idx_userid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043009, 'local', 'notificationsagent');
+    }
+
+    if ($oldversion < 2024043009) {
+        // Define index idx_courseid (not unique) to be added to notificationsagent_report.
+        $table = new xmldb_table('notificationsagent_report');
+        $index = new xmldb_index('idx_courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+
+        // Conditionally launch add index idx_courseid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043009, 'local', 'notificationsagent');
+    }
+
+    if ($oldversion < 2024043009) {
+        // Define index idx_actiondetail (not unique) to be added to notificationsagent_report.
+        $table = new xmldb_table('notificationsagent_report');
+        $index = new xmldb_index('idx_actiondetail', XMLDB_INDEX_NOTUNIQUE, ['actiondetail']);
+
+        // Conditionally launch add index idx_actiondetail.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2024043009, 'local', 'notificationsagent');
     }
 
     return true;

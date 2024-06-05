@@ -172,17 +172,30 @@ class messageagent extends notificationactionplugin {
         $userfrom = $context->get_rule()->get_createdby();
         $userto = $context->get_userid();
         $message = new \core\message\message();
-        $message->name = 'individual_message'; // Your notification name from message.php.
-        $message->userto = $context->get_userid();
-        $message->userfrom = $userfrom == $userto ? \core_user::get_noreply_user()
-            : $userto; // If the message is 'from' a specific user you can set them here.
         $message->component = 'notificationsaction_messageagent'; // Your plugin's name.
-        $message->subject = format_text($placeholdershuman->{self::UI_TITLE}); // Será nuestro TTTT.
-        $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
-        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->name = 'individual_message'; // Your notification name from message.php.
+        $message->userfrom = $userfrom == $userto ? \core_user::get_noreply_user() : $userfrom;
+        $message->subject = format_text($placeholdershuman->{self::UI_TITLE});
+        $message->fullmessage = format_text($sendmessage);
+        $message->fullmessageformat = FORMAT_MOODLE;
         $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
-        $message->smallmessage = shorten_text(format_text($sendmessage));
+        $message->smallmessage = format_text($sendmessage);
         $message->notification = $userfrom == $userto ? 1 : 0;
+        if ($message->notification === 0) {
+            // It's a private conversation between users.
+            $conversation = \core_message\api::create_conversation(
+                \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
+                [
+                    is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
+                    $userto,
+                ]
+            );
+            // We creat one conversation.
+            $message->convid = $conversation->id;
+            $message->courseid = $context->get_courseid();
+        } else {
+            $message->userto = $userto;
+        }
         $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
             false
         ); // A relevant URL for the notification.

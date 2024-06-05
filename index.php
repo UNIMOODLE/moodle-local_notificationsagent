@@ -209,12 +209,14 @@ foreach ($rules as $rule) {
         'name' => format_text($rule->get_name()),
         'owner' => $rule->get_owner(),
         'status' => $rule->get_status(),
-        'status_lang' => 
-            !$rule->validation($courseid) ? get_string('status_broken', 'local_notificationsagent') :
-            ($rule->get_forced() ?
-            ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
-                : get_string('status_active', 'local_notificationsagent')
-            ) : get_string('status_required', 'local_notificationsagent')),
+        'status_lang' =>
+            !$rule->validation($courseid)
+                ? get_string('status_broken', 'local_notificationsagent')
+                :
+                ($rule->get_forced() ?
+                    ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
+                        : get_string('status_active', 'local_notificationsagent')
+                    ) : get_string('status_required', 'local_notificationsagent')),
         'conditions' => $conditionsarray,
         'exceptions' => $exceptionsarray,
         'actions' => $actionsarray,
@@ -228,8 +230,12 @@ foreach ($rules as $rule) {
         'isallshared' => $rule->get_defaultrule(),
         'type_lang' => $rule->get_template()
             ? (($rule->get_shared() == 0 && !empty($rule->get_coursename_and_username_by_rule()))
-            ? ($courseid == SITEID ? $rule->get_coursename_and_username_by_rule() : get_string('type_sharedrule','local_notificationsagent'))
-            : get_string('type_rule', 'local_notificationsagent')
+                ? ($courseid == SITEID
+                    ? $rule->get_coursename_and_username_by_rule()
+                    : get_string(
+                        'type_sharedrule', 'local_notificationsagent'
+                    ))
+                : get_string('type_rule', 'local_notificationsagent')
             )
             : get_string('type_template', 'local_notificationsagent'),
         'editurl' => new moodle_url(
@@ -246,7 +252,7 @@ foreach ($rules as $rule) {
         'exporturl' => new moodle_url(
             "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
         ),
-        'capabilities' => $rule->get_card_options($courseid)
+        'capabilities' => $rule->get_card_options($courseid),
     ];
 }
 
@@ -254,7 +260,7 @@ $templatecontext['rulecontent'] = $rulecontent;
 $templatecontext['capabilities'] = [
     'import' => has_capability('local/notificationsagent:importrule', $context),
     'create' => has_capability('local/notificationsagent:createrule', $context),
-    'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
+    'report' => has_capability('local/notificationsagent:viewcourserule', $context),
 ];
 
 $categoriesall = core_course_category::top()->get_children();

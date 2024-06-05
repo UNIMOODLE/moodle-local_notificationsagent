@@ -71,7 +71,10 @@
                         </div>
                     {{/isrule}}
                 </div>
-                <h5 class="name mt-4">{{{ name }}}</h5>
+                <div class="d-flex flex-column justify-content-between">
+                    <h5 class="name mt-4">{{{ name }}}</h5>
+                    <span class="createby d-flex align-items-center"><i class="fa fa-user mr-1"></i>{{{ owner }}}</span>
+                </div>
             </div>
             <div class="card-body d-flex flex-column mx-3 my-2 p-0">
                 <div class="card-content">

@@ -155,6 +155,7 @@ foreach ($rules as $rule) {
     $rulecontent[] = [
         'id' => $rule->get_id(),
         'name' => format_text($rule->get_name()),
+        'owner' => $rule->get_owner(),
         'status' => $rule->get_status(),
         'status_lang' => $rule->get_forced() ?
             ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')

@@ -185,39 +185,6 @@ class notificationsagent_test extends \advanced_testcase {
         ];
     }
 
-    // /**
-    //  * Testing was_launched_indicated_times.
-    //  *
-    //  * @param int  $timesfired
-    //  * @param int  $firedtimes
-    //  * @param bool $expected
-    //  *
-    //  * @return void
-    //  * @throws \dml_exception
-    //  * @dataProvider launched_provider
-    //  * @covers       \local_notificationsagent\notificationsagent::was_launched_indicated_times
-    //  */
-    // public function test_was_launched_indicated_times($timesfired, $firedtimes, $expected) {
-    //     global $DB;
-    //     self::$rule->set_timesfired($timesfired);
-    //
-    //     $DB->insert_record('notificationsagent_launched', [
-    //         'ruleid' => self::$rule->get_id(),
-    //         'courseid' => self::$course->id,
-    //         'userid' => self::$user->id,
-    //         'timesfired' => $firedtimes,
-    //         'timecreated' => 1708604296,
-    //         'timemodified' => 1708604296,
-    //     ]);
-    //
-    //     $result = notificationsagent::was_launched_indicated_times(
-    //         self::$rule->get_id(), self::$rule->get_timesfired(), self::$course->id, self::$user->id
-    //     );
-    //
-    //     $this->assertSame($expected, $result);
-    //
-    // }
-
     /**
      * Dataprovider for launched
      *
@@ -249,88 +216,6 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::$user->id, notificationsagent::get_usersbycourse($context)[self::$user->id]->id);
 
     }
-
-    // /**
-    //  *  Testing delete cache by rule
-    //  *
-    //  * @return void
-    //  * @throws \dml_exception
-    //  * @covers \local_notificationsagent\notificationsagent::delete_cache_by_ruleid
-    //  */
-    // public function test_delete_cache_by_rule() {
-    //     global $DB;
-    //     $ruleid = self::$rule->get_id();
-    //     $courseid = self::$course->id;
-    //     $pluginname = sessionstart::NAME;
-    //     $objdb = new \stdClass();
-    //     $objdb->ruleid = $ruleid;
-    //     $objdb->courseid = $courseid;
-    //     $objdb->type = 'condition';
-    //     $objdb->pluginname = $pluginname;
-    //     $objdb->parameters = '{"time":84600}';
-    //     $objdb->cmid = self::CMID;
-    //     // Insert.
-    //     $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
-    //     $this->assertIsNumeric($conditionid);
-
-    //     $objdbcache = new \stdClass();
-    //     $objdbcache->conditionid = $conditionid;
-    //     $objdbcache->courseid = $courseid;
-    //     $objdbcache->pluginname = $pluginname;
-    //     $objdbcache->userid = self::$user->id;
-    //     $objdbcache->startdate = time();
-    //     // Insert.
-    //     $cacheid = $DB->insert_record('notificationsagent_cache', $objdbcache);
-    //     $this->assertIsNumeric($cacheid);
-
-    //     notificationsagent::delete_cache_by_ruleid(self::$rule->get_id());
-
-    //     $deleted = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
-
-    //     $this->assertFalse($deleted);
-
-    // }
-
-    // /**
-    //  * Testing delete triggers by ruleid
-    //  *
-    //  * @return void
-    //  * @throws \dml_exception
-    //  * @covers \local_notificationsagent\notificationsagent::delete_triggers_by_ruleid
-    //  */
-    // public function test_delete_triggers_by_ruleid() {
-    //     global $DB;
-    //     $ruleid = self::$rule->get_id();
-    //     $courseid = self::$course->id;
-    //     $pluginname = sessionstart::NAME;
-    //     $objdb = new \stdClass();
-    //     $objdb->ruleid = $ruleid;
-    //     $objdb->courseid = $courseid;
-    //     $objdb->type = 'condition';
-    //     $objdb->pluginname = $pluginname;
-    //     $objdb->parameters = '{"time":84600}';
-    //     $objdb->cmid = self::CMID;
-    //     // Insert.
-    //     $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
-    //     $this->assertIsNumeric($conditionid);
-
-    //     $objdbtrigger = new \stdClass();
-    //     $objdbtrigger->ruleid = self::$rule->get_id();
-    //     $objdbtrigger->conditionid = $conditionid;
-    //     $objdbtrigger->courseid = $courseid;
-    //     $objdbtrigger->userid = self::$user->id;
-    //     $objdbtrigger->startdate = time();
-    //     // Insert.
-    //     $cacheid = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
-    //     $this->assertIsNumeric($cacheid);
-
-    //     notificationsagent::delete_triggers_by_ruleid(self::$rule->get_id());
-
-    //     $deleted = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
-
-    //     $this->assertFalse($deleted);
-
-    // }
 
     /**
      * Testing set timer cache
@@ -926,6 +811,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @param int    $a
      * @param int    $b
      * @param bool   $expected
+     *
      * @dataProvider dataexpresion
      * @return void
      */

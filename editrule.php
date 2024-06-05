@@ -145,6 +145,10 @@ $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule',
 $ruleid = optional_param('ruleid', null, PARAM_INT);
 $ruleid = empty($ruleid) ? null : $ruleid;
 $rule = new rule($ruleid, $ruletype, $typeaction);
+
+// CHECK
+$rule->check_permission($context, $courseid);
+
 $customdata = [
     'rule' => $rule->to_record(),
     'timesfired' => rule::MINIMUM_EXECUTION,

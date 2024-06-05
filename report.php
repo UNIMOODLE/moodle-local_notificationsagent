@@ -29,12 +29,12 @@
  */
 
 require('../../config.php');
-global $PAGE, $CFG, $OUTPUT, $COURSE;
+global $PAGE, $CFG, $OUTPUT, $COURSE, $SITE, $USER;
 require_once($CFG->libdir . '/adminlib.php');
 
-use core_reportbuilder\system_report_factory;
-use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\filters\number;
+use core_reportbuilder\local\filters\select;
+use core_reportbuilder\system_report_factory;
 use local_notificationsagent\reportbuilder\local\systemreports;
 use local_notificationsagent\rule;
 
@@ -44,21 +44,33 @@ $ruleid = optional_param('ruleid', '', PARAM_INT);
 $courseid = optional_param('courseid', '', PARAM_INT);
 $filters = [];
 if ($courseid) {
+    global $DB;
     $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
     $PAGE->set_course($course);
-    $context = context_course::instance($courseid);
+    $context = context_course::instance($course->id);
     $coursefilter = get_course($courseid)->id;
-    $filters['course:courseselector_operator'] = number::EQUAL_TO;
-    $filters['course:courseselector_values'] = $coursefilter;
+    $filters['rule:courseselector_operator'] = number::EQUAL_TO;
+    $filters['rule:courseselector_values'] = $course->id;
+
 } else {
     $context = context_system::instance();
 }
 
 if ($ruleid) {
     $rule = rule::create_instance($ruleid);
-    $filter = $rule->get_name();
-    $filters['rule:rulename_operator'] = text::IS_EQUAL_TO;
+    $filter = $rule->get_id();
+    $filters['rule:rulename_operator'] = select::EQUAL_TO;
     $filters['rule:rulename_values'] = $filter;
+}
+
+// Only show my own name.
+if (!has_capability(
+    'local/notificationsagent:viewcourserule',
+    $context
+)
+) {
+    $filters['rule:userfullname_operator'] = select::EQUAL_TO;
+    $filters['rule:userfullname_values'] = $USER->id;
 }
 
 if (!has_capability('local/notificationsagent:viewassistantreport', $context)) {
@@ -108,7 +120,5 @@ echo $OUTPUT->header();
 $report = system_report_factory::create(systemreports\rules::class, $context);
 
 $report->set_filter_values($filters);
-
 echo $report->output();
 echo $output->footer();
-

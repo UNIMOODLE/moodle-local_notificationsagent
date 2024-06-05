@@ -42,6 +42,7 @@ use moodle_url;
 use context_course;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\helper\helper;
 use notificationscondition_ac\ac;
 use stdClass;
 
@@ -352,7 +353,7 @@ class rule {
         $instances = [];
 
         if ($courseid != SITEID && has_capability('local/notificationsagent:managecourserule', $context)) {
-            $rules = array_unique([...self::get_owner_rules(), ...self::get_course_rules_forced($courseid, 1)], SORT_REGULAR);
+            $rules = array_unique([...self::get_owner_rules(), ...self::get_course_rules($courseid, true)], SORT_REGULAR);
         }
 
         if (!empty($rules)) {
@@ -1735,13 +1736,17 @@ class rule {
      *
      * @param integer $courseid   Course id
      * @param bool    $notstudent Filter
+     * @param int    $ruleid     Concrete ruleid
      *
      * @return array $data rules
      */
-    private static function get_course_rules($courseid, $notstudent = false) {
+    private static function get_course_rules($courseid, $notstudent = false, $ruleid = null) {
         global $DB;
 
         $data = [];
+
+        $parents = helper::get_parents_categories_course($courseid);
+        list($sqlparents, $params) = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
 
         $notstudentjoin = '';
         if ($notstudent) {
@@ -1753,6 +1758,17 @@ class rule {
                                 JOIN {role} r ON r.id = ra.roleid AND r.id != 5";
         }
 
+        $ruleidwheresql1 = '';
+        $ruleidwheresql2 = '';
+        if (!is_null($ruleid)) {
+            $ruleidwheresql1 = " AND nr.id = :ruleid1";
+            $ruleidwheresql2 = " AND nr.id = :ruleid2";
+            $params = [
+                'ruleid1' => $ruleid,
+                'ruleid2' => $ruleid,
+            ] + $params;
+        }
+
         $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -1760,6 +1776,7 @@ class rule {
                   JOIN {course} c ON nctx.objectid = c.id
                   $notstudentjoin
                  WHERE c.id = :coursecontext
+                 $ruleidwheresql1
                  UNION
                 SELECT nr.id
                   FROM {notificationsagent_rule} nr
@@ -1768,15 +1785,17 @@ class rule {
                   JOIN {course_categories} cc ON nctx.objectid = cc.id
                   JOIN {course} c ON cc.id = c.category
                   $notstudentjoin
-                 WHERE c.id = :categorycontext
+                 WHERE cc.id $sqlparents
+                 $ruleidwheresql2
         ";
 
-        $data = $DB->get_records_sql($sql, [
+        $params = [
             'coursecontextid' => CONTEXT_COURSE,
             'coursecontext' => $courseid,
             'categorycontextid' => CONTEXT_COURSECAT,
-            'categorycontext' => $courseid,
-        ]);
+        ] + $params;
+
+        $data = $DB->get_records_sql($sql, $params);
 
         return $data;
     }
@@ -1794,7 +1813,10 @@ class rule {
 
         $data = [];
 
-        $sql = 'SELECT nr.id
+        $parents = helper::get_parents_categories_course($courseid);
+        list($sqlparents, $params) = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+
+        $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid AND nr.deleted = 0
@@ -1806,19 +1828,19 @@ class rule {
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :categorycontextid AND nr.deleted = 0
                   JOIN {course_categories} cc ON nctx.objectid = cc.id
-                  JOIN {course} c ON cc.id = c.category
-                 WHERE c.id = :categorycontext
+                 WHERE cc.id $sqlparents
                    AND nr.forced = :forcedcat
-        ';
+        ";
 
-        $data = $DB->get_records_sql($sql, [
+        $params = [
             'coursecontextid' => CONTEXT_COURSE,
             'coursecontext' => $courseid,
             'categorycontextid' => CONTEXT_COURSECAT,
-            'categorycontext' => $courseid,
             'forcedcourse' => $forced,
             'forcedcat' => $forced,
-        ]);
+        ] + $params;
+
+        $data = $DB->get_records_sql($sql, $params);
 
         return $data;
     }
@@ -2304,5 +2326,33 @@ class rule {
             : \local_notificationsagent\helper\helper::get_default_capabilities($context);
 
         return $capabilities;
+    }
+
+    /**
+     * Check permission to access to rule
+     * 
+     * @param context_system|context_course $context
+     * @param int $courseid
+     */
+    public function check_permission($context, $courseid) {
+        global $USER;
+
+        $isownrule = $this->get_createdby() == $USER->id;
+        $hasmanageallrule = has_capability('local/notificationsagent:manageallrule', $context);
+        $hasviewcourserules = has_capability('local/notificationsagent:viewcourserule', $context);
+        $hasmanagecourserule = has_capability('local/notificationsagent:managecourserule', $context);
+
+        if ($this->ruleaction == self::RULE_ADD || $isownrule || $hasmanageallrule) {
+            return true;
+        } elseif ($hasviewcourserules || $hasmanagecourserule) {
+            if (self::get_course_rules($courseid, true, $this->get_id())) {
+                return true;
+            }
+        }
+
+        throw new \moodle_exception(
+            'nopermissions', '', '',
+            get_capability_string('local/notificationsagent:managecourserule')
+        );
     }
 }

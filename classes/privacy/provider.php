@@ -183,10 +183,13 @@ class provider implements \core_privacy\local\metadata\provider,
         $context = $userlist->get_context();
 
         if ($context instanceof \context_course) {
-            list($usersql, $userparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
-            $select = "courseid = :courseid AND userid {$usersql}";
-            $params = ['courseid' => $context->instanceid] + $userparams;
-            $DB->delete_records_select('notificationsagent_report', $select, $params);
+            $userids = $userlist->get_userids();
+            if (!empty($userids)) {
+                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+                $select = "courseid = :courseid AND userid {$usersql}";
+                $params = ['courseid' => $context->instanceid] + $userparams;
+                $DB->delete_records_select('notificationsagent_report', $select, $params);
+            }
         }
     }
 

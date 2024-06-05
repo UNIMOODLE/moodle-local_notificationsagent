@@ -256,10 +256,10 @@ class ondates extends notificationconditionplugin {
      * If this method overrides, call to parent::validation
      *
      * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
-     *                                  and return directly
+     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the
+     *                                  form and return directly
      * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
-     * 
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
@@ -280,11 +280,6 @@ class ondates extends notificationconditionplugin {
         if ($startdatedata > $enddatedata) {
             $array[$this->get_name_ui(self::STARTDATE)] = get_string(
                 'validation_editrule_form_supported_invalid_date', 'notificationscondition_ondates'
-            );
-            $validation = false;
-        } else if (time() > $enddatedata) {
-            $array[$this->get_name_ui(self::ENDDATE)] = get_string(
-                'validation_editrule_form_supported_finished_date', 'notificationscondition_ondates'
             );
             $validation = false;
         }

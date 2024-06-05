@@ -57,17 +57,19 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $timestarted = $this->get_timestarted();
         \local_notificationsagent\helper\helper::custom_mtrace("Task started-> " . $timestarted);
         // Get cron task lastrun.
-        $tasklastrunttime = get_config('local_notificationsagent', 'cronlastrun');
+        $tasklastrunttime = $cronlastrun = get_config('local_notificationsagent', 'cronlastrun');
         // Rules in the interval  $timestarted and $tasklastrunttime.
         $triggers = notificationsagent::get_triggersbytimeinterval($timestarted, $tasklastrunttime);
-        // Set cron task lastrun.
-        set_config('cronlastrun', $timestarted, 'local_notificationsagent');
+        
         // Evalutate rules.
         foreach ($triggers as $trigger) {
             notificationsagent_engine::notificationsagent_engine_evaluate_rule(
                 [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid, $trigger->startdate
             );
+            $cronlastrun = $trigger->startdate;
         }
+        // Set cron task lastrun.
+        set_config('cronlastrun', $cronlastrun, 'local_notificationsagent');
         \local_notificationsagent\helper\helper::custom_mtrace("Task finished-> " . time());
         \local_notificationsagent\helper\helper::custom_mtrace("RUNTIME: " . $tasklastrunttime);
     }

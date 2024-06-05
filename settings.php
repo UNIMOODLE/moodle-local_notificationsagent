@@ -52,23 +52,32 @@ if ($hassiteconfig) {
             false
         );
         $settingspage->add($settingdisableuseruse);
+        
+        $settingmaxrulescron = new admin_setting_configtext(
+            'local_notificationsagent/max_rules_cron',
+            get_string('max_rules_cron', 'local_notificationsagent'),
+            get_string('max_rules_cron_desc', 'local_notificationsagent'),
+            '5000',
+            PARAM_INT
+        );
+        $settingspage->add($settingmaxrulescron);
 
         $settingstartdate = new admin_setting_configtextarea(
             'local_notificationsagent/startdate',
             get_string('startdate', 'local_notificationsagent'),
             get_string('startdate_desc', 'local_notificationsagent'),
             'mod_assign|assign|allowsubmissionsfromdate|duedate
-mod_bigbluebuttonbn|bigbluebuttonbn|openingtime
-mod_chat|chat|chattime|
-mod_choice|choice|timeopen|timeclose
-mod_data|data|timeavailablefrom|timeavailableto
-mod_feedback|feedback|timeopen|timeclose
-mod_forum|forum|duedate|cutoffdate
-mod_glossary|glossary|assesstimestart|assesstimefinish
-mod_lesson|lesson|available|deadline
-mod_quiz|quiz|timeopen|timeclose
-mod_scorm|scorm|timeopen|timeclose
-mod_workshop|workshop|submissionstart|submissionend',
+            mod_bigbluebuttonbn|bigbluebuttonbn|openingtime
+            mod_chat|chat|chattime|
+            mod_choice|choice|timeopen|timeclose
+            mod_data|data|timeavailablefrom|timeavailableto
+            mod_feedback|feedback|timeopen|timeclose
+            mod_forum|forum|duedate|cutoffdate
+            mod_glossary|glossary|assesstimestart|assesstimefinish
+            mod_lesson|lesson|available|deadline
+            mod_quiz|quiz|timeopen|timeclose
+            mod_scorm|scorm|timeopen|timeclose
+            mod_workshop|workshop|submissionstart|submissionend',
             PARAM_RAW,
             10,
             15

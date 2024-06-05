@@ -142,12 +142,16 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_execute_action($param) {
+    public function test_execute_action($param, $user) {
         $auxarray = json_decode($param, true);
         $auxarray['user'] = self::$user->id;
         $param = json_encode($auxarray);
+        self::$rule->set_createdby($user === 0 ? self::$user->id : $user);
         self::$context->set_params($param);
         self::$context->set_rule(self::$rule);
+        self::$context->set_userid(self::$user->id);
+        self::$context->set_courseid(self::$coursetest->id);
+
         self::$subplugin->set_id(self::CONDITIONID);
         // Test action.
         unset_config('noemailever');
@@ -157,7 +161,11 @@ class usermessageagent_test extends \advanced_testcase {
         $this->assertCount(1, $messages);
         $this->assertIsInt($result, $result);
         $this->assertSame(self::$user->email, $messages[0]->to);
-        $this->assertStringContainsString($auxarray['title'], $messages[0]->subject);
+        if ($user !== 0) {
+            $this->assertStringContainsString('Admin', $messages[0]->subject);
+        } else {
+            $this->assertStringContainsString($auxarray['title'], $messages[0]->subject);
+        }
         $this->assertStringContainsString($auxarray['message'], $messages[0]->body);
     }
 
@@ -167,7 +175,8 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            ['{"title":"TEST","message":"Message body"}'],
+            ['{"title":"TEST","message":"Message body"}', 2],
+            ['{"title":"TEST","message":"Message body"}', 0],
         ];
     }
 

@@ -650,14 +650,20 @@ class notificationsagent {
      */
     public static function get_triggersbytimeinterval($timestarted, $tasklastrunttime) {
         global $DB;
-        $rulesidquery = "
+
+        // Get max_rules_cron.
+        $maxrulescron = get_config('local_notificationsagent', 'max_rules_cron');
+        \local_notificationsagent\helper\helper::custom_mtrace("Task max_rules_cron-> " . $maxrulescron);
+
+        $rulesidquery = '
                     SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid, nt.startdate
                       FROM {notificationsagent_triggers} nt
                       JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
                      WHERE startdate
-                   BETWEEN :tasklastrunttime AND :timestarted
+                    BETWEEN :tasklastrunttime AND :timestarted
                        AND nt.courseid != :courseid
-                     ";
+                    ORDER BY nt.startdate ASC
+        ';
 
         return $DB->get_records_sql(
             $rulesidquery,
@@ -665,7 +671,9 @@ class notificationsagent {
                 'tasklastrunttime' => $tasklastrunttime,
                 'timestarted' => $timestarted,
                 'courseid' => SITEID,
-            ]
+            ],
+            0,
+            $maxrulescron
         );
     }
 
@@ -795,29 +803,29 @@ class notificationsagent {
         $DB->delete_records('notificationsagent_triggers', ['courseid' => $courseid]);
 
         // Get all rules.
-        $rules = self::get_rules_by_course($courseid);
-        $rulesid = array_column($rules, 'ruleid');
-        list($insql, $inparams) = $DB->get_in_or_equal($rulesid, SQL_PARAMS_NAMED);
-        $DB->delete_records_select(
-            'notificationsagent_context',
-            "contextid = :contextid AND objectid = :objectid AND ruleid $insql",
-            ["contextid" => CONTEXT_COURSE, "objectid" => $courseid, ...$inparams]
-        );
+        if ($rules = self::get_rules_by_course($courseid)) {
+            list($insql, $inparams) = $DB->get_in_or_equal(array_column($rules, 'ruleid'), SQL_PARAMS_NAMED);
+            $DB->delete_records_select(
+                'notificationsagent_context',
+                "contextid = :contextid AND objectid = :objectid AND ruleid $insql",
+                ["contextid" => CONTEXT_COURSE, "objectid" => $courseid, ...$inparams]
+            );
 
-        // Check if rule has more contexts.
-        $rulesid = [];
-        foreach ($rules as $rule) {
-            $ruleid = $rule->ruleid;
-            $instance = new rule($ruleid, rule::RULE_TYPE, rule::RULE_ONLY);
-            if (!$instance->has_context()) {
-                $rulesid[] = $ruleid;
+            // Check if rule has more contexts.
+            $rulesid = [];
+            foreach ($rules as $rule) {
+                $ruleid = $rule->ruleid;
+                $instance = new rule($ruleid, rule::RULE_TYPE, rule::RULE_ONLY);
+                if (!$instance->has_context()) {
+                    $rulesid[] = $ruleid;
+                }
             }
-        }
-        if (!empty($rulesid)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($rulesid, SQL_PARAMS_NAMED);
-            $DB->delete_records_select('notificationsagent_action', "ruleid $insql", $inparams);
-            $DB->delete_records_select('notificationsagent_condition', "ruleid $insql", $inparams);
-            $DB->delete_records_select('notificationsagent_rule', "id $insql", $inparams);
+            if (!empty($rulesid)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($rulesid, SQL_PARAMS_NAMED);
+                $DB->delete_records_select('notificationsagent_action', "ruleid $insql", $inparams);
+                $DB->delete_records_select('notificationsagent_condition', "ruleid $insql", $inparams);
+                $DB->delete_records_select('notificationsagent_rule', "id $insql", $inparams);
+            }
         }
     }
 }

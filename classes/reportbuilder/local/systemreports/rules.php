@@ -105,12 +105,11 @@ class rules extends system_report {
     protected function add_filters(): void {
         $filters = [
             'rule:rulename',
-            'course:courseselector',
-            'user:fullname',
+            'rule:courseselector',
+            'rule:userfullname',
             'rule:actiondetail',
             'rule:timestamp',
         ];
-
         $this->add_filters_from_entities($filters);
     }
 }

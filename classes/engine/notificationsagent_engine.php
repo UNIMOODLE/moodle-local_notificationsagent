@@ -36,6 +36,7 @@ namespace local_notificationsagent\engine;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\rule;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
@@ -107,14 +108,13 @@ class notificationsagent_engine {
                                 );
                                 $result = $action->execute_action($context, $parameters);
                                 if (!$result) {
-                                    $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
+                                    $parameters = helper::set_error($parameters);
                                 }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
                                     $parameters, $timeaccess
                                 );
                             }
-
                         }
                     }
                     $transaction->allow_commit();
@@ -152,7 +152,7 @@ class notificationsagent_engine {
                                 );
                                 $result = $action->execute_action($context, $parameters);
                                 if (!$result) {
-                                    $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
+                                    $parameters = helper::set_error($parameters);
                                 }
                                 $rule->record_report(
                                     $ruleid, $context->get_userid() == notificationsagent::GENERIC_USERID ? get_admin()->id
@@ -186,7 +186,7 @@ class notificationsagent_engine {
                                     );
                                     $result = $action->execute_action($context, $parameters);
                                     if (!$result) {
-                                        $parameters = get_string('actionerror', 'local_notificationsagent') . $parameters;
+                                        $parameters = helper::set_error($parameters);
                                     }
                                     $rule->record_report(
                                         $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
@@ -195,7 +195,6 @@ class notificationsagent_engine {
                                 }
                             }
                         }
-
                         $transaction->allow_commit();
                     }
                 }

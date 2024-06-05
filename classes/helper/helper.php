@@ -350,7 +350,7 @@ class helper {
      * Get default capabilities.
      *
      * @param \context $context The course context in which to check the capability.
-     * 
+     *
      * @return array $capabilities Default value for capabilities.
      */
     public static function get_default_capabilities($context) {
@@ -376,7 +376,30 @@ class helper {
             'export' => has_capability('local/notificationsagent:exportrule', $context),
             'force' => has_capability('local/notificationsagent:forcerule', $context),
             'share' => has_capability('local/notificationsagent:updateruleshare', $context),
-            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
+            'report' => has_capability('local/notificationsagent:manageownrule', $context),
         ];
+    }
+
+    /**
+     * Get parents categories id from course
+     *
+     * @param int $courseid
+     *
+     * @return array $parents categories id
+     */
+    public static function get_parents_categories_course($courseid) {
+        $course = get_course($courseid);
+        $categoryid = $course->category;
+        $category = \core_course_category::get($categoryid);
+        $parents = $category->get_parents();
+        $parents[] = $course->category;
+
+        return $parents;
+    }
+
+    public static function set_error($parameters) {
+        $json = json_decode($parameters, true);
+        $json['error'] = get_string('actionerror', 'local_notificationsagent');
+        return json_encode($json);
     }
 }

@@ -35,6 +35,7 @@ namespace notificationscondition_ondates;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
@@ -118,11 +119,11 @@ class ondates_test extends \advanced_testcase {
     /**
      * Test evaluate
      *
-     * @param int  $timeaccess    timeaccess
-     * @param bool $usecache      usecache
-     * @param bool $complementary complementary
-     * @param bool $expected      expected
-     * @param array $params       params
+     * @param int   $timeaccess    timeaccess
+     * @param bool  $usecache      usecache
+     * @param bool  $complementary complementary
+     * @param bool  $expected      expected
+     * @param array $params        params
      *
      *
      * @covers       \notificationscondition_ondates\ondates::evaluate
@@ -227,10 +228,10 @@ class ondates_test extends \advanced_testcase {
      * @covers       \notificationscondition_ondates\ondates::estimate_next_time
      * @dataProvider dataondates
      *
-     * @param int $timeaccess
-     * @param int $expected
+     * @param int   $timeaccess
+     * @param int   $expected
      * @param array $params
-     * @param int $complementary
+     * @param int   $complementary
      *
      * @return void
      */
@@ -422,6 +423,7 @@ class ondates_test extends \advanced_testcase {
      *
      * @param array $params
      * @param bool  $expected
+     *
      * @dataProvider datavalidation
      * @covers       \notificationscondition_ondates\ondates::validation
      */
@@ -439,7 +441,7 @@ class ondates_test extends \advanced_testcase {
         return [
             'Startdate(May 02 2024) Enddate(Jan 13 3000)' => ['{"startdate": 1714627363, "enddate": 32504765577}', true],
             'Startdate(May 04 2024) Enddate(May 02 2024)' => ['{"startdate": 1714827363, "enddate": 1714627363}', false],
-            'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', false],
+            'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', true],
         ];
     }
 
@@ -452,6 +454,18 @@ class ondates_test extends \advanced_testcase {
         $params = '{"startdate": 1714627363, "enddate": 1799827363}';
         self::$subplugin->set_parameters($params);
         $this->assertIsArray(self::$subplugin->load_dataform());
+    }
+
+    /**
+     * Test update after restore method
+     *
+     * @covers \notificationscondition_ondates\ondates::update_after_restore
+     * @return void
+     *
+     */
+    public function test_update_after_restore() {
+        $logger = new mock_base_logger(0);
+        $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
 
 }
