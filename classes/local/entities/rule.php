@@ -350,10 +350,12 @@ class rule extends base {
                     $coursecontext
                 )
                 ) {
+                    $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
                     $query
-                        = "SELECT DISTINCT {user}.id, CONCAT({user}.firstname ,' ', {user}.lastname) AS name
+                        = 'SELECT DISTINCT {user}.id, CONCAT({user}.firstname ," ", {user}.lastname) AS name
                              FROM {notificationsagent_report}
-                              JOIN {user} ON {user}.id={notificationsagent_report}.userid";
+                              JOIN {user} ON {user}.id={notificationsagent_report}.userid
+                           WHERE {notificationsagent_report}.courseid IN (' . $key . ' )';;
                     $users = $DB->get_recordset_sql($query);
 
                     foreach ($users as $user) {

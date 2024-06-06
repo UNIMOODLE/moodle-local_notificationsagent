@@ -75,6 +75,15 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        $recordset = $DB->get_recordset('notificationsagent_condition');
+        foreach ($recordset as $record) {
+            $decode = json_decode($record->parameters, false);
+            if (isset($decode->cmid)) {
+                $record->cmid = $decode->cmid;
+                $DB->update_record('notificationsagent_condition', $record);
+            }
+        }
+        $recordset->close();
         // Notificationsagent savepoint reached.
         upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
     }

@@ -172,12 +172,16 @@ abstract class notificationactionplugin extends notificationplugin {
         $delimiter = '/{' . rule::SEPARATOR . '}|&lt;!-- pagebreak --&gt;/';
 
         $messagesplit = preg_split($delimiter, $message);
+        $timesfired = $context->get_rule()->get_timesfired();
+        $usertimesfired = $context->get_usertimesfired();
+        $countmessagesplit = count($messagesplit);
 
-        if ($context->get_rule()->get_timesfired() == rule::MINIMUM_EXECUTION) {
+        if (($timesfired == rule::MINIMUM_EXECUTION) || ($usertimesfired > $countmessagesplit)) {
             $messageindex = rand(0, count($messagesplit) - 1);
         } else {
-            $messageindex = min($context->get_usertimesfired(), count($messagesplit)) - 1;
+            $messageindex = $usertimesfired - 1;
         }
+
         $result = $messagesplit[$messageindex];
 
         return $result;

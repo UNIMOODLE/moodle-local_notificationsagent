@@ -108,7 +108,7 @@ class messageagent_test extends \advanced_testcase {
         self::$subplugin = new messageagent(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -134,6 +134,7 @@ class messageagent_test extends \advanced_testcase {
         self::$context->set_rule(self::$rule);
         self::$context->set_userid(self::$user->id);
         self::$context->set_courseid(self::$coursecontext->id);
+        self::$context->set_usertimesfired(1);
         self::$subplugin->set_id(self::CONDITIONID);
         self::$rule->set_createdby($user === 0 ? self::$user->id : $user);
         // Test action.
@@ -157,8 +158,8 @@ class messageagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            ['{"title":"TEST","message":"Message body"}', 2],
-            ['{"title":"TEST","message":"Message body"}', 0],
+                ['{"title":"TEST","message":"Message body"}', 2],
+                ['{"title":"TEST","message":"Message body"}', 0],
         ];
     }
 
@@ -196,8 +197,8 @@ class messageagent_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -234,11 +235,11 @@ class messageagent_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -251,10 +252,10 @@ class messageagent_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -282,8 +283,8 @@ class messageagent_test extends \advanced_testcase {
         $UI_MESSAGE = 'test message';
 
         $paramstoreplace = [
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
         ];
         $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());
 

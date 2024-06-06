@@ -2033,71 +2033,7 @@ class rule {
         return $data;
     }
 
-    /**
-     * Store the number of times a rule has been executed in a specific context
-     *
-     * @param evaluationcontext $context The context in which the rule is being evaluated.
-     *
-     * @return int $timesfired Total user timesfired
-     */
-    public function set_launched($context) {
-        global $DB;
-
-        $cache = \cache::make('local_notificationsagent', 'launched');
-        $rulecache = $cache->get($this->get_id()) ? $cache->get($this->get_id()) : [];
-        $userlaunched = $rulecache[$context->get_courseid()][$context->get_userid()] ?? [];
-
-        if (empty($userlaunched)) {
-            $record = $this->get_or_create_launched_record($context);
-
-            $rulecache[$context->get_courseid()][$context->get_userid()] = $record;
-            $cache->set($this->get_id(), $rulecache);
-        } else {
-            $userlaunched->timesfired++;
-            $userlaunched->timemodified = time();
-            $DB->update_record('notificationsagent_launched', $userlaunched);
-
-            $rulecache[$context->get_courseid()][$context->get_userid()] = $userlaunched;
-            $cache->set($this->get_id(), $rulecache);
-        }
-
-        return $userlaunched->timesfired ?? $record->timesfired;
-    }
-
-    /**
-     * Get or create a record in the 'notificationsagent_launched' table for the given context.
-     *
-     * @param evaluationcontext $context The context in which the rule is being evaluated.
-     *
-     * @return object            $record  The object of the 'notificationsagent_launched' table.
-     */
-    private function get_or_create_launched_record($context) {
-        global $DB;
-
-        $record = $DB->get_record('notificationsagent_launched', [
-            'ruleid' => $this->get_id(),
-            'courseid' => $context->get_courseid(),
-            'userid' => $context->get_userid(),
-        ]);
-
-        if (empty($record)) {
-            $record = new stdClass();
-            $record->ruleid = $this->get_id();
-            $record->courseid = $context->get_courseid();
-            $record->userid = $context->get_userid();
-            $record->timesfired = self::MINIMUM_EXECUTION;
-            $record->timecreated = time();
-            $record->timemodified = time();
-            $record->id = $DB->insert_record('notificationsagent_launched', $record);
-        } else {
-            $record->timesfired++;
-            $record->timemodified = time();
-            $DB->update_record('notificationsagent_launched', $record);
-        }
-
-        return $record;
-    }
-
+    
     /**
      * Returns the number of times the rule has been executed in a given context
      *
@@ -2125,6 +2061,69 @@ class rule {
         }
 
         return $rulecache[$context->get_courseid()][$context->get_userid()] ?? null;
+    }
+
+    /**
+     * Store the number of times a rule has been executed in a specific context
+     *
+     * @param evaluationcontext $context The context in which the rule is being evaluated.
+     * 
+     * @return void
+     *
+     */
+    public function set_launched($context) {
+        $launched = $this->get_launched($context);
+
+        if (is_null($launched)) {
+            $launched = $this->create_launched_record($context);
+        } else {
+            $launched = $this->update_launched_record($launched, $context);
+        }
+
+        $cache = \cache::make('local_notificationsagent', 'launched');
+        $rulecache = $cache->get($this->get_id()) ? $cache->get($this->get_id()) : [];
+        $rulecache[$context->get_courseid()][$context->get_userid()] = $launched;
+        $cache->set($this->get_id(), $rulecache);
+    }
+
+    /**
+     * Create a record in the 'notificationsagent_launched' table for the given context.
+     *
+     * @param evaluationcontext $context The context in which the rule is being evaluated.
+     *
+     * @return object            $record  The object of the 'notificationsagent_launched' table.
+     */
+    private function create_launched_record($context) {
+        global $DB;
+
+        $launched = new stdClass();
+        $launched->ruleid = $this->get_id();
+        $launched->courseid = $context->get_courseid();
+        $launched->userid = $context->get_userid();
+        $launched->timesfired = self::MINIMUM_EXECUTION;
+        $launched->timecreated = time();
+        $launched->timemodified = time();
+        $launched->id = $DB->insert_record('notificationsagent_launched', $launched);
+
+        return $launched;
+    }
+    
+    /**
+     * Update a record in the 'notificationsagent_launched' table for the given context.
+     *
+     * @param object $record  The object of the 'notificationsagent_launched' table.
+     * @param evaluationcontext $context The context in which the rule is being evaluated.
+     *
+     * @return object $record  The object of the 'notificationsagent_launched' table.
+     */
+    private function update_launched_record($launched, $context) {
+        global $DB;
+
+        $launched->timesfired = $context->get_usertimesfired();
+        $launched->timemodified = time();
+        $DB->update_record('notificationsagent_launched', $launched);
+
+        return $launched;
     }
 
     /**

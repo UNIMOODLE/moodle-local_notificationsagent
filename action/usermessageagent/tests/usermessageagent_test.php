@@ -107,7 +107,7 @@ class usermessageagent_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
 
         $rule = new rule();
@@ -151,6 +151,7 @@ class usermessageagent_test extends \advanced_testcase {
         self::$context->set_rule(self::$rule);
         self::$context->set_userid(self::$user->id);
         self::$context->set_courseid(self::$coursetest->id);
+        self::$context->set_usertimesfired(1);
 
         self::$subplugin->set_id(self::CONDITIONID);
         // Test action.
@@ -175,8 +176,8 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            ['{"title":"TEST","message":"Message body"}', 2],
-            ['{"title":"TEST","message":"Message body"}', 0],
+                ['{"title":"TEST","message":"Message body"}', 2],
+                ['{"title":"TEST","message":"Message body"}', 0],
         ];
     }
 
@@ -214,8 +215,8 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -227,8 +228,8 @@ class usermessageagent_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_usermessageagent_title" => "Test title", $id . "_usermessageagent_message" => ['text' => "Message body"],
-            $id . "_usermessageagent_user" => 5,
+                $id . "_usermessageagent_title" => "Test title", $id . "_usermessageagent_message" => ['text' => "Message body"],
+                $id . "_usermessageagent_user" => 5,
         ];
         $expected = '{"title":"Test title","message":{"text":"Message body"},"user":5}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -255,11 +256,11 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -272,10 +273,10 @@ class usermessageagent_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -346,9 +347,9 @@ class usermessageagent_test extends \advanced_testcase {
         $params = json_encode($params);
 
         $paramstoreplace = [
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
-            shorten_text(self::$user->firstname . " " . self::$user->lastname),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+                shorten_text(self::$user->firstname . " " . self::$user->lastname),
         ];
         $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());
 

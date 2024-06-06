@@ -82,7 +82,9 @@ class notificationsagent_engine {
                     if ($context->is_evaluate($rule)) {
                         $result = $rule->evaluate($context);
                         if ($result) {
-                            $context->set_usertimesfired($rule->set_launched($context));
+                            $launched = $rule->get_launched($context);
+                            $usertimesfired = is_null($launched) ? rule::MINIMUM_EXECUTION : ++$launched->timesfired;
+                            $context->set_usertimesfired($usertimesfired);
                             $actions = $rule->get_actions();
                             foreach ($actions as $action) {
                                 $actionparams = json_decode($action->get_parameters(), true);
@@ -115,6 +117,7 @@ class notificationsagent_engine {
                                     $parameters, $timeaccess
                                 );
                             }
+                            $rule->set_launched($context);
                         }
                     }
                     $transaction->allow_commit();
@@ -125,7 +128,9 @@ class notificationsagent_engine {
                     $contextcourse = \context_course::instance($context->get_courseid());
                     if ($result) {
                         $transaction = $DB->start_delegated_transaction();
-                        $context->set_usertimesfired($rule->set_launched($context));
+                        $launched = $rule->get_launched($context);
+                        $usertimesfired = is_null($launched) ? rule::MINIMUM_EXECUTION : ++$launched->timesfired;
+                        $context->set_usertimesfired($usertimesfired);
                         $actions = $rule->get_actions();
                         foreach ($actions as $action) {
                             $actionparams = json_decode($action->get_parameters(), true);
@@ -195,6 +200,7 @@ class notificationsagent_engine {
                                 }
                             }
                         }
+                        $rule->set_launched($context);
                         $transaction->allow_commit();
                     }
                 }
