@@ -30,6 +30,6 @@
 defined('MOODLE_INTERNAL') || die();
 // This event will listen the user's first session in a course.
 $observers[] = [
-    'eventname' => '\core\event\course_viewed',
-    'callback' => 'notificationsaction_bootstrapnotifications_observer::course_viewed',
+        'eventname' => '\core\event\course_viewed',
+        'callback' => 'notificationsaction_bootstrapnotifications_observer::course_viewed',
 ];

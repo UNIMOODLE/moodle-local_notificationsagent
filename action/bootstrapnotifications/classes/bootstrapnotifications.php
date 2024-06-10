@@ -51,25 +51,25 @@ class bootstrapnotifications extends notificationactionplugin {
      * Get the elements for the bootstrapnotifications plugin.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param int         $type
+     * @param int $courseid
+     * @param int $type
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
         $element = $mform->createElement(
-            'text', $this->get_name_ui(self::UI_MESSAGE),
-            get_string(
-                'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
-                ['typeelement' => '[TTTT]']
-            ), ['size' => '64']
+                'text', $this->get_name_ui(self::UI_MESSAGE),
+                get_string(
+                        'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
+                        ['typeelement' => '[TTTT]']
+                ), ['size' => '64']
         );
 
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_TEXT);
         $mform->addRule(
-            $this->get_name_ui(self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+                $this->get_name_ui(self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
     }
 
@@ -125,9 +125,9 @@ class bootstrapnotifications extends notificationactionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -145,7 +145,7 @@ class bootstrapnotifications extends notificationactionplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -174,9 +174,9 @@ class bootstrapnotifications extends notificationactionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */

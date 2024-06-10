@@ -57,7 +57,7 @@ class notificationsaction_addusergroup_observer {
                  WHERE mna.pluginname = :name';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => addusergroup::NAME,
+                'name' => addusergroup::NAME,
         ]);
 
         foreach ($dataobj as $data) {
@@ -67,7 +67,7 @@ class notificationsaction_addusergroup_observer {
                 $result = $subplugin->validation($event->courseid);
                 if (!$result) {
                     update_rule_status::execute(
-                        $data->ruleid, rule::PAUSE_RULE,
+                            $data->ruleid, rule::PAUSE_RULE,
                     );
                     helper::broken_rule_notify($event->courseid, $data->ruleid);
                 }

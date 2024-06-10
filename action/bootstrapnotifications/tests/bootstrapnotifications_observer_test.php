@@ -108,7 +108,7 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
         self::$subplugin = new bootstrapnotifications(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -125,7 +125,7 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      *
      * @param string $message Message to create a bootstrap notification.
-     * @param int    $course  Course ID, SITEID for front page.
+     * @param int $course Course ID, SITEID for front page.
      *
      * @covers       \notificationsaction_bootstrapnotifications_observer::course_viewed
      * @covers       \notificationsaction_bootstrapnotifications\bootstrapmessages::get_records
@@ -146,9 +146,9 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
         $this->assertNotEmpty($messages);
 
         $event = \core\event\course_viewed::create([
-            'context' => \context_course::instance($courseid),
-            'userid' => self::$user->id,
-            'courseid' => $courseid,
+                'context' => \context_course::instance($courseid),
+                'userid' => self::$user->id,
+                'courseid' => $courseid,
         ]);
         $event->trigger();
 
@@ -171,9 +171,9 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'siteid' => ['{"message":"TEST"}', 1],
-            'message 1' => ['{"message":"TEST"}', 0],
-            'message 2' => ['{"message":"Message content"}', 0],
+                'siteid' => ['{"message":"TEST"}', 1],
+                'message 1' => ['{"message":"TEST"}', 0],
+                'message 2' => ['{"message":"Message content"}', 0],
         ];
     }
 

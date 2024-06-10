@@ -46,15 +46,15 @@ class bootstrapmessages extends \core\persistent {
      */
     protected static function define_properties() {
         return [
-            'userid' => [
-                'type' => PARAM_INT,
-            ],
-            'courseid' => [
-                'type' => PARAM_INT,
-            ],
-            'message' => [
-                'type' => PARAM_RAW,
-            ],
+                'userid' => [
+                        'type' => PARAM_INT,
+                ],
+                'courseid' => [
+                        'type' => PARAM_INT,
+                ],
+                'message' => [
+                        'type' => PARAM_RAW,
+                ],
         ];
     }
 }
