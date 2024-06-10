@@ -72,7 +72,7 @@ class forumnoreply extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -92,19 +92,19 @@ class forumnoreply extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $time = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($time)) {
             return !empty(
             self::get_unanswered_threads(
-                $cmid,
-                $courseid,
-                $timeaccess,
-                $timenowandtime,
-                $userid
+                    $cmid,
+                    $courseid,
+                    $timeaccess,
+                    $timenowandtime,
+                    $userid
             )
             );
         }
@@ -141,9 +141,9 @@ class forumnoreply extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -166,20 +166,20 @@ class forumnoreply extends notificationconditionplugin {
         }
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                ['typeelement' => '[FFFF]']
-            ),
-            $forums
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
+                        ['typeelement' => '[FFFF]']
+                ),
+                $forums
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -219,9 +219,9 @@ class forumnoreply extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -234,7 +234,8 @@ class forumnoreply extends notificationconditionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $paramstoteplace = [$activityname, \local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true)];
+        $paramstoteplace =
+                [$activityname, \local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true)];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
@@ -265,11 +266,11 @@ class forumnoreply extends notificationconditionplugin {
     /**
      * Get unanswered threads in a forum, or by a specific user
      *
-     * @param int      $cmid           The course module id.
-     * @param int      $courseid       The course id.
-     * @param int      $timenow        The time now.
-     * @param int      $timenowandtime The subplugin time.
-     * @param int|null $userid         The user id.
+     * @param int $cmid The course module id.
+     * @param int $courseid The course id.
+     * @param int $timenow The time now.
+     * @param int $timenowandtime The subplugin time.
+     * @param int|null $userid The user id.
      *
      * @return object Unanswered threads.
      */
@@ -287,14 +288,14 @@ class forumnoreply extends notificationconditionplugin {
         }
 
         $params = [
-                'forum' => $forumid,
-                'course' => $courseid,
-                'timestart' => 0,
-                'timeend' => 0,
-                'timenow' => $timenow,
-                'timenow2' => $timenow,
-                'timenowandtime' => $timenowandtime,
-            ] + $params;
+                        'forum' => $forumid,
+                        'course' => $courseid,
+                        'timestart' => 0,
+                        'timeend' => 0,
+                        'timenow' => $timenow,
+                        'timenow2' => $timenow,
+                        'timenowandtime' => $timenowandtime,
+                ] + $params;
 
         $sql = "SELECT DISTINCT fd.id, fd.timemodified as timemodified, fd.userid
                     FROM {forum_discussions} fd

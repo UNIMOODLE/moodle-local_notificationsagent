@@ -27,6 +27,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
@@ -62,18 +63,18 @@ class local_notificationsagent_observer {
                  WHERE (mnc.cmid = :cmid) OR (pluginname = :acname)';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'cmid' => $cmid,
-            'acname' => ac::NAME,
+                'cmid' => $cmid,
+                'acname' => ac::NAME,
         ]);
 
         foreach ($dataobj as $data) {
             $subplugin = notificationplugin::create_instance(
-                $data->id, notificationplugin::TYPE_CONDITION, $data->pluginname, $data->ruleid
+                    $data->id, notificationplugin::TYPE_CONDITION, $data->pluginname, $data->ruleid
             );
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid, rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
@@ -88,11 +89,12 @@ class local_notificationsagent_observer {
     public static function config_log_created(config_log_created $event) {
         $modifieditem = $event->other['plugin'];
         $notificationscondition = preg_filter(
-            '/^/', 'notificationscondition_',
-            array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationscondition'))
+                '/^/', 'notificationscondition_',
+                array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationscondition'))
         );
         $notificationsaction = preg_filter(
-            '/^/', 'notificationsaction_', array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationsaction'))
+                '/^/', 'notificationsaction_',
+                array_keys(core_plugin_manager::instance()->get_installed_plugins('notificationsaction'))
         );
         if (in_array($modifieditem, $notificationscondition, false) || in_array($modifieditem, $notificationsaction, false)) {
             \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION)->purge();

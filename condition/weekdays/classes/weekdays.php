@@ -69,7 +69,7 @@ class weekdays extends notificationconditionplugin {
     /**
      * Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -99,14 +99,14 @@ class weekdays extends notificationconditionplugin {
 
         $calendar = type_factory::get_calendar_instance();
         [
-            'year' => $year,
-            'mon' => $month,
-            'mday' => $day,
-            'wday' => $dayofweek,
-            'hours' => $hour,
-            'minutes' => $minute,
+                'year' => $year,
+                'mon' => $month,
+                'mday' => $day,
+                'wday' => $dayofweek,
+                'hours' => $hour,
+                'minutes' => $minute,
         ]
-            = usergetdate($context->get_timeaccess(), $CFG->timezone);
+                = usergetdate($context->get_timeaccess(), $CFG->timezone);
         // Condition.
         if (!$context->is_complementary()) {
             if (self::correct_weekday($dayofweek, $selecteddays)) {
@@ -116,7 +116,8 @@ class weekdays extends notificationconditionplugin {
             $weekdays = $calendar->get_weekdays();
             foreach ($weekdays as $weekday => $value) {
                 if (self::correct_weekday(
-                    date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)), $selecteddays
+                        date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)),
+                        $selecteddays
                 )
                 ) {
                     return $timestamp;
@@ -132,8 +133,8 @@ class weekdays extends notificationconditionplugin {
             $weekdays = $calendar->get_weekdays();
             foreach ($weekdays as $weekday => $value) {
                 if (!self::correct_weekday(
-                    date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)),
-                    $selecteddays
+                        date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)),
+                        $selecteddays
                 )
                 ) {
                     return $timestamp;
@@ -147,9 +148,9 @@ class weekdays extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -158,16 +159,16 @@ class weekdays extends notificationconditionplugin {
         // Example of checkbox id: 15_weekdays_dayofweek0 for sunday.
         foreach ($weekdays as $key => $value) {
             $radioarray[] = $mform->createElement(
-                'advcheckbox',
-                $this->get_name_ui(self::UI_DAYOFWEEK . $key),
-                '', $value['fullname'], $key
+                    'advcheckbox',
+                    $this->get_name_ui(self::UI_DAYOFWEEK . $key),
+                    '', $value['fullname'], $key
             );
         }
 
         $radiogroup = $mform->createElement(
-            'group', $this->get_name_ui($this->get_subtype()),
-            '',
-            $radioarray, null, false
+                'group', $this->get_name_ui($this->get_subtype()),
+                '',
+                $radioarray, null, false
         );
 
         $mform->insertElementBefore($radiogroup, 'new' . $type . '_group');
@@ -227,9 +228,9 @@ class weekdays extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -241,7 +242,7 @@ class weekdays extends notificationconditionplugin {
 
         foreach ($jsonparams->{self::NAME} as $day) {
             empty($contentdays) ? $contentdays = $weekdays[$day]['fullname']
-                : $contentdays .= ', ' . $weekdays[$day]['fullname'];
+                    : $contentdays .= ', ' . $weekdays[$day]['fullname'];
         }
         $humanvalue = str_replace($this->get_elements(), $contentdays, $this->get_title());
         $content[] = $humanvalue;
@@ -259,8 +260,8 @@ class weekdays extends notificationconditionplugin {
     /**
      * Check if today is marked as true.
      *
-     * @param int   $today (0 => sunday, 1 => monday...)
-     * @param array $days  weekdays selected
+     * @param int $today (0 => sunday, 1 => monday...)
+     * @param array $days weekdays selected
      *
      * @return boolean
      */
@@ -272,11 +273,11 @@ class weekdays extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
-     *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
-     * 
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from
+     * the form and return directly
+     * @param bool $onlyverifysiteid Default false. If true, only SITEID is verified
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
@@ -284,7 +285,7 @@ class weekdays extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it is false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
@@ -329,9 +330,9 @@ class weekdays extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool False if restore is not required
      */

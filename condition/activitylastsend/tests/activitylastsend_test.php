@@ -111,7 +111,7 @@ class activitylastsend_test extends \advanced_testcase {
         self::$subplugin = new activitylastsend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -121,20 +121,20 @@ class activitylastsend_test extends \advanced_testcase {
         self::$subtype = 'activitylastsend';
         self::$elements = ['[TTTT]', '[AAAA]'];
         self::$cmtestls = self::getDataGenerator()->create_module(
-            "assign",
-            [
-                'name' => 'Assign unittest',
-                'course' => self::$coursetest->id,
-            ],
+                "assign",
+                [
+                        'name' => 'Assign unittest',
+                        'course' => self::$coursetest->id,
+                ],
         );
     }
 
     /**
      *  Test evaluate.
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $param
-     * @param bool   $expected
+     * @param bool $expected
      *
      * @covers       \notificationscondition_activitylastsend\activitylastsend::evaluate
      *
@@ -166,9 +166,9 @@ class activitylastsend_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704445200, '{"time":864000}', false],
-            [1706173200, '{"time":864000}', true],
-            [1707123600, '{"time":864000}', true],
+                [1704445200, '{"time":864000}', false],
+                [1706173200, '{"time":864000}', true],
+                [1707123600, '{"time":864000}', true],
         ];
     }
 
@@ -206,18 +206,18 @@ class activitylastsend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
     /**
      * Test estimate next time.
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $param
-     * @param int    $complementary
-     * @param bool   $completion
+     * @param int $complementary
+     * @param bool $completion
      *
      * @covers       \notificationscondition_activitylastsend\activitylastsend::estimate_next_time
      * @dataProvider dataestimate
@@ -229,24 +229,24 @@ class activitylastsend_test extends \advanced_testcase {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
-        // $cm = get_coursemodule_from_instance('assign', self::$cmtestls->id, self::$coursetest->id);
+
         $assgigngenerator = self::getDataGenerator()->get_plugin_generator('mod_assign');
         $assigncm = $assgigngenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $assigncontext = \context_module::instance($assigncm->cmid);
         if ($completion) {
             $fs = get_file_storage();
             $filerecord = [
-                'contextid' => $assigncontext->id,
-                'component' => 'mod_assign',
-                'filearea' => 'content',
-                'itemid' => 0,
-                'filepath' => '/',
-                'filename' => 'user-test-file.txt',
-                'userid' => self::$user->id,
-                'timecreated' => self::USER_LASTSEND,
-                'timemodified' => self::USER_LASTSEND,
+                    'contextid' => $assigncontext->id,
+                    'component' => 'mod_assign',
+                    'filearea' => 'content',
+                    'itemid' => 0,
+                    'filepath' => '/',
+                    'filename' => 'user-test-file.txt',
+                    'userid' => self::$user->id,
+                    'timecreated' => self::USER_LASTSEND,
+                    'timemodified' => self::USER_LASTSEND,
             ];
 
             $fs->create_file_from_string($filerecord, 'User upload');
@@ -277,14 +277,14 @@ class activitylastsend_test extends \advanced_testcase {
     /**
      * Data provider for test_estimatenexttime
      */
-    public static function dataestimate() {
+    public static function dataestimate(): array {
         return [
-            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
-            [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+                [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+                [self::USER_LASTSEND + 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
         ];
     }
 
@@ -308,10 +308,10 @@ class activitylastsend_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_activitylastsend_days" => "1",
-            $id . "_activitylastsend_hours" => "0",
-            $id . "_activitylastsend_minutes" => "1",
-            $id . "_activitylastsend_cmid" => "7",
+                $id . "_activitylastsend_days" => "1",
+                $id . "_activitylastsend_hours" => "0",
+                $id . "_activitylastsend_minutes" => "1",
+                $id . "_activitylastsend_cmid" => "7",
         ];
         $expected = '{"time":86460,"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -328,14 +328,15 @@ class activitylastsend_test extends \advanced_testcase {
     public function test_processmarkups() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $time = '86460';
         $params[self::$subplugin::UI_TIME] = $time;
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
-            self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(),
+                [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
+                self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -351,10 +352,10 @@ class activitylastsend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -391,15 +392,15 @@ class activitylastsend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
         $form->definition();
-        $addjson = phpunitutil::get_method($form, 'addJson');
+        $addjson = phpunitutil::get_method($form, 'addjson');
         $addjson->invoke($form, notificationplugin::TYPE_CONDITION, self::$subplugin::NAME);
         $form->definition_after_data();
 
@@ -423,7 +424,7 @@ class activitylastsend_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 
@@ -442,29 +443,29 @@ class activitylastsend_test extends \advanced_testcase {
     public function test_get_cmidfiles($fileuploadtime, $crontimestarted) {
         $assgigngenerator = self::getDataGenerator()->get_plugin_generator('mod_assign');
         $assigncm = $assgigngenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $assigncontext = \context_module::instance($assigncm->cmid);
 
         if (!is_null($fileuploadtime)) {
             $fs = get_file_storage();
             $filerecord = [
-                'contextid' => $assigncontext->id,
-                'component' => 'mod_assign',
-                'filearea' => 'content',
-                'itemid' => 0,
-                'filepath' => '/',
-                'filename' => 'user-test-file.txt',
-                'userid' => self::$user->id,
-                'timecreated' => $fileuploadtime,
-                'timemodified' => $fileuploadtime,
+                    'contextid' => $assigncontext->id,
+                    'component' => 'mod_assign',
+                    'filearea' => 'content',
+                    'itemid' => 0,
+                    'filepath' => '/',
+                    'filename' => 'user-test-file.txt',
+                    'userid' => self::$user->id,
+                    'timecreated' => $fileuploadtime,
+                    'timemodified' => $fileuploadtime,
             ];
 
             $fs->create_file_from_string($filerecord, 'User upload');
         }
 
         $data = activitylastsend::get_cmidfiles(
-            $assigncm->cmid, self::$user->id, 86400, $crontimestarted
+                $assigncm->cmid, self::$user->id, 86400, $crontimestarted
         );
 
         if (!is_null($fileuploadtime)) {
@@ -481,10 +482,10 @@ class activitylastsend_test extends \advanced_testcase {
      */
     public static function dataprovidercmifiles(): array {
         return [
-            'Testing a file that was not uploaded' => [null, time()],
-            'Testing a file that was uploaded 2 minutes ago' => [1709014050, 1709014170],
-            'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
-            'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
+                'Testing a file that was not uploaded' => [null, time()],
+                'Testing a file that was uploaded 2 minutes ago' => [1709014050, 1709014170],
+                'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
+                'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
         ];
     }
 
@@ -496,9 +497,9 @@ class activitylastsend_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                'visible' => true,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmtestaa->cmid;

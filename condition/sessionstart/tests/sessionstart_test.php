@@ -108,7 +108,7 @@ class sessionstart_test extends \advanced_testcase {
         self::$subplugin = new sessionstart(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -124,12 +124,12 @@ class sessionstart_test extends \advanced_testcase {
     /**
      * Test the evaluate function.
      *
-     * @param int    $timeaccess     The time access value.
-     * @param bool   $usecache       Whether to use cache or not.
-     * @param bool   $usefirstaccess Whether to use first access or not.
-     * @param string $param          The parameter value.
-     * @param int    $complementary  The complementary value.
-     * @param bool   $expected       The expected result.
+     * @param int $timeaccess The time access value.
+     * @param bool $usecache Whether to use cache or not.
+     * @param bool $usefirstaccess Whether to use first access or not.
+     * @param string $param The parameter value.
+     * @param int $complementary The complementary value.
+     * @param bool $expected The expected result.
      *
      * @dataProvider dataprovider
      * @covers       \notificationscondition_sessionstart\sessionstart::evaluate
@@ -170,10 +170,10 @@ class sessionstart_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1707987600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1704099600, true, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1707987600, false, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1707987600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1704099600, true, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1707987600, false, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
 
         ];
     }
@@ -212,8 +212,8 @@ class sessionstart_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -229,10 +229,10 @@ class sessionstart_test extends \advanced_testcase {
     /**
      * Test for estimate next time.
      *
-     * @param int    $timeaccess    Time access for test.
-     * @param bool   $usecache      Use cache in test.
-     * @param bool   $complementary Complementary in test.
-     * @param string $param         Param in test.
+     * @param int $timeaccess Time access for test.
+     * @param bool $usecache Use cache in test.
+     * @param bool $complementary Complementary in test.
+     * @param string $param Param in test.
      *
      * @covers       \notificationscondition_sessionstart\sessionstart::estimate_next_time
      * @dataProvider dataestimate
@@ -267,9 +267,9 @@ class sessionstart_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-            'condition user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-            'condition no cache' => [1704099600, false, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-            'exception user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+                'condition user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+                'condition no cache' => [1704099600, false, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+                'exception user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
         ];
     }
 
@@ -292,11 +292,11 @@ class sessionstart_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -308,9 +308,9 @@ class sessionstart_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_sessionstart_days" => "1",
-            $id . "_sessionstart_hours" => "0",
-            $id . "_sessionstart_minutes" => "1",
+                $id . "_sessionstart_days" => "1",
+                $id . "_sessionstart_hours" => "0",
+                $id . "_sessionstart_minutes" => "1",
         ];
         $expected = '{"time":86460}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -328,7 +328,8 @@ class sessionstart_test extends \advanced_testcase {
         $time = 86400;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(),
+                [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -344,10 +345,10 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -382,15 +383,15 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
         $form->definition();
-        $addjson = phpunitutil::get_method($form, 'addJson');
+        $addjson = phpunitutil::get_method($form, 'addjson');
         $addjson->invoke($form, notificationplugin::TYPE_CONDITION, self::$subplugin::NAME);
         $form->definition_after_data();
 
@@ -414,7 +415,7 @@ class sessionstart_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 
@@ -447,9 +448,9 @@ class sessionstart_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\sessionstart::get_first_course_access
      */
     public function test_get_first_course_access() {
-        $this->assertNull(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id,));
+        $this->assertNull(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
         sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time());
-        $this->assertIsNumeric(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id,));
+        $this->assertIsNumeric(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
     }
 
 }

@@ -35,6 +35,6 @@
 // Used for updating temporary triggers in case of configuration changes in a course.
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => 'core\event\course_updated',
-    'callback' => 'notificationscondition_courseend_observer::course_updated',
+        'eventname' => 'core\event\course_updated',
+        'callback' => 'notificationscondition_courseend_observer::course_updated',
 ];

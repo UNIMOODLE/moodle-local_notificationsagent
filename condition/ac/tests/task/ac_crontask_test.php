@@ -91,10 +91,10 @@ class ac_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
 
@@ -118,7 +118,7 @@ class ac_crontask_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        self::setUser(2);//admin
+        self::setUser(2);// Admin.
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -127,7 +127,9 @@ class ac_crontask_test extends \advanced_testcase {
         $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json =
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         $objdb->parameters = $json;
         $objdb->cmid = null;
 
@@ -139,13 +141,13 @@ class ac_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(ac_crontask::class);
         $task->execute();
         $trigger = $DB->get_record(
-            'notificationsagent_triggers',
-            [
-                'conditionid' => $conditionid,
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'ruleid' => self::$rule->get_id(),
-            ]
+                'notificationsagent_triggers',
+                [
+                        'conditionid' => $conditionid,
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                        'ruleid' => self::$rule->get_id(),
+                ]
         );
 
         $this->assertEquals(self::$course->id, $trigger->courseid);

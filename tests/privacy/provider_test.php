@@ -22,7 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
-  * Version details
+ * Version details
  *
  * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
@@ -64,7 +64,9 @@ class provider_test extends \advanced_testcase {
      *  Random id for activity
      */
     public const CMID = 246000;
-
+    /**
+     * Component name
+     */
     public const COMPONENT = 'local_notificationsagent';
 
     /**
@@ -116,7 +118,7 @@ class provider_test extends \advanced_testcase {
      */
     public function test_get_contexts_for_userid() {
         $context = \context_course::instance(self::$course->id);
-        $contextlist = provider::get_contexts_for_userid(self::$user->id,);
+        $contextlist = provider::get_contexts_for_userid(self::$user->id);
         // Expect one item.
         $this->assertCount(1, $contextlist);
         // We should have the user context of our test user.
@@ -162,12 +164,14 @@ class provider_test extends \advanced_testcase {
     }
 
     /**
+     * Test for deleting data of user
+     *
      * @return void
      * @covers \local_notificationsagent\privacy\provider::delete_data_for_user
      */
     public function test_delete_data_for_user() {
         global $DB;
-        $contextlist = provider::get_contexts_for_userid(self::$user->id,);
+        $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $emptyapprvlist = new approved_contextlist(self::$user, 'mod_quiz', [$contextlist->get_contexts()[0]->id]);
         provider::delete_data_for_user($emptyapprvlist);
         $report = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
@@ -183,6 +187,8 @@ class provider_test extends \advanced_testcase {
     }
 
     /**
+     * Test for deleting data of users
+     *
      * @covers \local_notificationsagent\privacy\provider::delete_data_for_users
      * @return void
      */
@@ -198,11 +204,13 @@ class provider_test extends \advanced_testcase {
     }
 
     /**
+     * Test for exporting data of user
+     *
      * @covers \local_notificationsagent\privacy\provider::export_user_data
      * @return void
      */
     public function test_export_user_data() {
-        $contextlist = provider::get_contexts_for_userid(self::$user->id,);
+        $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $apprvlist = new approved_contextlist(self::$user, self::COMPONENT, [$contextlist->get_contexts()[0]->id]);
         $this->assertNotEmpty($apprvlist);
         $this->assertEquals(self::COMPONENT, $apprvlist->get_component());
@@ -211,7 +219,7 @@ class provider_test extends \advanced_testcase {
 
         foreach ($contextlist as $context) {
             $data = writer::with_context($context)->get_data(
-                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
+                    [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
             );
             $this->assertNotEmpty($data);
             foreach ($data as $datoreport) {

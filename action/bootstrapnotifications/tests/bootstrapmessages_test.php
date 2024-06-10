@@ -56,7 +56,7 @@ class bootstrapmessages_test extends \advanced_testcase {
 
      */
     public function test_define_properties() {
-        // Test persistant
+        // Test persistant.
         $this->assertTrue(bootstrapmessages::has_property('userid'));
         $this->assertTrue(bootstrapmessages::has_property('courseid'));
         $this->assertTrue(bootstrapmessages::has_property('message'));

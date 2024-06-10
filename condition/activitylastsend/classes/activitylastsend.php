@@ -68,7 +68,7 @@ class activitylastsend extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -84,9 +84,9 @@ class activitylastsend extends notificationconditionplugin {
         $conditionid = $this->get_id();
 
         $timelastsend = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (!empty($timelastsend)) {
@@ -115,8 +115,8 @@ class activitylastsend extends notificationconditionplugin {
         // Condition.
         if (!$context->is_complementary()) {
             if ($timeaccess >= $lastsendtime->timemodified
-                && $timeaccess <= $lastsendtime->timemodified +
-                $params->{self::UI_TIME}
+                    && $timeaccess <= $lastsendtime->timemodified +
+                    $params->{self::UI_TIME}
             ) {
                 $nexttime = $lastsendtime->timemodified + $params->{self::UI_TIME};
             } else if ($timeaccess > $lastsendtime->timemodified + $params->{self::UI_TIME}) {
@@ -126,8 +126,8 @@ class activitylastsend extends notificationconditionplugin {
 
         // Exception.
         if ($timeaccess >= $lastsendtime->timemodified
-            && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
-            && $context->is_complementary()
+                && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
+                && $context->is_complementary()
         ) {
             $nexttime = time();
         }
@@ -138,9 +138,9 @@ class activitylastsend extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The mform object.
-     * @param int              $courseid The course ID.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The mform object.
+     * @param int $courseid The course ID.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -159,20 +159,20 @@ class activitylastsend extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                ['typeelement' => '[AAAA]']
-            ),
-            $listactivities
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
+                        ['typeelement' => '[AAAA]']
+                ),
+                $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -212,9 +212,9 @@ class activitylastsend extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -227,7 +227,8 @@ class activitylastsend extends notificationconditionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $paramstoreplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
+        $paramstoreplace =
+                [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;
@@ -257,10 +258,10 @@ class activitylastsend extends notificationconditionplugin {
     /**
      * Get the files that have not been modified by the user in the activity for a specified time.
      *
-     * @param int $cmid          The course module id.
-     * @param int $userid        The user id.
+     * @param int $cmid The course module id.
+     * @param int $userid The user id.
      * @param int $conditiontime The end time for the course module.
-     * @param int $crontasktime  The time of the cron task.
+     * @param int $crontasktime The time of the cron task.
      *
      * @return object The file that has not been modified for the specified time
      */
@@ -281,13 +282,13 @@ class activitylastsend extends notificationconditionplugin {
         ';
 
         return $DB->get_record_sql(
-            $sql,
-            [
-                'cmid' => $cmid,
-                'userid' => $userid,
-                'time' => $conditiontime,
-                'now' => $crontasktime,
-            ]
+                $sql,
+                [
+                        'cmid' => $cmid,
+                        'userid' => $userid,
+                        'time' => $conditiontime,
+                        'now' => $crontasktime,
+                ]
         );
     }
 }

@@ -91,7 +91,7 @@ class removeusergroup_observer_test extends \advanced_testcase {
     /**
      * id for action
      */
-    public const actionID = 1;
+    public const ACTIONID = 1;
     /**
      * Date start for the course
      */
@@ -100,6 +100,7 @@ class removeusergroup_observer_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+
     /**
      * Set up the test environment.
      */
@@ -109,10 +110,10 @@ class removeusergroup_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$group = $this->getDataGenerator()->create_group(['courseid' => self::$course->id]);
     }
@@ -125,8 +126,8 @@ class removeusergroup_observer_test extends \advanced_testcase {
     public function test_group_deleted() {
         global $DB;
         $pluginname = removeusergroup::NAME;
-
-        self::setUser(2);//admin
+        // Admin.
+        self::setUser(2);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -148,7 +149,7 @@ class removeusergroup_observer_test extends \advanced_testcase {
 
         $actionid = $DB->insert_record('notificationsagent_action', $objaction);
         $this->assertIsInt($actionid);
-        
+
         groups_delete_group(self::$group->id);
 
         $rule = self::$rule::create_instance($ruleid);

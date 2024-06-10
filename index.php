@@ -30,6 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once("../../config.php");
 require_once('renderer.php');
 require_once("../../lib/modinfolib.php");
@@ -42,8 +43,8 @@ use local_notificationsagent\notificationplugin;
 $isroleadmin = false;
 if (is_siteadmin() || !empty($PAGE->settingsnav)) {
     if (is_siteadmin()
-        || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
-            || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
+            || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
+                    || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
     ) {
         $isroleadmin = true;
     }
@@ -68,8 +69,8 @@ $context = context_course::instance($courseid);
 if (get_config('local_notificationsagent', 'disable_user_use')) {
     if (!has_capability('local/notificationsagent:managecourserule', $context)) {
         throw new \moodle_exception(
-            'nopermissions', '', '',
-            get_capability_string('local/notificationsagent:managecourserule')
+                'nopermissions', '', '',
+                get_capability_string('local/notificationsagent:managecourserule')
         );
     }
 }
@@ -82,21 +83,21 @@ $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->ignore_active();
 if ($isroleadmin && $courseid == SITEID) {
     $PAGE->navbar->add(
-        $SITE->fullname,
-        new moodle_url('/')
+            $SITE->fullname,
+            new moodle_url('/')
     );
     $PAGE->navbar->add(
-        get_string('admin_breadcrumb', 'local_notificationsagent'),
-        new moodle_url('/local/notificationsagent/index.php')
+            get_string('admin_breadcrumb', 'local_notificationsagent'),
+            new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
     $PAGE->navbar->add(
-        $COURSE->fullname,
-        new moodle_url('/course/view.php', ['id' => $courseid])
+            $COURSE->fullname,
+            new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-        get_string('course_breadcrumb', 'local_notificationsagent'),
-        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+            get_string('course_breadcrumb', 'local_notificationsagent'),
+            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
@@ -112,7 +113,7 @@ echo $output->header();
 
 $renderer = $PAGE->get_renderer('core');
 $templatecontext = [
-    "courseid" => $courseid,
+        "courseid" => $courseid,
 ];
 
 $templatecontext['iscontextsite'] = false;
@@ -123,27 +124,27 @@ if ($isroleadmin && $courseid == SITEID) {
 $importruleurl = new moodle_url("/local/notificationsagent/importrule.php");
 $templatecontext['importruleurl'] = $importruleurl;
 $newruleurl = new moodle_url("/local/notificationsagent/editrule.php", [
-    'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
+        'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
 ]);
 $addruleurl = new moodle_url("/local/notificationsagent/assign.php", [
-    'courseid' => $courseid,
+        'courseid' => $courseid,
 ]);
 $addtemplate = new moodle_url("/local/notificationsagent/editrule.php", [
-    'action' => 'add', 'type' => rule::TEMPLATE_TYPE,
+        'action' => 'add', 'type' => rule::TEMPLATE_TYPE,
 ]);
 if ($templatecontext['iscontextsite']) {
     $reporturl = new moodle_url("/local/notificationsagent/report.php");
 } else {
     $reporturl = new moodle_url("/local/notificationsagent/report.php", [
-        'courseid' => $courseid,
+            'courseid' => $courseid,
     ]);
 }
 
 $templatecontext['url'] = [
-    'newrule' => $newruleurl,
-    'addrule' => $addruleurl,
-    'addtemplate' => $addtemplate,
-    'reporturl' => $reporturl,
+        'newrule' => $newruleurl,
+        'addrule' => $addruleurl,
+        'addtemplate' => $addtemplate,
+        'reporturl' => $reporturl,
 ];
 $pregerencesorderid = get_user_preferences('orderid');
 !empty($pregerencesorderid) ? $orderid = $pregerencesorderid : $orderid = null;
@@ -184,13 +185,13 @@ foreach ($rules as $rule) {
     }
 
     $conditionsarray = [
-        'hascontent' => !empty($conditionscontent),
-        'content' => $conditionscontent,
+            'hascontent' => !empty($conditionscontent),
+            'content' => $conditionscontent,
     ];
 
     $exceptionsarray = [
-        'hascontent' => !empty($exceptionscontent),
-        'content' => $exceptionscontent,
+            'hascontent' => !empty($exceptionscontent),
+            'content' => $exceptionscontent,
     ];
 
     // Actions.
@@ -200,67 +201,68 @@ foreach ($rules as $rule) {
         }
     }
     $actionsarray = [
-        'hascontent' => !empty($actionscontent),
-        'content' => $actionscontent,
+            'hascontent' => !empty($actionscontent),
+            'content' => $actionscontent,
     ];
 
     $rulecontent[] = [
-        'id' => $rule->get_id(),
-        'name' => format_text($rule->get_name()),
-        'owner' => $rule->get_owner(),
-        'status' => $rule->get_status(),
-        'status_lang' =>
-            !$rule->validation($courseid)
-                ? get_string('status_broken', 'local_notificationsagent')
-                :
-                ($rule->get_forced() ?
-                    ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
-                        : get_string('status_active', 'local_notificationsagent')
-                    ) : get_string('status_required', 'local_notificationsagent')),
-        'conditions' => $conditionsarray,
-        'exceptions' => $exceptionsarray,
-        'actions' => $actionsarray,
-        'type' => $rule->get_type(),
-        'isrule' => $rule->get_template(),
-        'forced' => $rule->get_forced(),
-        'validation' => $rule->validation($courseid),
-        'shared' => $rule->get_shared(),
-        'canshare' => $rule->can_share(),
-        'candelete' => $rule->can_delete(),
-        'isallshared' => $rule->get_defaultrule(),
-        'type_lang' => $rule->get_template()
-            ? (($rule->get_shared() == 0 && !empty($rule->get_coursename_and_username_by_rule()))
-                ? ($courseid == SITEID
-                    ? $rule->get_coursename_and_username_by_rule()
-                    : get_string(
-                        'type_sharedrule', 'local_notificationsagent'
-                    ))
-                : get_string('type_rule', 'local_notificationsagent')
-            )
-            : get_string('type_template', 'local_notificationsagent'),
-        'editurl' => new moodle_url(
-            "/local/notificationsagent/editrule.php", ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
-        ),
-        'reporturl' => new moodle_url(
-            "/local/notificationsagent/report.php", $templatecontext['iscontextsite']
-            ? ['ruleid' => $rule->get_id()]
-            : [
-                'courseid' => $courseid, 'ruleid' =>
-                    $rule->get_id(),
-            ],
-        ),
-        'exporturl' => new moodle_url(
-            "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
-        ),
-        'capabilities' => $rule->get_card_options($courseid),
+            'id' => $rule->get_id(),
+            'name' => format_text($rule->get_name()),
+            'owner' => $rule->get_owner(),
+            'status' => $rule->get_status(),
+            'status_lang' =>
+                    !$rule->validation($courseid)
+                            ? get_string('status_broken', 'local_notificationsagent')
+                            :
+                            ($rule->get_forced() ?
+                                    ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
+                                            : get_string('status_active', 'local_notificationsagent')
+                                    ) : get_string('status_required', 'local_notificationsagent')),
+            'conditions' => $conditionsarray,
+            'exceptions' => $exceptionsarray,
+            'actions' => $actionsarray,
+            'type' => $rule->get_type(),
+            'isrule' => $rule->get_template(),
+            'forced' => $rule->get_forced(),
+            'validation' => $rule->validation($courseid),
+            'shared' => $rule->get_shared(),
+            'canshare' => $rule->can_share(),
+            'candelete' => $rule->can_delete(),
+            'isallshared' => $rule->get_defaultrule(),
+            'type_lang' => $rule->get_template()
+                    ? (($rule->get_shared() == 0 && !empty($rule->get_coursename_and_username_by_rule()))
+                            ? ($courseid == SITEID
+                                    ? $rule->get_coursename_and_username_by_rule()
+                                    : get_string(
+                                            'type_sharedrule', 'local_notificationsagent'
+                                    ))
+                            : get_string('type_rule', 'local_notificationsagent')
+                    )
+                    : get_string('type_template', 'local_notificationsagent'),
+            'editurl' => new moodle_url(
+                    "/local/notificationsagent/editrule.php",
+                    ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
+            ),
+            'reporturl' => new moodle_url(
+                    "/local/notificationsagent/report.php", $templatecontext['iscontextsite']
+                    ? ['ruleid' => $rule->get_id()]
+                    : [
+                            'courseid' => $courseid, 'ruleid' =>
+                                    $rule->get_id(),
+                    ],
+            ),
+            'exporturl' => new moodle_url(
+                    "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
+            ),
+            'capabilities' => $rule->get_card_options($courseid),
     ];
 }
 
 $templatecontext['rulecontent'] = $rulecontent;
 $templatecontext['capabilities'] = [
-    'import' => has_capability('local/notificationsagent:importrule', $context),
-    'create' => has_capability('local/notificationsagent:createrule', $context),
-    'report' => has_capability('local/notificationsagent:viewcourserule', $context),
+        'import' => has_capability('local/notificationsagent:importrule', $context),
+        'create' => has_capability('local/notificationsagent:createrule', $context),
+        'report' => has_capability('local/notificationsagent:viewcourserule', $context),
 ];
 
 $categoriesall = core_course_category::top()->get_children();
@@ -276,7 +278,7 @@ if (!empty($categoryarray)) {
     $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);
     $outputcategories .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
     $outputcategories .= html_writer::tag(
-        "input", "", ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
+            "input", "", ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
     );
     $outputcategories .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "course-category-select-all"]);
     $outputcategories .= html_writer::end_div(); // ... .custom-checkbox

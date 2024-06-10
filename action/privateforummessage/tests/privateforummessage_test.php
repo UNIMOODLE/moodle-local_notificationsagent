@@ -107,7 +107,7 @@ class privateforummessage_test extends \advanced_testcase {
         self::$subplugin = new privateforummessage(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -123,8 +123,8 @@ class privateforummessage_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      *
-     * @param mixed $param            the parameter for execute_action method.
-     * @param bool  $creatediscussion create a discussion or not.
+     * @param mixed $param the parameter for execute_action method.
+     * @param bool $creatediscussion create a discussion or not.
      *
      * @covers       \notificationsaction_privateforummessage\privateforummessage::execute_action
      */
@@ -141,7 +141,7 @@ class privateforummessage_test extends \advanced_testcase {
 
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestapf = $cmgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
 
         $auxarray = json_decode($param, true);
@@ -152,23 +152,23 @@ class privateforummessage_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         // Conditions.
         $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
-                'parameters' => $param,
-                'pluginname' => 'forumnoreply', 'cmid' => $cmtestapf->cmid,
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                        'parameters' => $param,
+                        'pluginname' => 'forumnoreply', 'cmid' => $cmtestapf->cmid,
+                ],
         );
         $actionparam = '{"title":"titulo", "message":"forumbody test", "format":' . FORMAT_PLAIN . ', "cmid":' . $cmtestapf->cmid
-            . '}';
+                . '}';
 
         $DB->insert_record(
-            'notificationsagent_action',
-            [
-                'pluginname' => self::$subtype, 'type' => 'action',
-                'parameters' => $actionparam,
-                'cmid' => $cmtestapf->cmid,
-            ],
+                'notificationsagent_action',
+                [
+                        'pluginname' => self::$subtype, 'type' => 'action',
+                        'parameters' => $actionparam,
+                        'cmid' => $cmtestapf->cmid,
+                ],
         );
 
         if ($creatediscussion) {
@@ -259,8 +259,8 @@ class privateforummessage_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -272,8 +272,9 @@ class privateforummessage_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_privateforummessage_title" => "Test title", $id . "_privateforummessage_message" => ['text' => "Message body"],
-            $id . "_privateforummessage_cmid" => 7,
+                $id . "_privateforummessage_title" => "Test title",
+                $id . "_privateforummessage_message" => ['text' => "Message body"],
+                $id . "_privateforummessage_cmid" => 7,
         ];
         $expected = '{"title":"Test title","message":{"text":"Message body"},"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -290,10 +291,10 @@ class privateforummessage_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -324,7 +325,7 @@ class privateforummessage_test extends \advanced_testcase {
     public function test_getparametersplaceholders($param) {
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestaf = $cmgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
 
         $auxarray = json_decode($param, true);
@@ -361,22 +362,22 @@ class privateforummessage_test extends \advanced_testcase {
      *
      */
     public function test_processmarkups() {
-        $UI_TITLE = 'test title';
-        $UI_MESSAGE = 'test message';
+        $uititle = 'test title';
+        $uimessage = 'test message';
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
-        $params[self::$subplugin::UI_TITLE] = $UI_TITLE;
-        $params[self::$subplugin::UI_MESSAGE]['text'] = $UI_MESSAGE;
+        $params[self::$subplugin::UI_TITLE] = $uititle;
+        $params[self::$subplugin::UI_MESSAGE]['text'] = $uimessage;
         $params = json_encode($params);
 
         $paramstoreplace = [
-            shorten_text($cmgen->name),
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+                shorten_text($cmgen->name),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $uititle)),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $uimessage))),
         ];
         $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());
 
@@ -396,7 +397,7 @@ class privateforummessage_test extends \advanced_testcase {
         global $DB;
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestfap = $cmgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
 
         $record = new \stdClass();
@@ -436,7 +437,7 @@ class privateforummessage_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmgen->cmid;

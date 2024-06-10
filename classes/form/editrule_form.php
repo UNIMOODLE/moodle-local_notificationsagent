@@ -171,13 +171,13 @@ class editrule_form extends \moodleform {
         $rule = $this->_rule = $this->_customdata['rule'];
 
         $mform->addElement(
-            'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
-            ['size' => '64']
+                'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
+                ['size' => '64']
         );
         $mform->addRule('title', ' ', 'required');
         $mform->addElement(
-            'float', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
-            ['size' => '5']
+                'float', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
+                ['size' => '5']
         );
         $mform->setDefault('timesfired', $this->_customdata['timesfired']);
         if (!empty($CFG->formatstringstriptags)) {
@@ -188,32 +188,32 @@ class editrule_form extends \moodleform {
 
         // Days.
         $runtimegroup[] = $mform->createElement(
-            'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+                'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_days', '', [
-            'class' => 'mr-2', 'size' => 7, 'maxlength' => '3',
-            'placeholder' => get_string('condition_days', 'local_notificationsagent'),
-            'value' => 1,
+                'class' => 'mr-2', 'size' => 7, 'maxlength' => '3',
+                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                'value' => 1,
         ]);
 
         // Hours.
         $runtimegroup[] = $mform->createElement(
-            'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+                'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_hours', '', [
-            'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
-            'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
-            'value' => 0,
+                'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
+                'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                'value' => 0,
         ]);
 
         // Minutes.
         $runtimegroup[] = $mform->createElement(
-            'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+                'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_minutes', '', [
-            'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
-            'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-            'value' => 0,
+                'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
+                'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+                'value' => 0,
         ]);
 
         $mform->addGroup($runtimegroup, 'runtime_group', get_string('editrule_runtime', 'local_notificationsagent'));
@@ -272,12 +272,12 @@ class editrule_form extends \moodleform {
         $mform = $this->_form;
 
         $tab = $mform->getElementValue('tab-target');// Tab selected previously.
-        $this->loadTabContent($tab);
+        $this->loadtabcontent($tab);
 
         // LOAD JSON.
-        $this->loadJsonContent(notificationplugin::TYPE_CONDITION);
-        $this->loadJsonContent(notificationplugin::TYPE_EXCEPTION);
-        $this->loadJsonContent(notificationplugin::TYPE_ACTION);
+        $this->loadjsoncontent(notificationplugin::TYPE_CONDITION);
+        $this->loadjsoncontent(notificationplugin::TYPE_EXCEPTION);
+        $this->loadjsoncontent(notificationplugin::TYPE_ACTION);
     }
 
     /**
@@ -287,44 +287,56 @@ class editrule_form extends \moodleform {
     public function addorremovesubplugin() {
         $mform = $this->_form;
 
+        $clickadd = null;
         // When click registerNoSubmitButton to ADD.
-        $mform->getSubmitValue(self::FORM_NEW_CONDITION_BUTTON) ? ($clickadd = self::FORM_NEW_CONDITION_SELECT and
-            $type = notificationplugin::TYPE_CONDITION) : null;
-        $mform->getSubmitValue(self::FORM_NEW_EXCEPTION_BUTTON) ? ($clickadd = self::FORM_NEW_EXCEPTION_SELECT and
-            $type = notificationplugin::TYPE_EXCEPTION) : null;
-        $mform->getSubmitValue(self::FORM_NEW_ACTION_BUTTON) ? ($clickadd = self::FORM_NEW_ACTION_SELECT and
-            $type = notificationplugin::TYPE_ACTION) : null;
-        if (isset($clickadd)) {
-            $pluginname = $mform->getSubmitValue($clickadd);
-            $this->addJson($type, $pluginname);
+        if ($mform->getSubmitValue(self::FORM_NEW_CONDITION_BUTTON)) {
+            $clickadd = self::FORM_NEW_CONDITION_SELECT;
+            $type = notificationplugin::TYPE_CONDITION;
+        } else if ($mform->getSubmitValue(self::FORM_NEW_EXCEPTION_BUTTON)) {
+            $clickadd = self::FORM_NEW_EXCEPTION_SELECT;
+            $type = notificationplugin::TYPE_EXCEPTION;
+        } else if ($mform->getSubmitValue(self::FORM_NEW_ACTION_BUTTON)) {
+            $clickadd = self::FORM_NEW_ACTION_SELECT;
+            $type = notificationplugin::TYPE_ACTION;
         }
 
-        // When click registerNoSubmitButton to REMOVE.
-        $mform->getSubmitValue(self::FORM_REMOVE_CONDITION_BUTTON) ? ($clickremove = self::FORM_REMOVE_CONDITION_BUTTON and
-            $type = notificationplugin::TYPE_CONDITION) : null;
-        $mform->getSubmitValue(self::FORM_REMOVE_EXCEPTION_BUTTON) ? ($clickremove = self::FORM_REMOVE_EXCEPTION_BUTTON and
-            $type = notificationplugin::TYPE_EXCEPTION) : null;
-        $mform->getSubmitValue(self::FORM_REMOVE_ACTION_BUTTON) ? ($clickremove = self::FORM_REMOVE_ACTION_BUTTON and
-            $type = notificationplugin::TYPE_ACTION) : null;
+        if (!is_null($clickadd)) {
+            $pluginname = $mform->getSubmitValue($clickadd);
+            $this->addjson($type, $pluginname);
+        }
+
+        $clickremove = null;
+        // When click registerNoSubmitButton to ADD.
+        if ($mform->getSubmitValue(self::FORM_REMOVE_CONDITION_BUTTON)) {
+            $clickremove = self::FORM_REMOVE_CONDITION_BUTTON;
+            $type = notificationplugin::TYPE_CONDITION;
+        } else if ($mform->getSubmitValue(self::FORM_REMOVE_EXCEPTION_BUTTON)) {
+            $clickremove = self::FORM_REMOVE_EXCEPTION_BUTTON;
+            $type = notificationplugin::TYPE_EXCEPTION;
+        } else if ($mform->getSubmitValue(self::FORM_REMOVE_ACTION_BUTTON)) {
+            $clickremove = self::FORM_REMOVE_ACTION_BUTTON;
+            $type = notificationplugin::TYPE_ACTION;
+        }
+
         if (isset($clickremove)) {
             $idtoremove = $mform->getSubmitValue($clickremove);
-            $this->removeJson($type, $idtoremove);
+            $this->removejson($type, $idtoremove);
         }
     }
 
     /**
      * Add a JSON element to the form based on the type and plugin name.
      *
-     * @param string $type       Subplugin type
+     * @param string $type Subplugin type
      * @param string $pluginname Subplugin name
      */
-    private function addJson($type, $pluginname) {
+    private function addjson($type, $pluginname) {
         $mform = $this->_form;
 
         $jsonelement = $type == notificationplugin::TYPE_CONDITION
-            ? self::FORM_JSON_CONDITION
-            : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
-                : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
+                ? self::FORM_JSON_CONDITION
+                : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
+                        : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
         $condition = $mform->getElement($jsonelement);
         $conditionvalue = [];
         if (!empty($condition->getValue())) {
@@ -341,25 +353,25 @@ class editrule_form extends \moodleform {
      * Remove a JSON element to the form based on the type and plugin name.
      *
      * @param string $type Subplugin type
-     * @param int    $id   Subplugin id
+     * @param int $id Subplugin id
      */
-    private function removeJson($type, $id) {
+    private function removejson($type, $id) {
         $mform = $this->_form;
 
         $jsonelement = $type == notificationplugin::TYPE_CONDITION
-            ? self::FORM_JSON_CONDITION
-            : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
-                : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
+                ? self::FORM_JSON_CONDITION
+                : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
+                        : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
         $condition = $mform->getElement($jsonelement);
         $conditionvalue = [];
         if (!empty($condition->getValue())) {
             $conditionvalue = json_decode($condition->getValue(), true);
         }
         if (isset($conditionvalue[$id])) {
-            // If insert, then only remove from json
+            // If inserted, then only remove from json.
             if ($conditionvalue[$id]["action"] == self::FORM_JSON_ACTION_INSERT) {
                 unset($conditionvalue[$id]);
-            } else { // If edit, then remove delete from db
+            } else { // If edit, then remove delete from db.
                 $conditionvalue[$id]["action"] = self::FORM_JSON_ACTION_DELETE;
             }
         }
@@ -371,17 +383,17 @@ class editrule_form extends \moodleform {
      *
      * @param string $type Subplugin type
      */
-    private function loadJsonContent($type) {
+    private function loadjsoncontent($type) {
         $mform = $this->_form;
         $name = $type == notificationplugin::TYPE_CONDITION
-            ? self::FORM_JSON_CONDITION
-            : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
-                : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
+                ? self::FORM_JSON_CONDITION
+                : ($type == notificationplugin::TYPE_EXCEPTION ? self::FORM_JSON_EXCEPTION
+                        : ($type == notificationplugin::TYPE_ACTION ? self::FORM_JSON_ACTION : ''));
         $json = $mform->getElementValue($name);
         if (!empty($json)) {
             $json = json_decode($json, true);
             foreach ($json as $key => $value) {
-                // Load all plugins to insert or update
+                // Load all plugins to insert or update.
                 if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
                     content::get_plugin_ui($key, $this->_rule, $mform, $this->_customdata["courseid"], $value["pluginname"], $type);
                 }
@@ -394,7 +406,7 @@ class editrule_form extends \moodleform {
      *
      * @param string $tabtarget Tab element
      */
-    private function loadTabContent($tabtarget) {
+    private function loadtabcontent($tabtarget) {
         global $PAGE;
 
         $mform = $this->_form;
@@ -403,18 +415,18 @@ class editrule_form extends \moodleform {
         $mform->addElement('html', $render->tabnav($tabtarget));
 
         $mform->addElement(
-            'html', '
+                'html', '
             <div class="tab-content" id="nav-tabContent">
         '
         );
         $mform->addElement(
-            'html', '
+                'html', '
             <div>
         '
         );
         $this->settabcontentavailability();
         $mform->addElement(
-            'html', '
+                'html', '
             </div>
         '
         );
@@ -424,7 +436,7 @@ class editrule_form extends \moodleform {
         $classnavexceptions = ($tabtarget == 'nav-exceptions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
         $classnavactions = ($tabtarget == 'nav-actions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
         $mform->addElement(
-            'html', '
+                'html', '
             <div class="' . $classnavconditions . '" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
         '
         );
@@ -432,7 +444,7 @@ class editrule_form extends \moodleform {
         $this->settabcontent(notificationplugin::TYPE_CONDITION);
 
         $mform->addElement(
-            'html', '
+                'html', '
             </div>
             <div class="' . $classnavexceptions . '" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
         '
@@ -441,7 +453,7 @@ class editrule_form extends \moodleform {
         $this->settabcontent(notificationplugin::TYPE_EXCEPTION);
 
         $mform->addElement(
-            'html', '
+                'html', '
             </div>
             <div class="' . $classnavactions . '" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
         '
@@ -451,14 +463,14 @@ class editrule_form extends \moodleform {
 
         // Core_availability conditions.
         $mform->addElement(
-            'html', '
+                'html', '
             </div>
             <div id="nav-ac">
             '
         );
 
         $mform->addElement(
-            'html', '
+                'html', '
             </div>
         </div>
         '
@@ -478,40 +490,41 @@ class editrule_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = [];
-        
+
         if ($data["timesfired"] < rule::MINIMUM_EXECUTION || $data["timesfired"] > rule::MAXIMUM_EXECUTION) {
-            $errors["timesfired"] = get_string('editrule_execution_error', 'local_notificationsagent', ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]);
+            $errors["timesfired"] = get_string('editrule_execution_error', 'local_notificationsagent',
+                    ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]);
         }
 
         // If timesfired > 1, runtime > 0.
         if ($data["timesfired"] > 1) {
             if (empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
-                && empty($data["runtime_group"]["runtime_minutes"])
+                    && empty($data["runtime_group"]["runtime_minutes"])
             ) {
                 $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
             }
         }
-    
+
         $ac = $data[self::FORM_JSON_AC];
         $jsoncondition = json_decode($data[self::FORM_JSON_CONDITION], true);
         $jsonexception = json_decode($data[self::FORM_JSON_EXCEPTION], true);
         $jsonaction = json_decode($data[self::FORM_JSON_ACTION], true);
 
         // VALIDATION FOR JSON.
-        $countcondition = $this->validationJsonContent(notificationplugin::TYPE_CONDITION, $jsoncondition, $data, $errors);
-        $this->validationJsonContent(notificationplugin::TYPE_EXCEPTION, $jsonexception, $data, $errors);
-        $countaction = $this->validationJsonContent(notificationplugin::TYPE_ACTION, $jsonaction, $data, $errors);
-        
+        $countcondition = $this->validationjsoncontent(notificationplugin::TYPE_CONDITION, $jsoncondition, $data, $errors);
+        $this->validationjsoncontent(notificationplugin::TYPE_EXCEPTION, $jsonexception, $data, $errors);
+        $countaction = $this->validationjsoncontent(notificationplugin::TYPE_ACTION, $jsonaction, $data, $errors);
+
         if (empty($countcondition) && custominfo::is_empty($ac)) {
             $errors["newcondition_group"] = get_string('editrule_condition_error', 'local_notificationsagent');
         }
-        
+
         if (empty($countaction)) {
             $errors["newaction_group"] = get_string('editrule_action_error', 'local_notificationsagent');
         }
 
-        if(!empty($errors)){
-            \core\notification::add(implode('<br />', $errors),\core\notification::ERROR);
+        if (!empty($errors)) {
+            \core\notification::add(implode('<br />', $errors), \core\notification::ERROR);
         }
 
         return $errors;
@@ -520,19 +533,19 @@ class editrule_form extends \moodleform {
     /**
      * Load JSON content for validation.
      *
-     * @param array  $type   json type
-     * @param array  $json   data form json
-     * @param array  $data   data form
-     * @param array  $errors Erros
+     * @param array $type json type
+     * @param array $json data form json
+     * @param array $data data form
+     * @param array $errors Erros
      */
-    private function validationJsonContent($type, $json, $data, &$errors) {
+    private function validationjsoncontent($type, $json, $data, &$errors) {
         $count = 0;
-        if(!empty($json)){
+        if (!empty($json)) {
             foreach ($json as $key => $value) {
                 if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
                     $count++;
                     content::get_validation_form_plugin(
-                        $key, $data, $this->_rule, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
+                            $key, $data, $this->_rule, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
                     );
                 }
             }
@@ -550,7 +563,7 @@ class editrule_form extends \moodleform {
         $courseid = $this->_customdata["courseid"];
 
         $list = notificationsbaseinfo::get_description(
-            $courseid, ($type == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $type)
+                $courseid, ($type == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $type)
         );
         $listoptions = [];
         foreach ($list as $key => $value) {
@@ -559,8 +572,8 @@ class editrule_form extends \moodleform {
         $newgroup = [];
 
         $newgroup[] = $mform->createElement(
-            'select', 'new' . $type . '_select', '',
-            $listoptions, ['class' => 'col-sm-auto p-0 mr-3']
+                'select', 'new' . $type . '_select', '',
+                $listoptions, ['class' => 'col-sm-auto p-0 mr-3']
         );
         $newgroup[] = $mform->createElement('submit', 'new' . $type . '_button', get_string('add'));
 
@@ -594,12 +607,12 @@ class content {
     /**
      * Get the plugin UI.
      *
-     * @param mixed       $id         id
-     * @param \stdClass   $rule       rule
-     * @param \moodleform $mform      Form
-     * @param int         $idcourse   course id
-     * @param string      $pluginname Subplugin name
-     * @param string      $subtype    Subplugin type
+     * @param mixed $id id
+     * @param \stdClass $rule rule
+     * @param \moodleform $mform Form
+     * @param int $idcourse course id
+     * @param string $pluginname Subplugin name
+     * @param string $subtype Subplugin type
      */
     public static function get_plugin_ui($id, $rule, $mform, $idcourse, $pluginname, $subtype) {
         $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
@@ -611,11 +624,11 @@ class content {
     /**
      * Set the default plugin for a form and id.
      *
-     * @param mixed       $id         id
-     * @param \stdClass   $rule       rule
-     * @param \moodleform $form       Form
-     * @param string      $pluginname Subplugin name
-     * @param string      $subtype    Subplugin type
+     * @param mixed $id id
+     * @param \stdClass $rule rule
+     * @param \moodleform $form Form
+     * @param string $pluginname Subplugin name
+     * @param string $subtype Subplugin type
      */
     public static function set_default_plugin($id, $rule, $form, $pluginname, $subtype) {
         $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
@@ -627,13 +640,13 @@ class content {
     /**
      * Get the validation form plugin.
      *
-     * @param int       $id         id
-     * @param array     $data       data form
-     * @param \stdClass $rule       rule
-     * @param int       $idcourse   course id
-     * @param string    $pluginname Subplugin name
-     * @param string    $subtype    Subplugin type
-     * @param array     $errors     array of errors
+     * @param int $id id
+     * @param array $data data form
+     * @param \stdClass $rule rule
+     * @param int $idcourse course id
+     * @param string $pluginname Subplugin name
+     * @param string $subtype Subplugin type
+     * @param array $errors array of errors
      */
     public static function get_validation_form_plugin($id, $data, $rule, $idcourse, $pluginname, $subtype, &$errors) {
         $typeconditionoraction = $subtype == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $subtype;
@@ -652,8 +665,8 @@ class frontendCustom extends \core_availability\frontend {
     /**
      * Includes JavaScript for the main system and all plugins.
      *
-     * @param \stdClass          $course  Course object
-     * @param \cm_info|null      $cm      Course-module currently being edited (null if none)
+     * @param \stdClass $course Course object
+     * @param \cm_info|null $cm Course-module currently being edited (null if none)
      * @param \section_info|null $section Section currently being edited (null if none)
      */
     public static function include_all_javascript($course, \cm_info $cm = null, \section_info $section = null) {
@@ -664,8 +677,8 @@ class frontendCustom extends \core_availability\frontend {
         // into a single call (the main init function will call init for each
         // plugin).
         $modules = [
-            'moodle-local_notificationsagent-form', 'base', 'node',
-            'panel', 'moodle-core-notification-dialogue', 'json',
+                'moodle-local_notificationsagent-form', 'base', 'node',
+                'panel', 'moodle-core-notification-dialogue', 'json',
         ];
 
         // Work out JS to include for all components.
@@ -683,9 +696,9 @@ class frontendCustom extends \core_availability\frontend {
 
             // Get parameters for this plugin.
             $componentparams->{$plugin} = [
-                $component,
-                $frontend->allow_add($course, $cm, $section),
-                $frontend->get_javascript_init_params($course, $cm, $section),
+                    $component,
+                    $frontend->allow_add($course, $cm, $section),
+                    $frontend->get_javascript_init_params($course, $cm, $section),
             ];
 
             // Include strings for this plugin.
@@ -697,33 +710,33 @@ class frontendCustom extends \core_availability\frontend {
 
         // Include all JS (in one call). The init function runs on DOM ready.
         $PAGE->requires->yui_module(
-            $modules,
-            'M.core_availability.form.init', [$componentparams], null, true
+                $modules,
+                'M.core_availability.form.init', [$componentparams], null, true
         );
 
         // Include main strings.
         $PAGE->requires->strings_for_js(['none', 'cancel', 'delete', 'choosedots'],
-            'moodle');
+                'moodle');
         $PAGE->requires->strings_for_js([
-            'addrestriction', 'invalid',
-            'listheader_sign_before', 'listheader_sign_pos',
-            'listheader_sign_neg', 'listheader_single',
-            'listheader_multi_after', 'listheader_multi_before',
-            'listheader_multi_or', 'listheader_multi_and',
-            'unknowncondition', 'hide_verb', 'hidden_individual',
-            'show_verb', 'shown_individual', 'hidden_all', 'shown_all',
-            'condition_group', 'condition_group_info', 'and', 'or',
-            'label_multi', 'label_sign', 'setheading', 'itemheading',
-            'missingplugin',
+                'addrestriction', 'invalid',
+                'listheader_sign_before', 'listheader_sign_pos',
+                'listheader_sign_neg', 'listheader_single',
+                'listheader_multi_after', 'listheader_multi_before',
+                'listheader_multi_or', 'listheader_multi_and',
+                'unknowncondition', 'hide_verb', 'hidden_individual',
+                'show_verb', 'shown_individual', 'hidden_all', 'shown_all',
+                'condition_group', 'condition_group_info', 'and', 'or',
+                'label_multi', 'label_sign', 'setheading', 'itemheading',
+                'missingplugin',
         ],
-            'availability');
+                'availability');
     }
 
     /**
      * For use within forms, reports any validation errors from the availability
      * field.
      *
-     * @param string $ac   Form data fields
+     * @param string $ac Form data fields
      * @param array $errors Error array
      */
     public static function report_validation_errors($ac, array &$errors) {

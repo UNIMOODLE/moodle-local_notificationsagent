@@ -91,11 +91,11 @@ class activitysinceend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-                'enablecompletion' => true,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                        'enablecompletion' => true,
+                ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
 
@@ -116,8 +116,8 @@ class activitysinceend_observer_test extends \advanced_testcase {
         $pluginname = activitysinceend::NAME;
 
         $modinstance = self::getDataGenerator()->create_module('quiz', [
-            'course' => self::$course,
-            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+                'course' => self::$course,
+                'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
 
         $cmtestasect = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
@@ -149,14 +149,14 @@ class activitysinceend_observer_test extends \advanced_testcase {
         $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
 
         $event = \core\event\course_module_completion_updated::create([
-            'context' => \context_module::instance($cmtestasect->id),
-            'userid' => self::$user->id,
-            'relateduserid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => $cmtestasect->id,
-            'other' => [
-                'completionstate' => COMPLETION_COMPLETE,
-            ],
+                'context' => \context_module::instance($cmtestasect->id),
+                'userid' => self::$user->id,
+                'relateduserid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => $cmtestasect->id,
+                'other' => [
+                        'completionstate' => COMPLETION_COMPLETE,
+                ],
         ]);
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -172,10 +172,15 @@ class activitysinceend_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for course_module_completion_updated
+     *
+     * @return array
+     */
     public static function dataprovider(): array {
         return [
-            [1704445200, 86400],
-            [1706173200, 86400 * 3],
+                [1704445200, 86400],
+                [1706173200, 86400 * 3],
         ];
     }
 }

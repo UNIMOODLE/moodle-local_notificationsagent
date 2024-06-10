@@ -103,9 +103,11 @@ class removeusergroup_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
 
-        $create_group = true;
+        $creategroup = true;
         $arguments = $this->getProvidedData();
-        extract($arguments);
+        foreach ($arguments as $key => $value) {
+            $$key = $value;
+        }
 
         $this->resetAfterTest(true);
         self::$rule = new rule();
@@ -113,12 +115,12 @@ class removeusergroup_test extends \advanced_testcase {
         self::$subplugin = new removeusergroup(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
         self::getDataGenerator()->enrol_user(self::$user->id, self::$coursetest->id);
-        if ($create_group) {
+        if ($creategroup) {
             self::$group = self::getDataGenerator()->create_group(['courseid' => self::$coursetest->id]);
             self::getDataGenerator()->create_group_member(['userid' => self::$user->id, 'groupid' => self::$group->id]);
         }
@@ -180,8 +182,8 @@ class removeusergroup_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -219,11 +221,11 @@ class removeusergroup_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -238,10 +240,10 @@ class removeusergroup_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -261,8 +263,8 @@ class removeusergroup_test extends \advanced_testcase {
      * Data provider for get ui.
      */
     public static function dataprovidergetui(): Generator {
-        yield ['create_group' => false];
-        yield ['create_group' => true];
+        yield ['creategroup' => false];
+        yield ['creategroup' => true];
     }
 
     /**

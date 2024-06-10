@@ -103,6 +103,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+
     /**
      * Set up the test environment.
      */
@@ -112,10 +113,10 @@ class usergroupadd_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$group = $this->getDataGenerator()->create_group(['courseid' => self::$course->id]);
         self::$activity = self::getDataGenerator()->create_module('assign', ['course' => self::$course->id]);
@@ -125,7 +126,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
     /**
      * Check if the user has been added into a group.
      *
-     * @param string $role           Role name
+     * @param string $role Role name
      *
      * @covers       \notificationscondition_usergroupadd_observer::group_member_added
      * @dataProvider dataprovider
@@ -165,18 +166,18 @@ class usergroupadd_observer_test extends \advanced_testcase {
         self::$rule->set_createdby(self::$user->id);
         $this->getDataGenerator()->create_group_member(['userid' => self::$user->id, 'groupid' => self::$group->id]);
         $event = \core\event\group_member_added::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => self::$group->id,
-            'relateduserid' => self::$user->id,
-            'other' => [
-                'modulename' => 'assign',
-                'instanceid' => self::$activity->cmid,
-                'name' => self::$activity->name,
-                'component' => '',
-                'itemid' => '',
-            ],
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => self::$group->id,
+                'relateduserid' => self::$user->id,
+                'other' => [
+                        'modulename' => 'assign',
+                        'instanceid' => self::$activity->cmid,
+                        'name' => self::$activity->name,
+                        'component' => '',
+                        'itemid' => '',
+                ],
         ]);
         $event->trigger();
 
@@ -186,7 +187,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
         $this->assertEquals($cache->pluginname, $pluginname);
         $this->assertEquals($cache->userid, self::$user->id);
         $this->assertEquals($cache->courseid, self::$course->id);
-        
+
         $this->assertEquals($trigger->ruleid, $ruleid);
         $this->assertEquals($trigger->userid, self::$user->id);
         $this->assertEquals($trigger->courseid, self::$course->id);
@@ -206,7 +207,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
         global $DB;
         $pluginname = usergroupadd::NAME;
 
-        self::setUser(2);//admin
+        self::setUser(2);// Admin.
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -230,7 +231,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
 
         $conditionid = $DB->insert_record('notificationsagent_condition', $objcondition);
         $this->assertIsInt($conditionid);
-        
+
         groups_delete_group(self::$group->id);
 
         $rule = self::$rule::create_instance($ruleid);
@@ -244,9 +245,9 @@ class usergroupadd_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Testing as a student' => ['teacher'],
-            'Testing as a teacher' => ['student'],
-            'Testing as a editingteacher' => ['editingteacher'],
+                'Testing as a student' => ['teacher'],
+                'Testing as a teacher' => ['student'],
+                'Testing as a editingteacher' => ['editingteacher'],
         ];
     }
 

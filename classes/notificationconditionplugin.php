@@ -65,7 +65,7 @@ abstract class notificationconditionplugin extends notificationplugin {
      * Constructor for the class.
      *
      * @param int|stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
-     * @param mixed|null   $id       If is numeric => value is already in DB
+     * @param mixed|null $id If is numeric => value is already in DB
      *
      */
     public function __construct($ruleorid, $id = null) {
@@ -156,7 +156,7 @@ abstract class notificationconditionplugin extends notificationplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -175,11 +175,11 @@ abstract class notificationconditionplugin extends notificationplugin {
     /**
      * Save data and set notifications for students.
      *
-     * @param string    $action
+     * @param string $action
      * @param \stdClass $data
-     * @param int       $complementary
-     * @param array     $arraytimer to save triggers
-     * @param array     $students
+     * @param int $complementary
+     * @param array $arraytimer to save triggers
+     * @param array $students
      *
      * @return void
      */
@@ -200,10 +200,10 @@ abstract class notificationconditionplugin extends notificationplugin {
             if ($courseid == SITEID) {
                 return;
             }
-            
-            // Delete cache for this condition
+
+            // Delete cache for this condition.
             notificationsagent::set_timer_cache(
-                ["(courseid= $courseid AND conditionid= {$dataplugin->id})"], []
+                    ["(courseid= $courseid AND conditionid= {$dataplugin->id})"], []
             );
 
             $contextevaluation = new evaluationcontext();
@@ -212,7 +212,7 @@ abstract class notificationconditionplugin extends notificationplugin {
             $contextevaluation->set_timeaccess(time());
             $contextevaluation->set_complementary($complementary);
 
-            // Array to save cache
+            // Array to save cache.
             $insertdata = [];
             if (!$this->is_generic()) {
                 foreach ($students as $student) {
@@ -223,12 +223,12 @@ abstract class notificationconditionplugin extends notificationplugin {
                         continue;
                     }
                     $insertdata[] = [
-                        'userid' => $student->id,
-                        'courseid' => $courseid,
-                        'startdate' => $cache,
-                        'pluginname' => $this->get_subtype(),
-                        'conditionid' => $dataplugin->id,
-                        'ruleid' => $dataplugin->ruleid,
+                            'userid' => $student->id,
+                            'courseid' => $courseid,
+                            'startdate' => $cache,
+                            'pluginname' => $this->get_subtype(),
+                            'conditionid' => $dataplugin->id,
+                            'ruleid' => $dataplugin->ruleid,
                     ];
 
                     if (isset($arraytimer[$student->id])) {
@@ -247,12 +247,12 @@ abstract class notificationconditionplugin extends notificationplugin {
                 $studentid = notificationsagent::GENERIC_USERID;
                 if (!empty($cache)) {
                     $insertdata[] = [
-                        'userid' => $studentid,
-                        'courseid' => $courseid,
-                        'startdate' => $cache,
-                        'pluginname' => $this->get_subtype(),
-                        'conditionid' => $dataplugin->id,
-                        'ruleid' => $dataplugin->ruleid,
+                            'userid' => $studentid,
+                            'courseid' => $courseid,
+                            'startdate' => $cache,
+                            'pluginname' => $this->get_subtype(),
+                            'conditionid' => $dataplugin->id,
+                            'ruleid' => $dataplugin->ruleid,
                     ];
                 }
 
@@ -268,7 +268,7 @@ abstract class notificationconditionplugin extends notificationplugin {
             }
 
             notificationsagent::set_timer_cache(
-                [], $insertdata
+                    [], $insertdata
             );
 
         }
@@ -278,9 +278,9 @@ abstract class notificationconditionplugin extends notificationplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */
@@ -298,9 +298,9 @@ abstract class notificationconditionplugin extends notificationplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                'Subplugin (' . $this->get_pluginname() . ')
+                    'Subplugin (' . $this->get_pluginname() . ')
                 has an item on condition that was not restored',
-                \backup::LOG_WARNING
+                    \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

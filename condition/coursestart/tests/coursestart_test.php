@@ -105,7 +105,7 @@ class coursestart_test extends \advanced_testcase {
         self::$subplugin = new coursestart(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -122,11 +122,12 @@ class coursestart_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      *
-     * @param int    $timeaccess    The access time.
-     * @param bool   $usecache      Whether to use cache or not.
-     * @param string $param         The parameters.
-     * @param array  $complementary The complementary array.
-     * @param bool   $expected      The expected result.
+     * @param int $timeaccess The access time.
+     * @param bool $usecache Whether to use cache or not.
+     * @param string $param The parameters.
+     * @param array $complementary The complementary array.
+     * @param bool $expected The expected result.
+     * @covers       \notificationscondition_coursestart\coursestart::evaluate
      *
      * @return void
      */
@@ -162,12 +163,12 @@ class coursestart_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704445200, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false], // 0 false complementary
-            [1705050000, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1705050000, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
-            [1704445200, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1705050000, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1705050000, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+                [1704445200, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false], // 0 false complementary
+                [1705050000, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1705050000, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+                [1704445200, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1705050000, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1705050000, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_EXCEPTION, true],
 
         ];
     }
@@ -206,8 +207,8 @@ class coursestart_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -223,9 +224,9 @@ class coursestart_test extends \advanced_testcase {
     /**
      * Test the estimate_next_time function.
      *
-     * @param int    $timeaccess    The access time.
-     * @param array  $complementary The complementary array.
-     * @param string $param         The parameters.
+     * @param int $timeaccess The access time.
+     * @param array $complementary The complementary array.
+     * @param string $param The parameters.
      *
      * @covers       \notificationscondition_coursestart\coursestart::estimate_next_time
      * @dataProvider dataprovider
@@ -240,12 +241,12 @@ class coursestart_test extends \advanced_testcase {
         // Condition.
         if (!self::$context->is_complementary()) {
             if ($timeaccess >= self::COURSE_DATESTART
-                && ($timeaccess <= self::COURSE_DATESTART +
-                    $params->{notificationplugin::UI_TIME})
+                    && ($timeaccess <= self::COURSE_DATESTART +
+                            $params->{notificationplugin::UI_TIME})
             ) {
                 self::assertEquals(
-                    max(time(), self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME}),
-                    self::$subplugin->estimate_next_time(self::$context)
+                        max(time(), self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME}),
+                        self::$subplugin->estimate_next_time(self::$context)
                 );
             } else {
                 self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
@@ -255,8 +256,8 @@ class coursestart_test extends \advanced_testcase {
         // Exception.
         if (self::$context->is_complementary()) {
             if ($timeaccess >= self::COURSE_DATESTART
-                && $timeaccess <= self::COURSE_DATESTART +
-                $params->{notificationplugin::UI_TIME}
+                    && $timeaccess <= self::COURSE_DATESTART +
+                    $params->{notificationplugin::UI_TIME}
             ) {
                 $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
 
@@ -275,10 +276,10 @@ class coursestart_test extends \advanced_testcase {
      */
     public static function datacourse() {
         return [
-            'condition false 5' => [1704445200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-            'condition true 20' => [1705741200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-            'Exception false 5' => [1704445200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
-            'Exception true 20' => [1705741200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+                'condition false 5' => [1704445200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+                'condition true 20' => [1705741200, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+                'Exception false 5' => [1704445200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+                'Exception true 20' => [1705741200, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
         ];
     }
 
@@ -301,11 +302,11 @@ class coursestart_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -319,8 +320,8 @@ class coursestart_test extends \advanced_testcase {
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
         $expected = str_replace(
-            self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)],
-            self::$subplugin->get_title()
+                self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true)],
+                self::$subplugin->get_title()
         );
         self::$subplugin->set_parameters($params);
         $content = [];
@@ -337,10 +338,10 @@ class coursestart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -375,15 +376,15 @@ class coursestart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
         $form->definition();
-        $addjson = phpunitutil::get_method($form, 'addJson');
+        $addjson = phpunitutil::get_method($form, 'addjson');
         $addjson->invoke($form, notificationplugin::TYPE_CONDITION, self::$subplugin::NAME);
         $form->definition_after_data();
 
@@ -407,7 +408,7 @@ class coursestart_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 
@@ -419,9 +420,9 @@ class coursestart_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_coursestart_days" => "1",
-            $id . "_coursestart_hours" => "0",
-            $id . "_coursestart_minutes" => "1",
+                $id . "_coursestart_days" => "1",
+                $id . "_coursestart_hours" => "0",
+                $id . "_coursestart_minutes" => "1",
         ];
         $expected = '{"time":86460}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');

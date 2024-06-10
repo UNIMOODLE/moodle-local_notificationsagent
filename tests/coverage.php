@@ -32,35 +32,37 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Coverage class
+ */
 return new class extends phpunit_coverage_info {
     /** @var array The list of folders relative to the plugin root to include in coverage generation. */
     protected $includelistfolders
-        = [
-        ];
+            = [
+            ];
 
     /** @var array The list of files relative to the plugin root to include in coverage generation. */
     protected $includelistfiles
-        = [
-            'editrule.php',
-            'assignrule.php',
-            'exportrule.php',
-            'importrule.php',
-        ];
+            = [
+                    'editrule.php',
+                    'assignrule.php',
+                    'exportrule.php',
+                    'importrule.php',
+            ];
 
     /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
     protected $excludelistfolders
-        = [
-            'lang',
-            'condition/*/lang',
-            'action/*/lang',
-            'classes/helper/test',
-        ];
+            = [
+                    'lang',
+                    'condition/*/lang',
+                    'action/*/lang',
+                    'classes/helper/test',
+            ];
 
     /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
     protected $excludelistfiles
-        = [
-            'db/upgrade.php',
-            'db/tasks.php',
-        ];
+            = [
+                    'db/upgrade.php',
+                    'db/tasks.php',
+            ];
 };

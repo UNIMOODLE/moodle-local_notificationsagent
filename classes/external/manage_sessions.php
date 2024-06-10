@@ -48,9 +48,9 @@ class manage_sessions extends \external_api {
      */
     public static function execute_parameters(): \external_function_parameters {
         return new \external_function_parameters([
-            'sessionname' => new \external_value(PARAM_TEXT, 'The session name', VALUE_REQUIRED),
-            'orderid' => new \external_value(PARAM_INT, 'Option order', VALUE_REQUIRED),
-            'courseid' => new \external_value(PARAM_INT, 'Course id', VALUE_REQUIRED),
+                'sessionname' => new \external_value(PARAM_TEXT, 'The session name', VALUE_REQUIRED),
+                'orderid' => new \external_value(PARAM_INT, 'Option order', VALUE_REQUIRED),
+                'courseid' => new \external_value(PARAM_INT, 'Course id', VALUE_REQUIRED),
         ]);
     }
 
@@ -66,8 +66,11 @@ class manage_sessions extends \external_api {
     public static function execute($sessionname, $orderid, $courseid) {
         global $USER;
         $params = self::validate_parameters(
-            self::execute_parameters(), ["sessionname" => $sessionname,
-                "orderid" => $orderid, "courseid" => $courseid,]
+                self::execute_parameters(), [
+                        "sessionname" => $sessionname,
+                        "orderid" => $orderid,
+                        "courseid" => $courseid,
+                ]
         );
         if ($courseid != null) {
             $context = \context_course::instance($courseid);
@@ -95,9 +98,9 @@ class manage_sessions extends \external_api {
      */
     public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(
-            [
-                'orderid' => new \external_value(PARAM_INT, 'Order id value', VALUE_REQUIRED),
-            ]
+                [
+                        'orderid' => new \external_value(PARAM_INT, 'Order id value', VALUE_REQUIRED),
+                ]
         );
     }
 }

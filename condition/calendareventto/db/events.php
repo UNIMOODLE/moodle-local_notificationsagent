@@ -33,12 +33,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 $observers = [
-    [
-        'eventname' => 'core\event\calendar_event_updated',
-        'callback' => 'notificationscondition_calendareventto_observer::calendar_updated',
-    ],
-    [
-        'eventname' => '\core\event\calendar_event_deleted',
-        'callback' => 'notificationscondition_calendareventto_observer::calendar_event_deleted',
-    ],
+        [
+                'eventname' => 'core\event\calendar_event_updated',
+                'callback' => 'notificationscondition_calendareventto_observer::calendar_updated',
+        ],
+        [
+                'eventname' => '\core\event\calendar_event_deleted',
+                'callback' => 'notificationscondition_calendareventto_observer::calendar_event_deleted',
+        ],
 ];

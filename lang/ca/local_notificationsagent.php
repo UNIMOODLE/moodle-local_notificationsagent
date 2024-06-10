@@ -49,6 +49,8 @@ $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Deshabilitar en llocs en producció';
 $string['startdate'] = 'Configuració de dates dactivitat';
 $string['startdate_desc'] = 'Usar una línia per cada activitat amb el patró: pluginname|tablename|startdate|startend';
+$string['pause_after_restore'] = 'Atura les regles després de la restauració';
+$string['pause_after_restore_desc'] = 'Atura les regles després de restaurar un curs';
 
 // Subplugins settings.
 $string['notificationaction_action'] = 'Subplugins tipus action ';
@@ -132,9 +134,9 @@ $string['editrule_condition_title_usercompleteactivity'] = 'L\'usuari té comple
 $string['editrule_condition_title_activeactivity'] = 'L\'activitat [AAAA] està disponible';
 $string['editrule_condition_title_betweendates'] = 'Estem entre la data [FFFF-1] i [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete']
-    = 'Completa totes les activitats per accedir a aquest fòrum [FFFF]';
+        = 'Completa totes les activitats per accedir a aquest fòrum [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-    = 'Un fil obert per l\'usuari al fòrum [FFFF] sense respondre més de [TTTT] temps';
+        = 'Un fil obert per l\'usuari al fòrum [FFFF] sense respondre més de [TTTT] temps';
 
 $string['editrule_condition_element_time'] = 'Temps {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activitat {$a->typeelement}:';
@@ -147,7 +149,7 @@ $string['editrule_condition_error'] = 'Heu d\'afegir almenys una condició';
 $string['editrule_newaction'] = 'Nova acció:';
 $string['editrule_action_title_individualnotification'] = 'Enviar notificació individual amb títol [TTTT] i missatge [BBBB]';
 $string['editrule_action_title_notificationtouser']
-    = 'Enviar notificació a un usuari concret [UUUU] amb títol [TTTT] i missatge [BBBB]';
+        = 'Enviar notificació a un usuari concret [UUUU] amb títol [TTTT] i missatge [BBBB]';
 $string['editrule_action_title_postgeneralforum'] = 'Publicar un post general al fòrum [FFFF] amb títol [TTTT] i missatge [BBBB]';
 $string['editrule_action_title_postprivateforum'] = 'Publicar un post privat al fòrum [FFFF] amb títol [TTTT] i missatge [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Afegir un usuari a grup [GGGG]';
@@ -168,7 +170,7 @@ $string['editrule_action_error'] = 'Heu d\'afegir almenys una acció';
 $string['rulecancelled'] = 'Regla cancel·lada';
 $string['rulesaved'] = 'Regla desada';
 
-// Rule errors
+// Rule errors.
 $string['editrule_required_error'] = 'Camp requerit';
 $string['editrule_runtime_error'] = 'Si ' . $string['editrule_timesfired'] . ' és > 0, ha d\'indicar un interval';
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' entre {$a->minimum} i {$a->maximum}';
@@ -203,7 +205,7 @@ $string['statusactivate'] = 'Activar';
 $string['deletetitle'] = 'Esborra la {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = 'S\'esborrarà {$a->type} {$a->title}, voleu continuar?';
 $string['deletecontent_hascontext']
-    = 'La {$a->type} {$a->title} que voleu suprimir, està associada a altres contextos, voleu continuar?';
+        = 'La {$a->type} {$a->title} que voleu suprimir, està associada a altres contextos, voleu continuar?';
 $string['deleteaccept'] = 'Regla esborrada';
 
 // Assign modal.
@@ -255,13 +257,13 @@ $string['notificationsagent:sessionstart'] = 'Capacitat per utilitzar la condici
 $string['notificationsagent:activityavailable'] = 'Capacitat necessària per utilitzar la condició d\'activitat disponible';
 $string['notificationsagent:activityend'] = 'Capacitat necessària per utilitzar la condició de finalització de l\'activitat';
 $string['notificationsagent:activitylastsend']
-    = 'Capacitat necessària per utilitzar la condició d\'últim enviament de l\'activitat';
+        = 'Capacitat necessària per utilitzar la condició d\'últim enviament de l\'activitat';
 $string['notificationsagent:activitymodified'] = 'Capacitat necessària per utilitzar la condició modificada per l\'activitat';
 $string['notificationsagent:activitynewcontent']
-    = 'Capacitat necessària per utilitzar la condició de contingut nou de l\'activitat';
+        = 'Capacitat necessària per utilitzar la condició de contingut nou de l\'activitat';
 $string['notificationsagent:activitysinceend'] = 'Capacitat necessària per utilitzar l\'activitat des de la condició final';
 $string['notificationsagent:activitystudentend']
-    = 'Capacitat necessària per utilitzar la condició final de l\'activitat de l\'estudiant';
+        = 'Capacitat necessària per utilitzar la condició final de l\'activitat de l\'estudiant';
 $string['notificationsagent:calendareventto'] = 'Capacitat necessària per utilitzar l\'esdeveniment del calendari per condicionar';
 $string['notificationsagent:courseend'] = 'Capacitat necessària per utilitzar la condició de finalització del curs';
 $string['notificationsagent:forumnoreply'] = 'Capacitat necessària per utilitzar la condició sense resposta del fòrum';
@@ -319,7 +321,7 @@ $string['privacy:metadata:actionid'] = 'Un identificador per a una acció';
 $string['privacy:metadata:ruleid'] = 'Un identificador per a una regla';
 $string['privacy:metadata:actiondetail'] = 'Detall de l\'acció enviada a l\'usuari.';
 $string['privacy:metadata:notificationsagentreport']
-    = 'Enregistra missatges enviats als usuaris que poden contenir algunes dades d\'usuari.';
+        = 'Enregistra missatges enviats als usuaris que poden contenir algunes dades d\'usuari.';
 $string['privacy:metadata:timestamp'] = 'Marca de temps de l\'acció enviada.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Informe de l\'agent de notificacions.';
 

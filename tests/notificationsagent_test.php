@@ -101,19 +101,19 @@ class notificationsagent_test extends \advanced_testcase {
 
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::getDataGenerator()->create_user_course_lastaccess(self::$user, self::$course, self::USER_LASTACCESS);
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         self::$cmtestnt = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$course->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
+                'name' => 'Quiz unittest',
+                'course' => self::$course->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
         ]);
 
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
@@ -127,8 +127,8 @@ class notificationsagent_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\notificationsagent::notificationsagent_condition_get_cm_dates
      * @dataProvider dataprovider
      *
-     * @param int    $timeopen
-     * @param int    $timeclose
+     * @param int $timeopen
+     * @param int $timeclose
      * @param string $modname
      * @param string $fieldopen
      * @param string $fieldclose
@@ -142,16 +142,16 @@ class notificationsagent_test extends \advanced_testcase {
         self::setUser($manager);
 
         $options = [
-            'name' => 'Quiz unittest',
-            'course' => $course->id,
-            "{$fieldopen}" => $timeopen,
+                'name' => 'Quiz unittest',
+                'course' => $course->id,
+                "{$fieldopen}" => $timeopen,
         ];
 
         !empty($fieldclose) ? $options[$fieldclose] = $timeclose : '';
 
         $cmtest = self::getDataGenerator()->create_module(
-            "{$modname}",
-            $options
+                "{$modname}",
+                $options
         );
 
         $result = notificationsagent::notificationsagent_condition_get_cm_dates($cmtest->cmid);
@@ -171,17 +171,17 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'assign' => [1704099600, 1705741200, 'assign', 'allowsubmissionsfromdate', 'duedate'],
-            'choice' => [1704099600, 1705741200, 'choice', 'timeopen', 'timeclose'],
-            'data' => [1704099600, 1705741200, 'data', 'timeavailablefrom', 'timeavailableto'],
-            'feedback' => [1704099600, 1705741200, 'feedback', 'timeopen', 'timeclose'],
-            'quiz' => [1704099600, 1705741200, 'quiz', 'timeopen', 'timeclose'],
-            'forum' => [1704099600, 1705741200, 'forum', 'duedate', 'cutoffdate'],
-            'lesson' => [1704099600, 1705741200, 'lesson', 'available', 'deadline'],
-            'scorm' => [1704099600, 1705741200, 'scorm', 'timeopen', 'timeclose'],
-            'workshop' => [1704099600, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
-            'no datestart' => [null, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
-            'chattime' => [1704099600, 0, 'chat', 'chattime', null],
+                'assign' => [1704099600, 1705741200, 'assign', 'allowsubmissionsfromdate', 'duedate'],
+                'choice' => [1704099600, 1705741200, 'choice', 'timeopen', 'timeclose'],
+                'data' => [1704099600, 1705741200, 'data', 'timeavailablefrom', 'timeavailableto'],
+                'feedback' => [1704099600, 1705741200, 'feedback', 'timeopen', 'timeclose'],
+                'quiz' => [1704099600, 1705741200, 'quiz', 'timeopen', 'timeclose'],
+                'forum' => [1704099600, 1705741200, 'forum', 'duedate', 'cutoffdate'],
+                'lesson' => [1704099600, 1705741200, 'lesson', 'available', 'deadline'],
+                'scorm' => [1704099600, 1705741200, 'scorm', 'timeopen', 'timeclose'],
+                'workshop' => [1704099600, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
+                'no datestart' => [null, 1705741200, 'workshop', 'submissionstart', 'submissionend'],
+                'chattime' => [1704099600, 0, 'chat', 'chattime', null],
         ];
     }
 
@@ -192,9 +192,9 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public static function launched_provider(): array {
         return [
-            [3, 3, true],
-            [3, 2, false],
-            [3, 5, true],
+                [3, 3, true],
+                [3, 2, false],
+                [3, 5, true],
         ];
     }
 
@@ -210,7 +210,6 @@ class notificationsagent_test extends \advanced_testcase {
         $manager = self::getDataGenerator()->create_and_enrol(self::$course, 'manager');
         $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'teacher');
         $studentsuspended = self::getDataGenerator()->create_and_enrol(self::$course, 'student', ['suspended' => 1]);
-        // ... $studentnotactive = self::getDataGenerator()->create_and_enrol(self::$course, 'student', ['status' => 1]);
 
         $this->assertCount(1, notificationsagent::get_usersbycourse($context));
         $this->assertEquals(self::$user->id, notificationsagent::get_usersbycourse($context)[self::$user->id]->id);
@@ -228,30 +227,30 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_timer_cache(
-            [
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'startdate' => self::CM_DATESTART,
-                'cmid' => self::CMID,
-            ],
-            [
                 [
-                    'userid' => self::$user->id,
-                    'courseid' => self::$course->id,
-                    'startdate' => self::CM_DATESTART,
-                    'pluginname' => 'sessionend',
-                    'conditionid' => self::CMID,
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                        'startdate' => self::CM_DATESTART,
+                        'cmid' => self::CMID,
                 ],
-            ]
+                [
+                        [
+                                'userid' => self::$user->id,
+                                'courseid' => self::$course->id,
+                                'startdate' => self::CM_DATESTART,
+                                'pluginname' => 'sessionend',
+                                'conditionid' => self::CMID,
+                        ],
+                ]
         );
 
         $cache = $DB->get_record(
-            'notificationsagent_cache',
-            [
-                'conditionid' => self::CMID,
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-            ]
+                'notificationsagent_cache',
+                [
+                        'conditionid' => self::CMID,
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                ]
         );
         $this->assertIsNumeric($cache->id);
         $this->assertEquals(self::$user->id, $cache->userid);
@@ -259,30 +258,30 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::CM_DATESTART, $cache->startdate);
 
         notificationsagent::set_timer_cache(
-            [
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'startdate' => self::CM_DATESTART + 86400,
-
-                'cmid' => self::CMID,
-            ], [
                 [
-                    'userid' => self::$user->id,
-                    'courseid' => self::$course->id,
-                    'startdate' => self::CM_DATESTART + 86400,
-                    'pluginname' => "sessionend",
-                    'conditionid' => self::CMID,
-                ],
-            ]
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                        'startdate' => self::CM_DATESTART + 86400,
+
+                        'cmid' => self::CMID,
+                ], [
+                        [
+                                'userid' => self::$user->id,
+                                'courseid' => self::$course->id,
+                                'startdate' => self::CM_DATESTART + 86400,
+                                'pluginname' => "sessionend",
+                                'conditionid' => self::CMID,
+                        ],
+                ]
         );
 
         $cacheupdated = $DB->get_record(
-            'notificationsagent_cache',
-            [
-                'conditionid' => self::CMID,
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-            ]
+                'notificationsagent_cache',
+                [
+                        'conditionid' => self::CMID,
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                ]
         );
         $this->assertIsNumeric($cacheupdated->id);
         $this->assertEquals(self::$user->id, $cacheupdated->userid);
@@ -301,30 +300,30 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_time_trigger(
-            [
-                'ruleid' => self::$rule->get_id(),
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'conditionid' => self::CMID,
-            ], [
                 [
-                    'ruleid' => self::$rule->get_id(),
-                    'userid' => self::$user->id,
-                    'courseid' => self::$course->id,
-                    'startdate' => self::CM_DATESTART,
-                    'conditionid' => self::CMID,
-                ],
-            ]
+                        'ruleid' => self::$rule->get_id(),
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                        'conditionid' => self::CMID,
+                ], [
+                        [
+                                'ruleid' => self::$rule->get_id(),
+                                'userid' => self::$user->id,
+                                'courseid' => self::$course->id,
+                                'startdate' => self::CM_DATESTART,
+                                'conditionid' => self::CMID,
+                        ],
+                ]
 
         );
 
         $trigger = $DB->get_record(
-            'notificationsagent_triggers',
-            [
-                'ruleid' => self::$rule->get_id(),
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-            ]
+                'notificationsagent_triggers',
+                [
+                        'ruleid' => self::$rule->get_id(),
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                ]
         );
         $this->assertIsNumeric($trigger->id);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
@@ -334,30 +333,30 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
 
         notificationsagent::set_time_trigger(
-            [
-                'ruleid' => self::$rule->get_id(),
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'conditionid' => self::CMID,
-            ],
-            [
                 [
-                    'ruleid' => self::$rule->get_id(),
-                    'userid' => self::$user->id,
-                    'courseid' => self::$course->id,
-                    'startdate' => self::CM_DATESTART + 1,
-                    'conditionid' => self::CMID,
+                        'ruleid' => self::$rule->get_id(),
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                        'conditionid' => self::CMID,
                 ],
-            ]
+                [
+                        [
+                                'ruleid' => self::$rule->get_id(),
+                                'userid' => self::$user->id,
+                                'courseid' => self::$course->id,
+                                'startdate' => self::CM_DATESTART + 1,
+                                'conditionid' => self::CMID,
+                        ],
+                ]
         );
 
         $triggerupdated = $DB->get_record(
-            'notificationsagent_triggers',
-            [
-                'ruleid' => self::$rule->get_id(),
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-            ]
+                'notificationsagent_triggers',
+                [
+                        'ruleid' => self::$rule->get_id(),
+                        'userid' => self::$user->id,
+                        'courseid' => self::$course->id,
+                ]
         );
         $this->assertIsNumeric($triggerupdated->id);
         $this->assertEquals(self::$rule->get_id(), $triggerupdated->ruleid);
@@ -387,12 +386,12 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => self::$course->category,
-            ]
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid,
+                        'contextid' => CONTEXT_COURSECAT,
+                        'objectid' => self::$course->category,
+                ]
         );
 
         $defaultcontext = self::$rule->get_default_context();
@@ -485,12 +484,12 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => self::$course->category,
-            ]
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid,
+                        'contextid' => CONTEXT_COURSECAT,
+                        'objectid' => self::$course->category,
+                ]
         );
 
         // Condition.
@@ -536,12 +535,12 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => self::$course->category,
-            ]
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid,
+                        'contextid' => CONTEXT_COURSECAT,
+                        'objectid' => self::$course->category,
+                ]
         );
         $pluginname = ac::NAME;
         $objdb = new \stdClass();
@@ -585,12 +584,12 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => self::$course->category,
-            ]
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid,
+                        'contextid' => CONTEXT_COURSECAT,
+                        'objectid' => self::$course->category,
+                ]
         );
         $data = notificationsagent::get_course_category_context_byruleid($ruleid);
         $data = $data[key($data)];
@@ -605,7 +604,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @dataProvider ruleoffprovider
      *
      * @param int|null $ruleoff
-     * @param bool     $expected
+     * @param bool $expected
      *
      * @return void
      * @throws \dml_exception
@@ -649,17 +648,17 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public static function ruleoffprovider(): array {
         return [
-            [1704099600, true],
-            [null, false],
+                [1704099600, true],
+                [null, false],
         ];
     }
 
     /**
      * Testing get triggers bytimeinterval
      *
-     * @param int  $date
-     * @param int  $timestarted
-     * @param int  $tasklastrunttime
+     * @param int $date
+     * @param int $timestarted
+     * @param int $tasklastrunttime
      * @param bool $emptyresult
      *
      * @return void
@@ -707,10 +706,10 @@ class notificationsagent_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function datatriggers() {
+    public static function datatriggers(): array {
         return [
-            'On dates' => [1704099600, 1704099600 + 60, 1704099600 - 60, false],
-            'Out of date' => [1704099600 - 84600, 1704099600 + 60, 1704099600 - 60, true],
+                'On dates' => [1704099600, 1704099600 + 60, 1704099600 - 60, false],
+                'Out of date' => [1704099600 - 84600, 1704099600 + 60, 1704099600 - 60, true],
         ];
 
     }
@@ -721,8 +720,8 @@ class notificationsagent_test extends \advanced_testcase {
      * This function tests the supported_cm function of the notificationsagent class by creating a course, enrolling a manager,
      * creating a module, and checking if the returned result matches the expected result.
      *
-     * @param mixed  $expected The expected result of the supported_cm function.
-     * @param string $modname  The name of the module to be created.
+     * @param mixed $expected The expected result of the supported_cm function.
+     * @param string $modname The name of the module to be created.
      *
      * @covers       \local_notificationsagent\notificationsagent::supported_cm
      * @dataProvider datasupported
@@ -734,13 +733,13 @@ class notificationsagent_test extends \advanced_testcase {
         self::setUser($manager);
 
         $options = [
-            'name' => 'Quiz unittest',
-            'course' => $course->id,
+                'name' => 'Quiz unittest',
+                'course' => $course->id,
         ];
 
         $cmtest = self::getDataGenerator()->create_module(
-            "{$modname}",
-            $options
+                "{$modname}",
+                $options
         );
 
         $result = notificationsagent::supported_cm($cmtest->cmid, $course->id);
@@ -754,18 +753,18 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public static function datasupported(): array {
         return [
-            'assign' => [true, 'assign'],
-            'choice' => [true, 'choice'],
-            'data' => [true, 'data'],
-            'feedback' => [true, 'feedback'],
-            'quiz' => [true, 'quiz'],
-            'forum' => [true, 'forum'],
-            'lesson' => [true, 'lesson'],
-            'scorm' => [true, 'scorm'],
-            'workshop' => [true, 'workshop'],
-            'no datestart' => [true, 'workshop'],
-            'chattime' => [true, 'chat'],
-            'no supported cm' => [false, 'book'],
+                'assign' => [true, 'assign'],
+                'choice' => [true, 'choice'],
+                'data' => [true, 'data'],
+                'feedback' => [true, 'feedback'],
+                'quiz' => [true, 'quiz'],
+                'forum' => [true, 'forum'],
+                'lesson' => [true, 'lesson'],
+                'scorm' => [true, 'scorm'],
+                'workshop' => [true, 'workshop'],
+                'no datestart' => [true, 'workshop'],
+                'chattime' => [true, 'chat'],
+                'no supported cm' => [false, 'book'],
         ];
     }
 
@@ -808,10 +807,10 @@ class notificationsagent_test extends \advanced_testcase {
      * Test Evaluate expression
      *
      * @param string $operator
-     * @param int    $a
-     * @param int    $b
-     * @param bool   $expected
-     *
+     * @param int $a
+     * @param int $b
+     * @param bool $expected
+     * @covers       \local_notificationsagent\notificationsagent::evaluate_expression
      * @dataProvider dataexpresion
      * @return void
      */
@@ -820,15 +819,20 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertSame($expected, $result);
     }
 
-    public static function dataexpresion() {
+    /**
+     * Data provider for evaluate expression
+     *
+     * @return array[]
+     */
+    public static function dataexpresion(): array {
         return [
-            ['=', 3, 2, false],
-            ['!=', 3, 2, true],
-            ['>', 3, 2, true],
-            ['<', 3, 2, false],
-            ['>=', 3, 3, true],
-            ['<=', 3, 3, true],
-            ['', 3, 3, false],
+                ['=', 3, 2, false],
+                ['!=', 3, 2, true],
+                ['>', 3, 2, true],
+                ['<', 3, 2, false],
+                ['>=', 3, 3, true],
+                ['<=', 3, 3, true],
+                ['', 3, 3, false],
         ];
     }
 

@@ -44,30 +44,30 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
      */
     protected function define_course_plugin_structure() {
         return [
-            new restore_path_element(
-                'local_notificationsagent_rule',
-                $this->get_pathfor('/rules/rule')
-            ),
-            new restore_path_element(
-                'local_notificationsagent_rule_context',
-                $this->get_pathfor('/rules/rule/contexts/context')
-            ),
-            new restore_path_element(
-                'local_notificationsagent_rule_condition',
-                $this->get_pathfor('/rules/rule/conditions/condition')
-            ),
-            new restore_path_element(
-                'local_notificationsagent_rule_action',
-                $this->get_pathfor('/rules/rule/actions/action')
-            ),
-            new restore_path_element(
-                'local_notificationsagent_rule_launched',
-                $this->get_pathfor('/rules/rule/launcheds/launched')
-            ),
-            new restore_path_element(
-                'local_notificationsagent_rule_report',
-                $this->get_pathfor('/rules/rule/reports/report')
-            ),
+                new restore_path_element(
+                        'local_notificationsagent_rule',
+                        $this->get_pathfor('/rules/rule')
+                ),
+                new restore_path_element(
+                        'local_notificationsagent_rule_context',
+                        $this->get_pathfor('/rules/rule/contexts/context')
+                ),
+                new restore_path_element(
+                        'local_notificationsagent_rule_condition',
+                        $this->get_pathfor('/rules/rule/conditions/condition')
+                ),
+                new restore_path_element(
+                        'local_notificationsagent_rule_action',
+                        $this->get_pathfor('/rules/rule/actions/action')
+                ),
+                new restore_path_element(
+                        'local_notificationsagent_rule_launched',
+                        $this->get_pathfor('/rules/rule/launcheds/launched')
+                ),
+                new restore_path_element(
+                        'local_notificationsagent_rule_report',
+                        $this->get_pathfor('/rules/rule/reports/report')
+                ),
         ];
     }
 
@@ -81,10 +81,12 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule($data) {
         global $DB;
 
+        $ispauseafterrestore = get_config('local_notificationsagent', 'pauseafterrestore');
+
         $record = new \stdClass;
         $record->name = $data['name'];
         $record->description = $data['description'];
-        $record->status = $data['status'];
+        $record->status = $ispauseafterrestore ? \local_notificationsagent\rule::PAUSE_RULE : $data['status'];
         $record->createdby = $data['createdby'];
         $record->createdat = $data['createdat'];
         $record->shared = $data['shared'];
@@ -208,11 +210,11 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
             $record->actionid = $this->get_mappingid('notificationsagent_action', $data['actionid']);
             $record->actiondetail = $data['actiondetail'];
             $record->timestamp = $data['timestamp'];
-   
+
             $DB->insert_record('notificationsagent_report', $record);
         }
     }
-    
+
     /**
      * Executed after course restore is complete.
      *
@@ -230,23 +232,23 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
                AND nctx.contextid = :context
              WHERE nctx.objectid = :course
         ', [
-            'context' => CONTEXT_COURSE,
-            'course' => $this->task->get_courseid(),
+                'context' => CONTEXT_COURSE,
+                'course' => $this->task->get_courseid(),
         ]);
 
         foreach ($rules as $rule) {
             $instance = new \local_notificationsagent\rule($rule->id);
             $subplugins = array_merge(
-                $instance->get_conditions_to_evaluate(),
-                $instance->get_exceptions(),
-                $instance->get_actions()
+                    $instance->get_conditions_to_evaluate(),
+                    $instance->get_exceptions(),
+                    $instance->get_actions()
             );
 
             foreach ($subplugins as $subplugin) {
                 $subplugin->update_after_restore(
-                    $this->task->get_restoreid(),
-                    $this->task->get_courseid(),
-                    $this->task->get_logger()
+                        $this->task->get_restoreid(),
+                        $this->task->get_courseid(),
+                        $this->task->get_logger()
                 );
             }
         }

@@ -70,7 +70,7 @@ class usergroupadd extends notificationconditionplugin {
     /**
      * Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -87,13 +87,13 @@ class usergroupadd extends notificationconditionplugin {
         $params = json_decode($context->get_params());
 
         $cache = $DB->record_exists('notificationsagent_cache',
-            ['pluginname' => $pluginname, 'conditionid' => $conditionid,
-            'courseid' => $courseid, 'userid' => $userid, ]);
+                ['pluginname' => $pluginname, 'conditionid' => $conditionid,
+                        'courseid' => $courseid, 'userid' => $userid]);
 
         if (!$cache) {
             if (isset($userid)) {
                 $isingroup = $DB->record_exists('groups_members',
-                ['groupid' => $params->cmid, 'userid' => $userid]);
+                        ['groupid' => $params->cmid, 'userid' => $userid]);
             }
         }
 
@@ -134,9 +134,9 @@ class usergroupadd extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -150,24 +150,24 @@ class usergroupadd extends notificationconditionplugin {
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
-                $item->name, true
+                    $item->name, true
             );
         }
         asort($listgroups);
 
         $group = $mform->createElement(
-            'select', $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_action_element_group', 'notificationscondition_usergroupadd',
-                ['typeelement' => '[GGGG]']
-            ),
-            $listgroups
+                'select', $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_action_element_group', 'notificationscondition_usergroupadd',
+                        ['typeelement' => '[GGGG]']
+                ),
+                $listgroups
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -206,17 +206,17 @@ class usergroupadd extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
         !empty(groups_get_group_name($jsonparams->{self::UI_ACTIVITY})) ?
-        $group =  groups_get_group_name($jsonparams->{self::UI_ACTIVITY}):
-        $group = self::get_elements()[0];
+                $group = groups_get_group_name($jsonparams->{self::UI_ACTIVITY}) :
+                $group = self::get_elements()[0];
         $groupstring = str_replace($this->get_elements(), $group, $this->get_title());
         $content[] = $groupstring;
     }
@@ -234,11 +234,11 @@ class usergroupadd extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default true
-     * 
+     * @param bool $onlyverifysiteid Default true
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
@@ -246,7 +246,7 @@ class usergroupadd extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
@@ -265,9 +265,9 @@ class usergroupadd extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool False if restore is not required
      */

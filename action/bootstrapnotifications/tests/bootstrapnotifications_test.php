@@ -264,12 +264,12 @@ class bootstrapnotifications_test extends \advanced_testcase {
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::process_markups
      */
     public function test_processmarkups() {
-        $UI_MESSAGE = 'test message';
+        $uimessage = 'test message';
         $expected = str_replace(
-                self::$subplugin->get_elements(), [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $UI_MESSAGE))],
+                self::$subplugin->get_elements(), [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $uimessage))],
                 self::$subplugin->get_title()
         );
-        $params[self::$subplugin::UI_MESSAGE] = $UI_MESSAGE;
+        $params[self::$subplugin::UI_MESSAGE] = $uimessage;
         $params = json_encode($params);
         self::$subplugin->set_parameters($params);
         $content = [];

@@ -49,6 +49,8 @@ $string['tracelog'] = 'Aztarnaren erregistroa';
 $string['tracelog_desc'] = 'Aztarnaren erregistroa. Desgaitu ekoizpen guneetan';
 $string['startdate'] = 'Jarduera-dataren ezarpenak';
 $string['startdate_desc'] = 'Erabili lerro bat jarduera bakoitzeko ereduarekin: pluginname|tablename|startdate|startend';
+$string['pause_after_restore'] = 'Pausatu arauak leheneratu ondoren';
+$string['pause_after_restore_desc'] = 'Ikastaro bat leheneratu ondoren pausatu arauak';
 
 // Azpipluginen ezarpenak.
 $string['notificationaction_action'] = 'Subplugin motako ekintza ';
@@ -134,7 +136,7 @@ $string['editrule_condition_title_activeactivity'] = '[AAAA] jarduera eskuragarr
 $string['editrule_condition_title_betweendates'] = '[FFFF-1] eta [FFFF-2] dataren artean gaude';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Osatu jarduera guztiak foro honetara sartzeko [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-    = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
+        = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
 
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = '{$a->typeelement} jarduera:';
@@ -146,13 +148,13 @@ $string['editrule_condition_error'] = 'Gutxienez baldintza bat gehitu behar duzu
 // Ekintzak.
 $string['editrule_newaction'] = 'Ekintza berria:';
 $string['editrule_action_title_individualnotification']
-    = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+        = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['editrule_action_title_notificationtouser']
-    = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+        = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['editrule_action_title_postgeneralforum']
-    = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+        = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['editrule_action_title_postprivateforum']
-    = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+        = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Gehitu erabiltzailea [GGGG] taldean';
 $string['editrule_action_title_removeuserfromgroup'] = 'Kendu erabiltzaile bat [GGGG] talde batetik';
 $string['editrule_action_title_bootstrapnotification'] = 'Bootstrap jakinarazpena';
@@ -171,7 +173,7 @@ $string['editrule_action_error'] = 'Gutxienez ekintza bat gehitu behar duzu';
 $string['rulecancelled'] = 'Araua bertan behera utzi da';
 $string['rulesaved'] = 'Araua gorde da';
 
-// Rule errors
+// Rule errors.
 $string['editrule_required_error'] = 'Beharrezko eremua';
 $string['editrule_runtime_error'] = 'Ez ' . $string['editrule_timesfired'] . ' > 0 da, tarte bat adierazi behar du';
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' {$a->minimum} eta {$a->maximum} arteko eremua';
@@ -206,7 +208,7 @@ $string['statusactivate'] = 'Activatu';
 $string['deletetitle'] = 'Ezabatu {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = '{$a->type} {$a->title} ezabatzen ari da, jarraitu nahi duzu?';
 $string['deletecontent_hascontext']
-    = 'Ezabatu nahi duzun {$a->type} {$a->title} beste testuinguru batzuekin lotuta dago, jarraitu nahi duzu?';
+        = 'Ezabatu nahi duzun {$a->type} {$a->title} beste testuinguru batzuekin lotuta dago, jarraitu nahi duzu?';
 $string['deleteaccept'] = 'Ezabatutako araua';
 
 // Modala esleitu.
@@ -319,7 +321,7 @@ $string['privacy:metadata:actionid'] = 'Ekintza baten ID bat';
 $string['privacy:metadata:ruleid'] = 'Arau baten ID bat';
 $string['privacy:metadata:actiondetail'] = 'Erabiltzaileari bidalitako ekintzaren xehetasuna.';
 $string['privacy:metadata:notificationsagentreport']
-    = 'Erabiltzaileei bidalitako mezuak erregistratzen ditu, erabiltzailearen datu batzuk eduki ditzaketenak.';
+        = 'Erabiltzaileei bidalitako mezuak erregistratzen ditu, erabiltzailearen datu batzuk eduki ditzaketenak.';
 $string['privacy:metadata:timestamp'] = 'Bidalitako ekintzaren denbora-zigilua.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Jakinarazpen-agentearen txostena.';
 

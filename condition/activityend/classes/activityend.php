@@ -69,7 +69,7 @@ class activityend extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -89,9 +89,9 @@ class activityend extends notificationconditionplugin {
         $timeendactivity = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
 
         $timeend = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timeend)) {
@@ -140,9 +140,9 @@ class activityend extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The mform object to generate the UI for.
-     * @param int              $courseid The ID of the course.
-     * @param string           $type     The type of the form element.
+     * @param \MoodleQuickForm $mform The mform object to generate the UI for.
+     * @param int $courseid The ID of the course.
+     * @param string $type The type of the form element.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -161,20 +161,20 @@ class activityend extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_activityend',
-                ['typeelement' => '[AAAA]']
-            ),
-            $listactivities
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_activityend',
+                        ['typeelement' => '[AAAA]']
+                ),
+                $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -182,11 +182,11 @@ class activityend extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
-     * 
+     * @param bool $onlyverifysiteid Default false. If true, only SITEID is verified
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
@@ -194,22 +194,22 @@ class activityend extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it is false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
 
-        // All parameters
+        // All parameters.
         $data = json_decode($this->get_parameters(), true);
 
-        // Parameters to validate
+        // Parameters to validate.
         $cmid = $data[self::UI_ACTIVITY];
         if (!$validation = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend) {
             if (is_null($array)) {
                 return false;
             }
             $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                'validation_editrule_form_dateend', 'notificationscondition_activityend'
+                    'validation_editrule_form_dateend', 'notificationscondition_activityend'
             );
         }
 
@@ -252,9 +252,9 @@ class activityend extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -268,7 +268,8 @@ class activityend extends notificationconditionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $paramstoreplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
+        $paramstoreplace =
+                [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;

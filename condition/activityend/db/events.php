@@ -34,6 +34,6 @@
 defined('MOODLE_INTERNAL') || die();
 // This event will listen the user's first session in a course.
 $observers[] = [
-    'eventname' => '\core\event\course_module_updated',
-    'callback' => 'notificationscondition_activityend_observer::course_module_updated',
+        'eventname' => '\core\event\course_module_updated',
+        'callback' => 'notificationscondition_activityend_observer::course_module_updated',
 ];

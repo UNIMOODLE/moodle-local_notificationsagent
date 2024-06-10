@@ -38,7 +38,9 @@ use local_notificationsagent\rule;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\evaluationcontext;
 
-require_once $CFG->libdir . '/gradelib.php';
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->libdir . '/gradelib.php');
 
 /**
  * itemgraded subplugin class
@@ -70,7 +72,7 @@ class itemgraded extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -91,12 +93,12 @@ class itemgraded extends notificationconditionplugin {
 
         if (isset($usergrade->items[0]->grades[$userid]->grade)) {
             $gradeisachieved = notificationsagent::evaluate_expression(
-                $params->{self::UI_OP},
-                $usergrade->items[0]->grades[$userid]->grade,
-                $params->{self::UI_GRADE}
+                    $params->{self::UI_OP},
+                    $usergrade->items[0]->grades[$userid]->grade,
+                    $params->{self::UI_GRADE}
             );
         }
-   
+
         if ($gradeisachieved) {
             $meetcondition = true;
         }
@@ -130,38 +132,38 @@ class itemgraded extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
         $gradegroup[] = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_OP),
-            [],
-            self::OPERATORS
+                'select',
+                $this->get_name_ui(self::UI_OP),
+                [],
+                self::OPERATORS
         );
         $gradegroup[] = $mform->createElement(
-            'float',
-            $this->get_name_ui(self::UI_GRADE),
-            '',
-            [
-                'class' => 'mr-2', 'size' => '7',
-                'placeholder' => get_string('condition_grade', 'local_notificationsagent'),
-            ]
+                'float',
+                $this->get_name_ui(self::UI_GRADE),
+                '',
+                [
+                        'class' => 'mr-2', 'size' => '7',
+                        'placeholder' => get_string('condition_grade', 'local_notificationsagent'),
+                ]
         );
         $group = $mform->createElement(
-            'group', $this->get_name_ui($this->get_subtype()),
-            get_string('editrule_condition_grade', 'notificationscondition_itemgraded', ['typeelement' => '[GGGG]']),
-            $gradegroup, null, false
+                'group', $this->get_name_ui($this->get_subtype()),
+                get_string('editrule_condition_grade', 'notificationscondition_itemgraded', ['typeelement' => '[GGGG]']),
+                $gradegroup, null, false
         );
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addGroupRule(
-            $this->get_name_ui($this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui($this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
 
         $listactivities = [];
@@ -169,9 +171,9 @@ class itemgraded extends notificationconditionplugin {
         $items = $items ? $items : [];
         foreach ($items as $i => $item) {
             $cm = get_coursemodule_from_instance(
-                $item->itemmodule,
-                $item->iteminstance,
-                $courseid
+                    $item->itemmodule,
+                    $item->iteminstance,
+                    $courseid
             );
             $listactivities[$cm->id] = format_string($item->get_name(true));
         }
@@ -183,19 +185,19 @@ class itemgraded extends notificationconditionplugin {
         \core_collator::asort($listactivities);
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_itemgraded',
-                ['typeelement' => '[AAAA]']
-            ),
-            $listactivities
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_itemgraded',
+                        ['typeelement' => '[AAAA]']
+                ),
+                $listactivities
         );
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -226,9 +228,9 @@ class itemgraded extends notificationconditionplugin {
         $op = self::OPERATORS[$params[$this->get_name_ui(self::UI_OP)]] ?? '';
         $grade = $params[$this->get_name_ui(self::UI_GRADE)] ?? 0;
         $this->set_parameters(json_encode([
-            self::UI_ACTIVITY => (int) $activity,
-            self::UI_OP => (string) $op,
-            self::UI_GRADE => (float) $grade,
+                self::UI_ACTIVITY => (int) $activity,
+                self::UI_OP => (string) $op,
+                self::UI_GRADE => (float) $grade,
         ]));
         $this->set_cmid((int) $activity);
         return $this->get_parameters();
@@ -240,9 +242,9 @@ class itemgraded extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */

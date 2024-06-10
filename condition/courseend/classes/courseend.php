@@ -67,7 +67,7 @@ class courseend extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -85,9 +85,9 @@ class courseend extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $timeend = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
         $course = get_course($courseid);
         if (empty($timeend)) {
@@ -138,9 +138,9 @@ class courseend extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The Moodle quick form object.
-     * @param int              $courseid The ID of the course.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The Moodle quick form object.
+     * @param int $courseid The ID of the course.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -151,11 +151,11 @@ class courseend extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
-     * 
+     * @param bool $onlyverifysiteid Default false. If true, only SITEID is verified
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
@@ -217,9 +217,9 @@ class courseend extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -258,9 +258,9 @@ class courseend extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */

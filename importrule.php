@@ -115,7 +115,7 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
                     }
                 }
 
-                // TODO REFACTOR. Save triggers.
+                // Todo refactor. Save triggers.
                 $conditionid = $DB->insert_record('notificationsagent_condition', $sqlconditions);
             }
         }

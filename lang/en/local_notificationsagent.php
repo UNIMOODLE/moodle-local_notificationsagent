@@ -49,6 +49,8 @@ $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Disable on a production site';
 $string['startdate'] = 'Activity dates config';
 $string['startdate_desc'] = 'Use a line for each activity with the pattern: pluginname|tablename|startdate|startend';
+$string['pause_after_restore'] = 'Pause rules after restore';
+$string['pause_after_restore_desc'] = 'Pause rules after restoring a course';
 
 // Subplugins settings.
 $string['notificationaction_action'] = 'Action subplugins';
@@ -151,7 +153,7 @@ $string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is availab
 $string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-    = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
+        = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
 
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
@@ -164,7 +166,7 @@ $string['editrule_condition_error'] = 'You must add at least one condition';
 $string['editrule_newaction'] = 'New action:';
 $string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_notificationtouser']
-    = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
+        = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
@@ -185,7 +187,7 @@ $string['editrule_action_error'] = 'You must add at least one action';
 $string['rulecancelled'] = 'Rule cancelled';
 $string['rulesaved'] = 'Rule saved';
 
-// Rule errors
+// Rule errors.
 $string['editrule_required_error'] = 'Required field';
 $string['editrule_runtime_error'] = 'If ' . $string['editrule_timesfired'] . ' is > 0, must indicate an interval';
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' between {$a->minimum} and {$a->maximum}';
@@ -220,7 +222,7 @@ $string['statusactivate'] = 'Activate';
 $string['deletetitle'] = 'Delete {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = 'You are going to delete the {$a->type} {$a->title}, do you want to continue?';
 $string['deletecontent_hascontext']
-    = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
+        = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
 $string['deleteaccept'] = 'Rule deleted';
 
 // Assign modal.

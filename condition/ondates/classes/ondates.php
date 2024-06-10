@@ -35,7 +35,7 @@ use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 
 /**
- * ondates supluging class
+ * Ondates supluging class
  */
 class ondates extends notificationconditionplugin {
 
@@ -73,7 +73,7 @@ class ondates extends notificationconditionplugin {
     /**
      * Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -138,23 +138,23 @@ class ondates extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
         $startdateselector = $mform->createElement(
-            'date_selector',
-            $this->get_name_ui(self::STARTDATE),
-            get_string('editrule_condition_element_startdate', 'notificationscondition_ondates')
+                'date_selector',
+                $this->get_name_ui(self::STARTDATE),
+                get_string('editrule_condition_element_startdate', 'notificationscondition_ondates')
         );
 
         $enddatesselector = $mform->createElement(
-            'date_selector',
-            $this->get_name_ui(self::ENDDATE),
-            get_string('editrule_condition_element_enddate', 'notificationscondition_ondates')
+                'date_selector',
+                $this->get_name_ui(self::ENDDATE),
+                get_string('editrule_condition_element_enddate', 'notificationscondition_ondates')
         );
 
         $mform->insertElementBefore($startdateselector, 'new' . $type . '_group');
@@ -198,9 +198,9 @@ class ondates extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -217,7 +217,7 @@ class ondates extends notificationconditionplugin {
     /**
      * Replace first instance of string
      *
-     * @param string $search  String you want to change.
+     * @param string $search String you want to change.
      * @param string $replace String to be changed.
      * @param string $subject Main string.
      *
@@ -255,10 +255,10 @@ class ondates extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the
      *                                  form and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
+     * @param bool $onlyverifysiteid Default false. If true, only SITEID is verified
      *
      * @return bool
      */
@@ -267,7 +267,7 @@ class ondates extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
@@ -279,7 +279,7 @@ class ondates extends notificationconditionplugin {
 
         if ($startdatedata > $enddatedata) {
             $array[$this->get_name_ui(self::STARTDATE)] = get_string(
-                'validation_editrule_form_supported_invalid_date', 'notificationscondition_ondates'
+                    'validation_editrule_form_supported_invalid_date', 'notificationscondition_ondates'
             );
             $validation = false;
         }
@@ -296,10 +296,10 @@ class ondates extends notificationconditionplugin {
         $startdate = $params[self::STARTDATE];
         $enddate = $params[self::ENDDATE];
         $arrayparams[$this->get_name_ui(self::STARTDATE)] = [
-            'day' => date('d', $startdate), 'month' => date('m', $startdate), 'year' => date('Y', $startdate),
+                'day' => date('d', $startdate), 'month' => date('m', $startdate), 'year' => date('Y', $startdate),
         ];
         $arrayparams[$this->get_name_ui(self::ENDDATE)] = [
-            'day' => date('d', $enddate), 'month' => date('m', $enddate), 'year' => date('Y', $enddate),
+                'day' => date('d', $enddate), 'month' => date('m', $enddate), 'year' => date('Y', $enddate),
         ];
 
         return $arrayparams;
@@ -309,9 +309,9 @@ class ondates extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool False if restore is not required
      */

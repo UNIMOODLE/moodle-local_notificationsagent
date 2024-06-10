@@ -314,6 +314,8 @@ class evaluationcontext {
     }
 
     /**
+     * Get observer param
+     *
      * @return bool
      */
     public function get_observer(): bool {
@@ -321,6 +323,8 @@ class evaluationcontext {
     }
 
     /**
+     * Set observer param
+     *
      * @param bool $observer
      */
     public function set_observer(bool $observer): void {

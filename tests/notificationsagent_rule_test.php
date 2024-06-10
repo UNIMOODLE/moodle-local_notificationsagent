@@ -94,19 +94,19 @@ class notificationsagent_rule_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::getDataGenerator()->create_user_course_lastaccess(self::$user, self::$course, self::USER_LASTACCESS);
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         self::$cmtest = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$course->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
+                'name' => 'Quiz unittest',
+                'course' => self::$course->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
         ]);
     }
 
@@ -119,10 +119,10 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\rule::get_conditions
      * @dataProvider dataprovider
      *
-     * @param int   $date
+     * @param int $date
      * @param array $conditiondata
      * @param array $exceptiondata
-     * @param bool  $expected
+     * @param bool $expected
      *
      * @return void
      * @throws \dml_exception
@@ -197,55 +197,58 @@ class notificationsagent_rule_test extends \advanced_testcase {
     public static function dataprovider(): array {
         return [
             // Evaluate date, conditions, exceptions, expected.
-            [
-                1704186000, [['pluginname' => 'coursestart', 'params' => '{"time":864000}']],
-                [['pluginname' => '', 'params' => '']], false,
-            ],
-            [
-                1705050000, [['pluginname' => 'coursestart', 'params' => '{"time":864000}']],
-                [['pluginname' => '', 'params' => '']], true,
-            ],
-            [
-                1705050000, [['pluginname' => 'courseend', 'params' => '{"time":864000}']], [['pluginname' => '', 'params' => '']],
-                false,
-            ],
-            [
-                1706173200, [['pluginname' => 'courseend', 'params' => '{"time":864000}']], [['pluginname' => '', 'params' => '']],
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
-                    ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
-                ],
-                [['pluginname' => '', 'params' => '']], true,
-            ],
-            [
-                1706173200,
-                [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
-                    ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
-                ],
-                [['pluginname' => 'sessionend', 'params' => '{"time":864000}']], true,
-            ],
-            [
-                1708851600, [['pluginname' => 'sessionend', 'params' => '{"time":86400}']], [['pluginname' => '', 'params' => '']],
-                true,
-            ],
-            [
-                1708851600, [['pluginname' => 'sessionend', 'params' => '{"time":86400}']],
-                [['pluginname' => 'coursestart', 'params' => '{"time":86400}']], false,
-            ],
-            [
-                1706173200,
-                [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
+                        1704186000, [['pluginname' => 'coursestart', 'params' => '{"time":864000}']],
+                        [['pluginname' => '', 'params' => '']], false,
                 ],
                 [
-                    ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
-                ], false,
-            ],
+                        1705050000, [['pluginname' => 'coursestart', 'params' => '{"time":864000}']],
+                        [['pluginname' => '', 'params' => '']], true,
+                ],
+                [
+                        1705050000, [['pluginname' => 'courseend', 'params' => '{"time":864000}']],
+                        [['pluginname' => '', 'params' => '']],
+                        false,
+                ],
+                [
+                        1706173200, [['pluginname' => 'courseend', 'params' => '{"time":864000}']],
+                        [['pluginname' => '', 'params' => '']],
+                        true,
+                ],
+                [
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
+                                ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']], true,
+                ],
+                [
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
+                                ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
+                        ],
+                        [['pluginname' => 'sessionend', 'params' => '{"time":864000}']], true,
+                ],
+                [
+                        1708851600, [['pluginname' => 'sessionend', 'params' => '{"time":86400}']],
+                        [['pluginname' => '', 'params' => '']],
+                        true,
+                ],
+                [
+                        1708851600, [['pluginname' => 'sessionend', 'params' => '{"time":86400}']],
+                        [['pluginname' => 'coursestart', 'params' => '{"time":86400}']], false,
+                ],
+                [
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864000}'],
+                        ],
+                        [
+                                ['pluginname' => 'courseend', 'params' => '{"time":864000}'],
+                        ], false,
+                ],
         ];
     }
 
@@ -291,28 +294,28 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         // Conditions.
         $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
-                'parameters' => '{"time":300,"forum":3}',
-                'pluginname' => 'forumnoreply',
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                        'parameters' => '{"time":300,"forum":3}',
+                        'pluginname' => 'forumnoreply',
+                ],
         );
         $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
-                'parameters' => '{"time":300}',
-                'pluginname' => 'coursestart',
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
+                        'parameters' => '{"time":300}',
+                        'pluginname' => 'coursestart',
+                ],
         );
 
         $DB->insert_record(
-            'notificationsagent_action',
-            [
-                'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
-                'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
-            ],
+                'notificationsagent_action',
+                [
+                        'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
+                        'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
+                ],
         );
 
         $instance = self::$rule::create_instance($ruleid);
@@ -339,14 +342,13 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertIsString($outputcategories);
         $this->assertGreaterThan(0, strlen($outputcategories));
         $this->assertNotNull(\local_notificationsagent\helper\helper::get_module_url(self::$course->id, self::$cmtest->cmid));
-        //
 
     }
 
     /**
      * Testing rule update
      *
-     * @param int  $timesfired
+     * @param int $timesfired
      * @param bool $expected
      *
      * @covers       \local_notificationsagent\rule::update
@@ -396,9 +398,9 @@ class notificationsagent_rule_test extends \advanced_testcase {
      */
     public static function updateprovider(): array {
         return [
-            [18, 18],
-            [0, 1],
-            [null, 1],
+                [18, 18],
+                [0, 1],
+                [null, 1],
         ];
     }
 
@@ -430,76 +432,76 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
         // Conditions.
         $conditionid = $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid,
-                'type' => 'condition',
-                'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
-                'parameters' => '{"time":300,"forum":3}',
-                'pluginname' => 'forumnoreply',
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid,
+                        'type' => 'condition',
+                        'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                        'parameters' => '{"time":300,"forum":3}',
+                        'pluginname' => 'forumnoreply',
+                ],
         );
         $this->assertIsInt($conditionid);
         $condition2 = $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
-                'parameters' => '{"time":300}',
-                'pluginname' => 'coursestart',
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
+                        'parameters' => '{"time":300}',
+                        'pluginname' => 'coursestart',
+                ],
         );
         $this->assertIsInt($condition2);
         $action = $DB->insert_record(
-            'notificationsagent_action',
-            [
-                'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
-                'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
-            ],
+                'notificationsagent_action',
+                [
+                        'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
+                        'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
+                ],
         );
         $this->assertIsInt($action);
         $DB->insert_record(
-            'notificationsagent_cache',
-            [
-                'ruleid' => $ruleid,
-                'pluginname' => 'forumnoreply',
-                'courseid' => self::$course->id,
-                'userid' => self::$user->id,
-                'startdate' => time(),
-                'conditionid' => $conditionid,
-            ],
+                'notificationsagent_cache',
+                [
+                        'ruleid' => $ruleid,
+                        'pluginname' => 'forumnoreply',
+                        'courseid' => self::$course->id,
+                        'userid' => self::$user->id,
+                        'startdate' => time(),
+                        'conditionid' => $conditionid,
+                ],
         );
 
         $cacheid = $DB->insert_record(
-            'notificationsagent_cache',
-            [
-                'ruleid' => $ruleid,
-                'courseid' => self::$course->id,
-                'userid' => self::$user->id,
-                'startdate' => time(),
-                'conditionid' => $conditionid,
-            ],
+                'notificationsagent_cache',
+                [
+                        'ruleid' => $ruleid,
+                        'courseid' => self::$course->id,
+                        'userid' => self::$user->id,
+                        'startdate' => time(),
+                        'conditionid' => $conditionid,
+                ],
         );
         $this->assertIsInt($cacheid);
         $launched = $DB->insert_record(
-            'notificationsagent_launched',
-            [
-                'ruleid' => $ruleid, 'courseid' => self::$course->id,
-                'userid' => self::$user->id,
-                'timesfired' => 2, 'timecreated' => time(),
-                'timemodified' => time(),
-            ],
+                'notificationsagent_launched',
+                [
+                        'ruleid' => $ruleid, 'courseid' => self::$course->id,
+                        'userid' => self::$user->id,
+                        'timesfired' => 2, 'timecreated' => time(),
+                        'timemodified' => time(),
+                ],
         );
         $this->assertIsInt($launched);
         $contexid = $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid, 'contextid' => 50,
-                'objectid' => 2,
-            ],
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid, 'contextid' => 50,
+                        'objectid' => 2,
+                ],
         );
         $this->assertIsInt($contexid);
         $instance = self::$rule::create_instance($ruleid);
-        // print print_r($instance, true);
+
         $this->assertInstanceOf(rule::class, $instance);
         $delete = $instance->delete();
         $this->assertTrue($delete);
@@ -527,8 +529,8 @@ class notificationsagent_rule_test extends \advanced_testcase {
      *  Testing get rules
      *
      * @param string $role
-     * @param int    $shared
-     * @param int    $siteid
+     * @param int $shared
+     * @param int $siteid
      *
      * @covers       \local_notificationsagent\rule::get_rules_index
      * @covers       \local_notificationsagent\rule::get_shared_rules
@@ -570,12 +572,12 @@ class notificationsagent_rule_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-            'notificationsagent_context',
-            [
-                'ruleid' => $ruleid,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => self::$course->category,
-            ]
+                'notificationsagent_context',
+                [
+                        'ruleid' => $ruleid,
+                        'contextid' => CONTEXT_COURSECAT,
+                        'objectid' => self::$course->category,
+                ]
         );
 
         $defaultcontext = self::$rule->get_default_context();
@@ -617,11 +619,11 @@ class notificationsagent_rule_test extends \advanced_testcase {
      */
     public static function dataprovider_get_rules(): array {
         return [
-            'Admin' => [null, 1, 0],
-            'Admin shared rule' => [null, 0, 0],
-            'Admin siteid courses' => [null, 0, 1],
-            'Editingteacher' => ['editingteacher', 1, 0],
-            'Student' => ['student', 1, 0],
+                'Admin' => [null, 1, 0],
+                'Admin shared rule' => [null, 0, 0],
+                'Admin siteid courses' => [null, 0, 1],
+                'Editingteacher' => ['editingteacher', 1, 0],
+                'Student' => ['student', 1, 0],
 
         ];
     }
@@ -650,20 +652,20 @@ class notificationsagent_rule_test extends \advanced_testcase {
 
         // Conditions.
         $conditionid = $DB->insert_record(
-            'notificationsagent_condition',
-            [
-                'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
-                'parameters' => '{"time":300,"forum":3}',
-                'pluginname' => 'forumnoreply',
-            ],
+                'notificationsagent_condition',
+                [
+                        'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+                        'parameters' => '{"time":300,"forum":3}',
+                        'pluginname' => 'forumnoreply',
+                ],
         );
         // Actions.
         $actionid = $DB->insert_record(
-            'notificationsagent_action',
-            [
-                'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
-                'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
-            ],
+                'notificationsagent_action',
+                [
+                        'ruleid' => $ruleid, 'type' => 'action', 'pluginname' => 'messageagent',
+                        'parameters' => '{"title":"Friday - {Current_time}","message":" It is friday."}',
+                ],
         );
 
         $instance = self::$rule::create_instance($ruleid);

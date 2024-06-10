@@ -61,23 +61,27 @@ class helper {
      * Returns seconds in human format
      *
      * @param integer $seconds Seconds
-     * @param bool    $toshow
+     * @param bool $toshow
      *
      * @return array|string $data Time in days, hours, minutes and seconds
      */
     public static function to_human_format($seconds, $toshow = false) {
-        $dtF = new \DateTime('@0');
-        $dtT = new \DateTime("@$seconds");
+        $dft = new \DateTime('@0');
+        $dtt = new \DateTime("@$seconds");
 
         $stringtoshow = [];
-        $a = $dtF->diff($dtT)->format('%a') and
-        $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
-        $h = $dtF->diff($dtT)->format('%h') and
-        $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
-        $i = $dtF->diff($dtT)->format('%i') and
-        $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
-        $s = $dtF->diff($dtT)->format('%s') and
-        $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
+        if ($a = $dft->diff($dtt)->format('%a')) {
+            $stringtoshow[] = "$a " . get_string($a > 1 ? 'card_day_plural' : 'card_day', 'local_notificationsagent');
+        }
+        if ($h = $dft->diff($dtt)->format('%h')) {
+            $stringtoshow[] = "$h " . get_string($h > 1 ? 'card_hour_plural' : 'card_hour', 'local_notificationsagent');
+        }
+        if ($i = $dft->diff($dtt)->format('%i')) {
+            $stringtoshow[] = "$i " . get_string($i > 1 ? 'card_minute_plural' : 'card_minute', 'local_notificationsagent');
+        }
+        if ($s = $dft->diff($dtt)->format('%s')) {
+            $stringtoshow[] = "$s " . get_string($s > 1 ? 'card_second_plural' : 'card_second', 'local_notificationsagent');
+        }
 
         if (empty($stringtoshow)) {
             $stringtoshow[] = "0 " . get_string('card_second', 'local_notificationsagent');
@@ -105,14 +109,14 @@ class helper {
      * Get the URL for a specific module in a course.
      *
      * @param int $courseid The ID of the course.
-     * @param int $cmid     The ID of the course module.
+     * @param int $cmid The ID of the course module.
      *
      * @return moodle_url The URL of the course module.
      */
     public static function get_module_url($courseid, $cmid) {
         return new moodle_url(
-            get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
-            ['id' => $cmid]
+                get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
+                ['id' => $cmid]
         );
     }
 
@@ -130,10 +134,10 @@ class helper {
         $cmid = !empty($condition) ? ((json_decode($condition->get_parameters()))->cmid ?? '') : '';
 
         return !empty($cmid)
-            ? self::get_module_url($context->get_courseid(), $cmid)
-            : self::get_course_url(
-                $context->get_courseid()
-            );
+                ? self::get_module_url($context->get_courseid(), $cmid)
+                : self::get_course_url(
+                        $context->get_courseid()
+                );
     }
 
     /**
@@ -167,7 +171,7 @@ class helper {
      * Retrieve data for modal window
      *
      * @param \core_course_category $category
-     * @param int                   $ruleid
+     * @param int $ruleid
      *
      * @return array
      */
@@ -178,17 +182,17 @@ class helper {
         $coursesarry = [];
         foreach ($courses as $course) {
             $coursesarry[] = [
-                'id' => $course->id,
-                'name' => format_text($course->fullname),
+                    'id' => $course->id,
+                    'name' => format_text($course->fullname),
             ];
         }
 
         $categoryarray = [
-            'id' => $category->id,
-            'name' => format_text($category->name),
-            'categories' => [],
-            'courses' => $coursesarry,
-            'count' => $count,
+                'id' => $category->id,
+                'name' => format_text($category->name),
+                'categories' => [],
+                'courses' => $coursesarry,
+                'count' => $count,
         ];
 
         $categoryarray['countsubcategoriescourses'] = self::count_category_courses($category);
@@ -227,7 +231,7 @@ class helper {
      * Retrieve output for modal window
      *
      * @param array $arraycategories
-     * @param int   $categoryid
+     * @param int $categoryid
      *
      * @return string
      */
@@ -235,26 +239,26 @@ class helper {
         $output = "";
         foreach ($arraycategories as $key => $category) {
             $output .= html_writer::start_tag("li", [
-                "id" => "listitem-category-" . $category["id"],
-                "class" => "listitem listitem-category list-group-item list-group-item-action collapsed",
+                    "id" => "listitem-category-" . $category["id"],
+                    "class" => "listitem listitem-category list-group-item list-group-item-action collapsed",
             ]);
             $output .= html_writer::start_div("", ["class" => "category-listing-header d-flex"]);
             $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
             $output .= html_writer::tag("input", "", [
-                "id" => "checkboxcategory-" . $category["id"],
-                "type" => "checkbox", "class" => "custom-control-input",
-                "data-parent" => "#category-listing-content-" . $categoryid,
+                    "id" => "checkboxcategory-" . $category["id"],
+                    "type" => "checkbox", "class" => "custom-control-input",
+                    "data-parent" => "#category-listing-content-" . $categoryid,
             ]);
             $output .= html_writer::tag(
-                "label",
-                "",
-                ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
+                    "label",
+                    "",
+                    ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
             );
             $output .= html_writer::end_div(); // ... .custom-checkbox
             $output .= html_writer::start_div("", [
-                "class" => "d-flex px-0", "data-toggle" => "collapse",
-                "data-target" => "#category-listing-content-" . $category["id"],
-                "aria-controls" => "category-listing-content-" . $category["id"],
+                    "class" => "d-flex px-0", "data-toggle" => "collapse",
+                    "data-target" => "#category-listing-content-" . $category["id"],
+                    "aria-controls" => "category-listing-content-" . $category["id"],
             ]);
             $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
             $output .= $category["name"];
@@ -269,8 +273,8 @@ class helper {
             $output .= html_writer::end_div(); // ... .col-auto
             $output .= html_writer::end_div(); // ... .d-flex
             $output .= html_writer::start_tag("ul", [
-                "id" => "category-listing-content-" . $category["id"],
-                "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
+                    "id" => "category-listing-content-" . $category["id"],
+                    "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
             ]);
             if (!empty($category["categories"])) {
                 $output .= self::build_output_categories($category["categories"], $category["id"]);
@@ -278,24 +282,24 @@ class helper {
             if (!empty($category["courses"])) {
                 foreach ($category["courses"] as $key => $course) {
                     $output .= html_writer::start_tag("li", [
-                        "id" => "listitem-course-" . $course["id"],
-                        "class" => "listitem listitem-course list-group-item list-group-item-action",
+                            "id" => "listitem-course-" . $course["id"],
+                            "class" => "listitem listitem-course list-group-item list-group-item-action",
                     ]);
                     $output .= html_writer::start_div("", ["class" => "d-flex"]);
                     $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
                     $output .= html_writer::tag(
-                        "input",
-                        "",
-                        [
-                            "id" => "checkboxcourse-" . $course["id"],
-                            "type" => "checkbox", "class" => "custom-control-input",
-                            "data-parent" => "#category-listing-content-" . $category["id"],
-                        ]
+                            "input",
+                            "",
+                            [
+                                    "id" => "checkboxcourse-" . $course["id"],
+                                    "type" => "checkbox", "class" => "custom-control-input",
+                                    "data-parent" => "#category-listing-content-" . $category["id"],
+                            ]
                     );
                     $output .= html_writer::tag(
-                        "label",
-                        "",
-                        ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
+                            "label",
+                            "",
+                            ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
                     );
                     $output .= html_writer::end_div(); // ... .custom-checkbox
                     $output .= html_writer::start_div("", ["class" => "coursename"]);
@@ -312,16 +316,23 @@ class helper {
         return $output;
     }
 
+    /**
+     *  Notify to rules owners of the rule broken status
+     *
+     * @param int $courseid
+     * @param int $ruleid
+     * @return false|int|mixed
+     */
     public static function broken_rule_notify($courseid, $ruleid) {
         $rule = new rule($ruleid);
         $userid = $rule->get_createdby();
         $title = $rule->get_name() . " " . get_string('status_broken', 'local_notificationsagent');
         $text = get_string(
-            'brokenrulebody', 'local_notificationsagent',
-            [
-                'course' => get_course($courseid)->fullname,
-                'rule' => $rule->get_name(),
-            ]
+                'brokenrulebody', 'local_notificationsagent',
+                [
+                        'course' => get_course($courseid)->fullname,
+                        'rule' => $rule->get_name(),
+                ]
         );
         $message = new \core\message\message();
         $message->component = 'local_notificationsagent'; // Your plugin's name.
@@ -335,9 +346,9 @@ class helper {
         $message->smallmessage = shorten_text(format_text($text));
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
         $message->contexturl = (new \moodle_url(
-            '/local/notificationsagent/editrule.php?courseid=' . $courseid . '&action=edit&ruleid=' . $ruleid
+                '/local/notificationsagent/editrule.php?courseid=' . $courseid . '&action=edit&ruleid=' . $ruleid
         ))->out(
-            false
+                false
         ); // A relevant URL for the notification.
         $message->contexturlname = get_string('fullrule', 'local_notificationsagent'); // Link title explaining where users get
         // to  for the contexturl.
@@ -355,8 +366,8 @@ class helper {
      */
     public static function get_default_capabilities($context) {
         return [
-            'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
-            'export' => has_capability('local/notificationsagent:exportrule', $context),
+                'report' => has_capability('local/notificationsagent:viewassistantreport', $context),
+                'export' => has_capability('local/notificationsagent:exportrule', $context),
         ];
     }
 
@@ -369,14 +380,14 @@ class helper {
      */
     public static function get_capabilities($context) {
         return [
-            'resume' => has_capability('local/notificationsagent:updaterulestatus', $context),
-            'edit' => has_capability('local/notificationsagent:editrule', $context),
-            'delete' => has_capability('local/notificationsagent:deleterule', $context),
-            'assign' => has_capability('local/notificationsagent:assignrule', $context),
-            'export' => has_capability('local/notificationsagent:exportrule', $context),
-            'force' => has_capability('local/notificationsagent:forcerule', $context),
-            'share' => has_capability('local/notificationsagent:updateruleshare', $context),
-            'report' => has_capability('local/notificationsagent:manageownrule', $context),
+                'resume' => has_capability('local/notificationsagent:updaterulestatus', $context),
+                'edit' => has_capability('local/notificationsagent:editrule', $context),
+                'delete' => has_capability('local/notificationsagent:deleterule', $context),
+                'assign' => has_capability('local/notificationsagent:assignrule', $context),
+                'export' => has_capability('local/notificationsagent:exportrule', $context),
+                'force' => has_capability('local/notificationsagent:forcerule', $context),
+                'share' => has_capability('local/notificationsagent:updateruleshare', $context),
+                'report' => has_capability('local/notificationsagent:manageownrule', $context),
         ];
     }
 
@@ -397,6 +408,12 @@ class helper {
         return $parents;
     }
 
+    /**
+     * Set error in report actiondetail
+     *
+     * @param string $parameters
+     * @return false|string
+     */
     public static function set_error($parameters) {
         $json = json_decode($parameters, true);
         $json['error'] = get_string('actionerror', 'local_notificationsagent');

@@ -38,6 +38,7 @@ use notificationscondition_sessionstart\sessionstart;
 
 /**
  * Session start observer test.
+ *
  * @group notificationsagent
  */
 class sessionstart_observer_test extends \advanced_testcase {
@@ -87,10 +88,10 @@ class sessionstart_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
 
     }
@@ -140,9 +141,9 @@ class sessionstart_observer_test extends \advanced_testcase {
         }
 
         $event = \core\event\course_viewed::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
         ]);
         $event->trigger();
 
@@ -175,9 +176,9 @@ class sessionstart_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, true],
-            [86400, false],
-            [86400 * 3, false],
+                [86400, true],
+                [86400, false],
+                [86400 * 3, false],
 
         ];
     }

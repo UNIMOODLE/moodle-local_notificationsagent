@@ -39,13 +39,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'local/notificationsagent:weekend' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:weekend' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
 ];

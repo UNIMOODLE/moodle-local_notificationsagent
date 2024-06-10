@@ -60,11 +60,12 @@ class notificationsagent_trigger_cron extends scheduled_task {
         $tasklastrunttime = $cronlastrun = get_config('local_notificationsagent', 'cronlastrun');
         // Rules in the interval  $timestarted and $tasklastrunttime.
         $triggers = notificationsagent::get_triggersbytimeinterval($timestarted, $tasklastrunttime);
-        
+
         // Evalutate rules.
         foreach ($triggers as $trigger) {
             notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid, $trigger->startdate
+                    [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid,
+                    $trigger->startdate
             );
             $cronlastrun = $trigger->startdate;
         }

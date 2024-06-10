@@ -41,6 +41,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
+ * Ondates test cron task tests
+ *
  * @group notificationsagent
  */
 class ondates_crontask_test extends \advanced_testcase {
@@ -89,15 +91,16 @@ class ondates_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
     /**
      * Test execute.
+     *
      * @param int $date
      * @param int $user
      *
@@ -151,15 +154,20 @@ class ondates_crontask_test extends \advanced_testcase {
         \uopz_unset_return('time');
     }
 
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
     public static function dataprovider(): array {
         return [
-            [1706182049, 2],
-            [1705741200, 2],
-            [1705827600, 2],
-            [1716587999, 0],
-            [1716847199, 0],
-            [1716587999, 2],
-            [1716847199, 2],
+                [1706182049, 2],
+                [1705741200, 2],
+                [1705827600, 2],
+                [1716587999, 0],
+                [1716847199, 0],
+                [1716587999, 2],
+                [1716847199, 2],
         ];
     }
 

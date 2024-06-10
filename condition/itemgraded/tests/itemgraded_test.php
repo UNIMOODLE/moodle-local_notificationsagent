@@ -104,7 +104,7 @@ class itemgraded_test extends \advanced_testcase {
         self::$subplugin = new itemgraded(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -119,11 +119,11 @@ class itemgraded_test extends \advanced_testcase {
     /**
      * Test evaluate.
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $param
-     * @param bool   $complementary
-     * @param int    $correctquestions
-     * @param bool   $expected
+     * @param bool $complementary
+     * @param int $correctquestions
+     * @param bool $expected
      *
      * @covers       \notificationscondition_itemgraded\itemgraded::evaluate
      *
@@ -137,10 +137,10 @@ class itemgraded_test extends \advanced_testcase {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         // Generate quiz.
         $quiz = $quizgenerator->create_instance(['course' => self::$coursetest->id,
-            'grade' => 100.0,
-            'sumgrades' => 10,
-            'layout' => '1,0',
-            ]);
+                'grade' => 100.0,
+                'sumgrades' => 10,
+                'layout' => '1,0',
+        ]);
 
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
         $this->assertNotNull($cm);
@@ -173,12 +173,12 @@ class itemgraded_test extends \advanced_testcase {
         self::$context->set_params(json_encode($params));
         // Fill correct answers.
         for ($i = 0; $i < $correctquestions; $i++) {
-            $attemptobj->process_submitted_actions($timenow, false, [$i+1 => ['answer' => '1']]);
+            $attemptobj->process_submitted_actions($timenow, false, [$i + 1 => ['answer' => '1']]);
         }
         // Fill incorrect answers.
         while ($i < 10) {
 
-                $attemptobj->process_submitted_actions($timenow, false, [$i+1 => ['answer' => '0']]);
+            $attemptobj->process_submitted_actions($timenow, false, [$i + 1 => ['answer' => '0']]);
             $i++;
         }
 
@@ -194,9 +194,10 @@ class itemgraded_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'CONDITION = 50' => [1704445200, '{"op":"=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
-            'CONDITION > 10' => [1704445200, '{"op":">", "grade":10}', notificationplugin::COMPLEMENTARY_CONDITION, 6, true],
-            'CONDITION > 50 Incorrect' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 2, false],
+                'CONDITION = 50' => [1704445200, '{"op":"=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
+                'CONDITION > 10' => [1704445200, '{"op":">", "grade":10}', notificationplugin::COMPLEMENTARY_CONDITION, 6, true],
+                'CONDITION > 50 Incorrect' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 2,
+                        false],
 
         ];
     }
@@ -235,8 +236,8 @@ class itemgraded_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -252,11 +253,11 @@ class itemgraded_test extends \advanced_testcase {
     /**
      * Test estimate next time.
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $param
-     * @param bool   $complementary
-     * @param int    $correctquestions
-     * @param bool   $expected
+     * @param bool $complementary
+     * @param int $correctquestions
+     * @param bool $expected
      *
      * @covers       \notificationscondition_itemgraded\itemgraded::estimate_next_time
      * @dataProvider dataestimate
@@ -269,10 +270,10 @@ class itemgraded_test extends \advanced_testcase {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         // Generate quiz.
         $quiz = $quizgenerator->create_instance(['course' => self::$coursetest->id,
-            'grade' => 100.0,
-            'sumgrades' => 10,
-            'layout' => '1,0',
-            ]);
+                'grade' => 100.0,
+                'sumgrades' => 10,
+                'layout' => '1,0',
+        ]);
 
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
         $this->assertNotNull($cm);
@@ -305,11 +306,11 @@ class itemgraded_test extends \advanced_testcase {
         self::$context->set_params(json_encode($params));
         // Fill correct answers.
         for ($i = 0; $i < $correctquestions; $i++) {
-            $attemptobj->process_submitted_actions($timenow, false, [$i+1 => ['answer' => '1']]);
+            $attemptobj->process_submitted_actions($timenow, false, [$i + 1 => ['answer' => '1']]);
         }
         // Fill incorrect answers.
         while ($i < 10) {
-                $attemptobj->process_submitted_actions($timenow, false, [$i+1 => ['answer' => '0']]);
+            $attemptobj->process_submitted_actions($timenow, false, [$i + 1 => ['answer' => '0']]);
             $i++;
         }
 
@@ -330,9 +331,11 @@ class itemgraded_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-            'CONDITION = 50' => [1704445200, '{"op":"=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
-            'EXCEPTION > 50 Correct' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_EXCEPTION, 2, true],
-            'CONDITION > 50 Incorrect' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_EXCEPTION, 7, false],
+                'CONDITION = 50' => [1704445200, '{"op":"=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
+                'EXCEPTION > 50 Correct' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_EXCEPTION, 2,
+                        true],
+                'CONDITION > 50 Incorrect' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_EXCEPTION, 7,
+                        false],
         ];
     }
 
@@ -355,11 +358,11 @@ class itemgraded_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -385,7 +388,7 @@ class itemgraded_test extends \advanced_testcase {
      * Test get ui.
      *
      * @param bool $template Whether to use a template or not.
-     * @covers \notificationscondition_itemgraded\itemgraded::get_ui
+     * @covers       \notificationscondition_itemgraded\itemgraded::get_ui
      * @dataProvider datagetui
      */
     public function test_getui($template = false) {
@@ -397,10 +400,10 @@ class itemgraded_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -409,14 +412,13 @@ class itemgraded_test extends \advanced_testcase {
         $mform = phpunitutil::get_property($form, '_form');
         $subtype = notificationplugin::TYPE_CONDITION;
 
-
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         // Generate quiz.
         $quiz = $quizgenerator->create_instance(['course' => self::$coursetest->id,
-            'grade' => 100.0,
-            'sumgrades' => 10,
-            'layout' => '1,0',
-            ]);
+                'grade' => 100.0,
+                'sumgrades' => 10,
+                'layout' => '1,0',
+        ]);
 
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
 
@@ -450,12 +452,11 @@ class itemgraded_test extends \advanced_testcase {
      */
     public static function datagetui(): array {
         return [
-            'UI RULE' => [false],
-            'UI TEMPLATE' => [true],
+                'UI RULE' => [false],
+                'UI TEMPLATE' => [true],
 
         ];
     }
-
 
     /**
      * Test convert parameters.
@@ -465,9 +466,9 @@ class itemgraded_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_itemgraded_cmid" => "5",
-            $id . "_itemgraded_op" => 0,
-            $id . "_itemgraded_grade" => "50",
+                $id . "_itemgraded_cmid" => "5",
+                $id . "_itemgraded_op" => 0,
+                $id . "_itemgraded_grade" => "50",
         ];
         $expected = '{"cmid":5,"op":">","grade":50}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -483,9 +484,9 @@ class itemgraded_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                'visible' => true,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmtestaa->cmid;

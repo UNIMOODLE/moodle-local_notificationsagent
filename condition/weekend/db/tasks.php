@@ -31,13 +31,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
-    [
-        'classname' => 'notificationscondition_weekend\task\weekend_crontask',
-        'blocking' => 0,
-        'minute' => '1',
-        'hour' => '0',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*',
-    ],
+        [
+                'classname' => 'notificationscondition_weekend\task\weekend_crontask',
+                'blocking' => 0,
+                'minute' => '1',
+                'hour' => '0',
+                'day' => '*',
+                'dayofweek' => '*',
+                'month' => '*',
+        ],
 ];

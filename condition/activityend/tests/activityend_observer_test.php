@@ -90,10 +90,10 @@ class activityend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
 
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
 
         $role = 'student';
@@ -117,11 +117,11 @@ class activityend_observer_test extends \advanced_testcase {
 
     public function test_course_module_updated($role) {
         global $DB, $USER;
-        
+
         \uopz_set_return('time', self::COURSE_DATEEND - 120);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$course->id,
+                'course' => self::$course->id,
         ]);
         $cmgen->timeclose = self::COURSE_DATEEND;
 
@@ -151,15 +151,15 @@ class activityend_observer_test extends \advanced_testcase {
         self::setUser(self::$user->id);
 
         $event = \core\event\course_module_updated::create([
-            'context' => \context_module::instance($cmgen->cmid),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => $cmgen->cmid,
-            'other' => [
-                'modulename' => 'quiz',
-                'instanceid' => $cmgen->id,
-                'name' => $cmgen->name,
-            ],
+                'context' => \context_module::instance($cmgen->cmid),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => $cmgen->cmid,
+                'other' => [
+                        'modulename' => 'quiz',
+                        'instanceid' => $cmgen->id,
+                        'name' => $cmgen->name,
+                ],
         ]);
 
         $event->trigger();

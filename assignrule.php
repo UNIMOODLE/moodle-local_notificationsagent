@@ -22,7 +22,7 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version details
+ *  Version details
  *
  * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
@@ -30,6 +30,7 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once("../../config.php");
 
 use local_notificationsagent\rule;
@@ -58,6 +59,7 @@ if (!empty($idrule)) {
  * @param int $idrule
  *
  * @return array|array[]
+ * @package local_notificationsagent
  */
 function get_list_assigned_context($idrule) {
     $rule = rule::create_instance($idrule);
@@ -68,11 +70,12 @@ function get_list_assigned_context($idrule) {
 /**
  * Add list of courses assigned
  *
- * @param int   $idrule
+ * @param int $idrule
  * @param array $categories
  * @param array $courses
  *
  * @return void
+ * @package local_notificationsagent
  */
 function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     global $DB;
@@ -84,9 +87,9 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     if (!empty($categories)) {
         foreach ($categories as $category) {
             $paramscat = [
-                'ruleid' => $idrule,
-                'contextid' => CONTEXT_COURSECAT,
-                'objectid' => $category,
+                    'ruleid' => $idrule,
+                    'contextid' => CONTEXT_COURSECAT,
+                    'objectid' => $category,
             ];
             $DB->insert_record('notificationsagent_context', $paramscat);
         }
@@ -95,9 +98,9 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     if (!empty($courses)) {
         foreach ($courses as $course) {
             $paramscourse = [
-                'ruleid' => $idrule,
-                'contextid' => CONTEXT_COURSE,
-                'objectid' => $course,
+                    'ruleid' => $idrule,
+                    'contextid' => CONTEXT_COURSE,
+                    'objectid' => $course,
             ];
             $DB->insert_record('notificationsagent_context', $paramscourse);
         }
@@ -111,6 +114,7 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
  * @param int $forced
  *
  * @return void
+ * @package local_notificationsagent
  */
 function set_forced_rule($idrule, $forced) {
     global $DB;

@@ -34,13 +34,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
-    [
-        'classname' => 'notificationscondition_activityend\task\activityend_crontask',
-        'blocking' => 0,
-        'minute' => '30',
-        'hour' => '0',
-        'day' => '30',
-        'dayofweek' => '*',
-        'month' => '*',
-    ],
+        [
+                'classname' => 'notificationscondition_activityend\task\activityend_crontask',
+                'blocking' => 0,
+                'minute' => '30',
+                'hour' => '0',
+                'day' => '30',
+                'dayofweek' => '*',
+                'month' => '*',
+        ],
 ];

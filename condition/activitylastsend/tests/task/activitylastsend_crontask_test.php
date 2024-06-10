@@ -80,10 +80,10 @@ class activitylastsend_crontask_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
 
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course, 'student');
@@ -93,7 +93,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
     /**
      * Check if the user has not uploaded content to the activity for more than a specific time.
      *
-     * @param int $fileuploadtime  File uploaded time
+     * @param int $fileuploadtime File uploaded time
      * @param int $crontimestarted Cron task time
      *
      * @covers       \notificationscondition_activitylastsend\task\activitylastsend_crontask::execute
@@ -136,15 +136,15 @@ class activitylastsend_crontask_test extends \advanced_testcase {
         if (!is_null($fileuploadtime)) {
             $fs = get_file_storage();
             $filerecord = [
-                'contextid' => $assigncontext->id,
-                'component' => 'mod_assign',
-                'filearea' => 'content',
-                'itemid' => 0,
-                'filepath' => '/',
-                'filename' => 'user-test-file.txt',
-                'userid' => self::$user->id,
-                'timecreated' => $fileuploadtime,
-                'timemodified' => $fileuploadtime,
+                    'contextid' => $assigncontext->id,
+                    'component' => 'mod_assign',
+                    'filearea' => 'content',
+                    'itemid' => 0,
+                    'filepath' => '/',
+                    'filename' => 'user-test-file.txt',
+                    'userid' => self::$user->id,
+                    'timecreated' => $fileuploadtime,
+                    'timemodified' => $fileuploadtime,
             ];
 
             $fs->create_file_from_string($filerecord, 'User upload');
@@ -178,10 +178,10 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Testing a file that was not uploaded' => [null, time()],
-            'Testing a file that was uploaded 2 minutes ago' => [1709014050, 1709014170],
-            'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
-            'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
+                'Testing a file that was not uploaded' => [null, time()],
+                'Testing a file that was uploaded 2 minutes ago' => [1709014050, 1709014170],
+                'Testing a file that was uploaded 5 minutes ago' => [1711650868, 1711651168],
+                'Testing a file that was uploaded several days ago' => [1709022090, 1709116470],
         ];
     }
 

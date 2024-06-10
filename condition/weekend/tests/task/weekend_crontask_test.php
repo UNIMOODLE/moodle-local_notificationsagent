@@ -91,10 +91,10 @@ class weekend_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
@@ -158,12 +158,12 @@ class weekend_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1706182049, 0],
-            [1705741200, 0],
-            [1705827600, 0],
-            [1706182049, 2],
-            [1705741200, 2],
-            [1705827600, 2],
+                [1706182049, 0],
+                [1705741200, 0],
+                [1705827600, 0],
+                [1706182049, 2],
+                [1705741200, 2],
+                [1705827600, 2],
         ];
     }
 

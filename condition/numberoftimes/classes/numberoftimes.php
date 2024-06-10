@@ -71,7 +71,7 @@ class numberoftimes extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -88,8 +88,8 @@ class numberoftimes extends notificationconditionplugin {
         $numbertimes = $params->{self::N_TIMES};
 
         $launched = $DB->get_record(
-            'notificationsagent_launched',
-            ['ruleid' => $ruleid, 'userid' => $userid, 'courseid' => $courseid]
+                'notificationsagent_launched',
+                ['ruleid' => $ruleid, 'userid' => $userid, 'courseid' => $courseid]
         );
 
         if ($launched === false) {
@@ -97,7 +97,7 @@ class numberoftimes extends notificationconditionplugin {
         }
 
         ($timeaccess >= $launched->timemodified + $time && $launched->timesfired < $numbertimes)
-            ? $meetcondition = true : $meetcondition = false;
+                ? $meetcondition = true : $meetcondition = false;
 
         return $meetcondition;
     }
@@ -113,28 +113,28 @@ class numberoftimes extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The Moodle quick form object.
-     * @param int              $courseid The ID of the course.
-     * @param string           $type     The type of the condition.
+     * @param \MoodleQuickForm $mform The Moodle quick form object.
+     * @param int $courseid The ID of the course.
+     * @param string $type The type of the condition.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
         // Number of times.
         $element = $mform->createElement(
-            'float', $this->get_name_ui(self::N_TIMES),
-            get_string('condition_number_times', 'notificationscondition_numberoftimes', ['typeelement' => '[N]']),
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
-                'placeholder' => get_string('condition_number', 'notificationscondition_numberoftimes'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            ]
+                'float', $this->get_name_ui(self::N_TIMES),
+                get_string('condition_number_times', 'notificationscondition_numberoftimes', ['typeelement' => '[N]']),
+                [
+                        'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                        'placeholder' => get_string('condition_number', 'notificationscondition_numberoftimes'),
+                        'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                ]
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+                $this->get_name_ui(self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
     }
 
@@ -173,16 +173,17 @@ class numberoftimes extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
-        $paramstoteplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $jsonparams->{self::N_TIMES}];
+        $paramstoteplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true),
+                $jsonparams->{self::N_TIMES}];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
@@ -214,9 +215,9 @@ class numberoftimes extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */

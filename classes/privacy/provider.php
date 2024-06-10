@@ -13,12 +13,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU\".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
+ * Version details
+ *
  * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
@@ -39,8 +44,8 @@ use core_privacy\local\request;
  * Provider user data class
  */
 class provider implements \core_privacy\local\metadata\provider,
-                          \core_privacy\local\request\core_userlist_provider,
-                          \core_privacy\local\request\subsystem\provider {
+        \core_privacy\local\request\core_userlist_provider,
+        \core_privacy\local\request\subsystem\provider {
     /**
      * Privacy  notifications agent  provider.
      *
@@ -50,18 +55,18 @@ class provider implements \core_privacy\local\metadata\provider,
      */
     public static function get_metadata(collection $collection): collection {
         $reportdata = [
-            'userid' => 'privacy:metadata:userid',
-            'courseid' => 'privacy:metadata:courseid',
-            'ruleid' => 'privacy:metadata:ruleid',
-            'actionid' => 'privacy:metadata:actionid',
-            'actiondetail' => 'privacy:metadata:actiondetail',
-            'timestamp' => 'privacy:metadata:timestamp',
+                'userid' => 'privacy:metadata:userid',
+                'courseid' => 'privacy:metadata:courseid',
+                'ruleid' => 'privacy:metadata:ruleid',
+                'actionid' => 'privacy:metadata:actionid',
+                'actiondetail' => 'privacy:metadata:actiondetail',
+                'timestamp' => 'privacy:metadata:timestamp',
         ];
 
         $collection->add_database_table(
-            'notificationsagent_report',
-            $reportdata,
-            'privacy:metadata:notificationsagentreport'
+                'notificationsagent_report',
+                $reportdata,
+                'privacy:metadata:notificationsagentreport'
         );
 
         return $collection;
@@ -121,8 +126,8 @@ class provider implements \core_privacy\local\metadata\provider,
             }
 
             request\writer::with_context($context)->export_data(
-                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
-                (object) $exportdata
+                    [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
+                    (object) $exportdata
             );
         }
     }
@@ -196,7 +201,7 @@ class provider implements \core_privacy\local\metadata\provider,
     /**
      * Deletes notification report for a given user.
      *
-     * @param int      $courseid
+     * @param int $courseid
      * @param int|null $userid User id to delete..
      *
      */

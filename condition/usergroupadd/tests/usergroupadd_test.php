@@ -107,7 +107,7 @@ class usergroupadd_test extends \advanced_testcase {
         self::$subplugin = new usergroupadd(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$course = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -123,10 +123,10 @@ class usergroupadd_test extends \advanced_testcase {
     /**
      * Tests the evaluate method.
      *
-     * @param int  $timeaccess
+     * @param int $timeaccess
      * @param bool $usecache
      * @param bool $complementary
-     * @param int  $addingroup
+     * @param int $addingroup
      * @param bool $expected
      *
      * @covers       \notificationscondition_usergroupadd\usergroupadd::evaluate
@@ -138,15 +138,15 @@ class usergroupadd_test extends \advanced_testcase {
         self::setUser(self::$user->id);
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
-                'userid' => self::$user->id
+                    'userid' => self::$user->id
                 , 'groupid' => self::$group->id,
             ]);
         }
         self::$context->set_complementary($complementary);
         self::$context->set_params(
-            json_encode(
-                ['cmid' => self::$group->id],
-            )
+                json_encode(
+                        ['cmid' => self::$group->id],
+                )
         );
         self::$context->set_timeaccess($timeaccess);
         self::$subplugin->set_id(self::CONDITIONID);
@@ -170,10 +170,10 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Without cache or group' => [1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, false, false],
-            'In group but without cache' => [1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, true, true],
-            'Cached but without group' => [1701691707, true, notificationplugin::COMPLEMENTARY_CONDITION, false, true],
-            'Cached and in group' => [1703498961, true, notificationplugin::COMPLEMENTARY_CONDITION, true, true],
+                'Without cache or group' => [1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, false, false],
+                'In group but without cache' => [1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, true, true],
+                'Cached but without group' => [1701691707, true, notificationplugin::COMPLEMENTARY_CONDITION, false, true],
+                'Cached and in group' => [1703498961, true, notificationplugin::COMPLEMENTARY_CONDITION, true, true],
         ];
     }
 
@@ -211,8 +211,8 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -222,10 +222,10 @@ class usergroupadd_test extends \advanced_testcase {
      * @covers       \notificationscondition_usergroupadd\usergroupadd::estimate_next_time
      * @dataProvider datausergroupadd
      *
-     * @param int  $timeaccess    Time access
-     * @param int  $expected      Expected result
+     * @param int $timeaccess Time access
+     * @param int $expected Expected result
      * @param bool $complementary Complementary
-     * @param bool $addingroup    Add group
+     * @param bool $addingroup Add group
      *
      * @return void
      */
@@ -236,13 +236,13 @@ class usergroupadd_test extends \advanced_testcase {
         set_config('calendar_usergroupadd', 65);
         date_default_timezone_set('Europe/Madrid');
         self::$context->set_params(
-            json_encode(
-                ['cmid' => self::$group->id],
-            )
+                json_encode(
+                        ['cmid' => self::$group->id],
+                )
         );
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
-                'userid' => self::$user->id
+                    'userid' => self::$user->id
                 , 'groupid' => self::$group->id,
             ]);
         }
@@ -260,10 +260,10 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public static function datausergroupadd(): array {
         return [
-            'Condition Is in group' => [1704074700, 1704074700, 0, true],
-            'Condition Is not in group' => [1704495600, null, 0, false],
-            'Exception Is in group' => [1704074700, null, 1, true],
-            'Exception Is not in group' => [1704495600, 1704495600, 1, false],
+                'Condition Is in group' => [1704074700, 1704074700, 0, true],
+                'Condition Is not in group' => [1704495600, null, 0, false],
+                'Exception Is in group' => [1704074700, null, 1, true],
+                'Exception Is not in group' => [1704495600, 1704495600, 1, false],
         ];
     }
 
@@ -296,11 +296,11 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -342,10 +342,10 @@ class usergroupadd_test extends \advanced_testcase {
         $courseid = self::$course->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);

@@ -58,11 +58,12 @@ class ac extends notificationconditionplugin {
      *
      * @return string[]
      */
-    public function get_elements() {}
+    public function get_elements() {
+    }
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -94,8 +95,8 @@ class ac extends notificationconditionplugin {
      * Get the UI for the condition.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param string      $exception
+     * @param int $courseid
+     * @param string $exception
      */
     public function get_ui($mform, $courseid, $exception) {
         return '';
@@ -105,11 +106,11 @@ class ac extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default TRUE
-     * 
+     * @param bool $onlyverifysiteid Default TRUE
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
@@ -117,11 +118,11 @@ class ac extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it is false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
-        
+
         $info = new custominfo($courseid, $this->get_parameters());
 
         return $info->validation();
@@ -158,9 +159,9 @@ class ac extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin, such as replacing placeholders with dynamic
      * data, formatting content, etc.
      *
-     * @param string $content  — The content to be processed, passed by reference.
-     * @param int    $courseid — The ID of the course related to the content.
-     * @param bool   $complementary
+     * @param string $content — The content to be processed, passed by reference.
+     * @param int $courseid — The ID of the course related to the content.
+     * @param bool $complementary
      *
      */
     public function process_markups(&$content, $courseid, $complementary = null) {
@@ -192,16 +193,16 @@ class ac extends notificationconditionplugin {
     /**
      * Saves the data to the database.
      *
-     * @param string $action        The action to perform (insert, update, delete).
-     * @param mixed  $data          The data to be saved.
-     * @param mixed  $complementary Additional complementary data.
-     * @param int    $timer         (Optional) The timer. Default is 0.
-     * @param array  $students      (Optional) The students. Default is an empty array.
+     * @param string $action The action to perform (insert, update, delete).
+     * @param mixed $data The data to be saved.
+     * @param mixed $complementary Additional complementary data.
+     * @param int $timer (Optional) The timer. Default is 0.
+     * @param array $students (Optional) The students. Default is an empty array.
      */
     public function save($action, $data, $complementary, &$timer = 0, $students = []) {
         // Get data from form.
         $this->convert_parameters($data);
-        // If availability json is empty and row exists (UPDATE) then $action = delete
+        // If availability json is empty and row exists (UPDATE) then $action = delete.
         if (custominfo::is_empty($this->get_parameters()) && $action == editrule_form::FORM_JSON_ACTION_UPDATE) {
             $action = editrule_form::FORM_JSON_ACTION_DELETE;
             parent::save($action, $data, $complementary, $timer, $students);
@@ -214,14 +215,13 @@ class ac extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */
     public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
-        // TODO
         return false;
     }
 }

@@ -128,10 +128,10 @@ class unshare_rule_all_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
@@ -143,8 +143,8 @@ class unshare_rule_all_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\external\unshare_rule_all::execute_parameters
      * @dataProvider dataprovider
      *
-     * @param int    $user
-     * @param int    $useinstance
+     * @param int $user
+     * @param int $useinstance
      * @param string $expected
      *
      * @return void
@@ -190,10 +190,9 @@ class unshare_rule_all_test extends \advanced_testcase {
         $instance = self::$rule::create_instance($ruleid);
 
         $result = unshare_rule_all::execute(
-            $useinstance == 0 ? $useinstance : $instance->get_id()
+                $useinstance == 0 ? $useinstance : $instance->get_id()
         );
         $result = external_api::clean_returnvalue(unshare_rule_all::execute_returns(), $result);
-        // print print_r($result, true);
         if ($user == 2) {
             $this->assertEmpty($result['warnings']);
         } else {
@@ -208,9 +207,9 @@ class unshare_rule_all_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'No instance' => [1, 0, 'nosuchinstance'],
-            'Permissions' => [2, 1, ''],
-            'No Permissions' => [0, 1, 'nopermissions'],
+                'No instance' => [1, 0, 'nosuchinstance'],
+                'Permissions' => [2, 1, ''],
+                'No Permissions' => [0, 1, 'nopermissions'],
         ];
     }
 }

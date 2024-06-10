@@ -31,6 +31,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_notificationsagent;
+
+use core\event\course_deleted;
 use local_notificationsagent\rule;
 use notificationscondition_ac\ac;
 use notificationscondition_sessionend\sessionend;
@@ -100,16 +103,19 @@ class notificationsagent_observer_test extends \advanced_testcase {
 
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
     /**
+     *  Test for deleted courses
+     *
+     * @covers \local_notificationsagent\notificationsagent::delete_all_by_course()
      * @covers \local_notificationsagent_observer::course_deleted
-     * @covers \local_notificationsagent\notificationsagent::delete_all_by_course
+     *
      * @return void
      */
     public function test_course_deleted() {
@@ -154,18 +160,19 @@ class notificationsagent_observer_test extends \advanced_testcase {
         // Insert.
         $cacheid = $DB->insert_record('notificationsagent_triggers', $objdbtrigger);
         $this->assertIsNumeric($cacheid);
-
+        self::setAdminUser();
         $event = \core\event\course_deleted::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => 2,
-            'courseid' => self::$course->id,
-            'objectid' => self::$course->id,
-            'other' => ['fullname' => self::$course->fullname],
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => 2,
+                'courseid' => self::$course->id,
+                'objectid' => self::$course->id,
+                'other' => ['fullname' => self::$course->fullname],
         ]);
         $event->trigger();
 
         $deletereport = $DB->get_records('notificationsagent_report');
         $deletetrigger = $DB->get_records('notificationsagent_triggers');
+
         $this->assertEmpty($deletereport);
         $this->assertEmpty($deletetrigger);
 

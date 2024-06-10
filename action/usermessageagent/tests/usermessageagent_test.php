@@ -137,6 +137,7 @@ class usermessageagent_test extends \advanced_testcase {
      * Test for execute_action method.
      *
      * @param string $param
+     * @param int $user
      *
      * @covers       \notificationsaction_usermessageagent\usermessageagent::execute_action
      *
@@ -338,17 +339,17 @@ class usermessageagent_test extends \advanced_testcase {
      *
      */
     public function test_processmarkups() {
-        $UI_TITLE = 'test title';
-        $UI_MESSAGE = 'test message';
+        $uititle = 'test title';
+        $uimessage = 'test message';
 
         $params[self::$subplugin::UI_USER] = self::$user->id;
-        $params[self::$subplugin::UI_TITLE] = $UI_TITLE;
-        $params[self::$subplugin::UI_MESSAGE]['text'] = $UI_MESSAGE;
+        $params[self::$subplugin::UI_TITLE] = $uititle;
+        $params[self::$subplugin::UI_MESSAGE]['text'] = $uimessage;
         $params = json_encode($params);
 
         $paramstoreplace = [
-                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
-                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $uititle)),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $uimessage))),
                 shorten_text(self::$user->firstname . " " . self::$user->lastname),
         ];
         $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());

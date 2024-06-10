@@ -54,7 +54,7 @@ class notificationscondition_ac_observer {
                  WHERE mnc.pluginname = :name';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => ac::NAME,
+                'name' => ac::NAME,
         ]);
 
         foreach ($dataobj as $data) {
@@ -62,14 +62,14 @@ class notificationscondition_ac_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid, rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
         }
     }
 
-        /**
+    /**
      * Triggered when 'grouping_deleted' event is triggered.
      *
      * @param \core\event\grouping_deleted $event
@@ -82,7 +82,7 @@ class notificationscondition_ac_observer {
                  WHERE mnc.pluginname = :name';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => ac::NAME,
+                'name' => ac::NAME,
         ]);
 
         foreach ($dataobj as $data) {
@@ -90,7 +90,7 @@ class notificationscondition_ac_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid, rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }

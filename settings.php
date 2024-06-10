@@ -38,35 +38,42 @@ require_once($CFG->dirroot . '/local/notificationsagent/adminlib.php');
 
 if ($hassiteconfig) {
     $settingspage = new admin_settingpage(
-        'manage_notificationsagent', get_string(
-            'settings',
-            'local_notificationsagent'
-        )
+            'manage_notificationsagent', get_string(
+                    'settings',
+                    'local_notificationsagent'
+            )
     );
 
     if ($ADMIN->fulltree) {
         $settingdisableuseruse = new admin_setting_configcheckbox(
-            'local_notificationsagent/disable_user_use',
-            get_string('disable_user_use', 'local_notificationsagent'),
-            get_string('disable_user_use_desc', 'local_notificationsagent'),
-            false
+                'local_notificationsagent/disable_user_use',
+                get_string('disable_user_use', 'local_notificationsagent'),
+                get_string('disable_user_use_desc', 'local_notificationsagent'),
+                false
         );
         $settingspage->add($settingdisableuseruse);
-        
+
+        $pauseafterrestore = new admin_setting_configcheckbox(
+            'local_notificationsagent/pauseafterrestore',
+            get_string('pause_after_restore', 'local_notificationsagent'),
+            get_string('pause_after_restore_desc', 'local_notificationsagent'), true,
+        );
+
+        $settingspage->add($pauseafterrestore);
         $settingmaxrulescron = new admin_setting_configtext(
-            'local_notificationsagent/max_rules_cron',
-            get_string('max_rules_cron', 'local_notificationsagent'),
-            get_string('max_rules_cron_desc', 'local_notificationsagent'),
-            '5000',
-            PARAM_INT
+                'local_notificationsagent/max_rules_cron',
+                get_string('max_rules_cron', 'local_notificationsagent'),
+                get_string('max_rules_cron_desc', 'local_notificationsagent'),
+                '5000',
+                PARAM_INT
         );
         $settingspage->add($settingmaxrulescron);
 
         $settingstartdate = new admin_setting_configtextarea(
-            'local_notificationsagent/startdate',
-            get_string('startdate', 'local_notificationsagent'),
-            get_string('startdate_desc', 'local_notificationsagent'),
-            'mod_assign|assign|allowsubmissionsfromdate|duedate
+                'local_notificationsagent/startdate',
+                get_string('startdate', 'local_notificationsagent'),
+                get_string('startdate_desc', 'local_notificationsagent'),
+                'mod_assign|assign|allowsubmissionsfromdate|duedate
             mod_bigbluebuttonbn|bigbluebuttonbn|openingtime
             mod_chat|chat|chattime|
             mod_choice|choice|timeopen|timeclose
@@ -78,59 +85,59 @@ if ($hassiteconfig) {
             mod_quiz|quiz|timeopen|timeclose
             mod_scorm|scorm|timeopen|timeclose
             mod_workshop|workshop|submissionstart|submissionend',
-            PARAM_RAW,
-            10,
-            15
+                PARAM_RAW,
+                10,
+                15
         );
         $settingspage->add($settingstartdate);
 
         $settingstracelog = new admin_setting_configcheckbox(
-            'local_notificationsagent/tracelog',
-            get_string('tracelog', 'local_notificationsagent'),
-            get_string('tracelog_desc', 'local_notificationsagent'), false
+                'local_notificationsagent/tracelog',
+                get_string('tracelog', 'local_notificationsagent'),
+                get_string('tracelog_desc', 'local_notificationsagent'), false
         );
 
         $settingspage->add($settingstracelog);
     }
 
     $ADMIN->add(
-        'localplugins', new admin_category(
-            'notificationscategory',
-            get_string('pluginname', 'local_notificationsagent')
-        )
+            'localplugins', new admin_category(
+                    'notificationscategory',
+                    get_string('pluginname', 'local_notificationsagent')
+            )
     );
 
     $ADMIN->add('notificationscategory', $settingspage);
     $ADMIN->add(
-        'notificationscategory', new admin_externalpage(
-            'notificationsexternalpage', get_string(
-            'menu',
-            'local_notificationsagent'
-        ), $CFG->wwwroot . '/local/notificationsagent/index.php'
-        )
+            'notificationscategory', new admin_externalpage(
+                    'notificationsexternalpage', get_string(
+                    'menu',
+                    'local_notificationsagent'
+            ), $CFG->wwwroot . '/local/notificationsagent/index.php'
+            )
     );
 
     // Add subplugins management in settings view.
 
     $ADMIN->add(
-        'notificationscategory', new admin_category(
+            'notificationscategory', new admin_category(
+                    'notificationsactionplugins',
+                    get_string('actionplugins', 'local_notificationsagent')
+            )
+    );
+    $ADMIN->add(
             'notificationsactionplugins',
-            get_string('actionplugins', 'local_notificationsagent')
-        )
+            new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationsaction')
     );
     $ADMIN->add(
-        'notificationsactionplugins',
-        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationsaction')
+            'notificationscategory', new admin_category(
+                    'notificationsconditionplugins',
+                    get_string('conditionplugins', 'local_notificationsagent')
+            )
     );
     $ADMIN->add(
-        'notificationscategory', new admin_category(
             'notificationsconditionplugins',
-            get_string('conditionplugins', 'local_notificationsagent')
-        )
-    );
-    $ADMIN->add(
-        'notificationsconditionplugins',
-        new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationscondition')
+            new notificationsagent_admin_page_manage_notificationsagent_plugins('notificationscondition')
     );
 
     foreach (core_plugin_manager::instance()->get_plugins_of_type('notificationsaction') as $plugin) {
@@ -144,24 +151,24 @@ if ($hassiteconfig) {
     }
 
     $ADMIN->add(
-        'notificationscategory', new admin_externalpage(
-            'notificationsreport', get_string(
-            'report',
-            'local_notificationsagent'
-        ), $CFG->wwwroot . '/local/notificationsagent/report.php'
-        )
+            'notificationscategory', new admin_externalpage(
+                    'notificationsreport', get_string(
+                    'report',
+                    'local_notificationsagent'
+            ), $CFG->wwwroot . '/local/notificationsagent/report.php'
+            )
     );
 
     $ADMIN->add(
-        'reports', new admin_externalpage(
-            'notificationsagent', get_string('report', 'local_notificationsagent'),
-            "$CFG->wwwroot/local/notificationsagent/report.php"
-        )
+            'reports', new admin_externalpage(
+                    'notificationsagent', get_string('report', 'local_notificationsagent'),
+                    "$CFG->wwwroot/local/notificationsagent/report.php"
+            )
     );
     $ADMIN->add(
-        'taskconfig', new admin_externalpage(
-            'notificationsagentadmin', get_string('pluginname', 'local_notificationsagent'),
-            "$CFG->wwwroot/local/notificationsagent/index.php"
-        )
+            'taskconfig', new admin_externalpage(
+                    'notificationsagentadmin', get_string('pluginname', 'local_notificationsagent'),
+                    "$CFG->wwwroot/local/notificationsagent/index.php"
+            )
     );
 }

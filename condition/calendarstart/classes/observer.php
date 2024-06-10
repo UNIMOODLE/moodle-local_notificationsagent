@@ -77,15 +77,15 @@ class notificationscondition_calendarstart_observer {
 
         $cmid = $event->objectid;
 
-        //Get rules with conditions with cmid
+        // Get rules with conditions with cmid.
         $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid, mnc.pluginname
                   FROM {notificationsagent_condition} mnc
                  WHERE mnc.pluginname = :name
                    AND mnc.cmid = :cmid';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => calendarstart::NAME,
-            'cmid' => $cmid,
+                'name' => calendarstart::NAME,
+                'cmid' => $cmid,
         ]);
 
         foreach ($dataobj as $data) {
@@ -93,7 +93,7 @@ class notificationscondition_calendarstart_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid, rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }

@@ -155,13 +155,13 @@ abstract class notificationplugin {
      * Conditional operators.
      */
     const OPERATORS
-        = [
-            0 => '>',
-            1 => '>=',
-            2 => '=',
-            3 => '<',
-            4 => '<=',
-        ];
+            = [
+                    0 => '>',
+                    1 => '>=',
+                    2 => '=',
+                    3 => '<',
+                    4 => '<=',
+            ];
 
     /**
      * @var $id int the id of the subplugin instance
@@ -202,7 +202,7 @@ abstract class notificationplugin {
      * Constructor for the class.
      *
      * @param int|\stdClass $ruleorid object from DB table 'notificationsagent_rule' or just a rule id
-     * @param mixed         $id       If is numeric => value is already in DB
+     * @param mixed $id If is numeric => value is already in DB
      *
      */
     public function __construct($ruleorid, $id = null) {
@@ -264,8 +264,8 @@ abstract class notificationplugin {
      */
     public function get_description() {
         return [
-            'title' => $this->get_title(),
-            'name' => $this->get_subtype(),
+                'title' => $this->get_title(),
+                'name' => $this->get_subtype(),
         ];
     }
 
@@ -273,7 +273,7 @@ abstract class notificationplugin {
      * Generates the UI title element for the form and inserts it before a specified group.
      *
      * @param \MoodleQuickForm $mform The form to which the title element will be added.
-     * @param string           $type  The type of the notification plugin, used to build the class attribute.
+     * @param string $type The type of the notification plugin, used to build the class attribute.
      */
     protected function get_ui_title($mform, $type) {
         $title = \html_writer::start_tag('h5');
@@ -289,64 +289,64 @@ abstract class notificationplugin {
      * Builds select elements for date selection in the form.
      *
      * @param \MoodleQuickForm $mform The form to which the date elements will be added.
-     * @param string           $type  The type of the notification plugin, used to determine condition or action.
+     * @param string $type The type of the notification plugin, used to determine condition or action.
      */
     protected function get_ui_select_date($mform, $type) {
         $conditionoraction = ($type == self::TYPE_ACTION ? self::TYPE_ACTION : self::TYPE_CONDITION);
 
         // Days.
         $timegroup[] = $mform->createElement(
-            'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+                'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
         );
         $timegroup[] = $mform->createElement(
-            'float',
-            $this->get_name_ui(self::UI_DAYS),
-            get_string('condition_days', 'local_notificationsagent'),
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
-                'placeholder' => get_string('condition_days', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            ]
+                'float',
+                $this->get_name_ui(self::UI_DAYS),
+                get_string('condition_days', 'local_notificationsagent'),
+                [
+                        'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                        'placeholder' => get_string('condition_days', 'local_notificationsagent'),
+                        'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                ]
         );
 
         // Hours.
         $timegroup[] = $mform->createElement(
-            'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+                'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
         );
         $timegroup[] = $mform->createElement(
-            'float',
-            $this->get_name_ui(self::UI_HOURS),
-            '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
-                'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            ]
+                'float',
+                $this->get_name_ui(self::UI_HOURS),
+                '',
+                [
+                        'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
+                        'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
+                        'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                ]
         );
 
         // Minutes.
         $timegroup[] = $mform->createElement(
-            'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+                'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
         );
         $timegroup[] = $mform->createElement(
-            'float',
-            $this->get_name_ui(self::UI_MINUTES),
-            '',
-            [
-                'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
-                'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
-                'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
-            ]
+                'float',
+                $this->get_name_ui(self::UI_MINUTES),
+                '',
+                [
+                        'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
+                        'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
+                        'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
+                ]
         );
 
         // GroupTime.
         $group = $mform->createElement(
-            'group', $this->get_name_ui($this->get_subtype()),
-            get_string(
-                'editrule_condition_element_time', 'notifications' . $conditionoraction . '_' . get_called_class()::NAME,
-                ['typeelement' => '[TTTT]']
-            ),
-            $timegroup, null, false
+                'group', $this->get_name_ui($this->get_subtype()),
+                get_string(
+                        'editrule_condition_element_time', 'notifications' . $conditionoraction . '_' . get_called_class()::NAME,
+                        ['typeelement' => '[TTTT]']
+                ),
+                $timegroup, null, false
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
@@ -354,19 +354,20 @@ abstract class notificationplugin {
 
     /**
      * Convert select date value to unix
-     * 
+     *
      * @param array $params The parameters of the form
      *
      * @return array
      */
     protected function select_date_to_unix($params) {
         $timevalues = [
-            'days' => !empty($params[$this->get_name_ui(self::UI_DAYS)]) ? $params[$this->get_name_ui(self::UI_DAYS)] : 0,
-            'hours' => !empty($params[$this->get_name_ui(self::UI_HOURS)]) ? $params[$this->get_name_ui(self::UI_HOURS)] : 0,
-            'minutes' => !empty($params[$this->get_name_ui(self::UI_MINUTES)]) ? $params[$this->get_name_ui(self::UI_MINUTES)] : 0,
+                'days' => !empty($params[$this->get_name_ui(self::UI_DAYS)]) ? $params[$this->get_name_ui(self::UI_DAYS)] : 0,
+                'hours' => !empty($params[$this->get_name_ui(self::UI_HOURS)]) ? $params[$this->get_name_ui(self::UI_HOURS)] : 0,
+                'minutes' => !empty($params[$this->get_name_ui(self::UI_MINUTES)]) ? $params[$this->get_name_ui(self::UI_MINUTES)] :
+                        0,
         ];
         return ($timevalues['days'] * 24 * 60 * 60) + ($timevalues['hours'] * 60 * 60)
-            + ($timevalues['minutes'] * 60);
+                + ($timevalues['minutes'] * 60);
     }
 
     /**
@@ -394,11 +395,11 @@ abstract class notificationplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default false. If true, only SITEID is verified
-     * 
+     * @param bool $onlyverifysiteid Default false. If true, only SITEID is verified
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = false) {
@@ -414,7 +415,7 @@ abstract class notificationplugin {
         // All parameters.
         $data = json_decode($this->get_parameters() ?? '', true);
 
-        // Check cmid exists
+        // Check cmid exists.
         if ($cmid = $data[self::UI_ACTIVITY] ?? null) {
             $fastmodinfo = get_fast_modinfo($courseid);
             if (!$validation = isset($fastmodinfo->cms[$cmid]) ? true : false) {
@@ -422,7 +423,7 @@ abstract class notificationplugin {
                     return $validation;
                 }
                 $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                    'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
+                        'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
                 );
             }
         }
@@ -433,7 +434,7 @@ abstract class notificationplugin {
     /**
      * Save data (insert/update/delete)
      *
-     * @param string    $action
+     * @param string $action
      * @param \stdClass $dataplugin
      *
      * @return bool
@@ -484,9 +485,9 @@ abstract class notificationplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param string $content  The content to be processed, passed by reference.
-     * @param int    $courseid The ID of the course related to the content.
-     * @param mixed  $options  Additional options if any, null by default.
+     * @param string $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -495,7 +496,7 @@ abstract class notificationplugin {
     /**
      * Create subplugins from the given records.
      *
-     * @param array        $records  The array of records to create subplugins from.
+     * @param array $records The array of records to create subplugins from.
      * @param int|stdClass $ruleorid Object from DB table 'notificationsagent_rule' or just a rule id
      *
      * @return array The array of created subplugins.
@@ -523,10 +524,10 @@ abstract class notificationplugin {
     /**
      * Create a subplugin
      *
-     * @param int|\stdClass $id         If is numeric => value is already in DB
-     * @param string        $type       The type of the subplugin
-     * @param string        $pluginname The name of the subplugin
-     * @param int|\stdClass $ruleorid   Object from DB table 'notificationsagent_rule' or just a rule id
+     * @param int|\stdClass $id If is numeric => value is already in DB
+     * @param string $type The type of the subplugin
+     * @param string $pluginname The name of the subplugin
+     * @param int|\stdClass $ruleorid Object from DB table 'notificationsagent_rule' or just a rule id
      *
      * @return \stdClass
      */
@@ -690,6 +691,7 @@ abstract class notificationplugin {
      *
      * @return void
      */
-    public function set_default($form) {}
+    public function set_default($form) {
+    }
 
 }

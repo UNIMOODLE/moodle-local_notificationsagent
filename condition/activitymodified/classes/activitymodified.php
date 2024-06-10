@@ -67,7 +67,7 @@ class activitymodified extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -84,9 +84,9 @@ class activitymodified extends notificationconditionplugin {
         $cmid = (json_decode($context->get_params()))->{self::UI_ACTIVITY};
 
         $timelastsend = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timelastsend)) {
@@ -121,9 +121,9 @@ class activitymodified extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -142,18 +142,18 @@ class activitymodified extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                ['typeelement' => '[AAAA]']
-            ),
-            $listactivities
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
+                        ['typeelement' => '[AAAA]']
+                ),
+                $listactivities
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -192,9 +192,9 @@ class activitymodified extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -224,7 +224,7 @@ class activitymodified extends notificationconditionplugin {
     /**
      * Checks if there has been new content in the activity 1 minute ago.
      *
-     * @param int $cmid             The course module ID.
+     * @param int $cmid The course module ID.
      * @param int $eventtimecreated The event creation time.
      *
      * @return bool                   Is there any new content?
@@ -232,7 +232,7 @@ class activitymodified extends notificationconditionplugin {
     public static function get_any_new_content($cmid, $eventtimecreated) {
         global $DB;
 
-        $sql = " 
+        $sql = "
             SELECT f.id, f.userid, f.timemodified
                FROM {context} ctx
                 JOIN {files} f
@@ -244,8 +244,8 @@ class activitymodified extends notificationconditionplugin {
             ";
 
         $params = [
-            'cmid' => $cmid,
-            'contextlevel' => CONTEXT_MODULE,
+                'cmid' => $cmid,
+                'contextlevel' => CONTEXT_MODULE,
         ];
 
         return !empty($DB->get_record_sql($sql, $params));

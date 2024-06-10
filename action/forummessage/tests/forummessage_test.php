@@ -275,8 +275,8 @@ class forummessage_test extends \advanced_testcase {
      * @covers \notificationsaction_forummessage\forummessage::process_markups
      */
     public function test_processmarkups() {
-        $UI_TITLE = 'test title';
-        $UI_MESSAGE = 'test message';
+        $uititle = 'test title';
+        $uimessage = 'test message';
 
         $forumgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $forumgenerator->create_instance([
@@ -285,14 +285,14 @@ class forummessage_test extends \advanced_testcase {
 
         $paramstoreplace = [
                 shorten_text($cmgen->name),
-                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_TITLE)),
-                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $UI_MESSAGE))),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $uititle)),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $uimessage))),
         ];
         $expected = str_replace(self::$subplugin->get_elements(), $paramstoreplace, self::$subplugin->get_title());
 
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
-        $params[self::$subplugin::UI_TITLE] = $UI_TITLE;
-        $params[self::$subplugin::UI_MESSAGE]['text'] = $UI_MESSAGE;
+        $params[self::$subplugin::UI_TITLE] = $uititle;
+        $params[self::$subplugin::UI_MESSAGE]['text'] = $uimessage;
         $params = json_encode($params);
         self::$subplugin->set_parameters($params);
         $content = [];
@@ -342,6 +342,12 @@ class forummessage_test extends \advanced_testcase {
         yield [json_encode($data)];
     }
 
+    /**
+     * Test showuserplaceholders
+     *
+     * @covers \notificationsaction_removeusergroup\removeusergroup::show_user_placeholders
+     * @return void
+     */
     public function test_showuserplaceholders() {
         $this->assertFalse(self::$subplugin->show_user_placeholders());
     }

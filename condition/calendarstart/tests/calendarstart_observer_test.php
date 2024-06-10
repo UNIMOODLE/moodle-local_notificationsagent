@@ -94,21 +94,21 @@ class calendarstart_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         $coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser(self::$user);
         self::$calendarevent = self::getDataGenerator()->create_event(
-            [
-                'timestart' => self::COURSE_DATESTART,
-                'timeduration' => self::DURATION,
-                'courseid' => self::$course->id,
-                'userid' => self::$user->id,
-            ]
+                [
+                        'timestart' => self::COURSE_DATESTART,
+                        'timeduration' => self::DURATION,
+                        'courseid' => self::$course->id,
+                        'userid' => self::$user->id,
+                ]
         );
     }
 
@@ -149,16 +149,16 @@ class calendarstart_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         $event = \core\event\calendar_event_updated::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => self::$calendarevent->id,
-            'other' => [
-                'repeatid' => 0,
-                'name' => 'Calendar event',
-                'timestart' => self::COURSE_DATESTART,
-                'timeduration' => self::DURATION,
-            ],
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => self::$calendarevent->id,
+                'other' => [
+                        'repeatid' => 0,
+                        'name' => 'Calendar event',
+                        'timestart' => self::COURSE_DATESTART,
+                        'timeduration' => self::DURATION,
+                ],
         ]);
         $event->trigger();
 
@@ -192,14 +192,14 @@ class calendarstart_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, 1, 0],
-            [86400 * 3, 1, 0],
-            [86400, 0, 0],
-            [86400 * 3, 0, 0],
-            [86400, 1, 2],
-            [86400 * 3, 1, 2],
-            [86400, 0, 2],
-            [86400 * 3, 0, 2],
+                [86400, 1, 0],
+                [86400 * 3, 1, 0],
+                [86400, 0, 0],
+                [86400 * 3, 0, 0],
+                [86400, 1, 2],
+                [86400 * 3, 1, 2],
+                [86400, 0, 2],
+                [86400 * 3, 0, 2],
         ];
     }
 
@@ -210,11 +210,11 @@ class calendarstart_observer_test extends \advanced_testcase {
      * @covers       \notificationscondition_calendarstart_observer::calendar_event_deleted
      */
 
-     public function test_calendar_event_deleted() {
+    public function test_calendar_event_deleted() {
         global $DB;
         \uopz_set_return('time', self::COURSE_DATESTART);
 
-        self::setUser(2);//admin
+        self::setUser(2);// Admin.
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -222,7 +222,7 @@ class calendarstart_observer_test extends \advanced_testcase {
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        
+
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
@@ -239,25 +239,25 @@ class calendarstart_observer_test extends \advanced_testcase {
         $this->assertIsInt($conditionid);
 
         // Delete the event.
-        $DB->delete_records('event', array('id' => self::$calendarevent->id));
+        $DB->delete_records('event', ['id' => self::$calendarevent->id]);
 
         // Trigger an event for the delete action.
-        $eventargs = array(
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => self::$calendarevent->id,
-            'other' => [
-                'repeatid' => 0,
-                'name' => 'Calendar event',
-                'timestart' => self::COURSE_DATESTART,
-                'timeduration' => self::DURATION,
-            ],
-        );
+        $eventargs = [
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => self::$calendarevent->id,
+                'other' => [
+                        'repeatid' => 0,
+                        'name' => 'Calendar event',
+                        'timestart' => self::COURSE_DATESTART,
+                        'timeduration' => self::DURATION,
+                ],
+        ];
         $event = \core\event\calendar_event_deleted::create($eventargs);
         $event->trigger();
         $rule = self::$rule::create_instance($ruleid);
-        
+
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
         \uopz_unset_return('time');
     }

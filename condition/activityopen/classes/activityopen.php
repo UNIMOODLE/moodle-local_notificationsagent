@@ -69,7 +69,7 @@ class activityopen extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -88,9 +88,9 @@ class activityopen extends notificationconditionplugin {
         $conditionid = $this->get_id();
 
         $timestart = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timestart)) {
@@ -122,7 +122,7 @@ class activityopen extends notificationconditionplugin {
         }
         // Exception.
         if (($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime)
-            && $context->is_complementary()
+                && $context->is_complementary()
         ) {
             return time();
         }
@@ -132,9 +132,9 @@ class activityopen extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -154,20 +154,20 @@ class activityopen extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_activity', 'notificationscondition_activityopen',
-                ['typeelement' => '[AAAA]']
-            ),
-            $listactivities
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_activity', 'notificationscondition_activityopen',
+                        ['typeelement' => '[AAAA]']
+                ),
+                $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -207,9 +207,9 @@ class activityopen extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -222,7 +222,8 @@ class activityopen extends notificationconditionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $paramstoreplace = [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
+        $paramstoreplace =
+                [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;

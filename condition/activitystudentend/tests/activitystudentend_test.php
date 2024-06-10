@@ -123,7 +123,7 @@ class activitystudentend_test extends \advanced_testcase {
         self::$subplugin = new activitystudentend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -134,13 +134,13 @@ class activitystudentend_test extends \advanced_testcase {
         self::$elements = ['[TTTT]', '[AAAA]'];
 
         self::$cmtestse = self::getDataGenerator()->create_module(
-            "quiz",
-            [
-                'name' => 'Quiz unittest',
-                'course' => self::$coursetest->id,
-                "timeopen" => self::CM_DATESTART,
-                "timeclose" => self::CM_DATEEND,
-            ],
+                "quiz",
+                [
+                        'name' => 'Quiz unittest',
+                        'course' => self::$coursetest->id,
+                        "timeopen" => self::CM_DATESTART,
+                        "timeclose" => self::CM_DATEEND,
+                ],
         );
 
     }
@@ -148,11 +148,11 @@ class activitystudentend_test extends \advanced_testcase {
     /**
      * Test evaluate.
      *
-     * @param int    $timeaccess
-     * @param bool   $usecache
+     * @param int $timeaccess
+     * @param bool $usecache
      * @param string $param
-     * @param int    $complementary
-     * @param bool   $expected
+     * @param int $complementary
+     * @param bool $expected
      *
      * @covers       \notificationscondition_activitystudentend\activitystudentend::evaluate
      *
@@ -166,13 +166,13 @@ class activitystudentend_test extends \advanced_testcase {
         self::$subplugin->set_id(self::CONDITIONID);
 
         $cmtestse = self::getDataGenerator()->create_module(
-            "quiz",
-            [
-                'name' => 'Quiz unittest',
-                'course' => self::$coursetest->id,
-                "timeopen" => self::CM_DATESTART,
-                "timeclose" => self::CM_DATEEND,
-            ],
+                "quiz",
+                [
+                        'name' => 'Quiz unittest',
+                        'course' => self::$coursetest->id,
+                        "timeopen" => self::CM_DATESTART,
+                        "timeclose" => self::CM_DATEEND,
+                ],
         );
 
         $cmtestse->cmid = self::CMID;
@@ -209,10 +209,13 @@ class activitystudentend_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704445200, false, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1704445200, true, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1705741810, true, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1705741810, false, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1704445200, false, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION,
+                        false],
+                [1704445200, true, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION,
+                        false],
+                [1705741810, true, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1705741810, false, '{"time":864000, "cmid":' . self::CMID . '}', notificationplugin::COMPLEMENTARY_CONDITION,
+                        true],
 
         ];
     }
@@ -251,18 +254,18 @@ class activitystudentend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
     /**
      * Test estimate next time
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $param
-     * @param int    $complementary
-     * @param bool   $completion
+     * @param int $complementary
+     * @param bool $completion
      *
      * @covers       \notificationscondition_activitystudentend\activitystudentend::estimate_next_time
      * @dataProvider dataestimate
@@ -298,7 +301,7 @@ class activitystudentend_test extends \advanced_testcase {
             } else {
                 if ($timeaccess >= self::USER_ACTIVITY_LASTACCESS && $timeaccess <= self::USER_ACTIVITY_LASTACCESS + $param) {
                     self::assertEquals(
-                        self::USER_ACTIVITY_LASTACCESS + $param, self::$subplugin->estimate_next_time(self::$context)
+                            self::USER_ACTIVITY_LASTACCESS + $param, self::$subplugin->estimate_next_time(self::$context)
                     );
                 } else if ($timeaccess > self::USER_ACTIVITY_LASTACCESS + $param) {
                     self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
@@ -311,17 +314,17 @@ class activitystudentend_test extends \advanced_testcase {
     /**
      * Data provider for test_estimatenexttime.
      */
-    public static function dataestimate() {
+    public static function dataestimate(): array {
         return [
-            'no lastaccess' => [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
-            'out of interval' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            'interval' => [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            'exception out' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
-            'exception in' => [
-                self::USER_ACTIVITY_LASTACCESS + 864000 - 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,
-                true,
-            ],
+                'no lastaccess' => [1704186000, 864000, notificationplugin::COMPLEMENTARY_CONDITION, false],
+                'out of interval' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                'interval' => [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [self::USER_ACTIVITY_LASTACCESS + 120, 864000, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                'exception out' => [1705741200, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION, true],
+                'exception in' => [
+                        self::USER_ACTIVITY_LASTACCESS + 864000 - 120, 864000, notificationplugin::COMPLEMENTARY_EXCEPTION,
+                        true,
+                ],
         ];
     }
 
@@ -344,11 +347,11 @@ class activitystudentend_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -360,14 +363,15 @@ class activitystudentend_test extends \advanced_testcase {
     public function test_processmarkups() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $time = '86460';
         $params[self::$subplugin::UI_TIME] = $time;
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(), [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
-            self::$subplugin->get_title());
+        $expected = str_replace(self::$subplugin->get_elements(),
+                [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
+                self::$subplugin->get_title());
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -383,10 +387,10 @@ class activitystudentend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -423,15 +427,15 @@ class activitystudentend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
         $form->definition();
-        $addjson = phpunitutil::get_method($form, 'addJson');
+        $addjson = phpunitutil::get_method($form, 'addjson');
         $addjson->invoke($form, notificationplugin::TYPE_CONDITION, self::$subplugin::NAME);
         $form->definition_after_data();
 
@@ -455,7 +459,7 @@ class activitystudentend_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 
@@ -467,10 +471,10 @@ class activitystudentend_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_activitystudentend_days" => "1",
-            $id . "_activitystudentend_hours" => "0",
-            $id . "_activitystudentend_minutes" => "1",
-            $id . "_activitystudentend_cmid" => "7",
+                $id . "_activitystudentend_days" => "1",
+                $id . "_activitystudentend_hours" => "0",
+                $id . "_activitystudentend_minutes" => "1",
+                $id . "_activitystudentend_cmid" => "7",
         ];
         $expected = '{"time":86460,"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -486,9 +490,9 @@ class activitystudentend_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                'visible' => true,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmtestaa->cmid;

@@ -32,6 +32,7 @@
  */
 
 namespace notificationscondition_calendareventto;
+defined('MOODLE_INTERNAL') || die();
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
@@ -72,7 +73,7 @@ class calendareventto extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -89,16 +90,16 @@ class calendareventto extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $timestart = $DB->get_field(
-            'notificationsagent_cache',
-            'startdate',
-            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+                'notificationsagent_cache',
+                'startdate',
+                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
         $event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}]);
         if (empty($timestart)) {
             $timestart = $event[$params->{self::UI_ACTIVITY}]->timestart - $params->{self::UI_TIME};
         }
         ($timeaccess >= $timestart) && ($timeaccess <= $event[$params->{self::UI_ACTIVITY}]->timestart) ? $meetcondition = true
-            : $meetcondition = false;
+                : $meetcondition = false;
 
         return $meetcondition;
     }
@@ -142,9 +143,9 @@ class calendareventto extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -163,19 +164,19 @@ class calendareventto extends notificationconditionplugin {
         }
 
         $element = $mform->createElement(
-            'select', $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_condition_calendar', 'notificationscondition_calendareventto',
-                ['typeelement' => '[CCCC]']
-            ),
-            $events
+                'select', $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_condition_calendar', 'notificationscondition_calendareventto',
+                        ['typeelement' => '[CCCC]']
+                ),
+                $events
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -215,9 +216,9 @@ class calendareventto extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -235,11 +236,11 @@ class calendareventto extends notificationconditionplugin {
      * Validation subplugin
      * If this method overrides, call to parent::validation
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default TRUE
-     * 
+     * @param bool $onlyverifysiteid Default TRUE
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
@@ -247,7 +248,7 @@ class calendareventto extends notificationconditionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
@@ -287,9 +288,9 @@ class calendareventto extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */
@@ -307,9 +308,9 @@ class calendareventto extends notificationconditionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                'Restored item (' . $this->get_pluginname() . ')
+                    'Restored item (' . $this->get_pluginname() . ')
                 has eventid on action that was not restored',
-                \backup::LOG_WARNING
+                    \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

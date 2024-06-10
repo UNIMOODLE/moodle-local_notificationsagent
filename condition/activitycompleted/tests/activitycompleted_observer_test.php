@@ -104,11 +104,11 @@ class activitycompleted_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-                'enablecompletion' => true,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                        'enablecompletion' => true,
+                ])
         );
         self::$user = self::getDataGenerator()->create_user();
         self::setUser(self::$user);
@@ -136,8 +136,8 @@ class activitycompleted_observer_test extends \advanced_testcase {
         $pluginname = activitycompleted::NAME;
 
         $modinstance = self::getDataGenerator()->create_module('quiz', [
-            'course' => self::$course,
-            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+                'course' => self::$course,
+                'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
 
         $cmtestac = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
@@ -166,7 +166,6 @@ class activitycompleted_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         $completion = new \completion_info(self::$course);
-        // $completion->update_state($cmtestac, $status, self::$user->id, false);
         if ($status == COMPLETION_INCOMPLETE) {
             $completion->update_state($cmtestac, COMPLETION_COMPLETE, self::$user->id, false);
         }
@@ -192,10 +191,15 @@ class activitycompleted_observer_test extends \advanced_testcase {
 
     }
 
+    /**
+     * Data provider for course module completion updated
+     *
+     * @return array[]
+     */
     public static function dataprovider(): array {
         return [
-            [COMPLETION_COMPLETE],
-            [COMPLETION_INCOMPLETE],
+                [COMPLETION_COMPLETE],
+                [COMPLETION_INCOMPLETE],
         ];
     }
 

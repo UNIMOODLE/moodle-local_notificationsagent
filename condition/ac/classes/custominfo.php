@@ -37,11 +37,12 @@ use core_availability\info;
 use local_notificationsagent\notificationplugin;
 use moodle_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * This class extends the core_availability\info class to support the local_notificationsagent plugin.
  */
-class custominfo extends info
-{
+class custominfo extends info {
     /**
      * @var stdClass The course module object.
      */
@@ -50,11 +51,10 @@ class custominfo extends info
     /**
      * Construct the object with the given course ID and availability.
      *
-     * @param int    $courseid     Course id
+     * @param int $courseid Course id
      * @param string $availability Availability
      */
-    public function __construct($courseid, $availability)
-    {
+    public function __construct($courseid, $availability) {
         // Get course details.
         $course = get_course($courseid);
         parent::__construct($course, true, $availability);
@@ -66,8 +66,7 @@ class custominfo extends info
      *
      * @return string
      */
-    protected function get_thing_name()
-    {
+    protected function get_thing_name() {
         return 'ac';
     }
 
@@ -80,8 +79,7 @@ class custominfo extends info
      *
      * @return void
      */
-    protected function set_in_database($availability)
-    {
+    protected function set_in_database($availability) {
     }
 
     /**
@@ -89,8 +87,7 @@ class custominfo extends info
      *
      * @return \context_module The context module instance
      */
-    public function get_context()
-    {
+    public function get_context() {
         return \context_module::instance($this->cm->id);
     }
 
@@ -99,8 +96,7 @@ class custominfo extends info
      * completion information.
      *
      */
-    protected function get_view_hidden_capability()
-    {
+    protected function get_view_hidden_capability() {
     }
 
     /**
@@ -109,8 +105,7 @@ class custominfo extends info
      *
      * @param int $nouser
      */
-    private function set_mod_info($nouser = 0)
-    {
+    private function set_mod_info($nouser = 0) {
         $modinfo = get_fast_modinfo($this->get_course(), $nouser);
         $this->modinfo = $modinfo;
     }
@@ -127,8 +122,7 @@ class custominfo extends info
      *
      * @return array
      */
-    public function get_full_information_format($complementary)
-    {
+    public function get_full_information_format($complementary) {
         // Moodle requisite.
         $this->set_mod_info();
 
@@ -139,7 +133,7 @@ class custominfo extends info
         if (!empty($children[$complementary])) {
             $conditions = $children[$complementary]->get_all_children('core_availability\condition');
             list($innernot) = $children[$complementary]->get_logic_flags(
-                $complementary == notificationplugin::COMPLEMENTARY_EXCEPTION
+                    $complementary == notificationplugin::COMPLEMENTARY_EXCEPTION
             );
             foreach ($conditions as $child) {
                 $childdescription = $child->get_description(true, $innernot, $this);
@@ -156,8 +150,7 @@ class custominfo extends info
      *
      * @return bool
      */
-    public function validation()
-    {
+    public function validation() {
         global $DB;
 
         // Moodle requisite.
@@ -168,12 +161,12 @@ class custominfo extends info
         $modinfo = $this->get_modinfo();
         $courseid = $modinfo->get_course_id();
 
-        // Conditions
-        customtree::$customchildren = [];//empty
+        // Conditions.
+        customtree::$customchildren = []; // Empty.
         $tree = new customtree(json_decode($this->availability));
         $childrens = $tree::$customchildren;
         foreach ($childrens as $child) {
-            $type = $child->type; //completion//grade//group//grouping
+            $type = $child->type; // Completion//grade//group//grouping.
             // Look for a plugin of this type.
             $classname = '\availability_' . $type . '\condition';
             try {
@@ -186,7 +179,7 @@ class custominfo extends info
                     if (!array_key_exists($cmid, $modinfo->cms) || $modinfo->cms[$cmid]->deletioninprogress) {
                         return false;
                     }
-                } elseif ($type == 'grade') {
+                } else if ($type == 'grade') {
                     $gradeitemid = $child->id;
                     // Get all grade item names from cache, or using db query.
                     $cache = \cache::make('availability_grade', 'items');
@@ -194,7 +187,7 @@ class custominfo extends info
                         // We cache the whole items table not the name; the format_string
                         // call for the name might depend on current user (e.g. multilang)
                         // and this is a shared cache.
-                        $cacheditems = $DB->get_records('grade_items', array('courseid' => $courseid));
+                        $cacheditems = $DB->get_records('grade_items', ['courseid' => $courseid]);
                         $cache->set($courseid, $cacheditems);
                     }
 
@@ -202,15 +195,15 @@ class custominfo extends info
                     if (!array_key_exists($gradeitemid, $cacheditems)) {
                         return false;
                     }
-                } elseif ($type == 'group') {
+                } else if ($type == 'group') {
                     if ($groupid = $child->id) {
                         if (!groups_group_exists($groupid)) {
                             return false;
                         }
                     }
-                } elseif ($type == 'grouping') {
+                } else if ($type == 'grouping') {
                     if ($groupingid = $child->id) {
-                        if (!$DB->record_exists('groupings', array('id'=>$groupingid))) {
+                        if (!$DB->record_exists('groupings', ['id' => $groupingid])) {
                             return false;
                         }
                     }
@@ -220,7 +213,6 @@ class custominfo extends info
                 return false;
             }
         }
-
 
         return true;
     }
@@ -232,8 +224,7 @@ class custominfo extends info
      *
      * @return bool Returns true if the availability is empty, false otherwise.
      */
-    public static function is_empty($availability)
-    {
+    public static function is_empty($availability) {
         $result = true;
         if (!empty($availability)) {
             $tree = new \core_availability\tree(json_decode($availability));
@@ -252,8 +243,10 @@ class custominfo extends info
     }
 }
 
-class customtree extends \core_availability\tree
-{
+/**
+ *  Customtree class
+ */
+class customtree extends \core_availability\tree {
     /** @var array Children obj conditions
      *
      */
@@ -271,15 +264,13 @@ class customtree extends \core_availability\tree
      *    either silently discarded (if $lax is true) or causes a
      *    coding_exception (if $lax is false).
      *
-     * @see decode_availability
      * @param \stdClass $structure Structure (decoded from JSON)
      * @param boolean $lax If true, throw exceptions only for invalid structure
      * @param boolean $root If true, this is the root tree
-     * @return tree Availability tree
+     * @return \core_availability\tree Availability tree
      * @throws \coding_exception If data is not valid structure
      */
-    public function __construct($structure, $lax = false, $root = true)
-    {
+    public function __construct($structure, $lax = false, $root = true) {
         $this->root = $root;
 
         // Check object.
@@ -292,10 +283,12 @@ class customtree extends \core_availability\tree
             throw new \coding_exception('Invalid availability structure (missing ->op)');
         }
         $this->op = $structure->op;
-        if (!in_array($this->op, array(
-            self::OP_AND, self::OP_OR,
-            self::OP_NOT_AND, self::OP_NOT_OR
-        ), true)) {
+        if (!in_array($this->op, [
+                self::OP_AND,
+                self::OP_OR,
+                self::OP_NOT_AND,
+                self::OP_NOT_OR,
+        ], true)) {
             throw new \coding_exception('Invalid availability structure (unknown ->op)');
         }
 
@@ -307,37 +300,37 @@ class customtree extends \core_availability\tree
                 // Per-child show options.
                 if (!isset($structure->showc)) {
                     throw new \coding_exception(
-                        'Invalid availability structure (missing ->showc)'
+                            'Invalid availability structure (missing ->showc)'
                     );
                 }
                 if (!is_array($structure->showc)) {
                     throw new \coding_exception(
-                        'Invalid availability structure (->showc not array)'
+                            'Invalid availability structure (->showc not array)'
                     );
                 }
                 foreach ($structure->showc as $value) {
                     if (!is_bool($value)) {
                         throw new \coding_exception(
-                            'Invalid availability structure (->showc value not bool)'
+                                'Invalid availability structure (->showc value not bool)'
                         );
                     }
                 }
                 // Set it empty now - add corresponding ones later.
-                $this->showchildren = array();
+                $this->showchildren = [];
             } else {
                 // Entire tree show option. (Note: This is because when you use
                 // OR mode, say you have A OR B, the user does not meet conditions
                 // for either A or B. A is set to 'show' and B is set to 'hide'.
                 // But they don't have either, so how do we know which one to do?
-                // There might as well be only one value.)
+                // There might as well be only one value.).
                 if (!isset($structure->show)) {
                     throw new \coding_exception(
-                        'Invalid availability structure (missing ->show)'
+                            'Invalid availability structure (missing ->show)'
                     );
                 }
                 if (!is_bool($structure->show)) {
                     throw new \coding_exception(
-                        'Invalid availability structure (->show not bool)'
+                            'Invalid availability structure (->show not bool)'
                     );
                 }
                 $this->show = $structure->show;
@@ -364,7 +357,7 @@ class customtree extends \core_availability\tree
         if (is_array($this->showchildren) && count($structure->showc) != count($structure->c)) {
             throw new \coding_exception('Invalid availability structure (->c, ->showc mismatch)');
         }
-        $this->children = array();
+        $this->children = [];
         foreach ($structure->c as $index => $child) {
             if (!is_object($child)) {
                 throw new \coding_exception('Invalid availability structure (child not object)');

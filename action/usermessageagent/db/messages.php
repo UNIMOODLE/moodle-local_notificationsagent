@@ -33,10 +33,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
-    'particular_message' => [
-        'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
-        ]
-    ],
+        'particular_message' => [
+                'defaults' => [
+                        'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+                        'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+                ],
+        ],
 ];

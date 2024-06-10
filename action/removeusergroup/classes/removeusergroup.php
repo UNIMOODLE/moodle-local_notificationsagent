@@ -53,8 +53,8 @@ class removeusergroup extends notificationactionplugin {
      * Get the elements for the removeusergroup.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param int         $type
+     * @param int $courseid
+     * @param int $type
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -65,7 +65,7 @@ class removeusergroup extends notificationactionplugin {
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
-                $item->name, true
+                    $item->name, true
             );
         }
 
@@ -77,19 +77,19 @@ class removeusergroup extends notificationactionplugin {
         asort($listgroups);
 
         $group = $mform->createElement(
-            'select', $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_action_element_group', 'notificationsaction_removeusergroup',
-                ['typeelement' => '[GGGG]']
-            ),
-            $listgroups
+                'select', $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_action_element_group', 'notificationsaction_removeusergroup',
+                        ['typeelement' => '[GGGG]']
+                ),
+                $listgroups
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-            'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                'required'
         );
     }
 
@@ -145,9 +145,9 @@ class removeusergroup extends notificationactionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -167,7 +167,7 @@ class removeusergroup extends notificationactionplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -190,11 +190,11 @@ class removeusergroup extends notificationactionplugin {
     /**
      * Validation subplugin
      *
-     * @param int   $courseid           Course id
-     * @param array $array              The array to be modified by reference. If is null, validation is not being called from the form
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
      *                                  and return directly
-     * @param bool  $onlyverifysiteid   Default true
-     * 
+     * @param bool $onlyverifysiteid Default true
+     *
      * @return bool
      */
     public function validation($courseid, &$array = null, $onlyverifysiteid = true) {
@@ -202,7 +202,7 @@ class removeusergroup extends notificationactionplugin {
             return true;
         }
 
-        // If false from parent and $array is null, return
+        // If it is false from parent and $array is null, return.
         if (is_null($array) && !$validation) {
             return $validation;
         }
@@ -241,9 +241,9 @@ class removeusergroup extends notificationactionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */
@@ -261,9 +261,9 @@ class removeusergroup extends notificationactionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                'Restored item (' . $this->get_pluginname() . ')
+                    'Restored item (' . $this->get_pluginname() . ')
                 has groupid on action that was not restored',
-                \backup::LOG_WARNING
+                    \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

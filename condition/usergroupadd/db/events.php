@@ -35,12 +35,12 @@
 // Used for updating temporary triggers in case of asign in a group.
 defined('MOODLE_INTERNAL') || die();
 $observers = [
-    [
-        'eventname' => '\core\event\group_member_added',
-        'callback' => 'notificationscondition_usergroupadd_observer::group_member_added',
-    ],
-    [
-        'eventname' => '\core\event\group_deleted',
-        'callback' => 'notificationscondition_usergroupadd_observer::group_deleted',
-    ],
+        [
+                'eventname' => '\core\event\group_member_added',
+                'callback' => 'notificationscondition_usergroupadd_observer::group_member_added',
+        ],
+        [
+                'eventname' => '\core\event\group_deleted',
+                'callback' => 'notificationscondition_usergroupadd_observer::group_deleted',
+        ],
 ];

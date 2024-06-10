@@ -91,10 +91,10 @@ class weekdays_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
@@ -159,8 +159,8 @@ class weekdays_crontask_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-        'Cron every weekday' => [1706182049, 0, '{"weekdays":[0, 1, 2, 3, 4, 5, 6]}'],
-        'Cron for sundays' =>   [1706182049, 0, '{"weekdays":[6]}'],
+                'Cron every weekday' => [1706182049, 0, '{"weekdays":[0, 1, 2, 3, 4, 5, 6]}'],
+                'Cron for sundays' => [1706182049, 0, '{"weekdays":[6]}'],
         ];
     }
 

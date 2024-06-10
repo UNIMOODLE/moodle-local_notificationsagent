@@ -88,10 +88,10 @@ class courseend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
 
     }
@@ -153,10 +153,10 @@ class courseend_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, 0],
-            [86400 * 3, 0],
-            [86400, 2],
-            [86400 * 3, 2],
+                [86400, 0],
+                [86400 * 3, 0],
+                [86400, 2],
+                [86400 * 3, 2],
         ];
     }
 

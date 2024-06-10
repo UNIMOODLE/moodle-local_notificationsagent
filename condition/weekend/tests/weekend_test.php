@@ -103,7 +103,7 @@ class weekend_test extends \advanced_testcase {
         self::$subplugin = new weekend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -118,7 +118,7 @@ class weekend_test extends \advanced_testcase {
     /**
      * Test evaluate
      *
-     * @param int  $timeaccess
+     * @param int $timeaccess
      * @param bool $usecache
      * @param bool $complementary
      * @param bool $expected
@@ -156,12 +156,12 @@ class weekend_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1701691707, false, notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1703498961, false, notificationplugin::COMPLEMENTARY_CONDITION, false],
-            [1701511761, true, notificationplugin::COMPLEMENTARY_CONDITION, true],
-            [1701691707, true, notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1701691707, false, notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1703498961, false, notificationplugin::COMPLEMENTARY_CONDITION, false],
+                [1701511761, true, notificationplugin::COMPLEMENTARY_CONDITION, true],
+                [1701691707, true, notificationplugin::COMPLEMENTARY_CONDITION, false],
         ];
     }
 
@@ -199,8 +199,8 @@ class weekend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-            self::$subplugin->check_capability(self::$coursecontext)
+                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+                self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -237,14 +237,14 @@ class weekend_test extends \advanced_testcase {
      */
     public static function dataweekend(): array {
         return [
-            'Condition Monday -> Saturday' => [1704074700, 1704506700, 0],
-            'Condition Friday -> Saturday' => [1704470400, 1704470400, 0],
-            'Condition Saturday -> NOW' => [1704495600, 1704495600, 0],
-            'Condition Sunday -> NOW' => [1704582000, 1704582000, 0],
-            'Exception Saturday -> Monday' => [1704495600, 1704668400, 1],
-            'Exception Sunday -> Monday' => [1704495600, 1704668400, 1],
-            'Exception Thu -> NOW' => [1704927600, 1704927600, 1],
-            'Exception Friday-> NOW' => [1705014000, 1705014000, 1],
+                'Condition Monday -> Saturday' => [1704074700, 1704506700, 0],
+                'Condition Friday -> Saturday' => [1704470400, 1704470400, 0],
+                'Condition Saturday -> NOW' => [1704495600, 1704495600, 0],
+                'Condition Sunday -> NOW' => [1704582000, 1704582000, 0],
+                'Exception Saturday -> Monday' => [1704495600, 1704668400, 1],
+                'Exception Sunday -> Monday' => [1704495600, 1704668400, 1],
+                'Exception Thu -> NOW' => [1704927600, 1704927600, 1],
+                'Exception Friday-> NOW' => [1705014000, 1705014000, 1],
         ];
     }
 
@@ -277,11 +277,11 @@ class weekend_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -314,7 +314,7 @@ class weekend_test extends \advanced_testcase {
     /**
      * Test is weekend.
      *
-     * @param int  $time     time
+     * @param int $time time
      * @param bool $expected expected
      *
      * @dataProvider dataproviderwe
@@ -332,10 +332,10 @@ class weekend_test extends \advanced_testcase {
     public static function dataproviderwe(): array {
         // Only valid for a saturday, sunday configuration.
         return [
-            'Wednesday' => [1712741508, false],
-            'Thursday' => [1706182049, false],
-            'Saturday' => [1705741200, true],
-            'Sunday' => [1705827600, true],
+                'Wednesday' => [1712741508, false],
+                'Thursday' => [1706182049, false],
+                'Saturday' => [1705741200, true],
+                'Sunday' => [1705827600, true],
         ];
     }
 
@@ -348,10 +348,10 @@ class weekend_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);

@@ -108,7 +108,7 @@ class ac_test extends \advanced_testcase {
         self::$subplugin = new ac(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
@@ -124,7 +124,7 @@ class ac_test extends \advanced_testcase {
      * Test evaluate.
      *
      * @param string $conditionjson
-     * @param bool   $expected
+     * @param bool $expected
      *
      * @covers       \notificationscondition_ac\ac::evaluate
      *
@@ -144,12 +144,16 @@ class ac_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [
-                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', true,
-            ],
-            [
-                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', false,
-            ],
+                [
+                        '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                        {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        true,
+                ],
+                [
+                        '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},
+                        {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        false,
+                ],
         ];
     }
 
@@ -195,7 +199,7 @@ class ac_test extends \advanced_testcase {
      * @covers       \notificationscondition_ac\ac::estimate_next_time
      * @dataProvider dataestimate
      *
-     * @param string   $conditionjson
+     * @param string $conditionjson
      * @param int|null $expected
      *
      * @return void
@@ -220,14 +224,16 @@ class ac_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-            'condition. available' => [
-                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
-                1704099600,
-            ],
-            'condition. not available' => [
-                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
-                null,
-            ],
+                'condition. available' => [
+                        '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                        {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        1704099600,
+                ],
+                'condition. not available' => [
+                        '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}]},
+                        {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        null,
+                ],
         ];
     }
 
@@ -248,11 +254,11 @@ class ac_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-            self::$subplugin->get_description(),
-            [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                self::$subplugin->get_description(),
+                [
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -262,9 +268,11 @@ class ac_test extends \advanced_testcase {
      * @covers \notificationscondition_ac\ac::convert_parameters
      */
     public function test_convertparameters() {
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json =
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         $params = [
-            editrule_form::FORM_JSON_AC => $json,
+                editrule_form::FORM_JSON_AC => $json,
         ];
         $expected = $json;
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -279,7 +287,9 @@ class ac_test extends \advanced_testcase {
      */
     public function test_processmarkups() {
         $expected = 'Your First name is Fernando';
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json =
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         self::$subplugin->set_parameters($json);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id, false);
@@ -295,10 +305,10 @@ class ac_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -325,18 +335,18 @@ class ac_test extends \advanced_testcase {
      * Test validation.
      *
      * @param array $params
-     * @param bool  $expected
+     * @param bool $expected
      * @dataProvider datavalidation
      * @covers       \notificationscondition_ac\ac::validation
      */
     public function test_validation($params, $expected) {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
+                'visible' => true,
         ]);
         $params = str_replace('|CMID|', $cmtestaa->cmid, $params);
         self::$subplugin->set_parameters($params);
@@ -350,8 +360,12 @@ class ac_test extends \advanced_testcase {
      */
     public static function datavalidation(): array {
         return [
-            'Activity completion' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":|CMID|,"e":1}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', true],
-            'Activity completion2' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":100,"e":1}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}', false],
+                'Activity completion' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":|CMID|,"e":1}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        true],
+                'Activity completion2' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":100,"e":1}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
+                        false],
         ];
     }
 
@@ -361,11 +375,13 @@ class ac_test extends \advanced_testcase {
      * @covers \notificationscondition_ac\ac::load_dataform
      */
     public function test_loaddataform() {
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json =
+                '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
+                {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         self::$subplugin->set_parameters($json);
 
         $expected = [
-            editrule_form::FORM_JSON_AC => $json,
+                editrule_form::FORM_JSON_AC => $json,
         ];
 
         $this->assertSame($expected, self::$subplugin->load_dataform());

@@ -108,6 +108,7 @@ class ac_observer_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
+
     /**
      * Set up the test environment.
      */
@@ -117,10 +118,10 @@ class ac_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                ([
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$group = $this->getDataGenerator()->create_group(['courseid' => self::$course->id]);
         self::$grouping = $this->getDataGenerator()->create_grouping(['courseid' => self::$course->id]);
@@ -138,7 +139,7 @@ class ac_observer_test extends \advanced_testcase {
         global $DB;
         $pluginname = ac::NAME;
 
-        self::setUser(2);//admin
+        self::setUser(2);// Admin.
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -149,7 +150,8 @@ class ac_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"group","id":'.self::$group->id.'}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"group","id":' . self::$group->id .
+                '}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         $objcondition = new \stdClass();
         $objcondition->ruleid = self::$rule->get_id();
         $objcondition->courseid = self::$course->id;
@@ -160,7 +162,7 @@ class ac_observer_test extends \advanced_testcase {
 
         $conditionid = $DB->insert_record('notificationsagent_condition', $objcondition);
         $this->assertIsInt($conditionid);
-        
+
         groups_delete_group(self::$group->id);
 
         $rule = self::$rule::create_instance($ruleid);
@@ -176,7 +178,7 @@ class ac_observer_test extends \advanced_testcase {
         global $DB;
         $pluginname = ac::NAME;
 
-        self::setUser(2);//admin
+        self::setUser(2);// Admin.
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -187,7 +189,8 @@ class ac_observer_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
 
-        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"grouping","id":'.self::$grouping->id.'}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $json = '{"op":"&","c":[{"op":"&","c":[{"type":"grouping","id":' . self::$grouping->id .
+                '}]},{"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
         $objcondition = new \stdClass();
         $objcondition->ruleid = self::$rule->get_id();
         $objcondition->courseid = self::$course->id;
@@ -198,7 +201,7 @@ class ac_observer_test extends \advanced_testcase {
 
         $conditionid = $DB->insert_record('notificationsagent_condition', $objcondition);
         $this->assertIsInt($conditionid);
-        
+
         groups_delete_grouping(self::$grouping->id);
 
         $rule = self::$rule::create_instance($ruleid);
