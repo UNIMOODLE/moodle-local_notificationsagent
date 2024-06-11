@@ -36,5 +36,3 @@ namespace local_notificationsagent;
 use core_availability\info;
 use moodle_exception;
 use tool_brickfield\local\htmlchecker\common\checks\area_has_alt_value_test;
-
-

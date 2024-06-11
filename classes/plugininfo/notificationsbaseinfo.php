@@ -60,7 +60,7 @@ class notificationsbaseinfo extends base {
     public static function get_all_enabled_plugins() {
         $cachecondition = \cache::make('local_notificationsagent', notificationplugin::TYPE_CONDITION);
         self::$pluginscondition = $cachecondition->get(notificationplugin::TYPE_CONDITION) ? $cachecondition->get(
-                notificationplugin::TYPE_CONDITION
+            notificationplugin::TYPE_CONDITION
         ) : [];
         if (empty(self::$pluginscondition)) {
             $notificationscondition = core_plugin_manager::instance()->get_enabled_plugins('notificationscondition');
@@ -74,7 +74,7 @@ class notificationsbaseinfo extends base {
 
         $cacheaction = \cache::make('local_notificationsagent', notificationplugin::TYPE_ACTION);
         self::$pluginsaction = $cacheaction->get(notificationplugin::TYPE_ACTION) ? $cacheaction->get(
-                notificationplugin::TYPE_ACTION
+            notificationplugin::TYPE_ACTION
         ) : [];
         if (empty(self::$pluginsaction)) {
             $notificationsaction = core_plugin_manager::instance()->get_enabled_plugins('notificationsaction');
@@ -85,7 +85,6 @@ class notificationsbaseinfo extends base {
             }
             $cacheaction->set(notificationplugin::TYPE_ACTION, self::$pluginsaction);
         }
-
     }
 
     /**
@@ -122,5 +121,4 @@ class notificationsbaseinfo extends base {
             return $list;
         }
     }
-
 }

@@ -52,18 +52,20 @@ function local_notificationsagent_extend_navigation_course(navigation_node $pare
     $courseid = $course->id;
     $url = '/local/notificationsagent/index.php?courseid=' . $courseid;
     $parentnode->add(
-            $menuentrytext,
-            new moodle_url($url),
-            navigation_node::TYPE_SETTING,
-            null,
-            "notificationsagent"
+        $menuentrytext,
+        new moodle_url($url),
+        navigation_node::TYPE_SETTING,
+        null,
+        "notificationsagent"
     );
     // Add report navigation node.
     $reportnode = $parentnode->get('coursereports');
     if (isset($reportnode) && $reportnode !== false) {
         $reporturl = '/local/notificationsagent/report.php?courseid=' . $courseid;
         $reportnode->add(
-                get_string('pluginname', 'local_notificationsagent'), new moodle_url($reporturl), navigation_node::TYPE_SETTING
+            get_string('pluginname', 'local_notificationsagent'),
+            new moodle_url($reporturl),
+            navigation_node::TYPE_SETTING
         );
     }
 }

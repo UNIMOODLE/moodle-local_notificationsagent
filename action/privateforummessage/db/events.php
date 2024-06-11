@@ -33,6 +33,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 $observers[] = [
-    'eventname' => '\notificationsaction_privateforummessage\event\notificationsagent_privateforummessage_event',
-    'callback' => 'notificationsaction_privateforummessage_observer::general_post_forum',
+        'eventname' => '\notificationsaction_privateforummessage\event\notificationsagent_privateforummessage_event',
+        'callback' => 'notificationsaction_privateforummessage_observer::general_post_forum',
 ];

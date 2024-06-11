@@ -43,7 +43,6 @@ use moodle_exception;
  * subclasses should implement to work within the notification agent system.
  */
 abstract class notificationplugin {
-
     /**
      * Type of the notification plugin condition.
      */
@@ -296,13 +295,16 @@ abstract class notificationplugin {
 
         // Days.
         $timegroup[] = $mform->createElement(
-                'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+            'static',
+            'labeldays',
+            '',
+            get_string('condition_days', 'local_notificationsagent')
         );
         $timegroup[] = $mform->createElement(
-                'float',
-                $this->get_name_ui(self::UI_DAYS),
-                get_string('condition_days', 'local_notificationsagent'),
-                [
+            'float',
+            $this->get_name_ui(self::UI_DAYS),
+            get_string('condition_days', 'local_notificationsagent'),
+            [
                         'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                         'placeholder' => get_string('condition_days', 'local_notificationsagent'),
                         'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
@@ -311,13 +313,16 @@ abstract class notificationplugin {
 
         // Hours.
         $timegroup[] = $mform->createElement(
-                'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+            'static',
+            'labelhours',
+            '',
+            get_string('condition_hours', 'local_notificationsagent'),
         );
         $timegroup[] = $mform->createElement(
-                'float',
-                $this->get_name_ui(self::UI_HOURS),
-                '',
-                [
+            'float',
+            $this->get_name_ui(self::UI_HOURS),
+            '',
+            [
                         'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                         'placeholder' => get_string('condition_hours', 'local_notificationsagent'),
                         'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
@@ -326,13 +331,16 @@ abstract class notificationplugin {
 
         // Minutes.
         $timegroup[] = $mform->createElement(
-                'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+            'static',
+            'labelminutes',
+            '',
+            get_string('condition_minutes', 'local_notificationsagent'),
         );
         $timegroup[] = $mform->createElement(
-                'float',
-                $this->get_name_ui(self::UI_MINUTES),
-                '',
-                [
+            'float',
+            $this->get_name_ui(self::UI_MINUTES),
+            '',
+            [
                         'class' => 'mr-2', 'size' => '7', 'maxlength' => '2',
                         'placeholder' => get_string('condition_minutes', 'local_notificationsagent'),
                         'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
@@ -341,12 +349,16 @@ abstract class notificationplugin {
 
         // GroupTime.
         $group = $mform->createElement(
-                'group', $this->get_name_ui($this->get_subtype()),
-                get_string(
-                        'editrule_condition_element_time', 'notifications' . $conditionoraction . '_' . get_called_class()::NAME,
-                        ['typeelement' => '[TTTT]']
-                ),
-                $timegroup, null, false
+            'group',
+            $this->get_name_ui($this->get_subtype()),
+            get_string(
+                'editrule_condition_element_time',
+                'notifications' . $conditionoraction . '_' . get_called_class()::NAME,
+                ['typeelement' => '[TTTT]']
+            ),
+            $timegroup,
+            null,
+            false
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
@@ -423,7 +435,8 @@ abstract class notificationplugin {
                     return $validation;
                 }
                 $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                        'validation_editrule_form_supported_cm', 'notificationscondition_activityend'
+                    'validation_editrule_form_supported_cm',
+                    'notificationscondition_activityend'
                 );
             }
         }
@@ -476,7 +489,6 @@ abstract class notificationplugin {
         } else {
             throw new moodle_exception('errorinsertupdatedelete', 'notificationplugin');
         }
-
     }
 
     /**
@@ -693,5 +705,4 @@ abstract class notificationplugin {
      */
     public function set_default($form) {
     }
-
 }

@@ -54,9 +54,9 @@ if ($hassiteconfig) {
         $settingspage->add($settingdisableuseruse);
 
         $pauseafterrestore = new admin_setting_configcheckbox(
-            'local_notificationsagent/pauseafterrestore',
-            get_string('pause_after_restore', 'local_notificationsagent'),
-            get_string('pause_after_restore_desc', 'local_notificationsagent'), true,
+                'local_notificationsagent/pauseafterrestore',
+                get_string('pause_after_restore', 'local_notificationsagent'),
+                get_string('pause_after_restore_desc', 'local_notificationsagent'), true,
         );
 
         $settingspage->add($pauseafterrestore);
@@ -163,12 +163,6 @@ if ($hassiteconfig) {
             'reports', new admin_externalpage(
                     'notificationsagent', get_string('report', 'local_notificationsagent'),
                     "$CFG->wwwroot/local/notificationsagent/report.php"
-            )
-    );
-    $ADMIN->add(
-            'taskconfig', new admin_externalpage(
-                    'notificationsagentadmin', get_string('pluginname', 'local_notificationsagent'),
-                    "$CFG->wwwroot/local/notificationsagent/index.php"
             )
     );
 }

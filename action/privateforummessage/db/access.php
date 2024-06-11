@@ -34,12 +34,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'local/notificationsagent:privateforummessage' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
+        'local/notificationsagent:privateforummessage' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW,
+                ],
         ],
-    ],
 ];

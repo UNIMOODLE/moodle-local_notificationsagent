@@ -46,7 +46,6 @@ use local_notificationsagent\form\editrule_form;
  *
  */
 abstract class notificationconditionplugin extends notificationplugin {
-
     /**
      * Indicates if the plugin is complementary.
      *
@@ -83,7 +82,6 @@ abstract class notificationconditionplugin extends notificationplugin {
                 $this->set_iscomplementary($subplugin->complementary);
             }
         }
-
     }
 
     /**
@@ -203,7 +201,8 @@ abstract class notificationconditionplugin extends notificationplugin {
 
             // Delete cache for this condition.
             notificationsagent::set_timer_cache(
-                    ["(courseid= $courseid AND conditionid= {$dataplugin->id})"], []
+                ["(courseid= $courseid AND conditionid= {$dataplugin->id})"],
+                []
             );
 
             $contextevaluation = new evaluationcontext();
@@ -241,7 +240,6 @@ abstract class notificationconditionplugin extends notificationplugin {
                     $arraytimer[$student->id]['timer'] = $cache;
                     $arraytimer[$student->id]['conditionid'] = $dataplugin->id;
                 }
-
             } else {
                 $cache = $this->estimate_next_time($contextevaluation);
                 $studentid = notificationsagent::GENERIC_USERID;
@@ -268,9 +266,9 @@ abstract class notificationconditionplugin extends notificationplugin {
             }
 
             notificationsagent::set_timer_cache(
-                    [], $insertdata
+                [],
+                $insertdata
             );
-
         }
     }
 
@@ -298,9 +296,9 @@ abstract class notificationconditionplugin extends notificationplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                    'Subplugin (' . $this->get_pluginname() . ')
+                'Subplugin (' . $this->get_pluginname() . ')
                 has an item on condition that was not restored',
-                    \backup::LOG_WARNING
+                \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

@@ -42,7 +42,8 @@ use local_notificationsagent\form\editrule_form;
 global $DB, $PAGE, $COURSE;
 $isroleadmin = false;
 if (is_siteadmin() || !empty($PAGE->settingsnav)) {
-    if (is_siteadmin()
+    if (
+            is_siteadmin()
             || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
                     || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
     ) {
@@ -77,67 +78,73 @@ $PAGE->set_pagelayout('admin');
 $heading = rule::RULE_TYPE === $ruletype
         ? get_string('editrule_newrule', 'local_notificationsagent')
         : get_string(
-                'editrule_newtemplate', 'local_notificationsagent'
+            'editrule_newtemplate',
+            'local_notificationsagent'
         );
 $PAGE->set_title(
-        $heading . " - " .
+    $heading . " - " .
         get_string('heading', 'local_notificationsagent')
 );
 
 $PAGE->set_heading(
-        ($typeaction == 'add' || $typeaction == 'clone'
+    ($typeaction == 'add' || $typeaction == 'clone'
                 ? $heading
                 : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
         get_string('heading', 'local_notificationsagent')
 );
 $PAGE->navbar->add(
-        get_string('editrule_newrule', 'local_notificationsagent') . " - " .
+    get_string('editrule_newrule', 'local_notificationsagent') . " - " .
         get_string('heading', 'local_notificationsagent')
 );
 $PAGE->navbar->ignore_active();
 if ($isroleadmin && $courseid == SITEID) {
     $PAGE->navbar->add(
-            $SITE->fullname,
-            new moodle_url('/')
+        $SITE->fullname,
+        new moodle_url('/')
     );
     $PAGE->navbar->add(
-            'Notification Agent Admin',
-            new moodle_url('/local/notificationsagent/index.php')
+        'Notification Agent Admin',
+        new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
     $PAGE->navbar->add(
-            $COURSE->fullname,
-            new moodle_url('/course/view.php', ['id' => $courseid])
+        $COURSE->fullname,
+        new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-            'Notification Agent',
-            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+        'Notification Agent',
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }
 $PAGE->navbar->add(
-        ($typeaction == 'add' || $typeaction == 'clone' ? $heading : get_string('editrule_editrule', 'local_notificationsagent')),
-        new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $courseid])
+    ($typeaction == 'add' || $typeaction == 'clone' ? $heading : get_string('editrule_editrule', 'local_notificationsagent')),
+    new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $courseid])
 );
 $PAGE->requires->js_call_amd('core/copy_to_clipboard');
 $PAGE->requires->js_call_amd(
-        'local_notificationsagent/notification_tabs', 'init',
-        [editrule_form::FORM_NEW_CONDITION_BUTTON, editrule_form::FORM_NEW_CONDITION_SELECT]
+    'local_notificationsagent/notification_tabs',
+    'init',
+    [editrule_form::FORM_NEW_CONDITION_BUTTON, editrule_form::FORM_NEW_CONDITION_SELECT]
 );
 $PAGE->requires->js_call_amd(
-        'local_notificationsagent/notification_tabs', 'init',
-        [editrule_form::FORM_NEW_EXCEPTION_BUTTON, editrule_form::FORM_NEW_EXCEPTION_SELECT]
+    'local_notificationsagent/notification_tabs',
+    'init',
+    [editrule_form::FORM_NEW_EXCEPTION_BUTTON, editrule_form::FORM_NEW_EXCEPTION_SELECT]
 );
 $PAGE->requires->js_call_amd(
-        'local_notificationsagent/notification_tabs', 'initRemove',
-        [editrule_form::FORM_REMOVE_CONDITION_SPAN, editrule_form::FORM_REMOVE_CONDITION_BUTTON]
+    'local_notificationsagent/notification_tabs',
+    'initRemove',
+    [editrule_form::FORM_REMOVE_CONDITION_SPAN, editrule_form::FORM_REMOVE_CONDITION_BUTTON]
 );
 $PAGE->requires->js_call_amd(
-        'local_notificationsagent/notification_tabs', 'initRemove',
-        [editrule_form::FORM_REMOVE_EXCEPTION_SPAN, editrule_form::FORM_REMOVE_EXCEPTION_BUTTON]
+    'local_notificationsagent/notification_tabs',
+    'initRemove',
+    [editrule_form::FORM_REMOVE_EXCEPTION_SPAN, editrule_form::FORM_REMOVE_EXCEPTION_BUTTON]
 );
 $PAGE->requires->js_call_amd(
-        'local_notificationsagent/notification_tabs', 'initRemove',
-        [editrule_form::FORM_REMOVE_ACTION_SPAN, editrule_form::FORM_REMOVE_ACTION_BUTTON]
+    'local_notificationsagent/notification_tabs',
+    'initRemove',
+    [editrule_form::FORM_REMOVE_ACTION_SPAN, editrule_form::FORM_REMOVE_ACTION_BUTTON]
 );
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
 
@@ -162,18 +169,17 @@ $mform->set_data($rule->get_dataform());
 if ($mform->is_cancelled()) {
     $PAGE->set_url(new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]));
     redirect(
-            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]),
-            get_string('rulecancelled', 'local_notificationsagent')
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]),
+        get_string('rulecancelled', 'local_notificationsagent')
     );
 } else if ($mform->no_submit_button_pressed()) {
     $mform->addorremovesubplugin();
-
 } else if ($fromform = $mform->get_data()) {
     $rule->save_form($fromform);
 
     redirect(
-            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]),
-            get_string('rulesaved', 'local_notificationsagent')
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]),
+        get_string('rulesaved', 'local_notificationsagent')
     );
 }
 

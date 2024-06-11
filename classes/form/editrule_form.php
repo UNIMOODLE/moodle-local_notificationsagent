@@ -47,7 +47,6 @@ require_once("$CFG->dirroot/local/notificationsagent/lib.php");
  * Form for editing a notification rule.
  */
 class editrule_form extends \moodleform {
-
     /**
      * Private variable for storing action buttons.
      *
@@ -171,13 +170,17 @@ class editrule_form extends \moodleform {
         $rule = $this->_rule = $this->_customdata['rule'];
 
         $mform->addElement(
-                'text', 'title', get_string('editrule_title', 'local_notificationsagent'),
-                ['size' => '64']
+            'text',
+            'title',
+            get_string('editrule_title', 'local_notificationsagent'),
+            ['size' => '64']
         );
         $mform->addRule('title', ' ', 'required');
         $mform->addElement(
-                'float', 'timesfired', get_string('editrule_timesfired', 'local_notificationsagent'),
-                ['size' => '5']
+            'float',
+            'timesfired',
+            get_string('editrule_timesfired', 'local_notificationsagent'),
+            ['size' => '5']
         );
         $mform->setDefault('timesfired', $this->_customdata['timesfired']);
         if (!empty($CFG->formatstringstriptags)) {
@@ -188,7 +191,10 @@ class editrule_form extends \moodleform {
 
         // Days.
         $runtimegroup[] = $mform->createElement(
-                'static', 'labeldays', '', get_string('condition_days', 'local_notificationsagent')
+            'static',
+            'labeldays',
+            '',
+            get_string('condition_days', 'local_notificationsagent')
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_days', '', [
                 'class' => 'mr-2', 'size' => 7, 'maxlength' => '3',
@@ -198,7 +204,10 @@ class editrule_form extends \moodleform {
 
         // Hours.
         $runtimegroup[] = $mform->createElement(
-                'static', 'labelhours', '', get_string('condition_hours', 'local_notificationsagent'),
+            'static',
+            'labelhours',
+            '',
+            get_string('condition_hours', 'local_notificationsagent'),
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_hours', '', [
                 'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
@@ -208,7 +217,10 @@ class editrule_form extends \moodleform {
 
         // Minutes.
         $runtimegroup[] = $mform->createElement(
-                'static', 'labelminutes', '', get_string('condition_minutes', 'local_notificationsagent'),
+            'static',
+            'labelminutes',
+            '',
+            get_string('condition_minutes', 'local_notificationsagent'),
         );
         $runtimegroup[] = $mform->createElement('float', 'runtime_minutes', '', [
                 'class' => 'mr-2', 'size' => 7, 'maxlength' => '2',
@@ -415,18 +427,21 @@ class editrule_form extends \moodleform {
         $mform->addElement('html', $render->tabnav($tabtarget));
 
         $mform->addElement(
-                'html', '
+            'html',
+            '
             <div class="tab-content" id="nav-tabContent">
         '
         );
         $mform->addElement(
-                'html', '
+            'html',
+            '
             <div>
         '
         );
         $this->settabcontentavailability();
         $mform->addElement(
-                'html', '
+            'html',
+            '
             </div>
         '
         );
@@ -436,7 +451,8 @@ class editrule_form extends \moodleform {
         $classnavexceptions = ($tabtarget == 'nav-exceptions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
         $classnavactions = ($tabtarget == 'nav-actions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
         $mform->addElement(
-                'html', '
+            'html',
+            '
             <div class="' . $classnavconditions . '" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
         '
         );
@@ -444,7 +460,8 @@ class editrule_form extends \moodleform {
         $this->settabcontent(notificationplugin::TYPE_CONDITION);
 
         $mform->addElement(
-                'html', '
+            'html',
+            '
             </div>
             <div class="' . $classnavexceptions . '" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
         '
@@ -453,7 +470,8 @@ class editrule_form extends \moodleform {
         $this->settabcontent(notificationplugin::TYPE_EXCEPTION);
 
         $mform->addElement(
-                'html', '
+            'html',
+            '
             </div>
             <div class="' . $classnavactions . '" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
         '
@@ -463,14 +481,16 @@ class editrule_form extends \moodleform {
 
         // Core_availability conditions.
         $mform->addElement(
-                'html', '
+            'html',
+            '
             </div>
             <div id="nav-ac">
             '
         );
 
         $mform->addElement(
-                'html', '
+            'html',
+            '
             </div>
         </div>
         '
@@ -492,13 +512,17 @@ class editrule_form extends \moodleform {
         $errors = [];
 
         if ($data["timesfired"] < rule::MINIMUM_EXECUTION || $data["timesfired"] > rule::MAXIMUM_EXECUTION) {
-            $errors["timesfired"] = get_string('editrule_execution_error', 'local_notificationsagent',
-                    ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]);
+            $errors["timesfired"] = get_string(
+                'editrule_execution_error',
+                'local_notificationsagent',
+                ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]
+            );
         }
 
         // If timesfired > 1, runtime > 0.
         if ($data["timesfired"] > 1) {
-            if (empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
+            if (
+                empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
                     && empty($data["runtime_group"]["runtime_minutes"])
             ) {
                 $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
@@ -545,7 +569,13 @@ class editrule_form extends \moodleform {
                 if ($value["action"] == self::FORM_JSON_ACTION_INSERT || $value["action"] == self::FORM_JSON_ACTION_UPDATE) {
                     $count++;
                     content::get_validation_form_plugin(
-                            $key, $data, $this->_rule, $this->_customdata["courseid"], $value["pluginname"], $type, $errors
+                        $key,
+                        $data,
+                        $this->_rule,
+                        $this->_customdata["courseid"],
+                        $value["pluginname"],
+                        $type,
+                        $errors
                     );
                 }
             }
@@ -563,7 +593,8 @@ class editrule_form extends \moodleform {
         $courseid = $this->_customdata["courseid"];
 
         $list = notificationsbaseinfo::get_description(
-                $courseid, ($type == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $type)
+            $courseid,
+            ($type == notificationplugin::TYPE_EXCEPTION ? notificationplugin::TYPE_CONDITION : $type)
         );
         $listoptions = [];
         foreach ($list as $key => $value) {
@@ -572,8 +603,11 @@ class editrule_form extends \moodleform {
         $newgroup = [];
 
         $newgroup[] = $mform->createElement(
-                'select', 'new' . $type . '_select', '',
-                $listoptions, ['class' => 'col-sm-auto p-0 mr-3']
+            'select',
+            'new' . $type . '_select',
+            '',
+            $listoptions,
+            ['class' => 'col-sm-auto p-0 mr-3']
         );
         $newgroup[] = $mform->createElement('submit', 'new' . $type . '_button', get_string('add'));
 
@@ -591,7 +625,8 @@ class editrule_form extends \moodleform {
         if (!empty($CFG->enableavailability)) {
             $cm = null;
             $title = \html_writer::start_tag('h5');
-            $title .= get_string('conditiontext', 'notificationscondition_ac');;
+            $title .= get_string('conditiontext', 'notificationscondition_ac');
+            ;
             $title .= \html_writer::end_tag('h5');
             $mform->addElement('textarea', self::FORM_JSON_AC, $title);
             frontendCustom::include_all_javascript($COURSE, $cm);
@@ -603,7 +638,6 @@ class editrule_form extends \moodleform {
  * Content class, contains functions to display html content.
  */
 class content {
-
     /**
      * Get the plugin UI.
      *
@@ -655,7 +689,6 @@ class content {
             $subplugin->validation($idcourse, $errors);
         }
     }
-
 }
 
 /**
@@ -710,14 +743,20 @@ class frontendCustom extends \core_availability\frontend {
 
         // Include all JS (in one call). The init function runs on DOM ready.
         $PAGE->requires->yui_module(
-                $modules,
-                'M.core_availability.form.init', [$componentparams], null, true
+            $modules,
+            'M.core_availability.form.init',
+            [$componentparams],
+            null,
+            true
         );
 
         // Include main strings.
-        $PAGE->requires->strings_for_js(['none', 'cancel', 'delete', 'choosedots'],
-                'moodle');
-        $PAGE->requires->strings_for_js([
+        $PAGE->requires->strings_for_js(
+            ['none', 'cancel', 'delete', 'choosedots'],
+            'moodle'
+        );
+        $PAGE->requires->strings_for_js(
+            [
                 'addrestriction', 'invalid',
                 'listheader_sign_before', 'listheader_sign_pos',
                 'listheader_sign_neg', 'listheader_single',
@@ -728,8 +767,9 @@ class frontendCustom extends \core_availability\frontend {
                 'condition_group', 'condition_group_info', 'and', 'or',
                 'label_multi', 'label_sign', 'setheading', 'itemheading',
                 'missingplugin',
-        ],
-                'availability');
+            ],
+            'availability'
+        );
     }
 
     /**
@@ -754,7 +794,7 @@ class frontendCustom extends \core_availability\frontend {
         if (!empty($decoded->errors)) {
             $error = '';
             foreach ($decoded->errors as $stringinfo) {
-                list ($component, $stringname) = explode(':', $stringinfo);
+                 [$component, $stringname] = explode(':', $stringinfo);
                 if ($error !== '') {
                     $error .= ' ';
                 }

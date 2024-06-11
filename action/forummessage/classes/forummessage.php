@@ -38,6 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . "/mod/forum/externallib.php");
 
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationactionplugin;
@@ -71,33 +72,33 @@ class forummessage extends notificationactionplugin {
      * Get the elements for the forummessage plugin.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param int         $type
+     * @param int $courseid
+     * @param int $type
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
         // Title.
         $title = $mform->createElement(
-            'text', $this->get_name_ui(self::UI_TITLE),
-            get_string(
-                'editrule_action_element_title', 'notificationsaction_forummessage',
-                ['typeelement' => '[TTTT]']
-            ), ['size' => '64']
+                'text', $this->get_name_ui(self::UI_TITLE),
+                get_string(
+                        'editrule_action_element_title', 'notificationsaction_forummessage',
+                        ['typeelement' => '[TTTT]']
+                ), ['size' => '64']
         );
 
         $editoroptions = [
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true,
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'trusttext' => true,
         ];
 
         // Message.
         $message = $mform->createElement(
-            'editor', $this->get_name_ui(self::UI_MESSAGE),
-            get_string(
-                'editrule_action_element_message', 'notificationsaction_forummessage',
-                ['typeelement' => '[BBBB]']
-            ),
-            ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+                'editor', $this->get_name_ui(self::UI_MESSAGE),
+                get_string(
+                        'editrule_action_element_message', 'notificationsaction_forummessage',
+                        ['typeelement' => '[BBBB]']
+                ),
+                ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
         // Forum.
         $forumname = [];
@@ -118,14 +119,14 @@ class forummessage extends notificationactionplugin {
         asort($forumname);
 
         $cm = $mform->createElement(
-            'select',
-            $this->get_name_ui(self::UI_ACTIVITY),
-            get_string(
-                'editrule_action_element_forum',
-                'notificationsaction_forummessage',
-                ['typeelement' => '[FFFF]']
-            ),
-            $forumname
+                'select',
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string(
+                        'editrule_action_element_forum',
+                        'notificationsaction_forummessage',
+                        ['typeelement' => '[FFFF]']
+                ),
+                $forumname
         );
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
@@ -136,7 +137,7 @@ class forummessage extends notificationactionplugin {
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui(self::UI_MESSAGE), ' ', 'required');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
         );
 
     }
@@ -150,9 +151,9 @@ class forummessage extends notificationactionplugin {
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:forummessage', $context)
-            && has_capability('mod/forum:addnews', $context)
-            && has_capability('mod/forum:addquestion', $context)
-            && has_capability('mod/forum:startdiscussion', $context);
+                && has_capability('mod/forum:addnews', $context)
+                && has_capability('mod/forum:addquestion', $context)
+                && has_capability('mod/forum:startdiscussion', $context);
     }
 
     /**
@@ -171,7 +172,7 @@ class forummessage extends notificationactionplugin {
         $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
         $forum = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $this->set_parameters(
-            json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_ACTIVITY => $forum])
+                json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_ACTIVITY => $forum])
         );
         return $this->get_parameters();
     }
@@ -182,9 +183,9 @@ class forummessage extends notificationactionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -203,9 +204,9 @@ class forummessage extends notificationactionplugin {
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
         $paramstoteplace = [
-            shorten_text($activityname),
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
+                shorten_text($activityname),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
@@ -217,7 +218,7 @@ class forummessage extends notificationactionplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -286,9 +287,9 @@ class forummessage extends notificationactionplugin {
         $parameters = json_decode($this->get_parameters());
 
         return json_encode([
-            'title' => $parameters->{self::UI_TITLE},
-            'message' => $parameters->{self::UI_MESSAGE}->text,
-            'cmid' => $parameters->{self::UI_ACTIVITY},
+                'title' => $parameters->{self::UI_TITLE},
+                'message' => $parameters->{self::UI_MESSAGE}->text,
+                'cmid' => $parameters->{self::UI_ACTIVITY},
         ]);
     }
 

@@ -31,7 +31,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_notificationsagent_renderer extends plugin_renderer_base {
-
     /**
      * Function for the Tabs.
      *
@@ -49,12 +48,14 @@ class local_notificationsagent_renderer extends plugin_renderer_base {
             <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
                 <a class="' . $classnavconditions . '" id="nav-conditions-tab" data-toggle="tab" href="#nav-conditions"
                 role="tab" aria-controls="nav-conditions" aria-selected="false">' . get_string(
-                'conditions', 'local_notificationsagent'
-            ) . '</a>
+                    'conditions',
+                    'local_notificationsagent'
+                ) . '</a>
                 <a class="' . $classnavexceptions . '" id="nav-exceptions-tab" data-toggle="tab" href="#nav-exceptions"
                 role="tab" aria-controls="nav-exceptions" aria-selected="false">' . get_string(
-                'exceptions', 'local_notificationsagent'
-            ) . '</a>
+                    'exceptions',
+                    'local_notificationsagent'
+                ) . '</a>
                 <a class="' . $classnavactions . '" id="nav-actions-tab" data-toggle="tab" href="#nav-actions"
                 role="tab" aria-controls="nav-actions" aria-selected="false">
                 ' . get_string('actions', 'local_notificationsagent') . '</a>

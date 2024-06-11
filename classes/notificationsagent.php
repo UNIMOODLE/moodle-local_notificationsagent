@@ -39,7 +39,6 @@ use stdClass;
  * Notifications agent main class
  */
 class notificationsagent {
-
     /** @var int All users are affected by the action/condition */
     public const GENERIC_USERID = -1;
     /** @var string Condition Availability type */
@@ -74,7 +73,8 @@ class notificationsagent {
                            WHERE nc.pluginname = :pluginname
         ';
         $conditions = $DB->get_recordset_sql(
-                $conditionssql, [
+            $conditionssql,
+            [
                         'pluginname' => $pluginname,
                         'categorycontextid' => CONTEXT_COURSECAT,
                         'coursecontextid' => CONTEXT_COURSE,
@@ -142,7 +142,8 @@ class notificationsagent {
                              AND nc.cmid = :cmid
         ';
         $conditions = $DB->get_recordset_sql(
-                $conditionssql, [
+            $conditionssql,
+            [
                         'pluginname' => $pluginname,
                         'categorycontextid' => CONTEXT_COURSECAT,
                         'coursecontextid' => CONTEXT_COURSE,
@@ -204,7 +205,8 @@ class notificationsagent {
                            WHERE nc.pluginname = :pluginname
         ';
         $conditions = $DB->get_recordset_sql(
-                $conditionssql, [
+            $conditionssql,
+            [
                         'pluginname' => $pluginname,
                 ]
         );
@@ -251,7 +253,8 @@ class notificationsagent {
                                     )
         ';
         $conditions = $DB->get_recordset_sql(
-                $conditionssql, [
+            $conditionssql,
+            [
                         'pluginname' => self::CONDITION_AVAILABILITY,
                         'pluginnameaux' => self::CONDITION_AVAILABILITY,
                 ]
@@ -369,8 +372,17 @@ class notificationsagent {
      */
     public static function get_usersbycourse($context): array {
         return get_role_users(
-                5, $context, false, 'u.*',
-                '', true, '', '', '', 'u.suspended = 0', ''
+            5,
+            $context,
+            false,
+            'u.*',
+            '',
+            true,
+            '',
+            '',
+            '',
+            'u.suspended = 0',
+            ''
         );
     }
 
@@ -431,10 +443,12 @@ class notificationsagent {
         $contextuser = $context->get_userid();  // 0 or userid>0
         $student = $subplugin->rule->createdby;
         // Avoid to set triggers for event or cron triggered by users who don't own the rule.
-        if ($contextuser > 0 && $contextuser != $student
+        if (
+            $contextuser > 0 && $contextuser != $student
                 && !has_capability(
-                        'local/notificationsagent:managecourserule',
-                        $coursecontext, $student
+                    'local/notificationsagent:managecourserule',
+                    $coursecontext,
+                    $student
                 )
         ) {
             return;
@@ -443,12 +457,13 @@ class notificationsagent {
         if ($contextuser > 0 && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $student)) {
             $userid = $student;
             $userslimit = rule::get_limit_reached_by_users(
-                    $courseid,
-                    $subplugin->rule->id,
-                    $subplugin->rule->timesfired,
-                    [$userid]
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                [$userid]
             );
-            if (!$userslimit[$userid]
+            if (
+                !$userslimit[$userid]
                     && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
@@ -474,20 +489,22 @@ class notificationsagent {
         }
         if (!$subplugin->is_generic()) {
             // If $USER has student role, only generate triggers for its.
-            if (has_capability(
+            if (
+                has_capability(
                     'local/notificationsagent:managecourserule',
-                    $coursecontext, $student
-            )
+                    $coursecontext,
+                    $student
+                )
             ) {
                 $users = $contextuser ? [(object) ['id' => $contextuser]] : self::get_usersbycourse($coursecontext);
             } else {
                 $users = [(object) ['id' => $student]];
             }
             $userslimit = rule::get_limit_reached_by_users(
-                    $courseid,
-                    $subplugin->rule->id,
-                    $subplugin->rule->timesfired,
-                    array_column($users, 'id')
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                array_column($users, 'id')
             );
 
             foreach ($users as $user) {
@@ -517,10 +534,12 @@ class notificationsagent {
 
         if ($subplugin->is_generic()) {
             // If $USER has student role, only generate triggers for the user.
-            if (has_capability(
+            if (
+                has_capability(
                     'local/notificationsagent:managecourserule',
-                    $coursecontext, $student
-            )
+                    $coursecontext,
+                    $student
+                )
             ) {
                 $userid = self::GENERIC_USERID;
             } else {
@@ -528,13 +547,14 @@ class notificationsagent {
             }
 
             $userslimit = rule::get_limit_reached_by_users(
-                    $courseid,
-                    $subplugin->rule->id,
-                    $subplugin->rule->timesfired,
-                    [$userid]
+                $courseid,
+                $subplugin->rule->id,
+                $subplugin->rule->timesfired,
+                [$userid]
             );
 
-            if (!$userslimit[$userid]
+            if (
+                !$userslimit[$userid]
                     && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
@@ -604,8 +624,8 @@ class notificationsagent {
                            WHERE id = :instance";
 
                 $dates = $DB->get_record_sql(
-                        $dates,
-                        [
+                    $dates,
+                    [
                                 'instance' => $modtype->instance,
                         ]
                 );
@@ -618,7 +638,6 @@ class notificationsagent {
             if (empty($dates->timeend)) {
                 $dates->timeend = get_course($modtype->course)->enddate;
             }
-
         }
 
         return $dates;
@@ -636,8 +655,9 @@ class notificationsagent {
     public static function is_ruleoff($ruleid, $userid, $courseid) {
         global $DB;
         $ruleoff = $DB->get_field(
-                'notificationsagent_triggers', 'MAX(ruleoff)',
-                [
+            'notificationsagent_triggers',
+            'MAX(ruleoff)',
+            [
                         'ruleid' => $ruleid,
                         'userid' => $userid,
                         'courseid' => $courseid,
@@ -673,14 +693,14 @@ class notificationsagent {
         ';
 
         return $DB->get_records_sql(
-                $rulesidquery,
-                [
+            $rulesidquery,
+            [
                         'tasklastrunttime' => $tasklastrunttime,
                         'timestarted' => $timestarted,
                         'courseid' => SITEID,
                 ],
-                0,
-                $maxrulescron
+            0,
+            $maxrulescron
         );
     }
 
@@ -723,16 +743,18 @@ class notificationsagent {
         global $DB;
 
         if (!empty($conditionids)) {
-            list($conditionsql, $params) = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
+            [$conditionsql, $params] = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED);
             $params = ['userid' => $userid] + $params;
 
             $DB->delete_records_select(
-                    'notificationsagent_cache',
-                    "userid = :userid AND conditionid {$conditionsql}", $params
+                'notificationsagent_cache',
+                "userid = :userid AND conditionid {$conditionsql}",
+                $params
             );
             $DB->delete_records_select(
-                    'notificationsagent_triggers',
-                    "userid = :userid AND conditionid {$conditionsql}", $params
+                'notificationsagent_triggers',
+                "userid = :userid AND conditionid {$conditionsql}",
+                $params
             );
         }
     }
@@ -782,7 +804,8 @@ class notificationsagent {
                     AND (nctx.contextid = :coursecontextid AND nctx.objectid = :courseid)
         ';
         $rules = $DB->get_records_sql(
-                $sql, [
+            $sql,
+            [
                         'coursecontextid' => CONTEXT_COURSE,
                         'courseid' => $courseid,
                 ]
@@ -811,11 +834,11 @@ class notificationsagent {
 
         // Get all rules.
         if ($rules = self::get_rules_by_course($courseid)) {
-            list($insql, $inparams) = $DB->get_in_or_equal(array_column($rules, 'ruleid'), SQL_PARAMS_NAMED);
+            [$insql, $inparams] = $DB->get_in_or_equal(array_column($rules, 'ruleid'), SQL_PARAMS_NAMED);
             $DB->delete_records_select(
-                    'notificationsagent_context',
-                    "contextid = :contextid AND objectid = :objectid AND ruleid $insql",
-                    ["contextid" => CONTEXT_COURSE, "objectid" => $courseid, ...$inparams]
+                'notificationsagent_context',
+                "contextid = :contextid AND objectid = :objectid AND ruleid $insql",
+                ["contextid" => CONTEXT_COURSE, "objectid" => $courseid, ...$inparams]
             );
 
             // Check if rule has more contexts.
@@ -828,7 +851,7 @@ class notificationsagent {
                 }
             }
             if (!empty($rulesid)) {
-                list($insql, $inparams) = $DB->get_in_or_equal($rulesid, SQL_PARAMS_NAMED);
+                [$insql, $inparams] = $DB->get_in_or_equal($rulesid, SQL_PARAMS_NAMED);
                 $DB->delete_records_select('notificationsagent_action', "ruleid $insql", $inparams);
                 $DB->delete_records_select('notificationsagent_condition', "ruleid $insql", $inparams);
                 $DB->delete_records_select('notificationsagent_rule', "id $insql", $inparams);

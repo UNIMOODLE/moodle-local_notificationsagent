@@ -291,9 +291,11 @@ class rule {
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
             $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
-        if (has_capability('local/notificationsagent:viewcourserule', $context)
+        if (
+            has_capability('local/notificationsagent:viewcourserule', $context)
                 || has_capability(
-                        'local/notificationsagent:managecourserule', $context
+                    'local/notificationsagent:managecourserule',
+                    $context
                 )
         ) {
             $rules = [...$rules, ...self::get_course_rules($courseid, true), ...self::get_course_rules_forced($courseid)];
@@ -455,7 +457,6 @@ class rule {
             $jsonactions[$action->get_id()] = ["pluginname" => $action->get_subtype(), "action" => $ruleaction];
         }
         $this->dataform = array_merge($this->dataform, [editrule_form::FORM_JSON_ACTION => json_encode($jsonactions)]);
-
     }
 
     /**
@@ -525,10 +526,11 @@ class rule {
     private function load_ac() {
         global $DB;
 
-        if ($ac = $DB->get_record(
+        if (
+            $ac = $DB->get_record(
                 'notificationsagent_condition',
                 ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_CONDITION, 'pluginname' => 'ac']
-        )
+            )
         ) {
             $this->ac = notificationplugin::create_instance($ac->id, $ac->type, $ac->pluginname, $this->to_record());
         }
@@ -569,7 +571,6 @@ class rule {
             }
         }
         return null;
-
     }
 
     /**
@@ -592,8 +593,9 @@ class rule {
         global $DB;
 
         $selectconditions = $DB->get_records_select(
-                'notificationsagent_condition', 'ruleid = ? AND type = ? AND complementary = ? AND pluginname <> ?',
-                [$this->id, notificationplugin::TYPE_CONDITION, notificationplugin::COMPLEMENTARY_CONDITION, ac::NAME]
+            'notificationsagent_condition',
+            'ruleid = ? AND type = ? AND complementary = ? AND pluginname <> ?',
+            [$this->id, notificationplugin::TYPE_CONDITION, notificationplugin::COMPLEMENTARY_CONDITION, ac::NAME]
         );
         $this->conditions = notificationplugin::create_subplugins($selectconditions, $this->to_record());
     }
@@ -614,8 +616,9 @@ class rule {
         global $DB;
 
         $selectexceptions = $DB->get_records_select(
-                'notificationsagent_condition', 'ruleid = ? AND type = ? AND complementary = ? AND pluginname <> ?',
-                [$this->id, notificationplugin::TYPE_CONDITION, notificationplugin::COMPLEMENTARY_EXCEPTION, ac::NAME]
+            'notificationsagent_condition',
+            'ruleid = ? AND type = ? AND complementary = ? AND pluginname <> ?',
+            [$this->id, notificationplugin::TYPE_CONDITION, notificationplugin::COMPLEMENTARY_EXCEPTION, ac::NAME]
         );
         $this->exceptions = notificationplugin::create_subplugins($selectexceptions, $this->to_record());
     }
@@ -636,8 +639,8 @@ class rule {
         global $DB;
 
         $selectactions = $DB->get_records(
-                'notificationsagent_action',
-                ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_ACTION]
+            'notificationsagent_action',
+            ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_ACTION]
         );
 
         $this->actions = notificationplugin::create_subplugins($selectactions, $this->to_record());
@@ -744,7 +747,7 @@ class rule {
         $conditions = $this->get_conditions();
         if (!empty($conditions)) {
             $conditionsid = array_keys($conditions);
-            list($insql, $inparams) = $DB->get_in_or_equal($conditionsid);
+            [$insql, $inparams] = $DB->get_in_or_equal($conditionsid);
             $DB->delete_records_select('notificationsagent_cache', "conditionid $insql", $inparams);
         }
     }
@@ -1035,8 +1038,8 @@ class rule {
                 }
 
                 notificationsagent::set_time_trigger(
-                        $deletedata,
-                        $insertdata
+                    $deletedata,
+                    $insertdata
                 );
 
                 return false;
@@ -1068,8 +1071,8 @@ class rule {
                 }
 
                 notificationsagent::set_time_trigger(
-                        $deletedata,
-                        $insertdata
+                    $deletedata,
+                    $insertdata
                 );
 
                 return false;
@@ -1092,8 +1095,8 @@ class rule {
         ];
 
         notificationsagent::set_time_trigger(
-                $deletedata,
-                $insertdata
+            $deletedata,
+            $insertdata
         );
 
         // All conditions are met, and no exceptions are triggered.
@@ -1352,10 +1355,12 @@ class rule {
         $context = context_course::instance($courseid);
 
         // If $USER has student role, only generate triggers for the user.
-        if (has_capability(
+        if (
+            has_capability(
                 'local/notificationsagent:managecourserule',
-                $context, $USER->id
-        )
+                $context,
+                $USER->id
+            )
         ) {
             $students = notificationsagent::get_usersbycourse($context);
         } else {
@@ -1374,9 +1379,13 @@ class rule {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
-                if ($subplugin = notificationplugin::create_instance(
-                        $idname, notificationplugin::TYPE_CONDITION, $pluginname, $this->to_record()
-                )
+                if (
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_CONDITION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
                 }
@@ -1388,9 +1397,13 @@ class rule {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
-                if ($subplugin = notificationplugin::create_instance(
-                        $idname, notificationplugin::TYPE_CONDITION, $pluginname, $this->to_record()
-                )
+                if (
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_CONDITION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_EXCEPTION, $arraytimer, $students);
                 }
@@ -1414,9 +1427,13 @@ class rule {
      */
     private function save_form_ac($data, &$arraytimer, $students) {
         $id = $this->get_ac() ? $this->get_ac()->id : null;
-        if ($subpluginac = notificationplugin::create_instance(
-                $id, notificationplugin::TYPE_CONDITION, ac::NAME, $this->to_record()
-        )
+        if (
+            $subpluginac = notificationplugin::create_instance(
+                $id,
+                notificationplugin::TYPE_CONDITION,
+                ac::NAME,
+                $this->to_record()
+            )
         ) {
             $action = $this->get_ac() ? editrule_form::FORM_JSON_ACTION_UPDATE : editrule_form::FORM_JSON_ACTION_INSERT;
             $subpluginac->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
@@ -1457,10 +1474,12 @@ class rule {
                 }
             } else {
                 // If $USER has student role, only generate triggers for the user.
-                if (has_capability(
+                if (
+                    has_capability(
                         'local/notificationsagent:managecourserule',
-                        $context, $USER->id
-                )
+                        $context,
+                        $USER->id
+                    )
                 ) {
                     $studentid = notificationsagent::GENERIC_USERID;
                 } else {
@@ -1491,9 +1510,13 @@ class rule {
             foreach ($array as $idname => $value) {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
-                if ($subplugin = notificationplugin::create_instance(
-                        $idname, notificationplugin::TYPE_ACTION, $pluginname, $this->to_record()
-                )
+                if (
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_ACTION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data);
                 }
@@ -1572,8 +1595,12 @@ class rule {
         global $DB;
 
         $data = $DB->get_records(
-                'notificationsagent_context',
-                ['ruleid' => $this->get_id(), 'contextid' => CONTEXT_COURSE], '', 'objectid', 0, 1
+            'notificationsagent_context',
+            ['ruleid' => $this->get_id(), 'contextid' => CONTEXT_COURSE],
+            '',
+            'objectid',
+            0,
+            1
         );
 
         return reset($data)->objectid ?? 0;
@@ -1650,8 +1677,10 @@ class rule {
         global $DB;
 
         $conditions = $DB->get_records(
-                'notificationsagent_condition',
-                ['ruleid' => $id], '', 'pluginname, type, parameters, complementary'
+            'notificationsagent_condition',
+            ['ruleid' => $id],
+            '',
+            'pluginname, type, parameters, complementary'
         );
         foreach ($conditions as $condition) {
             $data = new stdClass();
@@ -1675,8 +1704,10 @@ class rule {
         global $DB;
 
         $actions = $DB->get_records(
-                'notificationsagent_action',
-                ['ruleid' => $id], '', 'pluginname, type, parameters'
+            'notificationsagent_action',
+            ['ruleid' => $id],
+            '',
+            'pluginname, type, parameters'
         );
         foreach ($actions as $action) {
             $data = new stdClass();
@@ -1745,7 +1776,7 @@ class rule {
         $data = [];
 
         $parents = helper::get_parents_categories_course($courseid);
-        list($sqlparents, $params) = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+        [$sqlparents, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
 
         $notstudentjoin = '';
         if ($notstudent) {
@@ -1813,7 +1844,7 @@ class rule {
         $data = [];
 
         $parents = helper::get_parents_categories_course($courseid);
-        list($sqlparents, $params) = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+        [$sqlparents, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
 
         $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
@@ -1987,10 +2018,12 @@ class rule {
         $hasdelete = false;
 
         $context = \context_course::instance($this->get_default_context(), IGNORE_MISSING);
-        if ($this->get_createdby() == $USER->id
+        if (
+            $this->get_createdby() == $USER->id
                 || ($context
                         && has_capability(
-                                'local/notificationsagent:managesiterule', $context
+                            'local/notificationsagent:managesiterule',
+                            $context
                         ))
         ) {
             $hasdelete = true;
@@ -2145,12 +2178,12 @@ class rule {
 
         // There is no cache, we have to get it from the database and set the cache.
         if (empty($coursecache)) {
-            list($launchedsql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            [$launchedsql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
             $params = ['ruleid' => $ruleid, 'courseid' => $courseid] + $params;
             $userslaunched = $DB->get_records_select(
-                    'notificationsagent_launched',
-                    "ruleid = :ruleid AND courseid = :courseid AND userid {$launchedsql}",
-                    $params
+                'notificationsagent_launched',
+                "ruleid = :ruleid AND courseid = :courseid AND userid {$launchedsql}",
+                $params
             );
 
             foreach ($userslaunched as $userlaunched) {
@@ -2238,7 +2271,7 @@ class rule {
      */
     public static function order_rules_by_field($rules, $field, $desc, $courseid) {
         if ($field == "broken") {
-            usort($rules, function($a, $b) use ($courseid) {
+            usort($rules, function ($a, $b) use ($courseid) {
                 if ($a->validation($courseid) && !$b->validation($courseid)) {
                     return 1;
                 } else if (!$a->validation($courseid) && $b->validation($courseid)) {
@@ -2249,7 +2282,7 @@ class rule {
             });
         } else {
             if ($desc == 1) {
-                usort($rules, function($a, $b) use ($field, $courseid) {
+                usort($rules, function ($a, $b) use ($field, $courseid) {
                     if ($b->$field - $a->$field == 0) {
                         if ($a->validation($courseid) && !$b->validation($courseid)) {
                             return -1;
@@ -2262,7 +2295,7 @@ class rule {
                     return $b->$field - $a->$field;
                 });
             } else {
-                usort($rules, function($a, $b) use ($field, $courseid) {
+                usort($rules, function ($a, $b) use ($field, $courseid) {
                     if ($b->$field - $a->$field == 0) {
                         if ($a->validation($courseid) && !$b->validation($courseid)) {
                             return -1;
@@ -2296,7 +2329,6 @@ class rule {
             return get_string('cardsharedby', 'local_notificationsagent', $data);
         }
         return '';
-
     }
 
     /**
@@ -2352,8 +2384,10 @@ class rule {
         }
 
         throw new \moodle_exception(
-                'nopermissions', '', '',
-                get_capability_string('local/notificationsagent:managecourserule')
+            'nopermissions',
+            '',
+            '',
+            get_capability_string('local/notificationsagent:managecourserule')
         );
     }
 }

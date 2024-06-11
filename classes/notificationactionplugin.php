@@ -45,7 +45,6 @@ use local_notificationsagent\notificationplugin;
  * plugins should inherit and implement according to their specific needs.
  */
 abstract class notificationactionplugin extends notificationplugin {
-
     /**
      * Constructor for the class.
      *
@@ -66,7 +65,6 @@ abstract class notificationactionplugin extends notificationplugin {
                 $this->set_parameters($subplugin->parameters);
             }
         }
-
     }
 
     /**
@@ -111,16 +109,19 @@ abstract class notificationactionplugin extends notificationplugin {
     public function placeholders($mform, $type, $showuserplaceholders) {
         $id = $this->get_id();
         $placeholders = \html_writer::start_tag(
-            'div', ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
+            'div',
+            ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
         );
         $placeholders .= \html_writer::start_tag('div', ["class" => "col-md-12"]);
         $placeholders .= \html_writer::start_tag(
-            'div', ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
+            'div',
+            ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
         );
         foreach (rule::get_placeholders($showuserplaceholders) as $option) {
             $clipboardtarget = "#notificationvars_" . $id . "_" . $type . "_" . $option;
             $placeholders .= \html_writer::start_tag(
-                'a', [
+                'a',
+                [
                     "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
                     "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget,
                 ]

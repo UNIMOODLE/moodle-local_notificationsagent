@@ -49,32 +49,32 @@ class messageagent extends notificationactionplugin {
      * Get the elements for the messageagent plugin.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param int         $type
+     * @param int $courseid
+     * @param int $type
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
         $title = $mform->createElement(
-            'text', $this->get_name_ui(self::UI_TITLE),
-            get_string(
-                'editrule_action_title', 'notificationsaction_messageagent',
-                ['typeelement' => '[TTTT]']
-            ), ['size' => '64']
+                'text', $this->get_name_ui(self::UI_TITLE),
+                get_string(
+                        'editrule_action_title', 'notificationsaction_messageagent',
+                        ['typeelement' => '[TTTT]']
+                ), ['size' => '64']
         );
 
         $editoroptions = [
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true,
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'trusttext' => true,
         ];
 
         $message = $mform->createElement(
-            'editor', $this->get_name_ui(self::UI_MESSAGE),
-            get_string(
-                'editrule_action_message', 'notificationsaction_messageagent',
-                ['typeelement' => '[BBBB]']
-            ),
-            ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+                'editor', $this->get_name_ui(self::UI_MESSAGE),
+                get_string(
+                        'editrule_action_message', 'notificationsaction_messageagent',
+                        ['typeelement' => '[BBBB]']
+                ),
+                ['class' => 'fitem_id_templatevars_editor'], $editoroptions
         );
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
@@ -112,7 +112,7 @@ class messageagent extends notificationactionplugin {
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:messageagent', $context)
-            && has_capability('moodle/site:sendmessage', $context);
+                && has_capability('moodle/site:sendmessage', $context);
     }
 
     /**
@@ -139,9 +139,9 @@ class messageagent extends notificationactionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -150,8 +150,8 @@ class messageagent extends notificationactionplugin {
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
         $paramstoteplace = [
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
@@ -162,7 +162,7 @@ class messageagent extends notificationactionplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -184,11 +184,11 @@ class messageagent extends notificationactionplugin {
         if ($message->notification === 0) {
             // It's a private conversation between users.
             $conversation = \core_message\api::create_conversation(
-                \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
-                [
-                    is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
-                    $userto,
-                ]
+                    \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
+                    [
+                            is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
+                            $userto,
+                    ]
             );
             // We creat one conversation.
             $message->convid = $conversation->id;
@@ -197,7 +197,7 @@ class messageagent extends notificationactionplugin {
             $message->userto = $userto;
         }
         $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
-            false
+                false
         ); // A relevant URL for the notification.
         $message->contexturlname = get_string('course'); // Link title explaining where users get to for the contexturl.
 
@@ -224,8 +224,8 @@ class messageagent extends notificationactionplugin {
         $parameters = json_decode($this->get_parameters());
 
         return json_encode([
-            'title' => $parameters->{self::UI_TITLE},
-            'message' => $parameters->{self::UI_MESSAGE}->text,
+                'title' => $parameters->{self::UI_TITLE},
+                'message' => $parameters->{self::UI_MESSAGE}->text,
         ]);
     }
 
@@ -233,11 +233,11 @@ class messageagent extends notificationactionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
-     * @return bool|void False if restore is not required
+     * @return bool False if restore is not required
      */
     public function update_after_restore($restoreid, $courseid, \base_logger $logger) {
         return false;

@@ -39,7 +39,6 @@ use core_reportbuilder\local\entities\user;
  * System report class for listing notification rules.
  */
 class rules extends system_report {
-
     /**
      * A function to initialise the entities, tables, joins, columns, filters, and set downloadable for the report.
      */

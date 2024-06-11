@@ -43,9 +43,7 @@ use core_privacy\local\request;
 /**
  * Provider user data class
  */
-class provider implements \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\core_userlist_provider,
-        \core_privacy\local\request\subsystem\provider {
+class provider implements \core_privacy\local\request\core_userlist_provider, \core_privacy\local\metadata\provider, \core_privacy\local\request\subsystem\provider {
     /**
      * Privacy  notifications agent  provider.
      *
@@ -64,9 +62,9 @@ class provider implements \core_privacy\local\metadata\provider,
         ];
 
         $collection->add_database_table(
-                'notificationsagent_report',
-                $reportdata,
-                'privacy:metadata:notificationsagentreport'
+            'notificationsagent_report',
+            $reportdata,
+            'privacy:metadata:notificationsagentreport'
         );
 
         return $collection;
@@ -101,7 +99,7 @@ class provider implements \core_privacy\local\metadata\provider,
         if ($contextlist->get_component() != 'local_notificationsagent') {
             return;
         }
-        $contexts = array_filter($contextlist->get_contexts(), function($context) {
+        $contexts = array_filter($contextlist->get_contexts(), function ($context) {
             if ($context->contextlevel == CONTEXT_COURSE) {
                 return $context;
             }
@@ -126,8 +124,8 @@ class provider implements \core_privacy\local\metadata\provider,
             }
 
             request\writer::with_context($context)->export_data(
-                    [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
-                    (object) $exportdata
+                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
+                (object) $exportdata
             );
         }
     }
@@ -190,7 +188,7 @@ class provider implements \core_privacy\local\metadata\provider,
         if ($context instanceof \context_course) {
             $userids = $userlist->get_userids();
             if (!empty($userids)) {
-                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+                [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
                 $select = "courseid = :courseid AND userid {$usersql}";
                 $params = ['courseid' => $context->instanceid] + $userparams;
                 $DB->delete_records_select('notificationsagent_report', $select, $params);
@@ -210,5 +208,4 @@ class provider implements \core_privacy\local\metadata\provider,
         $params = (isset($userid)) ? ['courseid' => $courseid, 'userid' => $userid] : ['courseid' => $courseid];
         $DB->delete_records('notificationsagent_report', $params);
     }
-
 }

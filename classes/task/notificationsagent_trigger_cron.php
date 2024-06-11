@@ -64,8 +64,12 @@ class notificationsagent_trigger_cron extends scheduled_task {
         // Evalutate rules.
         foreach ($triggers as $trigger) {
             notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                    [$trigger->ruleid], $timestarted, $trigger->userid, $trigger->courseid, $trigger->conditionid,
-                    $trigger->startdate
+                [$trigger->ruleid],
+                $timestarted,
+                $trigger->userid,
+                $trigger->courseid,
+                $trigger->conditionid,
+                $trigger->startdate
             );
             $cronlastrun = $trigger->startdate;
         }

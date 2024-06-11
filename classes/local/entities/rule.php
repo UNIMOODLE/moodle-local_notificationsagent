@@ -45,7 +45,6 @@ use lang_string;
  * Class of the entities of the rule.
  */
 class rule extends base {
-
     /**
      * Database tables that this entity uses and their default aliases
      *
@@ -134,7 +133,7 @@ class rule extends base {
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(true)
             ->add_field("{$actionealias}.pluginname")
-            ->add_callback(static function(string $pluginname): string {
+            ->add_callback(static function (string $pluginname): string {
                 return get_string('pluginname', 'notificationsaction_' . $pluginname);
             });
 
@@ -146,7 +145,7 @@ class rule extends base {
             ->set_type(column::TYPE_LONGTEXT)
             ->set_is_sortable(true)
             ->add_field("{$reportalias}.actiondetail")
-            ->add_callback(static function($str): string {
+            ->add_callback(static function ($str): string {
                 $json = json_decode($str, true);
                 $result = '';
                 if ($json == null) {
@@ -166,8 +165,10 @@ class rule extends base {
             ->set_type(column::TYPE_TIMESTAMP)
             ->set_is_sortable(true)
             ->add_field("{$reportalias}.timestamp")
-            ->add_callback([format::class, 'userdate'],
-                get_string('strftimedatetimeshortaccurate', 'core_langconfig'));
+            ->add_callback(
+                [format::class, 'userdate'],
+                get_string('strftimedatetimeshortaccurate', 'core_langconfig')
+            );
 
         return $columns;
     }
@@ -188,29 +189,31 @@ class rule extends base {
         $rulejoin = $this->rulejoin();
         $coursecontext = \context_course::instance($COURSE->id);
         // Get rules to view as capability function.
-        $viewrules = static function(): array {
+        $viewrules = static function (): array {
             global $DB, $USER, $COURSE;
             $userid = $USER->id;
             $course = $COURSE;
             $coursecontext = \context_course::instance($course->id);
             $options = [];
             // User can see all the rules.
-            if (has_capability(
-                'local/notificationsagent:manageallrule',
-                $coursecontext,
-                $userid
-            )
+            if (
+                has_capability(
+                    'local/notificationsagent:manageallrule',
+                    $coursecontext,
+                    $userid
+                )
             ) {
                 $query = 'SELECT id
                                   FROM {notificationsagent_rule}
                                WHERE template = 1';
                 $rulenames = $DB->get_fieldset_sql($query);
                 // User can see rules of current course.
-            } else if (has_capability(
-                'local/notificationsagent:viewcourserule',
-                $coursecontext,
-                $userid
-            )
+            } else if (
+                has_capability(
+                    'local/notificationsagent:viewcourserule',
+                    $coursecontext,
+                    $userid
+                )
             ) {
                 $query
                     = 'SELECT DISTINCT {notificationsagent_report}.ruleid
@@ -218,11 +221,12 @@ class rule extends base {
                       WHERE {notificationsagent_report}.courseid =' . $COURSE->id;
                 $rulenames = $DB->get_fieldset_sql($query);
                 // User can see rules of its own.
-            } else if (has_capability(
-                'local/notificationsagent:manageownrule',
-                $coursecontext,
-                $userid
-            )
+            } else if (
+                has_capability(
+                    'local/notificationsagent:manageownrule',
+                    $coursecontext,
+                    $userid
+                )
             ) {
                 $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
                 $query
@@ -277,14 +281,15 @@ class rule extends base {
             "{$coursealias}.id"
         ))
             ->add_joins($this->get_joins())
-            ->set_options_callback(static function(): array {
+            ->set_options_callback(static function (): array {
                 global $COURSE, $DB;
                 $options = [];
                 $coursecontext = \context_course::instance($COURSE->id);
-                if (has_capability(
-                    'local/notificationsagent:manageallrule',
-                    $coursecontext
-                )
+                if (
+                    has_capability(
+                        'local/notificationsagent:manageallrule',
+                        $coursecontext
+                    )
                 ) {
                     $query = "SELECT id FROM {course} where id!=" . SITEID;
                     $courses = $DB->get_fieldset_sql($query);
@@ -292,10 +297,11 @@ class rule extends base {
                     foreach ($courses as $course) {
                         $options[$course] = get_course($course)->fullname;
                     }
-                } else if (has_capability(
-                    'local/notificationsagent:manageownrule',
-                    $coursecontext
-                )
+                } else if (
+                    has_capability(
+                        'local/notificationsagent:manageownrule',
+                        $coursecontext
+                    )
                 ) {
                     $query = "SELECT id FROM {course} WHERE id = ($COURSE->id)";
                     $courses = $DB->get_fieldset_sql($query);
@@ -326,14 +332,15 @@ class rule extends base {
             "{$narralias}.userid"
         ))
             ->add_joins($this->get_joins())
-            ->set_options_callback(static function(): array {
+            ->set_options_callback(static function (): array {
                 global $USER, $COURSE, $DB;
                 $options = [];
                 $coursecontext = \context_course::instance($COURSE->id);
-                if (has_capability(
-                    'local/notificationsagent:manageallrule',
-                    $coursecontext
-                )
+                if (
+                    has_capability(
+                        'local/notificationsagent:manageallrule',
+                        $coursecontext
+                    )
                 ) {
                     $query
                         = "SELECT DISTINCT {user}.id, CONCAT({user}.firstname ,' ', {user}.lastname) AS name
@@ -345,26 +352,29 @@ class rule extends base {
                     foreach ($users as $user) {
                         $options[$user->id] = $user->name;
                     }
-                } else if (has_capability(
-                    'local/notificationsagent:viewcourserule',
-                    $coursecontext
-                )
+                } else if (
+                    has_capability(
+                        'local/notificationsagent:viewcourserule',
+                        $coursecontext
+                    )
                 ) {
                     $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
                     $query
                         = 'SELECT DISTINCT {user}.id, CONCAT({user}.firstname ," ", {user}.lastname) AS name
                              FROM {notificationsagent_report}
                               JOIN {user} ON {user}.id={notificationsagent_report}.userid
-                           WHERE {notificationsagent_report}.courseid IN (' . $key . ' )';;
+                           WHERE {notificationsagent_report}.courseid IN (' . $key . ' )';
+                    ;
                     $users = $DB->get_recordset_sql($query);
 
                     foreach ($users as $user) {
                         $options[$user->id] = $user->name;
                     }
-                } else if (has_capability(
-                    'local/notificationsagent:manageownrule',
-                    $coursecontext
-                )
+                } else if (
+                    has_capability(
+                        'local/notificationsagent:manageownrule',
+                        $coursecontext
+                    )
                 ) {
                     $options[$USER->id] = $USER->firstname . ' ' . $USER->lastname;
                 }

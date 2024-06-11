@@ -73,7 +73,10 @@ class unshare_rule_all extends \external_api {
         if (empty($instance)) {
             try {
                 throw new \moodle_exception(
-                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                    'nosuchinstance',
+                    '',
+                    '',
+                    get_capability_string('local/notificationsagent:nosuchinstance')
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
@@ -93,13 +96,18 @@ class unshare_rule_all extends \external_api {
                     $instance->reject_share_rule($instance->get_id());
                 } else {
                     throw new \moodle_exception(
-                        'isnotrule', '', '', '',
+                        'isnotrule',
+                        '',
+                        '',
+                        '',
                         get_string('isnotrule', 'local_notificationsagent')
                     );
                 }
             } else {
                 throw new \moodle_exception(
-                    'nopermissions', '', '',
+                    'nopermissions',
+                    '',
+                    '',
                     get_capability_string('local/notificationsagent:unshareruleall')
                 );
             }

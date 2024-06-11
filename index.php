@@ -42,7 +42,8 @@ use local_notificationsagent\notificationplugin;
 
 $isroleadmin = false;
 if (is_siteadmin() || !empty($PAGE->settingsnav)) {
-    if (is_siteadmin()
+    if (
+            is_siteadmin()
             || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
                     || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
     ) {
@@ -69,8 +70,10 @@ $context = context_course::instance($courseid);
 if (get_config('local_notificationsagent', 'disable_user_use')) {
     if (!has_capability('local/notificationsagent:managecourserule', $context)) {
         throw new \moodle_exception(
-                'nopermissions', '', '',
-                get_capability_string('local/notificationsagent:managecourserule')
+            'nopermissions',
+            '',
+            '',
+            get_capability_string('local/notificationsagent:managecourserule')
         );
     }
 }
@@ -83,21 +86,21 @@ $PAGE->navbar->add(get_string('heading', 'local_notificationsagent'));
 $PAGE->navbar->ignore_active();
 if ($isroleadmin && $courseid == SITEID) {
     $PAGE->navbar->add(
-            $SITE->fullname,
-            new moodle_url('/')
+        $SITE->fullname,
+        new moodle_url('/')
     );
     $PAGE->navbar->add(
-            get_string('admin_breadcrumb', 'local_notificationsagent'),
-            new moodle_url('/local/notificationsagent/index.php')
+        get_string('admin_breadcrumb', 'local_notificationsagent'),
+        new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
     $PAGE->navbar->add(
-            $COURSE->fullname,
-            new moodle_url('/course/view.php', ['id' => $courseid])
+        $COURSE->fullname,
+        new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-            get_string('course_breadcrumb', 'local_notificationsagent'),
-            new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
+        get_string('course_breadcrumb', 'local_notificationsagent'),
+        new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }
 $PAGE->requires->js_call_amd('local_notificationsagent/notification_assigntemplate', 'init');
@@ -234,17 +237,19 @@ foreach ($rules as $rule) {
                             ? ($courseid == SITEID
                                     ? $rule->get_coursename_and_username_by_rule()
                                     : get_string(
-                                            'type_sharedrule', 'local_notificationsagent'
+                                        'type_sharedrule',
+                                        'local_notificationsagent'
                                     ))
                             : get_string('type_rule', 'local_notificationsagent')
                     )
                     : get_string('type_template', 'local_notificationsagent'),
             'editurl' => new moodle_url(
-                    "/local/notificationsagent/editrule.php",
-                    ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
+                "/local/notificationsagent/editrule.php",
+                ['courseid' => $courseid, 'action' => 'edit', 'ruleid' => $rule->get_id()]
             ),
             'reporturl' => new moodle_url(
-                    "/local/notificationsagent/report.php", $templatecontext['iscontextsite']
+                "/local/notificationsagent/report.php",
+                $templatecontext['iscontextsite']
                     ? ['ruleid' => $rule->get_id()]
                     : [
                             'courseid' => $courseid, 'ruleid' =>
@@ -252,7 +257,8 @@ foreach ($rules as $rule) {
                     ],
             ),
             'exporturl' => new moodle_url(
-                    "/local/notificationsagent/exportrule.php", ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
+                "/local/notificationsagent/exportrule.php",
+                ['courseid' => $courseid, 'ruleid' => $rule->get_id()]
             ),
             'capabilities' => $rule->get_card_options($courseid),
     ];
@@ -278,7 +284,9 @@ if (!empty($categoryarray)) {
     $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);
     $outputcategories .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
     $outputcategories .= html_writer::tag(
-            "input", "", ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
+        "input",
+        "",
+        ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
     );
     $outputcategories .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "course-category-select-all"]);
     $outputcategories .= html_writer::end_div(); // ... .custom-checkbox

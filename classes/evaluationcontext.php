@@ -37,7 +37,6 @@ namespace local_notificationsagent;
  * Context of a notification evaluation.
  */
 class evaluationcontext {
-
     /**
      * @var int The user ID.
      */
@@ -330,5 +329,4 @@ class evaluationcontext {
     public function set_observer(bool $observer): void {
         $this->observer = $observer;
     }
-
 }

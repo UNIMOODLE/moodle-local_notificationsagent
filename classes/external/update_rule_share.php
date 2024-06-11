@@ -79,7 +79,10 @@ class update_rule_share extends \external_api {
         if (empty($instance)) {
             try {
                 throw new \moodle_exception(
-                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                    'nosuchinstance',
+                    '',
+                    '',
+                    get_capability_string('local/notificationsagent:nosuchinstance')
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
@@ -105,13 +108,18 @@ class update_rule_share extends \external_api {
                     $DB->update_record('notificationsagent_rule', $request);
                 } else {
                     throw new \moodle_exception(
-                        'isnotrule', '', '', '',
+                        'isnotrule',
+                        '',
+                        '',
+                        '',
                         get_string('isnotrule', 'local_notificationsagent')
                     );
                 }
             } else {
                 throw new \moodle_exception(
-                    'nopermissions', '', '',
+                    'nopermissions',
+                    '',
+                    '',
                     get_capability_string('local/notificationsagent:updateruleshare')
                 );
             }

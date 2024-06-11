@@ -51,7 +51,6 @@ if ($courseid) {
     $coursefilter = get_course($courseid)->id;
     $filters['rule:courseselector_operator'] = number::EQUAL_TO;
     $filters['rule:courseselector_values'] = $course->id;
-
 } else {
     $context = context_system::instance();
 }
@@ -64,10 +63,11 @@ if ($ruleid) {
 }
 
 // Only show my own name.
-if (!has_capability(
-    'local/notificationsagent:viewcourserule',
-    $context
-)
+if (
+    !has_capability(
+        'local/notificationsagent:viewcourserule',
+        $context
+    )
 ) {
     $filters['rule:userfullname_operator'] = select::EQUAL_TO;
     $filters['rule:userfullname_values'] = $USER->id;
@@ -75,7 +75,10 @@ if (!has_capability(
 
 if (!has_capability('local/notificationsagent:viewassistantreport', $context)) {
     throw new \moodle_exception(
-        'nopermissions', 'error', '', get_capability_string('local/notificationsagent:viewassistantreport')
+        'nopermissions',
+        'error',
+        '',
+        get_capability_string('local/notificationsagent:viewassistantreport')
     );
 }
 

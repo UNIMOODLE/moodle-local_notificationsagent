@@ -40,7 +40,6 @@ use core_reportbuilder\local\filters\autocomplete as coreautocomplete;
  * Autocomplete class
  */
 class autocomplete extends coreautocomplete {
-
     /**
      * Overriding Setup form of core autocomplete class
      *
@@ -84,7 +83,8 @@ class autocomplete extends coreautocomplete {
         $context = context_course::instance($COURSE->id);
 
         // Let choose any rule in rule selector for this capability.
-        if ($name == 'rule:rulename'
+        if (
+            $name == 'rule:rulename'
             && has_capability(
                 'local/notificationsagent:viewcourserule',
                 $context
@@ -94,7 +94,8 @@ class autocomplete extends coreautocomplete {
         }
 
         // Let choose any course in course selector for this capability.
-        if ($name == 'rule:courseselector'
+        if (
+            $name == 'rule:courseselector'
             && has_capability(
                 'local/notificationsagent:manageallrule',
                 $context
@@ -105,7 +106,8 @@ class autocomplete extends coreautocomplete {
 
         // Let choose any user in user selector for this capability.
         // Students only see themselves.
-        if ($name == 'rule:userfullname'
+        if (
+            $name == 'rule:userfullname'
             && has_capability(
                 'local/notificationsagent:viewcourserule',
                 $context

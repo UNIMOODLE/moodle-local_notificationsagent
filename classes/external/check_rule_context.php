@@ -73,7 +73,10 @@ class check_rule_context extends \external_api {
         if (empty($instance)) {
             try {
                 throw new \moodle_exception(
-                    'nosuchinstance', '', '', get_capability_string('local/notificationsagent:nosuchinstance')
+                    'nosuchinstance',
+                    '',
+                    '',
+                    get_capability_string('local/notificationsagent:nosuchinstance')
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
@@ -91,7 +94,9 @@ class check_rule_context extends \external_api {
                 $result['hascontext'] = $instance->has_context();
             } else {
                 throw new \moodle_exception(
-                    'nopermissions', '', '',
+                    'nopermissions',
+                    '',
+                    '',
                     get_capability_string('local/notificationsagent:checkrulecontext')
                 );
             }

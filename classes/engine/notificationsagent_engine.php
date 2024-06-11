@@ -46,7 +46,6 @@ use local_notificationsagent\notificationplugin;
  * Engine class to evaluate notifications agent rules.
  */
 class notificationsagent_engine {
-
     /**
      * Evaluates a set of rules for notifications agent and performs the corresponding actions.
      *
@@ -59,7 +58,11 @@ class notificationsagent_engine {
      *
      */
     public static function notificationsagent_engine_evaluate_rule(
-        $ruleids, $timeaccess, $userid, $courseid, $triggercondition,
+        $ruleids,
+        $timeaccess,
+        $userid,
+        $courseid,
+        $triggercondition,
         $startdate
     ) {
         global $DB;
@@ -92,10 +95,12 @@ class notificationsagent_engine {
 
                                 // If the action has a specific user, send the action only to that user.
                                 // otherwise, send the action for each user.
-                                if ($hasuser
+                                if (
+                                    $hasuser
                                     && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $hasuser)
                                 ) {
-                                    if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                    if (
+                                        ($context->get_userid() == notificationsagent::GENERIC_USERID)
                                         || ($context->get_userid() == $hasuser)
                                     ) {
                                         $context->set_userid($hasuser);
@@ -113,8 +118,12 @@ class notificationsagent_engine {
                                     $parameters = helper::set_error($parameters);
                                 }
                                 $rule->record_report(
-                                    $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
-                                    $parameters, $timeaccess
+                                    $ruleid,
+                                    $context->get_userid(),
+                                    $context->get_courseid(),
+                                    $action->get_id(),
+                                    $parameters,
+                                    $timeaccess
                                 );
                             }
                             $rule->set_launched($context);
@@ -138,10 +147,12 @@ class notificationsagent_engine {
 
                             // If the action has a specific user, send the action only to that user.
                             // otherwise, send the action for each user.
-                            if ($hasuser
+                            if (
+                                $hasuser
                                 && !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
                             ) {
-                                if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                if (
+                                    ($context->get_userid() == notificationsagent::GENERIC_USERID)
                                     || ($context->get_userid() == $hasuser)
                                 ) {
                                     $context->set_userid($hasuser);
@@ -160,9 +171,13 @@ class notificationsagent_engine {
                                     $parameters = helper::set_error($parameters);
                                 }
                                 $rule->record_report(
-                                    $ruleid, $context->get_userid() == notificationsagent::GENERIC_USERID ? get_admin()->id
-                                    : $context->get_userid(), $context->get_courseid(), $action->get_id(),
-                                    $parameters, $timeaccess
+                                    $ruleid,
+                                    $context->get_userid() == notificationsagent::GENERIC_USERID ? get_admin()->id
+                                    : $context->get_userid(),
+                                    $context->get_courseid(),
+                                    $action->get_id(),
+                                    $parameters,
+                                    $timeaccess
                                 );
                             } else {
                                 $coursecontext = \context_course::instance($context->get_courseid());
@@ -174,10 +189,12 @@ class notificationsagent_engine {
 
                                     // If the action has a specific user, send the action only to that user.
                                     // otherwise, send the action for each user.
-                                    if ($hasuser
+                                    if (
+                                        $hasuser
                                         && !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
                                     ) {
-                                        if (($context->get_userid() == notificationsagent::GENERIC_USERID)
+                                        if (
+                                            ($context->get_userid() == notificationsagent::GENERIC_USERID)
                                             || ($context->get_userid() == $hasuser)
                                         ) {
                                             $context->set_userid($hasuser);
@@ -194,8 +211,12 @@ class notificationsagent_engine {
                                         $parameters = helper::set_error($parameters);
                                     }
                                     $rule->record_report(
-                                        $ruleid, $context->get_userid(), $context->get_courseid(), $action->get_id(),
-                                        $parameters, $timeaccess
+                                        $ruleid,
+                                        $context->get_userid(),
+                                        $context->get_courseid(),
+                                        $action->get_id(),
+                                        $parameters,
+                                        $timeaccess
                                     );
                                 }
                             }

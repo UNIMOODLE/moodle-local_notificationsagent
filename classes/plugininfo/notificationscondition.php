@@ -39,7 +39,6 @@ use local_notificationsagent\plugininfo\notificationsbaseinfo, core_plugin_manag
  * Information class for notifications condition plugins.
  */
 class notificationscondition extends notificationsbaseinfo {
-
     /**
      * Return uninstall allowed.
      *
@@ -66,13 +65,13 @@ class notificationscondition extends notificationsbaseinfo {
             $installed[] = 'notificationscondition_' . $plugin;
         }
 
-        list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
+        [$installed, $params] = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
         $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'disabled'", $params, 'plugin ASC');
         foreach ($disabled as $conf) {
             if (empty($conf->value)) {
                 continue;
             }
-            list($type, $name) = explode('_', $conf->plugin, 2);
+            [$type, $name] = explode('_', $conf->plugin, 2);
             unset($plugins[$name]);
         }
 
@@ -162,5 +161,4 @@ class notificationscondition extends notificationsbaseinfo {
 
         $adminroot->add($this->type . 'plugins', $settings);
     }
-
 }

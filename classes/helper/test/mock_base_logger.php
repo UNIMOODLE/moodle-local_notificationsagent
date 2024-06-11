@@ -46,7 +46,6 @@ use base_logger;
  * Class mock_base_logger.
  */
 class mock_base_logger extends base_logger {
-
     /**
      * Log a message.
      *
