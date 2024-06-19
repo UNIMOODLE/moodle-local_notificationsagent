@@ -48,7 +48,6 @@ use notificationsaction_messageagent\messageagent;
  * @group notificationsagent
  */
 class messageagent_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -108,7 +107,7 @@ class messageagent_test extends \advanced_testcase {
         self::$subplugin = new messageagent(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -198,8 +197,8 @@ class messageagent_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -236,8 +235,8 @@ class messageagent_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]

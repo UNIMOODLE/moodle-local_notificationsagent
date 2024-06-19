@@ -92,7 +92,7 @@ $string['export'] = 'Esportatu';
 $string['ruledownload'] = 'Esportatu araua honela';
 
 // Txantiloia esleitu.
-$string['assign'] = 'Esleitu';
+$string['assign'] = 'Hautatu';
 $string['type_template'] = 'Txantiloia';
 $string['type_rule'] = 'Araua';
 $string['type_sharedrule'] = 'Arau partekatua';

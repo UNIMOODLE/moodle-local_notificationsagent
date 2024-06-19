@@ -34,7 +34,6 @@ use notificationsaction_bootstrapnotifications\bootstrapmessages;
  * Observer for the notificationsaction_bootstrapnotifications plugin.
  */
 class notificationsaction_bootstrapnotifications_observer {
-
     /**
      * A function to handle the course_viewed event.
      *
@@ -54,6 +53,5 @@ class notificationsaction_bootstrapnotifications_observer {
             \core\notification::success($message->get('message'));
             $message->delete();
         }
-
     }
 }

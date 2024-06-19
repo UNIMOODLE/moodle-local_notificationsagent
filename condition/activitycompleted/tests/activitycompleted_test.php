@@ -46,7 +46,6 @@ use local_notificationsagent\form\editrule_form;
  * @group notificationsagent
  */
 class activitycompleted_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -107,7 +106,7 @@ class activitycompleted_test extends \advanced_testcase {
         self::$subplugin = new activitycompleted(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
@@ -144,14 +143,18 @@ class activitycompleted_test extends \advanced_testcase {
         self::$context->set_params(json_encode(['cmid' => $cmtestaa->cmid]));
 
         if ($expected) {
-            $DB->insert_record('course_modules_completion', ['coursemoduleid' => $cmtestaa->cmid
-                , 'userid' => self::$user->id, 'completionstate' => 1, 'timemodified' => time()]);
+            $DB->insert_record(
+                'course_modules_completion',
+                ['coursemoduleid' => $cmtestaa->cmid,
+                            'userid' => self::$user->id,
+                            'completionstate' => 1,
+                'timemodified' => time()]
+            );
         }
 
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
-
     }
 
     /**
@@ -208,8 +211,8 @@ class activitycompleted_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -241,8 +244,11 @@ class activitycompleted_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
 
         if ($completed) {
-            $DB->insert_record('course_modules_completion', ['coursemoduleid' => $cmtestent->cmid
-                , 'userid' => self::$user->id, 'completionstate' => 1, 'timemodified' => time()]);
+            $DB->insert_record(
+                'course_modules_completion',
+                ['coursemoduleid' => $cmtestent->cmid, 'userid' => self::$user->id, 'completionstate' => 1,
+                            'timemodified' => time()]
+            );
         }
 
         $result = self::$subplugin->estimate_next_time(self::$context);
@@ -297,8 +303,8 @@ class activitycompleted_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -319,7 +325,6 @@ class activitycompleted_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
-
     }
 
     /**

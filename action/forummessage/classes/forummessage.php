@@ -79,11 +79,14 @@ class forummessage extends notificationactionplugin {
         $this->get_ui_title($mform, $type);
         // Title.
         $title = $mform->createElement(
-                'text', $this->get_name_ui(self::UI_TITLE),
-                get_string(
-                        'editrule_action_element_title', 'notificationsaction_forummessage',
-                        ['typeelement' => '[TTTT]']
-                ), ['size' => '64']
+            'text',
+            $this->get_name_ui(self::UI_TITLE),
+            get_string(
+                'editrule_action_element_title',
+                'notificationsaction_forummessage',
+                ['typeelement' => '[TTTT]']
+            ),
+            ['size' => '64']
         );
 
         $editoroptions = [
@@ -93,12 +96,15 @@ class forummessage extends notificationactionplugin {
 
         // Message.
         $message = $mform->createElement(
-                'editor', $this->get_name_ui(self::UI_MESSAGE),
-                get_string(
-                        'editrule_action_element_message', 'notificationsaction_forummessage',
-                        ['typeelement' => '[BBBB]']
-                ),
-                ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+            'editor',
+            $this->get_name_ui(self::UI_MESSAGE),
+            get_string(
+                'editrule_action_element_message',
+                'notificationsaction_forummessage',
+                ['typeelement' => '[BBBB]']
+            ),
+            ['class' => 'fitem_id_templatevars_editor'],
+            $editoroptions
         );
         // Forum.
         $forumname = [];
@@ -119,14 +125,14 @@ class forummessage extends notificationactionplugin {
         asort($forumname);
 
         $cm = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_action_element_forum',
-                        'notificationsaction_forummessage',
-                        ['typeelement' => '[FFFF]']
-                ),
-                $forumname
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_action_element_forum',
+                'notificationsaction_forummessage',
+                ['typeelement' => '[FFFF]']
+            ),
+            $forumname
         );
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
@@ -137,9 +143,10 @@ class forummessage extends notificationactionplugin {
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui(self::UI_MESSAGE), ' ', 'required');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
-
     }
 
     /**
@@ -172,7 +179,7 @@ class forummessage extends notificationactionplugin {
         $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
         $forum = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $this->set_parameters(
-                json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_ACTIVITY => $forum])
+            json_encode([self::UI_TITLE => $title, self::UI_MESSAGE => $message, self::UI_ACTIVITY => $forum])
         );
         return $this->get_parameters();
     }

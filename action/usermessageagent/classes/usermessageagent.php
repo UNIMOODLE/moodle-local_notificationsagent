@@ -42,7 +42,6 @@ use local_notificationsagent\notificationactionplugin;
  * Class representing usermessageagent action plugin.
  */
 class usermessageagent extends notificationactionplugin {
-
     /** @var UI ELEMENTS */
     public const NAME = 'usermessageagent';
     /** @var UI ELEMENTS */
@@ -63,11 +62,14 @@ class usermessageagent extends notificationactionplugin {
 
         // Title.
         $title = $mform->createElement(
-            'text', $this->get_name_ui(self::UI_TITLE),
+            'text',
+            $this->get_name_ui(self::UI_TITLE),
             get_string(
-                'editrule_action_element_title', 'notificationsaction_usermessageagent',
+                'editrule_action_element_title',
+                'notificationsaction_usermessageagent',
                 ['typeelement' => '[TTTT]']
-            ), ['size' => '64']
+            ),
+            ['size' => '64']
         );
 
         $editoroptions = [
@@ -77,12 +79,15 @@ class usermessageagent extends notificationactionplugin {
 
         // Message.
         $message = $mform->createElement(
-            'editor', $this->get_name_ui(self::UI_MESSAGE),
+            'editor',
+            $this->get_name_ui(self::UI_MESSAGE),
             get_string(
-                'editrule_action_element_message', 'notificationsaction_usermessageagent',
+                'editrule_action_element_message',
+                'notificationsaction_usermessageagent',
                 ['typeelement' => '[BBBB]']
             ),
-            ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+            ['class' => 'fitem_id_templatevars_editor'],
+            $editoroptions
         );
 
         // Users.
@@ -96,13 +101,15 @@ class usermessageagent extends notificationactionplugin {
 
             foreach ($enrolledusers as $uservalue) {
                 $listusers[$uservalue->id] = format_string(
-                    $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]", true
+                    $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]",
+                    true
                 );
             }
         } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
             // User view - restricted to own user.
             $listusers[$USER->id] = format_string(
-                $USER->firstname . " " . $USER->lastname . " [" . $USER->email . "]", true
+                $USER->firstname . " " . $USER->lastname . " [" . $USER->email . "]",
+                true
             );
         }
 
@@ -114,9 +121,11 @@ class usermessageagent extends notificationactionplugin {
         asort($listusers);
 
         $user = $mform->createElement(
-            'select', $this->get_name_ui(self::UI_USER),
+            'select',
+            $this->get_name_ui(self::UI_USER),
             get_string(
-                'editrule_action_element_user', 'notificationsaction_addusergroup',
+                'editrule_action_element_user',
+                'notificationsaction_addusergroup',
                 ['typeelement' => '[UUUU]']
             ),
             $listusers
@@ -130,7 +139,9 @@ class usermessageagent extends notificationactionplugin {
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
         $mform->addRule($this->get_name_ui(self::UI_MESSAGE), ' ', 'required');
         $mform->addRule(
-            $this->get_name_ui(self::UI_USER), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::UI_USER),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

@@ -34,6 +34,7 @@
 use local_notificationsagent\notificationsagent;
 use notificationscondition_coursestart\coursestart;
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\helper\helper;
 
 /**
  * Class observer of coursestart
@@ -57,6 +58,9 @@ class notificationscondition_coursestart_observer {
         if (!isset($other["updatedfields"]["startdate"])) {
             return;
         }
+
+        // Save cache.
+        helper::set_cache_course($courseid);
 
         $pluginname = coursestart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);

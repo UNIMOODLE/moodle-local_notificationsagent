@@ -47,7 +47,6 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @group notificationsagent
  */
 class bootstrapmessages_test extends \advanced_testcase {
-
     /**
      * Test define properties.
      *
@@ -60,7 +59,5 @@ class bootstrapmessages_test extends \advanced_testcase {
         $this->assertTrue(bootstrapmessages::has_property('userid'));
         $this->assertTrue(bootstrapmessages::has_property('courseid'));
         $this->assertTrue(bootstrapmessages::has_property('message'));
-
     }
-
 }

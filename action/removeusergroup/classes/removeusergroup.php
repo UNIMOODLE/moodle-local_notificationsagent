@@ -45,7 +45,6 @@ use local_notificationsagent\rule;
  * Class for removeusergroup.
  */
 class removeusergroup extends notificationactionplugin {
-
     /** @var UI ELEMENTS */
     public const NAME = 'removeusergroup';
 
@@ -65,7 +64,8 @@ class removeusergroup extends notificationactionplugin {
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
-                    $item->name, true
+                $item->name,
+                true
             );
         }
 
@@ -77,19 +77,22 @@ class removeusergroup extends notificationactionplugin {
         asort($listgroups);
 
         $group = $mform->createElement(
-                'select', $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_action_element_group', 'notificationsaction_removeusergroup',
-                        ['typeelement' => '[GGGG]']
-                ),
-                $listgroups
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_action_element_group',
+                'notificationsaction_removeusergroup',
+                ['typeelement' => '[GGGG]']
+            ),
+            $listgroups
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -261,9 +264,9 @@ class removeusergroup extends notificationactionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                    'Restored item (' . $this->get_pluginname() . ')
+                'Restored item (' . $this->get_pluginname() . ')
                 has groupid on action that was not restored',
-                    \backup::LOG_WARNING
+                \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

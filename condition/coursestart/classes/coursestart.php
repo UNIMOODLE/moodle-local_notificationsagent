@@ -35,6 +35,7 @@ namespace notificationscondition_coursestart;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\notificationconditionplugin;
 
 /**
@@ -73,29 +74,16 @@ class coursestart extends notificationconditionplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(evaluationcontext $context): bool {
-        global $DB;
-
         $courseid = $context->get_courseid();
-        $userid = $context->get_userid();
-        $pluginname = $this->get_subtype();
         $params = json_decode($context->get_params());
         $meetcondition = false;
-        $conditionid = $this->get_id();
-
         $timeaccess = $context->get_timeaccess();
 
-        $timestart = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
-        );
-
-        if (empty($timestart)) {
-            $course = get_course($courseid);
+        if ($course = helper::get_cache_course($courseid)) {
             $timestart = $course->startdate + $params->{self::UI_TIME};
+            $meetcondition = ($timeaccess >= $timestart);
         }
 
-        ($timeaccess >= $timestart) ? $meetcondition = true : $meetcondition = false;
         return $meetcondition;
     }
 
@@ -107,33 +95,29 @@ class coursestart extends notificationconditionplugin {
      * @return int|mixed|null
      */
     public function estimate_next_time(evaluationcontext $context) {
-        global $DB, $COURSE;
-
         $timestart = null;
         $params = json_decode($context->get_params());
         $courseid = $context->get_courseid();
 
-        if ($COURSE->id == $courseid) {
-            $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
-        } else {
-            $course = get_course($courseid);
-        }
-
-        $timeaccess = $context->get_timeaccess();
-        // Condition.
-        if (!$context->is_complementary()) {
-            if ($timeaccess <= ($course->startdate + $params->{self::UI_TIME})) {
-                $timestart = max(time(), $course->startdate + $params->{self::UI_TIME});
-            } else {
+        if ($course = helper::get_cache_course($courseid)) {
+            $coursestart = $course->startdate;
+            $timeaccess = $context->get_timeaccess();
+            // Condition.
+            if (!$context->is_complementary()) {
+                if ($timeaccess <= ($coursestart + $params->{self::UI_TIME})) {
+                    $timestart = max(time(), $coursestart + $params->{self::UI_TIME});
+                } else {
+                    return time();
+                }
+            }
+            // Exception.
+            if (($timeaccess <= $coursestart + $params->{self::UI_TIME} && $timeaccess >= $coursestart)
+                    && $context->is_complementary()
+            ) {
                 return time();
             }
         }
-        // Exception.
-        if (($timeaccess <= $course->startdate + $params->{self::UI_TIME} && $timeaccess >= $course->startdate)
-                && $context->is_complementary()
-        ) {
-            return time();
-        }
+
         return $timestart;
     }
 

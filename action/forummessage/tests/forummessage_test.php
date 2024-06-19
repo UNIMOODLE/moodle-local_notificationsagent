@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class forummessage_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -105,7 +104,7 @@ class forummessage_test extends \advanced_testcase {
         self::$subplugin = new forummessage(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -194,8 +193,8 @@ class forummessage_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -368,5 +367,4 @@ class forummessage_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

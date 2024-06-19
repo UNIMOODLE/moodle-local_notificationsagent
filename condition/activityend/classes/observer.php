@@ -40,7 +40,6 @@ use local_notificationsagent\rule;
  * Class notificationscondition_activityend_observer
  */
 class notificationscondition_activityend_observer {
-
     /**
      * Updates the course module when it is modified.
      *

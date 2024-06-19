@@ -80,7 +80,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -195,6 +195,5 @@ class activitylastsend_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(activitylastsend_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

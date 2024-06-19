@@ -47,7 +47,6 @@ use notificationsaction_bootstrapnotifications\bootstrapnotifications;
  * @group notificationsagent
  */
 class bootstrapnotifications_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -108,7 +107,7 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
         self::$subplugin = new bootstrapnotifications(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -162,7 +161,6 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
             $this->assertEquals($message, $SESSION->notifications[0]->message);
             $this->assertEquals('success', $SESSION->notifications[0]->type);
         }
-
     }
 
     /**
@@ -176,5 +174,4 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
                 'message 2' => ['{"message":"Message content"}', 0],
         ];
     }
-
 }

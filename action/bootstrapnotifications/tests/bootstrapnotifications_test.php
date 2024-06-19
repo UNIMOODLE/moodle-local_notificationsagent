@@ -47,7 +47,6 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @group notificationsagent
  */
 class bootstrapnotifications_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -110,7 +109,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
         self::$subplugin = new bootstrapnotifications(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -143,7 +142,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
         self::$subplugin->execute_action(self::$context, $param);
 
         $messages = bootstrapmessages::get_records(
-                ['userid' => self::$context->get_userid(), 'courseid' => self::$context->get_courseid()]
+            ['userid' => self::$context->get_userid(), 'courseid' => self::$context->get_courseid()]
         );
 
         $params = self::$context->get_params();
@@ -198,8 +197,8 @@ class bootstrapnotifications_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -227,7 +226,6 @@ class bootstrapnotifications_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertEquals($expected, $result);
-
     }
 
     /**
@@ -266,8 +264,9 @@ class bootstrapnotifications_test extends \advanced_testcase {
     public function test_processmarkups() {
         $uimessage = 'test message';
         $expected = str_replace(
-                self::$subplugin->get_elements(), [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $uimessage))],
-                self::$subplugin->get_title()
+            self::$subplugin->get_elements(),
+            [shorten_text(str_replace('{' . Rule::SEPARATOR . '}', ' ', $uimessage))],
+            self::$subplugin->get_title()
         );
         $params[self::$subplugin::UI_MESSAGE] = $uimessage;
         $params = json_encode($params);

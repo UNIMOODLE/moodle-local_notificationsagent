@@ -41,7 +41,6 @@ use notificationsaction_bootstrapnotifications\bootstrapmessages;
  * Class representing a bootstrapnotifications action plugin.
  */
 class bootstrapnotifications extends notificationactionplugin {
-
     /** @var UI ELEMENTS */
     public const NAME = 'bootstrapnotifications';
     /** @var UI ELEMENTS */
@@ -58,18 +57,23 @@ class bootstrapnotifications extends notificationactionplugin {
         $this->get_ui_title($mform, $type);
 
         $element = $mform->createElement(
-                'text', $this->get_name_ui(self::UI_MESSAGE),
-                get_string(
-                        'editrule_action_element_text', 'notificationsaction_bootstrapnotifications',
-                        ['typeelement' => '[TTTT]']
-                ), ['size' => '64']
+            'text',
+            $this->get_name_ui(self::UI_MESSAGE),
+            get_string(
+                'editrule_action_element_text',
+                'notificationsaction_bootstrapnotifications',
+                ['typeelement' => '[TTTT]']
+            ),
+            ['size' => '64']
         );
 
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_TEXT);
         $mform->addRule(
-                $this->get_name_ui(self::UI_MESSAGE), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::UI_MESSAGE),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

@@ -114,8 +114,8 @@ class helper {
      */
     public static function get_module_url($courseid, $cmid) {
         return new moodle_url(
-            get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
-            ['id' => $cmid]
+                get_fast_modinfo($courseid)->get_cm($cmid)->url->get_path(),
+                ['id' => $cmid]
         );
     }
 
@@ -135,7 +135,7 @@ class helper {
         return !empty($cmid)
                 ? self::get_module_url($context->get_courseid(), $cmid)
                 : self::get_course_url(
-                    $context->get_courseid()
+                        $context->get_courseid()
                 );
     }
 
@@ -178,9 +178,9 @@ class helper {
         global $DB;
         $courses = $category->get_courses();
         $count = $category->coursecount;
-        $coursesarry = [];
+        $coursesarray = [];
         foreach ($courses as $course) {
-            $coursesarry[] = [
+            $coursesarray[] = [
                     'id' => $course->id,
                     'name' => format_text($course->fullname),
             ];
@@ -190,7 +190,7 @@ class helper {
                 'id' => $category->id,
                 'name' => format_text($category->name),
                 'categories' => [],
-                'courses' => $coursesarry,
+                'courses' => $coursesarray,
                 'count' => $count,
         ];
 
@@ -249,9 +249,9 @@ class helper {
                     "data-parent" => "#category-listing-content-" . $categoryid,
             ]);
             $output .= html_writer::tag(
-                "label",
-                "",
-                ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
+                    "label",
+                    "",
+                    ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
             );
             $output .= html_writer::end_div(); // ... .custom-checkbox
             $output .= html_writer::start_div("", [
@@ -287,18 +287,18 @@ class helper {
                     $output .= html_writer::start_div("", ["class" => "d-flex"]);
                     $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
                     $output .= html_writer::tag(
-                        "input",
-                        "",
-                        [
+                            "input",
+                            "",
+                            [
                                     "id" => "checkboxcourse-" . $course["id"],
                                     "type" => "checkbox", "class" => "custom-control-input",
                                     "data-parent" => "#category-listing-content-" . $category["id"],
                             ]
                     );
                     $output .= html_writer::tag(
-                        "label",
-                        "",
-                        ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
+                            "label",
+                            "",
+                            ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
                     );
                     $output .= html_writer::end_div(); // ... .custom-checkbox
                     $output .= html_writer::start_div("", ["class" => "coursename"]);
@@ -327,9 +327,9 @@ class helper {
         $userid = $rule->get_createdby();
         $title = $rule->get_name() . " " . get_string('status_broken', 'local_notificationsagent');
         $text = get_string(
-            'brokenrulebody',
-            'local_notificationsagent',
-            [
+                'brokenrulebody',
+                'local_notificationsagent',
+                [
                         'course' => get_course($courseid)->fullname,
                         'rule' => $rule->get_name(),
                 ]
@@ -346,9 +346,9 @@ class helper {
         $message->smallmessage = shorten_text(format_text($text));
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
         $message->contexturl = (new \moodle_url(
-            '/local/notificationsagent/editrule.php?courseid=' . $courseid . '&action=edit&ruleid=' . $ruleid
+                '/local/notificationsagent/editrule.php?courseid=' . $courseid . '&action=edit&ruleid=' . $ruleid
         ))->out(
-            false
+                false
         ); // A relevant URL for the notification.
         $message->contexturlname = get_string('fullrule', 'local_notificationsagent'); // Link title explaining where users get
         // to  for the contexturl.
@@ -419,4 +419,42 @@ class helper {
         $json['error'] = get_string('actionerror', 'local_notificationsagent');
         return json_encode($json);
     }
+
+    /**
+     * Get the course cache
+     *
+     * @param int $courseid The ID of the course.
+     *
+     * @return \stdClass A course object
+     */
+    public static function get_cache_course($courseid) {
+        global $DB;
+        $cache = \cache::make('local_notificationsagent', 'course');
+        $coursecache = $cache->get($courseid) ? $cache->get($courseid) : null;
+        if (is_null($coursecache)) {
+            if ($coursecache = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST)) {
+                $cache->set($courseid, $coursecache);
+            }
+        }
+
+        return $coursecache;
+    }
+
+    /**
+     * Set the course cache
+     *
+     * @param int $courseid The ID of the course.
+     *
+     * @return \stdClass A course object
+     */
+    public static function set_cache_course($courseid) {
+        global $DB;
+        $cache = \cache::make('local_notificationsagent', 'course');
+        if ($coursecache = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST)) {
+            $cache->set($courseid, $coursecache);
+        }
+
+        return $coursecache;
+    }
+
 }

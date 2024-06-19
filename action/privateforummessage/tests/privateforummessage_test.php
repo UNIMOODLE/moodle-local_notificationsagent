@@ -47,7 +47,6 @@ use notificationsaction_privateforummessage\privateforummessage;
  * @group notificationsagent
  */
 class privateforummessage_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -107,7 +106,7 @@ class privateforummessage_test extends \advanced_testcase {
         self::$subplugin = new privateforummessage(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -152,8 +151,8 @@ class privateforummessage_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
         // Conditions.
         $DB->insert_record(
-                'notificationsagent_condition',
-                [
+            'notificationsagent_condition',
+            [
                         'ruleid' => $ruleid, 'type' => 'condition', 'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
                         'parameters' => $param,
                         'pluginname' => 'forumnoreply', 'cmid' => $cmtestapf->cmid,
@@ -163,8 +162,8 @@ class privateforummessage_test extends \advanced_testcase {
                 . '}';
 
         $DB->insert_record(
-                'notificationsagent_action',
-                [
+            'notificationsagent_action',
+            [
                         'pluginname' => self::$subtype, 'type' => 'action',
                         'parameters' => $actionparam,
                         'cmid' => $cmtestapf->cmid,
@@ -259,8 +258,8 @@ class privateforummessage_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -426,7 +425,6 @@ class privateforummessage_test extends \advanced_testcase {
         $obj->course = self::$coursetest->id;
 
         $this->assertIsInt(privateforummessage::forum_add_post($obj));
-
     }
 
     /**
@@ -445,5 +443,4 @@ class privateforummessage_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

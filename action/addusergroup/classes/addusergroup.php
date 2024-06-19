@@ -46,7 +46,6 @@ use local_notificationsagent\evaluationcontext;
  * Class representing the addusergroup action plugin.
  */
 class addusergroup extends notificationactionplugin {
-
     /** @var UI ELEMENTS */
     public const NAME = 'addusergroup';
 
@@ -66,7 +65,8 @@ class addusergroup extends notificationactionplugin {
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
-                    $item->name, true
+                $item->name,
+                true
             );
         }
         // Only is template.
@@ -77,19 +77,22 @@ class addusergroup extends notificationactionplugin {
         asort($listgroups);
 
         $group = $mform->createElement(
-                'select', $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_action_element_group', 'notificationsaction_addusergroup',
-                        ['typeelement' => '[GGGG]']
-                ),
-                $listgroups
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_action_element_group',
+                'notificationsaction_addusergroup',
+                ['typeelement' => '[GGGG]']
+            ),
+            $listgroups
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -261,9 +264,9 @@ class addusergroup extends notificationactionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                    'Restored item (' . $this->get_pluginname() . ')
+                'Restored item (' . $this->get_pluginname() . ')
                 has groupid on action that was not restored',
-                    \backup::LOG_WARNING
+                \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

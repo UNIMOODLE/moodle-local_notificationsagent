@@ -43,7 +43,6 @@ use notificationscondition_activityopen\activityopen;
  * @group notificationsagent
  */
 class activityopen_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -95,7 +94,6 @@ class activityopen_observer_test extends \advanced_testcase {
             ])
         );
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
-
     }
 
     /**

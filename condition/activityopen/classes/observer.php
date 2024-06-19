@@ -41,7 +41,6 @@ use local_notificationsagent\rule;
  * Class notificationscondition_activityopen_observer
  */
 class notificationscondition_activityopen_observer {
-
     /**
      * Updates the course module when it is modified.
      *

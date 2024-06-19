@@ -196,7 +196,7 @@ Feature: Testing rules management in notifications agent plugin
     And I should see "Testing rule1"
     And I should see "Active"
     And I wait "2" seconds
-    When I click on "Assign" "link"
+    When I click on "Select" "link"
     And I click on "checkboxcategory-1" "checkbox"
     And I click on "saveassignTemplateModal" "button"
     And I wait "2" seconds
@@ -242,7 +242,7 @@ Feature: Testing rules management in notifications agent plugin
     And I should see "Testing rule1"
     And I should see "Active"
     And I wait "2" seconds
-    When I click on "Assign" "link"
+    When I click on "Select" "link"
     And I click on "checkboxcategory-1" "checkbox"
     And I click on "forced" "checkbox"
     And I click on "saveassignTemplateModal" "button"
@@ -311,7 +311,7 @@ Feature: Testing rules management in notifications agent plugin
     And I should see "Testing rule1"
     And I should see "Active"
     And I wait "2" seconds
-    When I click on "Assign" "link"
+    When I click on "Select" "link"
     And I click on "checkboxcategory-1" "checkbox"
     And I click on "saveassignTemplateModal" "button"
     And I wait "1" seconds

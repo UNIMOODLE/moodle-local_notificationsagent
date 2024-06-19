@@ -41,7 +41,6 @@ use local_notificationsagent\notificationactionplugin;
  * Class representing a messageagent action plugin.
  */
 class messageagent extends notificationactionplugin {
-
     /** @var UI ELEMENTS */
     public const NAME = 'messageagent';
 
@@ -56,11 +55,14 @@ class messageagent extends notificationactionplugin {
         $this->get_ui_title($mform, $type);
 
         $title = $mform->createElement(
-                'text', $this->get_name_ui(self::UI_TITLE),
-                get_string(
-                        'editrule_action_title', 'notificationsaction_messageagent',
-                        ['typeelement' => '[TTTT]']
-                ), ['size' => '64']
+            'text',
+            $this->get_name_ui(self::UI_TITLE),
+            get_string(
+                'editrule_action_title',
+                'notificationsaction_messageagent',
+                ['typeelement' => '[TTTT]']
+            ),
+            ['size' => '64']
         );
 
         $editoroptions = [
@@ -69,12 +71,15 @@ class messageagent extends notificationactionplugin {
         ];
 
         $message = $mform->createElement(
-                'editor', $this->get_name_ui(self::UI_MESSAGE),
-                get_string(
-                        'editrule_action_message', 'notificationsaction_messageagent',
-                        ['typeelement' => '[BBBB]']
-                ),
-                ['class' => 'fitem_id_templatevars_editor'], $editoroptions
+            'editor',
+            $this->get_name_ui(self::UI_MESSAGE),
+            get_string(
+                'editrule_action_message',
+                'notificationsaction_messageagent',
+                ['typeelement' => '[BBBB]']
+            ),
+            ['class' => 'fitem_id_templatevars_editor'],
+            $editoroptions
         );
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
@@ -184,8 +189,8 @@ class messageagent extends notificationactionplugin {
         if ($message->notification === 0) {
             // It's a private conversation between users.
             $conversation = \core_message\api::create_conversation(
-                    \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
-                    [
+                \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
+                [
                             is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
                             $userto,
                     ]
@@ -197,7 +202,7 @@ class messageagent extends notificationactionplugin {
             $message->userto = $userto;
         }
         $message->contexturl = (new \moodle_url('/course/view.php?id=' . $context->get_courseid()))->out(
-                false
+            false
         ); // A relevant URL for the notification.
         $message->contexturlname = get_string('course'); // Link title explaining where users get to for the contexturl.
 

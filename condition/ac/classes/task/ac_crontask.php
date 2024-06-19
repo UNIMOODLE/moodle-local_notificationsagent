@@ -42,7 +42,6 @@ use notificationscondition_ac\ac;
  * Class ac_crontask
  */
 class ac_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *

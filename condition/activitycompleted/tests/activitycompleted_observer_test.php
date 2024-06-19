@@ -48,7 +48,6 @@ use notificationscondition_activitycompleted\activitycompleted;
  * @group notificationsagent
  */
 class activitycompleted_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -104,7 +103,7 @@ class activitycompleted_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                         'enablecompletion' => true,
@@ -188,7 +187,6 @@ class activitycompleted_observer_test extends \advanced_testcase {
             $this->assertEmpty($cache);
             $this->assertEmpty($trigger);
         }
-
     }
 
     /**
@@ -202,5 +200,4 @@ class activitycompleted_observer_test extends \advanced_testcase {
                 [COMPLETION_INCOMPLETE],
         ];
     }
-
 }

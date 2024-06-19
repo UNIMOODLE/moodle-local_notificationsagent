@@ -40,6 +40,10 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'simpledata' => true,
     ],
+    'course' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simpledata' => true,
+    ],
     notificationplugin::TYPE_CONDITION => [
         'mode' => cache_store::MODE_APPLICATION,
         'simpledata' => true,

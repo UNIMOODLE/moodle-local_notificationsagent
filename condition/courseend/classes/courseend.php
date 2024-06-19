@@ -35,6 +35,7 @@ namespace notificationscondition_courseend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\notificationconditionplugin;
 
 /**
@@ -73,28 +74,17 @@ class courseend extends notificationconditionplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(evaluationcontext $context): bool {
-        global $DB;
-
         $courseid = $context->get_courseid();
-        $userid = $context->get_userid();
-        $pluginname = $this->get_subtype();
         $params = json_decode($context->get_params());
         $meetcondition = false;
-        $conditionid = $this->get_id();
 
         $timeaccess = $context->get_timeaccess();
 
-        $timeend = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
-        );
-        $course = get_course($courseid);
-        if (empty($timeend)) {
+        if ($course = helper::get_cache_course($courseid)) {
             $timeend = $course->enddate - $params->{self::UI_TIME};
+            $meetcondition = ($timeaccess >= $timeend) && ($timeaccess <= $course->enddate);
         }
 
-        ($timeaccess >= $timeend) && ($timeaccess <= $course->enddate) ? $meetcondition = true : $meetcondition = false;
         return $meetcondition;
     }
 
@@ -110,28 +100,26 @@ class courseend extends notificationconditionplugin {
         $time = $params->{self::UI_TIME};
         $timeaccess = $context->get_timeaccess();
         $courseid = $context->get_courseid();
-        if ($COURSE->id == $courseid) {
-            $courseend = $DB->get_field('course', 'enddate', ['id' => $courseid]);
-        } else {
-            $courseend = get_course($courseid)->enddate;
-        }
-
-        // Condition.
-        if (!$context->is_complementary()) {
-            if ($timeaccess <= $courseend - $time) {
-                $timeend = $courseend - $time;
-            } else if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
-                $timeend = time();
+        if ($course = helper::get_cache_course($courseid)) {
+            $courseend = $course->enddate;
+            // Condition.
+            if (!$context->is_complementary()) {
+                if ($timeaccess <= $courseend - $time) {
+                    $timeend = $courseend - $time;
+                } else if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
+                    $timeend = time();
+                }
+            }
+            // Exception.
+            if ($context->is_complementary()) {
+                if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
+                    $timeend = $courseend;
+                } else {
+                    $timeend = time();
+                }
             }
         }
-        // Exception.
-        if ($context->is_complementary()) {
-            if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
-                $timeend = $courseend;
-            } else {
-                $timeend = time();
-            }
-        }
+        
         return $timeend;
     }
 

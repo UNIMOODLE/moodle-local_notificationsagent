@@ -146,7 +146,7 @@ Feature: Testing templates management in notifications agent plugin
     And I should see "Testing template1"
     And I should see "template"
     And I wait "2" seconds
-    When I click on "Assign" "link"
+    When I click on "Select" "link"
     And I click on "checkboxcategory-1" "checkbox"
     And I click on "saveassignTemplateModal" "button"
     And I wait "2" seconds
@@ -224,7 +224,7 @@ Feature: Testing templates management in notifications agent plugin
     And I should see "Testing template1"
     And I should see "template"
     And I wait "2" seconds
-    And I click on "Assign" "link"
+    And I click on "Select" "link"
     And I click on "checkboxcategory-1" "checkbox"
     And I click on "saveassignTemplateModal" "button"
     And I wait "1" seconds

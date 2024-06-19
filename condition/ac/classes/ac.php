@@ -38,7 +38,6 @@ use local_notificationsagent\form\editrule_form;
  * Class representing the availability condition plugin.
  */
 class ac extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */

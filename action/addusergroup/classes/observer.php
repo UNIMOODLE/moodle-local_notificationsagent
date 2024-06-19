@@ -41,7 +41,6 @@ use notificationsaction_addusergroup\addusergroup;
  * Event handler for addusergroup subplugin.
  */
 class notificationsaction_addusergroup_observer {
-
     /**
      * Triggered when 'group_deleted' event is triggered.
      *
@@ -67,7 +66,8 @@ class notificationsaction_addusergroup_observer {
                 $result = $subplugin->validation($event->courseid);
                 if (!$result) {
                     update_rule_status::execute(
-                            $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid,
+                        rule::PAUSE_RULE,
                     );
                     helper::broken_rule_notify($event->courseid, $data->ruleid);
                 }

@@ -92,7 +92,7 @@ $string['export'] = 'Exportar';
 $string['ruledownload'] = 'Exportar regla como';
 
 // Assign Template.
-$string['assign'] = 'Asignar';
+$string['assign'] = 'Seleccionar';
 $string['type_template'] = 'Plantilla';
 $string['type_rule'] = 'Regla';
 $string['type_sharedrule'] = 'Regla compartida';

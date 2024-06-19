@@ -132,8 +132,8 @@ class custominfo extends info {
         $children = $getavailabilitytree->get_all_children('core_availability\tree');
         if (!empty($children[$complementary])) {
             $conditions = $children[$complementary]->get_all_children('core_availability\condition');
-            list($innernot) = $children[$complementary]->get_logic_flags(
-                    $complementary == notificationplugin::COMPLEMENTARY_EXCEPTION
+            [$innernot] = $children[$complementary]->get_logic_flags(
+                $complementary == notificationplugin::COMPLEMENTARY_EXCEPTION
             );
             foreach ($conditions as $child) {
                 $childdescription = $child->get_description(true, $innernot, $this);
@@ -173,7 +173,7 @@ class custominfo extends info {
                 $instance = new $classname($child);
 
                 if ($type == 'completion') {
-                    list($selfcmid, $selfsectionid) = $instance->get_selfids($this);
+                    [$selfcmid, $selfsectionid] = $instance->get_selfids($this);
                     $cmid = $instance->get_cmid($course, $selfcmid, $selfsectionid);
 
                     if (!array_key_exists($cmid, $modinfo->cms) || $modinfo->cms[$cmid]->deletioninprogress) {
@@ -208,7 +208,6 @@ class custominfo extends info {
                         }
                     }
                 }
-
             } catch (moodle_exception $e) {
                 return false;
             }
@@ -283,12 +282,14 @@ class customtree extends \core_availability\tree {
             throw new \coding_exception('Invalid availability structure (missing ->op)');
         }
         $this->op = $structure->op;
-        if (!in_array($this->op, [
+        if (
+            !in_array($this->op, [
                 self::OP_AND,
                 self::OP_OR,
                 self::OP_NOT_AND,
                 self::OP_NOT_OR,
-        ], true)) {
+            ], true)
+        ) {
             throw new \coding_exception('Invalid availability structure (unknown ->op)');
         }
 
@@ -300,18 +301,18 @@ class customtree extends \core_availability\tree {
                 // Per-child show options.
                 if (!isset($structure->showc)) {
                     throw new \coding_exception(
-                            'Invalid availability structure (missing ->showc)'
+                        'Invalid availability structure (missing ->showc)'
                     );
                 }
                 if (!is_array($structure->showc)) {
                     throw new \coding_exception(
-                            'Invalid availability structure (->showc not array)'
+                        'Invalid availability structure (->showc not array)'
                     );
                 }
                 foreach ($structure->showc as $value) {
                     if (!is_bool($value)) {
                         throw new \coding_exception(
-                                'Invalid availability structure (->showc value not bool)'
+                            'Invalid availability structure (->showc value not bool)'
                         );
                     }
                 }
@@ -325,12 +326,12 @@ class customtree extends \core_availability\tree {
                 // There might as well be only one value.).
                 if (!isset($structure->show)) {
                     throw new \coding_exception(
-                            'Invalid availability structure (missing ->show)'
+                        'Invalid availability structure (missing ->show)'
                     );
                 }
                 if (!is_bool($structure->show)) {
                     throw new \coding_exception(
-                            'Invalid availability structure (->show not bool)'
+                        'Invalid availability structure (->show not bool)'
                     );
                 }
                 $this->show = $structure->show;

@@ -48,7 +48,6 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @group notificationsagent
  */
 class usermessageagent_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -107,7 +106,7 @@ class usermessageagent_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
 
         $rule = new rule();
@@ -216,8 +215,8 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -257,8 +256,8 @@ class usermessageagent_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -379,5 +378,4 @@ class usermessageagent_test extends \advanced_testcase {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
-
 }

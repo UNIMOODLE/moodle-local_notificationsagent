@@ -47,7 +47,6 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @group notificationsagent
  */
 class ac_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -108,7 +107,7 @@ class ac_test extends \advanced_testcase {
         self::$subplugin = new ac(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
@@ -136,7 +135,6 @@ class ac_test extends \advanced_testcase {
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
-
     }
 
     /**
@@ -254,8 +252,8 @@ class ac_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]

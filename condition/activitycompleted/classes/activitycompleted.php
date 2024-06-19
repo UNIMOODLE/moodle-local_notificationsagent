@@ -41,7 +41,6 @@ use local_notificationsagent\evaluationcontext;
  * Activitycompleted subplugin class
  */
 class activitycompleted extends notificationconditionplugin {
-
     /**
      * @var string Subplugin name
      */
@@ -67,7 +66,7 @@ class activitycompleted extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -84,12 +83,12 @@ class activitycompleted extends notificationconditionplugin {
         $params = json_decode($context->get_params());
 
         $cache = $DB->record_exists('notificationsagent_cache', [
-            'pluginname' => $pluginname, 'conditionid' => $conditionid,
-            'courseid' => $courseid, 'userid' => $userid,
+                'pluginname' => $pluginname, 'conditionid' => $conditionid,
+                'courseid' => $courseid, 'userid' => $userid,
         ]);
 
         if (!$cache) {
-            list($course, $cm) = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
+            [$course, $cm] = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
 
             $cinfo = new \completion_info($course);
             $cminfo = $cinfo->get_data($cm, false, $userid);
@@ -132,9 +131,9 @@ class activitycompleted extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -155,7 +154,8 @@ class activitycompleted extends notificationconditionplugin {
             'select',
             $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
-                'editrule_condition_activity', 'notificationscondition_activitycompleted',
+                'editrule_condition_activity',
+                'notificationscondition_activitycompleted',
                 ['typeelement' => '[AAAA]']
             ),
             $listactivities
@@ -163,7 +163,8 @@ class activitycompleted extends notificationconditionplugin {
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -203,9 +204,9 @@ class activitycompleted extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */

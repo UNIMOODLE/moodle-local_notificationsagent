@@ -43,7 +43,6 @@ use local_notificationsagent\rule;
  * Class activityopen.
  */
 class activityopen extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -88,9 +87,9 @@ class activityopen extends notificationconditionplugin {
         $conditionid = $this->get_id();
 
         $timestart = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timestart)) {
@@ -121,7 +120,8 @@ class activityopen extends notificationconditionplugin {
             }
         }
         // Exception.
-        if (($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime)
+        if (
+            ($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime)
                 && $context->is_complementary()
         ) {
             return time();
@@ -154,20 +154,22 @@ class activityopen extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_activityopen',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activityopen',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

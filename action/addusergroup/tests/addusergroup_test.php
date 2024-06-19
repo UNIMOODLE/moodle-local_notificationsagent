@@ -47,7 +47,6 @@ use notificationsaction_addusergroup\addusergroup;
  * @group notificationsagent
  */
 class addusergroup_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -297,5 +296,4 @@ class addusergroup_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

@@ -42,7 +42,6 @@ use local_notificationsagent\rule;
  * This class handles the condition of activity last send.
  */
 class activitylastsend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -84,9 +83,9 @@ class activitylastsend extends notificationconditionplugin {
         $conditionid = $this->get_id();
 
         $timelastsend = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (!empty($timelastsend)) {
@@ -114,7 +113,8 @@ class activitylastsend extends notificationconditionplugin {
 
         // Condition.
         if (!$context->is_complementary()) {
-            if ($timeaccess >= $lastsendtime->timemodified
+            if (
+                $timeaccess >= $lastsendtime->timemodified
                     && $timeaccess <= $lastsendtime->timemodified +
                     $params->{self::UI_TIME}
             ) {
@@ -125,7 +125,8 @@ class activitylastsend extends notificationconditionplugin {
         }
 
         // Exception.
-        if ($timeaccess >= $lastsendtime->timemodified
+        if (
+            $timeaccess >= $lastsendtime->timemodified
                 && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
                 && $context->is_complementary()
         ) {
@@ -159,20 +160,22 @@ class activitylastsend extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activitysinceend',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -282,8 +285,8 @@ class activitylastsend extends notificationconditionplugin {
         ';
 
         return $DB->get_record_sql(
-                $sql,
-                [
+            $sql,
+            [
                         'cmid' => $cmid,
                         'userid' => $userid,
                         'time' => $conditiontime,

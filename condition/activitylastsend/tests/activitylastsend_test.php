@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class activitylastsend_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -111,7 +110,7 @@ class activitylastsend_test extends \advanced_testcase {
         self::$subplugin = new activitylastsend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -121,8 +120,8 @@ class activitylastsend_test extends \advanced_testcase {
         self::$subtype = 'activitylastsend';
         self::$elements = ['[TTTT]', '[AAAA]'];
         self::$cmtestls = self::getDataGenerator()->create_module(
-                "assign",
-                [
+            "assign",
+            [
                         'name' => 'Assign unittest',
                         'course' => self::$coursetest->id,
                 ],
@@ -206,8 +205,8 @@ class activitylastsend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -317,7 +316,6 @@ class activitylastsend_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
-
     }
 
     /**
@@ -334,9 +332,11 @@ class activitylastsend_test extends \advanced_testcase {
         $params[self::$subplugin::UI_TIME] = $time;
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(),
-                [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
-                self::$subplugin->get_title());
+        $expected = str_replace(
+            self::$subplugin->get_elements(),
+            [\local_notificationsagent\helper\helper::to_human_format($time, true), $cmgen->name],
+            self::$subplugin->get_title()
+        );
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -424,7 +424,7 @@ class activitylastsend_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 
@@ -465,7 +465,10 @@ class activitylastsend_test extends \advanced_testcase {
         }
 
         $data = activitylastsend::get_cmidfiles(
-                $assigncm->cmid, self::$user->id, 86400, $crontimestarted
+            $assigncm->cmid,
+            self::$user->id,
+            86400,
+            $crontimestarted
         );
 
         if (!is_null($fileuploadtime)) {
@@ -474,7 +477,6 @@ class activitylastsend_test extends \advanced_testcase {
         } else {
             $this->assertEmpty($data);
         }
-
     }
 
     /**
@@ -507,5 +509,4 @@ class activitylastsend_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

@@ -41,7 +41,6 @@ use notificationsaction_removeusergroup\removeusergroup;
  * Event handler for removeusergroup subplugin.
  */
 class notificationsaction_removeusergroup_observer {
-
     /**
      * Triggered when 'group_deleted' event is triggered.
      *
@@ -67,7 +66,8 @@ class notificationsaction_removeusergroup_observer {
                 $result = $subplugin->validation($event->courseid);
                 if (!$result) {
                     update_rule_status::execute(
-                        $data->ruleid, rule::PAUSE_RULE,
+                        $data->ruleid,
+                        rule::PAUSE_RULE,
                     );
                     helper::broken_rule_notify($event->courseid, $data->ruleid);
                 }

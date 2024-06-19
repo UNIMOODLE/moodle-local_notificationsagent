@@ -44,7 +44,6 @@ use notificationscondition_activityend\activityend;
  * @group notificationsagent
  */
 class activityend_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -90,7 +89,7 @@ class activityend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
 
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -102,7 +101,6 @@ class activityend_observer_test extends \advanced_testcase {
             $$key = $value;
         }
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course, $role);
-
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\helper\helper;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_courseend\courseend;
 
@@ -57,6 +58,9 @@ class notificationscondition_courseend_observer {
         if (!isset($other["updatedfields"]["enddate"])) {
             return;
         }
+
+        // Save cache.
+        helper::set_cache_course($courseid);
 
         $pluginname = courseend::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);

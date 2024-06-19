@@ -33,6 +33,7 @@
 
 namespace local_notificationsagent;
 
+use local_notificationsagent\helper\helper;
 use stdClass;
 
 /**
@@ -632,11 +633,15 @@ class notificationsagent {
             }
 
             if (empty($dates->timestart)) {
-                $dates->timestart = get_course($modtype->course)->startdate;
+                if ($course = helper::get_cache_course($modtype->course)) {
+                    $dates->timestart = $course->startdate;    
+                }
             }
 
             if (empty($dates->timeend)) {
-                $dates->timeend = get_course($modtype->course)->enddate;
+                if ($course = helper::get_cache_course($modtype->course)) {
+                    $dates->timeend = $course->enddate;    
+                }
             }
         }
 

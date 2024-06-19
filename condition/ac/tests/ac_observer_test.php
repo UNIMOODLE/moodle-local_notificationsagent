@@ -47,7 +47,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class ac_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -118,7 +117,7 @@ class ac_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -207,5 +206,4 @@ class ac_observer_test extends \advanced_testcase {
         $rule = self::$rule::create_instance($ruleid);
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
     }
-
 }

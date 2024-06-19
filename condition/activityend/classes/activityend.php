@@ -43,7 +43,6 @@ use local_notificationsagent\rule;
  * This class handles the condition of activity end.
  */
 class activityend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -164,7 +163,8 @@ class activityend extends notificationconditionplugin {
                 'select',
                 $this->get_name_ui(self::UI_ACTIVITY),
                 get_string(
-                        'editrule_condition_activity', 'notificationscondition_activityend',
+                        'editrule_condition_activity',
+                        'notificationscondition_activityend',
                         ['typeelement' => '[AAAA]']
                 ),
                 $listactivities
@@ -173,7 +173,8 @@ class activityend extends notificationconditionplugin {
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+                $this->get_name_ui(self::UI_ACTIVITY),
+                get_string('editrule_required_error', 'local_notificationsagent'),
                 'required'
         );
     }
@@ -209,7 +210,8 @@ class activityend extends notificationconditionplugin {
                 return false;
             }
             $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                    'validation_editrule_form_dateend', 'notificationscondition_activityend'
+                    'validation_editrule_form_dateend',
+                    'notificationscondition_activityend'
             );
         }
 

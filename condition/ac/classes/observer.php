@@ -40,7 +40,6 @@ use notificationscondition_ac\ac;
  * Event handler for ac subplugin.
  */
 class notificationscondition_ac_observer {
-
     /**
      * Triggered when 'group_deleted' event is triggered.
      *
@@ -62,7 +61,8 @@ class notificationscondition_ac_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                        $data->ruleid, rule::PAUSE_RULE,
+                    $data->ruleid,
+                    rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }
@@ -90,7 +90,8 @@ class notificationscondition_ac_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                        $data->ruleid, rule::PAUSE_RULE,
+                    $data->ruleid,
+                    rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }

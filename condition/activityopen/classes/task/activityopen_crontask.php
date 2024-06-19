@@ -44,7 +44,6 @@ use local_notificationsagent\rule;
  * Class activityopen_crontask
  */
 class activityopen_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *
@@ -81,6 +80,5 @@ class activityopen_crontask extends scheduled_task {
         }
 
         \local_notificationsagent\helper\helper::custom_mtrace("Activity open end ");
-
     }
 }
