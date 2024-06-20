@@ -88,9 +88,9 @@ class activityend extends notificationconditionplugin {
         $timeendactivity = notificationsagent::notificationsagent_condition_get_cm_dates($cmid)->timeend;
 
         $timeend = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timeend)) {
@@ -160,22 +160,22 @@ class activityend extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity',
-                        'notificationscondition_activityend',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activityend',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -210,8 +210,8 @@ class activityend extends notificationconditionplugin {
                 return false;
             }
             $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
-                    'validation_editrule_form_dateend',
-                    'notificationscondition_activityend'
+                'validation_editrule_form_dateend',
+                'notificationscondition_activityend'
             );
         }
 

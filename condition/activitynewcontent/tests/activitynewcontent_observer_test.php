@@ -43,7 +43,6 @@ use notificationscondition_activitynewcontent\activitynewcontent;
  * @group notificationsagent
  */
 class activitynewcontent_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -95,7 +94,6 @@ class activitynewcontent_observer_test extends \advanced_testcase {
             ])
         );
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
-
     }
 
     /**
@@ -169,7 +167,6 @@ class activitynewcontent_observer_test extends \advanced_testcase {
             $this->assertFalse($cache);
             $this->assertFalse($trigger);
         }
-
     }
 
     /**
@@ -185,5 +182,4 @@ class activitynewcontent_observer_test extends \advanced_testcase {
             'Module label admin' => ['label', 2, false],
         ];
     }
-
 }

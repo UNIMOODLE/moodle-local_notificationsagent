@@ -39,7 +39,6 @@ use notificationscondition_activitynewcontent\activitynewcontent;
  * Activitynewcontent observer
  */
 class notificationscondition_activitynewcontent_observer {
-
     /**
      * Module created listener
      *
@@ -74,7 +73,6 @@ class notificationscondition_activitynewcontent_observer {
                 $context->set_courseid($courseid);
 
                 notificationsagent::generate_cache_triggers($subplugin, $context);
-
             }
         }
     }

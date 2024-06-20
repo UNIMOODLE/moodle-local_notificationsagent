@@ -47,7 +47,6 @@ use notificationscondition_ondates\ondates;
  * @group notificationsagent
  */
 class ondates_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -113,17 +112,16 @@ class ondates_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'ondates';
         self::$elements = ['FFFF', 'FFFF'];
-
     }
 
     /**
      * Test evaluate
      *
-     * @param int   $timeaccess    timeaccess
-     * @param bool  $usecache      usecache
-     * @param bool  $complementary complementary
-     * @param bool  $expected      expected
-     * @param array $params        params
+     * @param int $timeaccess timeaccess
+     * @param bool $usecache usecache
+     * @param bool $complementary complementary
+     * @param bool $expected expected
+     * @param array $params params
      *
      *
      * @covers       \notificationscondition_ondates\ondates::evaluate
@@ -160,26 +158,26 @@ class ondates_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [
-                1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1713913200, "enddate":1714345199}',
-            ],
-            [
-                1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1714345199, "enddate":1713913200}',
-            ],
-            [
-                1701691707, false, notificationplugin::COMPLEMENTARY_CONDITION, true
-                , '{"startdate":1701622222, "enddate":1714345199}',
-            ],
-            [
-                1703498961, false, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1713913200, "enddate":1714345199}',
-            ],
-            [
-                1701400000, true, notificationplugin::COMPLEMENTARY_CONDITION, false
-                , '{"startdate":1701500000, "enddate":1701510000}',
-            ],
+                [
+                        1701598161, false, notificationplugin::COMPLEMENTARY_CONDITION, false,
+                        '{"startdate":1713913200, "enddate":1714345199}',
+                ],
+                [
+                        1701511761, false, notificationplugin::COMPLEMENTARY_CONDITION, false,
+                        '{"startdate":1714345199, "enddate":1713913200}',
+                ],
+                [
+                        1701691707, false, notificationplugin::COMPLEMENTARY_CONDITION, true, '
+                        {"startdate":1701622222, "enddate":1714345199}',
+                ],
+                [
+                        1703498961, false, notificationplugin::COMPLEMENTARY_CONDITION, false,
+                        '{"startdate":1713913200, "enddate":1714345199}',
+                ],
+                [
+                        1701400000, true, notificationplugin::COMPLEMENTARY_CONDITION, false,
+                        '{"startdate":1701500000, "enddate":1701510000}',
+                ],
         ];
     }
 
@@ -228,10 +226,10 @@ class ondates_test extends \advanced_testcase {
      * @covers       \notificationscondition_ondates\ondates::estimate_next_time
      * @dataProvider dataondates
      *
-     * @param int   $timeaccess
-     * @param int   $expected
+     * @param int $timeaccess
+     * @param int $expected
      * @param array $params
-     * @param int   $complementary
+     * @param int $complementary
      *
      * @return void
      */
@@ -247,7 +245,6 @@ class ondates_test extends \advanced_testcase {
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
         \uopz_unset_return('time');
-
     }
 
     /**
@@ -257,16 +254,20 @@ class ondates_test extends \advanced_testcase {
      */
     public static function dataondates(): array {
         return [
-            'Condition Dec 03 2023 -> Apr 29 2024' => [1701621111, 1704506700, '{"startdate":1704506700, "enddate":1714345199}', 0],
-            'Exception Jan 06 2024 -> Apr 28 2024' => [1701621111, 1701621111, '{"startdate":1704506700, "enddate":1714345199}', 1],
-            'Condition Dec 03 2023 -> May 05 2024' => [1704495600, 1704495600, '{"startdate":1701622222, "enddate":1714894444}', 0],
-            'Condition Dec 03 2023 -> May 28 2024 ' => [1716995444, false, '{"startdate":1701622222, "enddate":1716894444}', 0],
-            'Exception Dec 03 2023 -> May 28 2024 ' => [
-                1716995444, 1716995444
-                , '{"startdate":1701622222, "enddate":1716894444}', 1,
-            ],
-            'Exception Dec 03 2023 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}', 1],
-            'Exception Jan 20 2024 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}', 1],
+                'Condition Dec 03 2023 -> Apr 29 2024' => [1701621111, 1704506700, '{"startdate":1704506700, "enddate":1714345199}',
+                        0],
+                'Exception Jan 06 2024 -> Apr 28 2024' => [1701621111, 1701621111, '{"startdate":1704506700, "enddate":1714345199}',
+                        1],
+                'Condition Dec 03 2023 -> May 05 2024' => [1704495600, 1704495600, '{"startdate":1701622222, "enddate":1714894444}',
+                        0],
+                'Condition Dec 03 2023 -> May 28 2024 ' => [1716995444, false, '{"startdate":1701622222, "enddate":1716894444}', 0],
+                'Exception Dec 03 2023 -> May 28 2024 ' => [
+                        1716995444, 1716995444, '{"startdate":1701622222, "enddate":1716894444}', 1,
+                ],
+                'Exception Dec 03 2023 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}',
+                        1],
+                'Exception Jan 20 2024 -> May 05 2024' => [1704495600, 1714946400, '{"startdate":1701622222, "enddate":1714946399}',
+                        1],
         ];
     }
 
@@ -301,9 +302,9 @@ class ondates_test extends \advanced_testcase {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -324,7 +325,7 @@ class ondates_test extends \advanced_testcase {
         $lastparams[$startdatename] = strtotime('today', $paramsdecoded->$startdatename);
         $lastparams[$enddatename] = strtotime('tomorrow', $paramsdecoded->$enddatename) - 1;
         $expected = '{"' . self::$subplugin::STARTDATE . '":' . $lastparams[$startdatename] . ',"'
-            . self::$subplugin::ENDDATE . '":' . $lastparams[$enddatename] . '}';
+                . self::$subplugin::ENDDATE . '":' . $lastparams[$enddatename] . '}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $lastparams);
         $this->assertEquals($result, $expected);
@@ -344,12 +345,14 @@ class ondates_test extends \advanced_testcase {
         self::$subplugin->process_markups($content, self::$coursetest->id);
 
         $humanvalue = self::$subplugin->replace_first(
-            self::$subplugin->get_elements()[0]
-            , userdate($paramsdecoded->startdate), self::$subplugin->get_title()
+            self::$subplugin->get_elements()[0],
+            userdate($paramsdecoded->startdate),
+            self::$subplugin->get_title()
         );
         $humanvalue = self::$subplugin->replace_first(
-            self::$subplugin->get_elements()[1]
-            , userdate($paramsdecoded->enddate), $humanvalue
+            self::$subplugin->get_elements()[1],
+            userdate($paramsdecoded->enddate),
+            $humanvalue
         );
         $this->assertSame($humanvalue, $content[0]);
     }
@@ -357,9 +360,9 @@ class ondates_test extends \advanced_testcase {
     /**
      * Test whether is ondates
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $params
-     * @param bool   $expected
+     * @param bool $expected
      *
      * @covers       \notificationscondition_ondates\ondates::is_ondates()
      * @dataProvider dataproviderwe
@@ -368,12 +371,13 @@ class ondates_test extends \advanced_testcase {
         set_config('calendar_ondates', 65);
         $paramsdecoded = json_decode($params);
         $this->assertSame(
-            $expected, ondates::is_ondates(
-            $timeaccess, $paramsdecoded->startdate
-            , $paramsdecoded->enddate
-        )
+            $expected,
+            ondates::is_ondates(
+                $timeaccess,
+                $paramsdecoded->startdate,
+                $paramsdecoded->enddate
+            )
         );
-
     }
 
     /**
@@ -382,9 +386,9 @@ class ondates_test extends \advanced_testcase {
     public static function dataproviderwe(): array {
         // Only valid for a saturday, sunday configuration.
         return [
-            'On dates' => [1714039202, '{"startdate":1704506700, "enddate":1714345199}', true],
-            'In 1 year' => [1745575202, '{"startdate":1704506700, "enddate":1714345199}', false],
-            '1 year ago' => [1682416802, '{"startdate":1704506700, "enddate":1714345199}', false],
+                'On dates' => [1714039202, '{"startdate":1704506700, "enddate":1714345199}', true],
+                'In 1 year' => [1745575202, '{"startdate":1704506700, "enddate":1714345199}', false],
+                '1 year ago' => [1682416802, '{"startdate":1704506700, "enddate":1714345199}', false],
         ];
     }
 
@@ -397,10 +401,10 @@ class ondates_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -415,14 +419,13 @@ class ondates_test extends \advanced_testcase {
 
         $this->assertTrue($mform->elementExists($startdatename));
         $this->assertTrue($mform->elementExists($enddatename));
-
     }
 
     /**
      * Test validate form.
      *
      * @param array $params
-     * @param bool  $expected
+     * @param bool $expected
      *
      * @dataProvider datavalidation
      * @covers       \notificationscondition_ondates\ondates::validation
@@ -439,9 +442,9 @@ class ondates_test extends \advanced_testcase {
      */
     public static function datavalidation(): array {
         return [
-            'Startdate(May 02 2024) Enddate(Jan 13 3000)' => ['{"startdate": 1714627363, "enddate": 32504765577}', true],
-            'Startdate(May 04 2024) Enddate(May 02 2024)' => ['{"startdate": 1714827363, "enddate": 1714627363}', false],
-            'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', true],
+                'Startdate(May 02 2024) Enddate(Jan 13 3000)' => ['{"startdate": 1714627363, "enddate": 32504765577}', true],
+                'Startdate(May 04 2024) Enddate(May 02 2024)' => ['{"startdate": 1714827363, "enddate": 1714627363}', false],
+                'Startdate(Apr 18 2024) Enddate(Apr 22 2024)' => ['{"startdate": 1713427363, "enddate": 1713827363}', true],
         ];
     }
 
@@ -467,5 +470,4 @@ class ondates_test extends \advanced_testcase {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
-
 }

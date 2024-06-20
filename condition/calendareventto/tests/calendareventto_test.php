@@ -46,7 +46,6 @@ use notificationscondition_calendareventto\calendareventto;
  * @group notificationsagent
  */
 class calendareventto_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -119,13 +118,13 @@ class calendareventto_test extends \advanced_testcase {
         self::$subplugin = new calendareventto(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_and_enrol(self::$coursecontext, 'manager');
         self::setUser(self::$user);
         self::$caledarevent = self::getDataGenerator()->create_event(
-                [
+            [
                         'timestart' => self::COURSE_DATESTART,
                         'timeduration' => self::DURATION,
                         'courseid' => self::$coursetest->id,
@@ -231,8 +230,8 @@ class calendareventto_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -274,7 +273,8 @@ class calendareventto_test extends \advanced_testcase {
         if (self::$context->is_complementary()) {
             if ($timeaccess < self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}) {
                 self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
-            } else if ($timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
+            } else if (
+                $timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
                     && $timeaccess <= self::COURSE_DATESTART
             ) {
                 self::assertEquals(self::COURSE_DATESTART, self::$subplugin->estimate_next_time(self::$context));
@@ -284,10 +284,11 @@ class calendareventto_test extends \advanced_testcase {
         } else {
             if ($timeaccess < self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}) {
                 self::assertEquals(
-                        self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME},
-                        self::$subplugin->estimate_next_time(self::$context)
+                    self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME},
+                    self::$subplugin->estimate_next_time(self::$context)
                 );
-            } else if ($timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
+            } else if (
+                $timeaccess >= self::COURSE_DATESTART - $params->{notificationplugin::UI_TIME}
                     && $timeaccess <= self::COURSE_DATESTART
             ) {
                 self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
@@ -336,8 +337,8 @@ class calendareventto_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -353,8 +354,11 @@ class calendareventto_test extends \advanced_testcase {
         $time = self::$caledarevent->timestart;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(),
-                [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(
+            self::$subplugin->get_elements(),
+            [\local_notificationsagent\helper\helper::to_human_format($time, true)],
+            self::$subplugin->get_title()
+        );
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -442,7 +446,7 @@ class calendareventto_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 

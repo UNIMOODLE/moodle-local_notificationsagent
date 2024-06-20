@@ -39,7 +39,6 @@ use local_notificationsagent\rule;
  * usergroupadd supluging class
  */
 class usergroupadd extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -86,14 +85,19 @@ class usergroupadd extends notificationconditionplugin {
 
         $params = json_decode($context->get_params());
 
-        $cache = $DB->record_exists('notificationsagent_cache',
-                ['pluginname' => $pluginname, 'conditionid' => $conditionid,
-                        'courseid' => $courseid, 'userid' => $userid]);
+        $cache = $DB->record_exists(
+            'notificationsagent_cache',
+            ['pluginname' => $pluginname, 'conditionid' => $conditionid,
+            'courseid' => $courseid,
+            'userid' => $userid]
+        );
 
         if (!$cache) {
             if (isset($userid)) {
-                $isingroup = $DB->record_exists('groups_members',
-                        ['groupid' => $params->cmid, 'userid' => $userid]);
+                $isingroup = $DB->record_exists(
+                    'groups_members',
+                    ['groupid' => $params->cmid, 'userid' => $userid]
+                );
             }
         }
 
@@ -150,24 +154,28 @@ class usergroupadd extends notificationconditionplugin {
 
         foreach ($groups as $item) {
             $listgroups[$item->id] = format_string(
-                    $item->name, true
+                $item->name,
+                true
             );
         }
         asort($listgroups);
 
         $group = $mform->createElement(
-                'select', $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_action_element_group', 'notificationscondition_usergroupadd',
-                        ['typeelement' => '[GGGG]']
-                ),
-                $listgroups
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_action_element_group',
+                'notificationscondition_usergroupadd',
+                ['typeelement' => '[GGGG]']
+            ),
+            $listgroups
         );
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

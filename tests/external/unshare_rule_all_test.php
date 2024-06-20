@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class unshare_rule_all_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -128,7 +127,7 @@ class unshare_rule_all_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -190,7 +189,7 @@ class unshare_rule_all_test extends \advanced_testcase {
         $instance = self::$rule::create_instance($ruleid);
 
         $result = unshare_rule_all::execute(
-                $useinstance == 0 ? $useinstance : $instance->get_id()
+            $useinstance == 0 ? $useinstance : $instance->get_id()
         );
         $result = external_api::clean_returnvalue(unshare_rule_all::execute_returns(), $result);
         if ($user == 2) {

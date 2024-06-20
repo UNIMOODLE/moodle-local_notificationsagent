@@ -46,7 +46,6 @@ use notificationscondition_activitynewcontent\activitynewcontent;
  * @group notificationsagent
  */
 class activitynewcontent_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -151,7 +150,6 @@ class activitynewcontent_test extends \advanced_testcase {
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
-
     }
 
     /**

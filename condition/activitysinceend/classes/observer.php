@@ -71,7 +71,6 @@ class notificationscondition_activitysinceend_observer {
             $context->set_timeaccess($event->timecreated);
 
             notificationsagent::generate_cache_triggers($subplugin, $context);
-
         }
     }
 }

@@ -42,7 +42,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class courseend_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -88,12 +87,11 @@ class courseend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
         );
-
     }
 
     /**
@@ -159,5 +157,4 @@ class courseend_observer_test extends \advanced_testcase {
                 [86400 * 3, 2],
         ];
     }
-
 }

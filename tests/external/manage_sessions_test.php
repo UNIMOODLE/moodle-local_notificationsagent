@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class manage_sessions_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -174,7 +173,6 @@ class manage_sessions_test extends \advanced_testcase {
         $result = external_api::clean_returnvalue(manage_sessions::execute_returns(), $result);
 
         $this->assertEquals($expected, $result['orderid']);
-
     }
 
     /**

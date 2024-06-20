@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class usergroupadd_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -113,7 +112,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -195,7 +194,6 @@ class usergroupadd_observer_test extends \advanced_testcase {
         self::$rule->reject_share_rule($ruleid);
         $this->assertEquals(self::$rule->get_default_context(), self::$course->id);
         self::$rule->before_delete();
-
     }
 
     /**
@@ -250,5 +248,4 @@ class usergroupadd_observer_test extends \advanced_testcase {
                 'Testing as a editingteacher' => ['editingteacher'],
         ];
     }
-
 }

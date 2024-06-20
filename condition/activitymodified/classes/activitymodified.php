@@ -41,7 +41,6 @@ use local_notificationsagent\rule;
  * Class representing the activitymodified condition plugin.
  */
 class activitymodified extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -84,9 +83,9 @@ class activitymodified extends notificationconditionplugin {
         $cmid = (json_decode($context->get_params()))->{self::UI_ACTIVITY};
 
         $timelastsend = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timelastsend)) {
@@ -142,18 +141,20 @@ class activitymodified extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activitysinceend',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

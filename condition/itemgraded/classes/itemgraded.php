@@ -46,7 +46,6 @@ require_once($CFG->libdir . '/gradelib.php');
  * itemgraded subplugin class
  */
 class itemgraded extends notificationconditionplugin {
-
     /**
      * @var string Subplugin name
      */
@@ -93,9 +92,9 @@ class itemgraded extends notificationconditionplugin {
 
         if (isset($usergrade->items[0]->grades[$userid]->grade)) {
             $gradeisachieved = notificationsagent::evaluate_expression(
-                    $params->{self::UI_OP},
-                    $usergrade->items[0]->grades[$userid]->grade,
-                    $params->{self::UI_GRADE}
+                $params->{self::UI_OP},
+                $usergrade->items[0]->grades[$userid]->grade,
+                $params->{self::UI_GRADE}
             );
         }
 
@@ -140,30 +139,34 @@ class itemgraded extends notificationconditionplugin {
         $this->get_ui_title($mform, $type);
 
         $gradegroup[] = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_OP),
-                [],
-                self::OPERATORS
+            'select',
+            $this->get_name_ui(self::UI_OP),
+            [],
+            self::OPERATORS
         );
         $gradegroup[] = $mform->createElement(
-                'float',
-                $this->get_name_ui(self::UI_GRADE),
-                '',
-                [
+            'float',
+            $this->get_name_ui(self::UI_GRADE),
+            '',
+            [
                         'class' => 'mr-2', 'size' => '7',
                         'placeholder' => get_string('condition_grade', 'local_notificationsagent'),
                 ]
         );
         $group = $mform->createElement(
-                'group', $this->get_name_ui($this->get_subtype()),
-                get_string('editrule_condition_grade', 'notificationscondition_itemgraded', ['typeelement' => '[GGGG]']),
-                $gradegroup, null, false
+            'group',
+            $this->get_name_ui($this->get_subtype()),
+            get_string('editrule_condition_grade', 'notificationscondition_itemgraded', ['typeelement' => '[GGGG]']),
+            $gradegroup,
+            null,
+            false
         );
         $mform->insertElementBefore($group, 'new' . $type . '_group');
 
         $mform->addGroupRule(
-                $this->get_name_ui($this->get_subtype()), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui($this->get_subtype()),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
 
         $listactivities = [];
@@ -171,9 +174,9 @@ class itemgraded extends notificationconditionplugin {
         $items = $items ? $items : [];
         foreach ($items as $i => $item) {
             $cm = get_coursemodule_from_instance(
-                    $item->itemmodule,
-                    $item->iteminstance,
-                    $courseid
+                $item->itemmodule,
+                $item->iteminstance,
+                $courseid
             );
             $listactivities[$cm->id] = format_string($item->get_name(true));
         }
@@ -185,19 +188,21 @@ class itemgraded extends notificationconditionplugin {
         \core_collator::asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_itemgraded',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_itemgraded',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

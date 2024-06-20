@@ -43,7 +43,6 @@ use notificationscondition_sessionstart\sessionstart;
  * @group notificationsagent
  */
 class notificationsagent_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -101,7 +100,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -118,7 +117,6 @@ class notificationsagent_test extends \advanced_testcase {
 
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
         self::$rule = $rule;
-
     }
 
     /**
@@ -150,8 +148,8 @@ class notificationsagent_test extends \advanced_testcase {
         !empty($fieldclose) ? $options[$fieldclose] = $timeclose : '';
 
         $cmtest = self::getDataGenerator()->create_module(
-                "{$modname}",
-                $options
+            "{$modname}",
+            $options
         );
 
         $result = notificationsagent::notificationsagent_condition_get_cm_dates($cmtest->cmid);
@@ -213,7 +211,6 @@ class notificationsagent_test extends \advanced_testcase {
 
         $this->assertCount(1, notificationsagent::get_usersbycourse($context));
         $this->assertEquals(self::$user->id, notificationsagent::get_usersbycourse($context)[self::$user->id]->id);
-
     }
 
     /**
@@ -227,13 +224,13 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_timer_cache(
-                [
+            [
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
                         'startdate' => self::CM_DATESTART,
                         'cmid' => self::CMID,
                 ],
-                [
+            [
                         [
                                 'userid' => self::$user->id,
                                 'courseid' => self::$course->id,
@@ -245,8 +242,8 @@ class notificationsagent_test extends \advanced_testcase {
         );
 
         $cache = $DB->get_record(
-                'notificationsagent_cache',
-                [
+            'notificationsagent_cache',
+            [
                         'conditionid' => self::CMID,
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
@@ -258,13 +255,14 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::CM_DATESTART, $cache->startdate);
 
         notificationsagent::set_timer_cache(
-                [
+            [
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
                         'startdate' => self::CM_DATESTART + 86400,
 
                         'cmid' => self::CMID,
-                ], [
+                ],
+            [
                         [
                                 'userid' => self::$user->id,
                                 'courseid' => self::$course->id,
@@ -276,8 +274,8 @@ class notificationsagent_test extends \advanced_testcase {
         );
 
         $cacheupdated = $DB->get_record(
-                'notificationsagent_cache',
-                [
+            'notificationsagent_cache',
+            [
                         'conditionid' => self::CMID,
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
@@ -300,12 +298,13 @@ class notificationsagent_test extends \advanced_testcase {
         global $DB;
 
         notificationsagent::set_time_trigger(
-                [
+            [
                         'ruleid' => self::$rule->get_id(),
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
                         'conditionid' => self::CMID,
-                ], [
+                ],
+            [
                         [
                                 'ruleid' => self::$rule->get_id(),
                                 'userid' => self::$user->id,
@@ -314,12 +313,11 @@ class notificationsagent_test extends \advanced_testcase {
                                 'conditionid' => self::CMID,
                         ],
                 ]
-
         );
 
         $trigger = $DB->get_record(
-                'notificationsagent_triggers',
-                [
+            'notificationsagent_triggers',
+            [
                         'ruleid' => self::$rule->get_id(),
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
@@ -333,13 +331,13 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
 
         notificationsagent::set_time_trigger(
-                [
+            [
                         'ruleid' => self::$rule->get_id(),
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
                         'conditionid' => self::CMID,
                 ],
-                [
+            [
                         [
                                 'ruleid' => self::$rule->get_id(),
                                 'userid' => self::$user->id,
@@ -351,8 +349,8 @@ class notificationsagent_test extends \advanced_testcase {
         );
 
         $triggerupdated = $DB->get_record(
-                'notificationsagent_triggers',
-                [
+            'notificationsagent_triggers',
+            [
                         'ruleid' => self::$rule->get_id(),
                         'userid' => self::$user->id,
                         'courseid' => self::$course->id,
@@ -364,7 +362,6 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals(self::CM_DATESTART + 1, $triggerupdated->startdate);
         $this->assertEquals(self::$user->id, $triggerupdated->userid);
         $this->assertEquals(self::$course->id, $triggerupdated->courseid);
-
     }
 
     /**
@@ -386,8 +383,8 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-                'notificationsagent_context',
-                [
+            'notificationsagent_context',
+            [
                         'ruleid' => $ruleid,
                         'contextid' => CONTEXT_COURSECAT,
                         'objectid' => self::$course->category,
@@ -484,8 +481,8 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-                'notificationsagent_context',
-                [
+            'notificationsagent_context',
+            [
                         'ruleid' => $ruleid,
                         'contextid' => CONTEXT_COURSECAT,
                         'objectid' => self::$course->category,
@@ -514,7 +511,6 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertEquals($instance->get_id(), $result->ruleid);
         $this->assertTrue(in_array(self::$course->id, $result->courses));
         $this->assertEquals($instance->get_conditions($pluginname)[$conditionid]->get_parameters(), $result->parameters);
-
     }
 
     /**
@@ -535,8 +531,8 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-                'notificationsagent_context',
-                [
+            'notificationsagent_context',
+            [
                         'ruleid' => $ruleid,
                         'contextid' => CONTEXT_COURSECAT,
                         'objectid' => self::$course->category,
@@ -563,7 +559,6 @@ class notificationsagent_test extends \advanced_testcase {
 
         $this->assertEquals($rule->get_id(), $data->ruleid);
         $this->assertTrue(in_array(self::$course->id, $data->courses));
-
     }
 
     /**
@@ -584,8 +579,8 @@ class notificationsagent_test extends \advanced_testcase {
         $ruleid = self::$rule->create($dataform);
 
         $DB->insert_record(
-                'notificationsagent_context',
-                [
+            'notificationsagent_context',
+            [
                         'ruleid' => $ruleid,
                         'contextid' => CONTEXT_COURSECAT,
                         'objectid' => self::$course->category,
@@ -594,7 +589,6 @@ class notificationsagent_test extends \advanced_testcase {
         $data = notificationsagent::get_course_category_context_byruleid($ruleid);
         $data = $data[key($data)];
         $this->assertEquals(self::$course->id, $data);
-
     }
 
     /**
@@ -638,7 +632,6 @@ class notificationsagent_test extends \advanced_testcase {
         $this->assertIsNumeric($cacheid);
 
         $this->assertSame($expected, notificationsagent::is_ruleoff(self::$rule->get_id(), self::$user->id, $courseid));
-
     }
 
     /**
@@ -711,7 +704,6 @@ class notificationsagent_test extends \advanced_testcase {
                 'On dates' => [1704099600, 1704099600 + 60, 1704099600 - 60, false],
                 'Out of date' => [1704099600 - 84600, 1704099600 + 60, 1704099600 - 60, true],
         ];
-
     }
 
     /**
@@ -738,14 +730,13 @@ class notificationsagent_test extends \advanced_testcase {
         ];
 
         $cmtest = self::getDataGenerator()->create_module(
-                "{$modname}",
-                $options
+            "{$modname}",
+            $options
         );
 
         $result = notificationsagent::supported_cm($cmtest->cmid, $course->id);
 
         $this->assertEquals($expected, $result);
-
     }
 
     /**
@@ -835,5 +826,4 @@ class notificationsagent_test extends \advanced_testcase {
                 ['', 3, 3, false],
         ];
     }
-
 }

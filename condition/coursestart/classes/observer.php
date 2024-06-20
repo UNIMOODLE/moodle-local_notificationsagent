@@ -40,7 +40,6 @@ use local_notificationsagent\helper\helper;
  * Class observer of coursestart
  */
 class notificationscondition_coursestart_observer {
-
     /**
      * Handles the course_updated event.
      *

@@ -41,7 +41,6 @@ use local_notificationsagent\rule;
  * Activitynewcontent class
  */
 class activitynewcontent extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -152,7 +151,8 @@ class activitynewcontent extends notificationconditionplugin {
             'select',
             $this->get_name_ui(self::MODNAME),
             get_string(
-                'editrule_condition_activity', 'notificationscondition_activitysinceend',
+                'editrule_condition_activity',
+                'notificationscondition_activitysinceend',
                 ['typeelement' => '[AAAA]']
             ),
             $listactivities
@@ -160,7 +160,9 @@ class activitynewcontent extends notificationconditionplugin {
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::MODNAME), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::MODNAME),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

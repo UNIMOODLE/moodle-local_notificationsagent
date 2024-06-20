@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class check_rule_context_test extends \advanced_testcase {
-
     /**
      * @var rule
      */

@@ -39,7 +39,6 @@ use local_notificationsagent\evaluationcontext;
  * ondates cron task
  */
 class ondates_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *

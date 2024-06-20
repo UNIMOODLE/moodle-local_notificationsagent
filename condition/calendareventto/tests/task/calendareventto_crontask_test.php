@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class calendareventto_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -98,7 +97,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -107,14 +106,13 @@ class calendareventto_crontask_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser(self::$user);
         self::$calendarevent = self::getDataGenerator()->create_event(
-                [
+            [
                         'timestart' => self::COURSE_DATESTART,
                         'timeduration' => self::DURATION,
                         'courseid' => self::$course->id,
                         'userid' => self::$user->id,
                 ]
         );
-
     }
 
     /**
@@ -190,6 +188,5 @@ class calendareventto_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(calendareventto_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

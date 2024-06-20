@@ -40,7 +40,6 @@ use notificationscondition_courseend\courseend;
  * Class notificationscondition_courseend_observer.
  */
 class notificationscondition_courseend_observer {
-
     /**
      * Handles the course_updated event.
      *

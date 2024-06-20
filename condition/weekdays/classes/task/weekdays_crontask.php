@@ -39,7 +39,6 @@ use local_notificationsagent\evaluationcontext;
  * weekdays cron task
  */
 class weekdays_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *
@@ -70,7 +69,6 @@ class weekdays_crontask extends scheduled_task {
                     notificationsagent::generate_cache_triggers($subplugin, $context);
                 }
             }
-
         }
         \local_notificationsagent\helper\helper::custom_mtrace("weekdays end");
     }

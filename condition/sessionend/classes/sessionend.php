@@ -41,7 +41,6 @@ use local_notificationsagent\notificationconditionplugin;
  * Class representing the sessionend condition plugin.
  */
 class sessionend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -84,13 +83,15 @@ class sessionend extends notificationconditionplugin {
 
         $timend = $DB->get_field(
             'notificationsagent_cache',
-            'startdate', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timend)) {
             $lastaccess = $DB->get_field(
                 'user_lastaccess',
-                'timeaccess', ['courseid' => $courseid, 'userid' => $userid],
+                'timeaccess',
+                ['courseid' => $courseid, 'userid' => $userid],
             );
             if (empty($lastaccess)) {
                 return $meetcondition;
@@ -117,7 +118,8 @@ class sessionend extends notificationconditionplugin {
 
         $lastaccess = $DB->get_field(
             'user_lastaccess',
-            'timeaccess', ['courseid' => $courseid, 'userid' => $userid],
+            'timeaccess',
+            ['courseid' => $courseid, 'userid' => $userid],
         );
 
         // The student never has view the course.

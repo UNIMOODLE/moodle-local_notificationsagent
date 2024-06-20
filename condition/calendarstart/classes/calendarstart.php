@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * Class representing the calendarstart condition plugin.
  */
 class calendarstart extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -102,9 +101,9 @@ class calendarstart extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $timestart = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timestart)) {
@@ -115,7 +114,6 @@ class calendarstart extends notificationconditionplugin {
                 $timestart = $event[$params->{self::UI_ACTIVITY}]->timestart + $event[$params->{self::UI_ACTIVITY}]->timeduration
                         + $params->{self::UI_TIME};
             }
-
         }
 
         ($timeaccess >= $timestart) ? $meetcondition = true : $meetcondition = false;
@@ -147,16 +145,15 @@ class calendarstart extends notificationconditionplugin {
                 } else if ($timeaccess > $timeevent + $params->{self::UI_TIME}) {
                     $timereturn = time();
                 }
-
             } else {
-                if ($timeaccess >= $timeevent + $timeduration
+                if (
+                    $timeaccess >= $timeevent + $timeduration
                         && $timeaccess <= $timeevent + $timeduration + $params->{self::UI_TIME}
                 ) {
                     $timereturn = $timeevent + $timeduration + $params->{self::UI_TIME};
                 } else if ($timeaccess > $timeevent + $timeduration + $params->{self::UI_TIME}) {
                     $timereturn = time();
                 }
-
             }
         }
 
@@ -167,7 +164,8 @@ class calendarstart extends notificationconditionplugin {
                     $timereturn = time();
                 }
             } else {
-                if ($timeaccess >= $timeevent + $timeduration
+                if (
+                    $timeaccess >= $timeevent + $timeduration
                         && $timeaccess < $timeevent + $timeduration + $params->{self::UI_TIME}
                 ) {
                     $timereturn = time();
@@ -204,38 +202,48 @@ class calendarstart extends notificationconditionplugin {
         }
 
         $element = $mform->createElement(
-                'select', $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_calendar', 'notificationscondition_calendarstart',
-                        ['typeelement' => '[CCCC]']
-                ),
-                $events
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_calendar',
+                'notificationscondition_calendarstart',
+                ['typeelement' => '[CCCC]']
+            ),
+            $events
         );
 
         // Radio.
         $radioarray = [];
         $radioarray[] = $mform->createElement(
-                'radio',
-                $this->get_name_ui(self::UI_RADIO),
-                '', get_string('afterstart', 'notificationscondition_calendarstart'), 1
+            'radio',
+            $this->get_name_ui(self::UI_RADIO),
+            '',
+            get_string('afterstart', 'notificationscondition_calendarstart'),
+            1
         );
         $radioarray[] = $mform->createElement(
-                'radio',
-                $this->get_name_ui(self::UI_RADIO),
-                '', get_string('afterend', 'notificationscondition_calendarstart'), 2
+            'radio',
+            $this->get_name_ui(self::UI_RADIO),
+            '',
+            get_string('afterend', 'notificationscondition_calendarstart'),
+            2
         );
 
         $radiogroup = $mform->createElement(
-                'group', $this->get_name_ui(self::UI_RADIO_GROUP),
-                '',
-                $radioarray, null, false
+            'group',
+            $this->get_name_ui(self::UI_RADIO_GROUP),
+            '',
+            $radioarray,
+            null,
+            false
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
         $mform->insertElementBefore($radiogroup, 'new' . $type . '_group');
     }
@@ -265,7 +273,7 @@ class calendarstart extends notificationconditionplugin {
         $radio = $params[$this->get_name_ui(self::UI_RADIO)] ?? 0;
         $timeinseconds = $this->select_date_to_unix($params);
         $this->set_parameters(
-                json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $calendar, self::UI_RADIO => $radio])
+            json_encode([self::UI_TIME => $timeinseconds, self::UI_ACTIVITY => (int) $calendar, self::UI_RADIO => $radio])
         );
         $this->set_cmid((int) $calendar);
         return $this->get_parameters();
@@ -368,9 +376,9 @@ class calendarstart extends notificationconditionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                    'Restored item (' . $this->get_pluginname() . ')
+                'Restored item (' . $this->get_pluginname() . ')
                 has eventid on action that was not restored',
-                    \backup::LOG_WARNING
+                \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

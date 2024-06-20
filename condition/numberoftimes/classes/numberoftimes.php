@@ -41,7 +41,6 @@ use local_notificationsagent\notificationconditionplugin;
  * Class representing the numberoftimes condition plugin.
  */
 class numberoftimes extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -88,8 +87,8 @@ class numberoftimes extends notificationconditionplugin {
         $numbertimes = $params->{self::N_TIMES};
 
         $launched = $DB->get_record(
-                'notificationsagent_launched',
-                ['ruleid' => $ruleid, 'userid' => $userid, 'courseid' => $courseid]
+            'notificationsagent_launched',
+            ['ruleid' => $ruleid, 'userid' => $userid, 'courseid' => $courseid]
         );
 
         if ($launched === false) {
@@ -122,9 +121,10 @@ class numberoftimes extends notificationconditionplugin {
 
         // Number of times.
         $element = $mform->createElement(
-                'float', $this->get_name_ui(self::N_TIMES),
-                get_string('condition_number_times', 'notificationscondition_numberoftimes', ['typeelement' => '[N]']),
-                [
+            'float',
+            $this->get_name_ui(self::N_TIMES),
+            get_string('condition_number_times', 'notificationscondition_numberoftimes', ['typeelement' => '[N]']),
+            [
                         'class' => 'mr-2', 'size' => '7', 'maxlength' => '3',
                         'placeholder' => get_string('condition_number', 'notificationscondition_numberoftimes'),
                         'oninput' => 'this.value = this.value.replace(/[^0-9]/g, "").replace(/(\..*)\./g, "$1")',
@@ -134,7 +134,9 @@ class numberoftimes extends notificationconditionplugin {
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::N_TIMES), get_string('editrule_required_error', 'local_notificationsagent'), 'required'
+            $this->get_name_ui(self::N_TIMES),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 

@@ -38,7 +38,6 @@ use core_calendar\type_factory;
  * Ondates supluging class
  */
 class ondates extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -86,7 +85,6 @@ class ondates extends notificationconditionplugin {
         $enddate = json_decode($data[self::ENDDATE]);
 
         return self::is_ondates($timeaccess, $startdate, $enddate);
-
     }
 
     /**
@@ -146,20 +144,19 @@ class ondates extends notificationconditionplugin {
         $this->get_ui_title($mform, $type);
 
         $startdateselector = $mform->createElement(
-                'date_selector',
-                $this->get_name_ui(self::STARTDATE),
-                get_string('editrule_condition_element_startdate', 'notificationscondition_ondates')
+            'date_selector',
+            $this->get_name_ui(self::STARTDATE),
+            get_string('editrule_condition_element_startdate', 'notificationscondition_ondates')
         );
 
         $enddatesselector = $mform->createElement(
-                'date_selector',
-                $this->get_name_ui(self::ENDDATE),
-                get_string('editrule_condition_element_enddate', 'notificationscondition_ondates')
+            'date_selector',
+            $this->get_name_ui(self::ENDDATE),
+            get_string('editrule_condition_element_enddate', 'notificationscondition_ondates')
         );
 
         $mform->insertElementBefore($startdateselector, 'new' . $type . '_group');
         $mform->insertElementBefore($enddatesselector, 'new' . $type . '_group');
-
     }
 
     /**
@@ -279,7 +276,8 @@ class ondates extends notificationconditionplugin {
 
         if ($startdatedata > $enddatedata) {
             $array[$this->get_name_ui(self::STARTDATE)] = get_string(
-                    'validation_editrule_form_supported_invalid_date', 'notificationscondition_ondates'
+                'validation_editrule_form_supported_invalid_date',
+                'notificationscondition_ondates'
             );
             $validation = false;
         }

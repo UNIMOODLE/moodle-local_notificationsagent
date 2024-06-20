@@ -42,7 +42,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class calendarstart_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -94,7 +93,7 @@ class calendarstart_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -103,7 +102,7 @@ class calendarstart_observer_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser(self::$user);
         self::$calendarevent = self::getDataGenerator()->create_event(
-                [
+            [
                         'timestart' => self::COURSE_DATESTART,
                         'timeduration' => self::DURATION,
                         'courseid' => self::$course->id,
@@ -180,7 +179,6 @@ class calendarstart_observer_test extends \advanced_testcase {
             $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
             $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         }
-
     }
 
     /**
@@ -261,5 +259,4 @@ class calendarstart_observer_test extends \advanced_testcase {
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
         \uopz_unset_return('time');
     }
-
 }

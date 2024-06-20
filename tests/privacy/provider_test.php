@@ -123,7 +123,6 @@ class provider_test extends \advanced_testcase {
         $this->assertCount(1, $contextlist);
         // We should have the user context of our test user.
         $this->assertSame($context, $contextlist->current());
-
     }
 
     /**
@@ -183,7 +182,6 @@ class provider_test extends \advanced_testcase {
         provider::delete_data_for_user($apprvlist);
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
         $this->assertEmpty($deletereport);
-
     }
 
     /**
@@ -200,7 +198,6 @@ class provider_test extends \advanced_testcase {
         provider::delete_data_for_users($apprvlist);
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
         $this->assertEmpty($deletereport);
-
     }
 
     /**
@@ -219,7 +216,7 @@ class provider_test extends \advanced_testcase {
 
         foreach ($contextlist as $context) {
             $data = writer::with_context($context)->get_data(
-                    [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
+                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
             );
             $this->assertNotEmpty($data);
             foreach ($data as $datoreport) {

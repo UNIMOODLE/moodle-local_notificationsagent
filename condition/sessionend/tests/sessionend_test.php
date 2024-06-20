@@ -39,7 +39,6 @@ use local_notificationsagent\notificationplugin;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
 use notificationscondition_sessionend\sessionend;
-
 use local_notificationsagent\helper\test\mock_base_logger;
 
 /**
@@ -48,7 +47,6 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @group notificationsagent
  */
 class sessionend_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -110,7 +108,7 @@ class sessionend_test extends \advanced_testcase {
         self::$subplugin = new sessionend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -144,9 +142,9 @@ class sessionend_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
         self::getDataGenerator()->create_user_course_lastaccess(
-                self::$user,
-                self::$coursetest,
-                $uselastacces ? self::USER_LASTACCESS : 0
+            self::$user,
+            self::$coursetest,
+            $uselastacces ? self::USER_LASTACCESS : 0
         );
 
         if ($usecache) {
@@ -215,8 +213,8 @@ class sessionend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -241,11 +239,10 @@ class sessionend_test extends \advanced_testcase {
 
         if ($userlastaccess) {
             self::getDataGenerator()->create_user_course_lastaccess(
-                    self::$user,
-                    self::$coursetest,
-                    $userlastaccess
+                self::$user,
+                self::$coursetest,
+                $userlastaccess
             );
-
         }
 
         if ($userlastaccess && !self::$context->is_complementary()) {
@@ -298,8 +295,8 @@ class sessionend_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -315,8 +312,11 @@ class sessionend_test extends \advanced_testcase {
         $time = 86400;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
-        $expected = str_replace(self::$subplugin->get_elements(),
-                [\local_notificationsagent\helper\helper::to_human_format($time, true)], self::$subplugin->get_title());
+        $expected = str_replace(
+            self::$subplugin->get_elements(),
+            [\local_notificationsagent\helper\helper::to_human_format($time, true)],
+            self::$subplugin->get_title()
+        );
         self::$subplugin->set_parameters($params);
         $content = [];
         self::$subplugin->process_markups($content, self::$coursetest->id);
@@ -402,7 +402,7 @@ class sessionend_test extends \advanced_testcase {
         $this->assertTrue(isset($defaulttime[$uidays]) && $defaulttime[$uidays] == self::$subplugin::UI_DAYS_DEFAULT_VALUE);
         $this->assertTrue(isset($defaulttime[$uihours]) && $defaulttime[$uihours] == self::$subplugin::UI_HOURS_DEFAULT_VALUE);
         $this->assertTrue(
-                isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
+            isset($defaulttime[$uiminutes]) && $defaulttime[$uiminutes] == self::$subplugin::UI_MINUTES_DEFAULT_VALUE
         );
     }
 

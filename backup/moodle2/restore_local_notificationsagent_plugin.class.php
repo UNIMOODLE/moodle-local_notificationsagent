@@ -36,7 +36,6 @@
  * Restore subplugin class
  */
 class restore_local_notificationsagent_plugin extends restore_local_plugin {
-
     /**
      * Define plugin structure
      *
@@ -45,28 +44,28 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     protected function define_course_plugin_structure() {
         return [
                 new restore_path_element(
-                        'local_notificationsagent_rule',
-                        $this->get_pathfor('/rules/rule')
+                    'local_notificationsagent_rule',
+                    $this->get_pathfor('/rules/rule')
                 ),
                 new restore_path_element(
-                        'local_notificationsagent_rule_context',
-                        $this->get_pathfor('/rules/rule/contexts/context')
+                    'local_notificationsagent_rule_context',
+                    $this->get_pathfor('/rules/rule/contexts/context')
                 ),
                 new restore_path_element(
-                        'local_notificationsagent_rule_condition',
-                        $this->get_pathfor('/rules/rule/conditions/condition')
+                    'local_notificationsagent_rule_condition',
+                    $this->get_pathfor('/rules/rule/conditions/condition')
                 ),
                 new restore_path_element(
-                        'local_notificationsagent_rule_action',
-                        $this->get_pathfor('/rules/rule/actions/action')
+                    'local_notificationsagent_rule_action',
+                    $this->get_pathfor('/rules/rule/actions/action')
                 ),
                 new restore_path_element(
-                        'local_notificationsagent_rule_launched',
-                        $this->get_pathfor('/rules/rule/launcheds/launched')
+                    'local_notificationsagent_rule_launched',
+                    $this->get_pathfor('/rules/rule/launcheds/launched')
                 ),
                 new restore_path_element(
-                        'local_notificationsagent_rule_report',
-                        $this->get_pathfor('/rules/rule/reports/report')
+                    'local_notificationsagent_rule_report',
+                    $this->get_pathfor('/rules/rule/reports/report')
                 ),
         ];
     }
@@ -83,7 +82,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         $ispauseafterrestore = get_config('local_notificationsagent', 'pauseafterrestore');
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->name = $data['name'];
         $record->description = $data['description'];
         $record->status = $ispauseafterrestore ? \local_notificationsagent\rule::PAUSE_RULE : $data['status'];
@@ -111,7 +110,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_context($data) {
         global $DB;
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
         $record->contextid = $data['contextid'];
         if ($this->task->get_courseid() == SITEID) {
@@ -133,7 +132,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_condition($data) {
         global $DB;
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
         $record->pluginname = $data['pluginname'];
         $record->type = $data['type'];
@@ -156,7 +155,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_action($data) {
         global $DB;
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
         $record->pluginname = $data['pluginname'];
         $record->type = $data['type'];
@@ -179,7 +178,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         // Only import the history of rules launched if the source and target course is the same.
         if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
-            $record = new \stdClass;
+            $record = new \stdClass();
             $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
             $record->userid = $data['userid'];
@@ -203,7 +202,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         // Only import the history of report records if the source and target course is the same.
         if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
-            $record = new \stdClass;
+            $record = new \stdClass();
             $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
             $record->userid = $data['userid'];
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
@@ -239,16 +238,16 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         foreach ($rules as $rule) {
             $instance = new \local_notificationsagent\rule($rule->id);
             $subplugins = array_merge(
-                    $instance->get_conditions_to_evaluate(),
-                    $instance->get_exceptions(),
-                    $instance->get_actions()
+                $instance->get_conditions_to_evaluate(),
+                $instance->get_exceptions(),
+                $instance->get_actions()
             );
 
             foreach ($subplugins as $subplugin) {
                 $subplugin->update_after_restore(
-                        $this->task->get_restoreid(),
-                        $this->task->get_courseid(),
-                        $this->task->get_logger()
+                    $this->task->get_restoreid(),
+                    $this->task->get_courseid(),
+                    $this->task->get_logger()
                 );
             }
         }

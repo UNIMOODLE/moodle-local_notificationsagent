@@ -38,7 +38,6 @@ use core_calendar\type_factory;
  * Weekend supluging class
  */
 class weekend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -144,11 +143,12 @@ class weekend extends notificationconditionplugin {
         $concatenatedtoday = implode(', ', $test);
 
         $element = $mform->createElement(
-            'static', $this->get_name_ui(self::UI_DESCRIPTION), get_string('weekendtag', 'notificationscondition_weekend'),
+            'static',
+            $this->get_name_ui(self::UI_DESCRIPTION),
+            get_string('weekendtag', 'notificationscondition_weekend'),
             get_string('weekendtext', 'notificationscondition_weekend', ['weekend' => $concatenatedtoday])
         );
         $mform->insertElementBefore($element, 'new' . $type . '_group');
-
     }
 
     /**

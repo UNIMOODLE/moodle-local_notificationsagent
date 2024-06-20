@@ -42,7 +42,6 @@ use local_notificationsagent\helper\helper;
  * Event handler for usergroupadd subplugin.
  */
 class notificationscondition_usergroupadd_observer {
-
     /**
      * Triggered when 'group_member_added' event is triggered.
      *
@@ -93,7 +92,8 @@ class notificationscondition_usergroupadd_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                    $data->ruleid,
+                    rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }

@@ -42,7 +42,6 @@ use local_notificationsagent\rule;
  * Class activitystudentend condition
  */
 class activitystudentend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -85,9 +84,9 @@ class activitystudentend extends notificationconditionplugin {
 
         // Timestart es el tiempo de primer acceso más time.
         $lastaccess = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($lastaccess)) {
@@ -133,7 +132,8 @@ class activitystudentend extends notificationconditionplugin {
         }
 
         // Exception.
-        if ($timeaccess >= $lastaccess
+        if (
+            $timeaccess >= $lastaccess
                 && $timeaccess <= $lastaccess + $params->{self::UI_TIME}
                 && $context->is_complementary()
         ) {
@@ -168,20 +168,22 @@ class activitystudentend extends notificationconditionplugin {
         asort($listactivities);
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_activitystudentend',
-                        ['typeelement' => '[AAAA]']
-                ),
-                $listactivities
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activitystudentend',
+                ['typeelement' => '[AAAA]']
+            ),
+            $listactivities
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -276,8 +278,9 @@ class activitystudentend extends notificationconditionplugin {
         global $DB;
 
         $exists = $DB->get_field(
-                'notificationsagent_cmview',
-                'id', ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $idactivity],
+            'notificationsagent_cmview',
+            'id',
+            ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $idactivity],
         );
         $objdb = new \stdClass();
         $objdb->userid = $userid;
@@ -306,8 +309,9 @@ class activitystudentend extends notificationconditionplugin {
     public static function get_cmlastaccess($userid, $courseid, $cmid) {
         global $DB;
         $lastaccess = $DB->get_field(
-                'notificationsagent_cmview',
-                'firstaccess', ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid],
+            'notificationsagent_cmview',
+            'firstaccess',
+            ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid],
         );
 
         if (empty($lastaccess)) {
@@ -323,7 +327,8 @@ class activitystudentend extends notificationconditionplugin {
                LIMIT 1";
 
             $result = $DB->get_record_sql(
-                    $query, [
+                $query,
+                [
                             'courseid' => $courseid,
                             'userid' => $userid,
                             'cmid' => $cmid,

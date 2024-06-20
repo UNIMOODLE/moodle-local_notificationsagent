@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class share_rule_all_test extends \advanced_testcase {
-
     /**
      * @var rule
      */

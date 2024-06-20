@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class update_rule_status_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -191,7 +190,8 @@ class update_rule_status_test extends \advanced_testcase {
         $instance = self::$rule::create_instance($ruleid);
 
         $result = update_rule_status::execute(
-            $useinstance == 0 ? $useinstance : $instance->get_id(), $status
+            $useinstance == 0 ? $useinstance : $instance->get_id(),
+            $status
         );
         $result = external_api::clean_returnvalue(update_rule_status::execute_returns(), $result);
 
