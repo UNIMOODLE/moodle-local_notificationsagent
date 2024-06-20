@@ -428,7 +428,7 @@ abstract class notificationplugin {
         $data = json_decode($this->get_parameters() ?? '', true);
 
         // Check cmid exists.
-        if ($cmid = $data[self::UI_ACTIVITY] ?? null) {
+        if ($cmid = $this->get_activity_cmid($data, $courseid) ?? null) {
             $fastmodinfo = get_fast_modinfo($courseid);
             if (!$validation = isset($fastmodinfo->cms[$cmid]) ? true : false) {
                 if (is_null($array)) {
@@ -442,6 +442,12 @@ abstract class notificationplugin {
         }
 
         return $validation;
+    }
+    /**
+     * Get activity id from $data.
+     */
+    public function get_activity_cmid($data, $courseid) {
+        return ((object)$data)->{self::UI_ACTIVITY} ?? null;
     }
 
     /**

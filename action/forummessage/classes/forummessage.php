@@ -183,7 +183,19 @@ class forummessage extends notificationactionplugin {
         );
         return $this->get_parameters();
     }
-
+    /** Get activity id from $data */
+    public function get_activity_cmid($data, $courseid) {
+        $cmid = ((object)$data)->{self::UI_ACTIVITY};
+        // notificationsagent::FORUM_NEWS_CMID is the mark value for the forum news.
+        if ($cmid == notificationsagent::FORUM_NEWS_CMID) {
+            // Return the forum news cmid.
+            $instanced = notificationactionplugin::get_news_forum($courseid);            
+            // Get cmid.
+            $fastmodinfo = get_fast_modinfo($courseid);
+            $cmid = $fastmodinfo->get_instances_of('forum')[$instanced]->id;
+        } 
+        return $cmid;
+    }
     /**
      * Process and replace markups in the supplied content.
      *
@@ -201,7 +213,7 @@ class forummessage extends notificationactionplugin {
 
         // Check if activity is found, if is not, return [FFFF].
         $activityname = '[FFFF]';
-        $cmid = $jsonparams->{self::UI_ACTIVITY};
+        $cmid = $this->get_activity_cmid($jsonparams, $courseid);
         if ($cmid == notificationsagent::FORUM_NEWS_CMID) {
             $activityname = get_string('frontpagenews');
         } else {
