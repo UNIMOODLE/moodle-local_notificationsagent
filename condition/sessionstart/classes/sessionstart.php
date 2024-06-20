@@ -39,7 +39,6 @@ use local_notificationsagent\notificationconditionplugin;
  * This class handles the condition of session start.
  */
 class sessionstart extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -82,7 +81,8 @@ class sessionstart extends notificationconditionplugin {
 
         $timestart = $DB->get_field(
             'notificationsagent_cache',
-            'startdate', ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($timestart)) {
@@ -98,7 +98,6 @@ class sessionstart extends notificationconditionplugin {
         ($timeaccess >= $timestart) ? $meetcondition = true : $meetcondition = false;
 
         return $meetcondition;
-
     }
 
     /**
@@ -243,7 +242,8 @@ class sessionstart extends notificationconditionplugin {
     public static function get_first_course_access($userid, $courseid) {
         global $DB;
         $firstacces = $DB->get_field(
-            'notificationsagent_crseview', 'firstaccess',
+            'notificationsagent_crseview',
+            'firstaccess',
             ['userid' => $userid, 'courseid' => $courseid]
         );
 
@@ -257,7 +257,8 @@ class sessionstart extends notificationconditionplugin {
                   LIMIT 1';
 
             $result = $DB->get_record_sql(
-                $query, [
+                $query,
+                [
                     'courseid' => $courseid,
                     'userid' => $userid,
                     'eventname' => '\\core\\event\\course_viewed',

@@ -47,7 +47,6 @@ require_once("{$CFG->libdir}/externallib.php");
  * @group notificationsagent
  */
 class delete_rule_test extends \advanced_testcase {
-
     /**
      * @var rule
      */

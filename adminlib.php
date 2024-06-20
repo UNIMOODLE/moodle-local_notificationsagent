@@ -39,7 +39,6 @@ require_once($CFG->libdir . '/adminlib.php');
  *  Links external PHP pages into the admin tree.
  */
 class notificationsagent_admin_page_manage_notificationsagent_plugins extends admin_externalpage {
-
     /** @var string the name of plugin subtype */
     private $subtype = '';
 
@@ -73,7 +72,8 @@ class notificationsagent_admin_page_manage_notificationsagent_plugins extends ad
         $found = false;
 
         foreach (core_component::get_plugin_list($this->subtype) as $name => $notused) {
-            if (strpos(
+            if (
+                strpos(
                     core_text::strtolower(get_string('pluginname', $this->subtype . '_' . $name)),
                     $query
                 ) !== false
@@ -101,7 +101,6 @@ class notificationsagent_admin_page_manage_notificationsagent_plugins extends ad
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class notificationsagent_plugin_manager {
-
     /** @var object the url of the manage submission plugin page */
     private $pageurl;
     /** @var string any error from the current action */
@@ -168,13 +167,14 @@ class notificationsagent_plugin_manager {
         }
 
         return $OUTPUT->action_icon(
-                new moodle_url(
-                    $url,
-                    ['action' => $action, 'plugin' => $plugin, 'sesskey' => sesskey()]
-                ),
-                new pix_icon($icon, $alt, 'moodle', ['title' => $alt]),
-                null, ['title' => $alt]
-            ) . ' ';
+            new moodle_url(
+                $url,
+                ['action' => $action, 'plugin' => $plugin, 'sesskey' => sesskey()]
+            ),
+            new pix_icon($icon, $alt, 'moodle', ['title' => $alt]),
+            null,
+            ['title' => $alt]
+        ) . ' ';
     }
 
     /**
@@ -239,7 +239,8 @@ class notificationsagent_plugin_manager {
                     new moodle_url(
                         '/admin/settings.php',
                         ['section' => $this->subtype . '_' . $plugin]
-                    ), get_string('settings')
+                    ),
+                    get_string('settings')
                 );
             } else {
                 $row[] = '&nbsp;';

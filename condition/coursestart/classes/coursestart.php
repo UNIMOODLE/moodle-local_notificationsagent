@@ -42,7 +42,6 @@ use local_notificationsagent\notificationconditionplugin;
  * Class representing the coursestart condition plugin.
  */
 class coursestart extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -111,7 +110,8 @@ class coursestart extends notificationconditionplugin {
                 }
             }
             // Exception.
-            if (($timeaccess <= $coursestart + $params->{self::UI_TIME} && $timeaccess >= $coursestart)
+            if (
+                ($timeaccess <= $coursestart + $params->{self::UI_TIME} && $timeaccess >= $coursestart)
                     && $context->is_complementary()
             ) {
                 return time();

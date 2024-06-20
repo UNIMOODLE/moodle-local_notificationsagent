@@ -42,7 +42,6 @@ use notificationscondition_activityavailable\activityavailable;
  * Class for testing the activityavailable_crontask.
  */
 class activityavailable_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *
@@ -74,7 +73,6 @@ class activityavailable_crontask extends scheduled_task {
                     notificationsagent::generate_cache_triggers($subplugin, $context);
                 }
             }
-
         }
         \local_notificationsagent\helper\helper::custom_mtrace("Activityavailable end ");
     }

@@ -47,7 +47,6 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  * Calendarevetto class
  */
 class calendareventto extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -90,9 +89,9 @@ class calendareventto extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $timestart = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
         $event = calendar_get_events_by_id([$params->{self::UI_ACTIVITY}]);
         if (empty($timestart)) {
@@ -134,7 +133,6 @@ class calendareventto extends notificationconditionplugin {
                     $timestart = time();
                 }
             }
-
         }
 
         return $timestart;
@@ -164,19 +162,22 @@ class calendareventto extends notificationconditionplugin {
         }
 
         $element = $mform->createElement(
-                'select', $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_calendar', 'notificationscondition_calendareventto',
-                        ['typeelement' => '[CCCC]']
-                ),
-                $events
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_calendar',
+                'notificationscondition_calendareventto',
+                ['typeelement' => '[CCCC]']
+            ),
+            $events
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -308,9 +309,9 @@ class calendareventto extends notificationconditionplugin {
             }
             // Otherwise it's a warning.
             $logger->process(
-                    'Restored item (' . $this->get_pluginname() . ')
+                'Restored item (' . $this->get_pluginname() . ')
                 has eventid on action that was not restored',
-                    \backup::LOG_WARNING
+                \backup::LOG_WARNING
             );
         } else {
             $newparameters = json_decode($this->get_parameters());

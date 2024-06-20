@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class weekend_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -103,7 +102,7 @@ class weekend_test extends \advanced_testcase {
         self::$subplugin = new weekend(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -112,7 +111,6 @@ class weekend_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'weekend';
         self::$elements = [];
-
     }
 
     /**
@@ -199,8 +197,8 @@ class weekend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -227,7 +225,6 @@ class weekend_test extends \advanced_testcase {
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
         \uopz_unset_return('time');
-
     }
 
     /**
@@ -277,8 +274,8 @@ class weekend_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -323,7 +320,6 @@ class weekend_test extends \advanced_testcase {
     final public function test_isweekend(int $time, bool $expected) {
         set_config('calendar_weekend', 65);
         $this->assertSame($expected, weekend::is_weekend($time));
-
     }
 
     /**
@@ -377,5 +373,4 @@ class weekend_test extends \advanced_testcase {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
-
 }

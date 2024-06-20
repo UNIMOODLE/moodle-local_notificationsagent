@@ -47,7 +47,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class itemgraded_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -104,7 +103,7 @@ class itemgraded_test extends \advanced_testcase {
         self::$subplugin = new itemgraded(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$coursetest = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$coursetest->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -113,7 +112,6 @@ class itemgraded_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'itemgraded';
         self::$elements = ['[OOOP]', '[GGGG]', '[AAAA]'];
-
     }
 
     /**
@@ -177,7 +175,6 @@ class itemgraded_test extends \advanced_testcase {
         }
         // Fill incorrect answers.
         while ($i < 10) {
-
             $attemptobj->process_submitted_actions($timenow, false, [$i + 1 => ['answer' => '0']]);
             $i++;
         }
@@ -186,7 +183,6 @@ class itemgraded_test extends \advanced_testcase {
         $result = self::$subplugin->evaluate(self::$context);
 
         $this->assertSame($result, $expected);
-
     }
 
     /**
@@ -236,8 +232,8 @@ class itemgraded_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -358,8 +354,8 @@ class itemgraded_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -494,5 +490,4 @@ class itemgraded_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

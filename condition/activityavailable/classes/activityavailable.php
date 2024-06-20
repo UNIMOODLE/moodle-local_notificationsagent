@@ -42,7 +42,6 @@ use notificationscondition_ac\custominfo;
  * Class activityavailable.
  */
 class activityavailable extends notificationconditionplugin {
-
     /** @var string name */
     public const NAME = 'activityavailable';
 
@@ -66,7 +65,7 @@ class activityavailable extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -110,9 +109,9 @@ class activityavailable extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The form to which the elements will be added.
-     * @param int              $courseid The course identifier.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The form to which the elements will be added.
+     * @param int $courseid The course identifier.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -135,7 +134,8 @@ class activityavailable extends notificationconditionplugin {
             'select',
             $this->get_name_ui(self::UI_ACTIVITY),
             get_string(
-                'editrule_condition_activity', 'notificationscondition_activityavailable',
+                'editrule_condition_activity',
+                'notificationscondition_activityavailable',
                 ['typeelement' => '[AAAA]']
             ),
             $listactivities
@@ -143,7 +143,8 @@ class activityavailable extends notificationconditionplugin {
 
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-            $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
             'required'
         );
     }
@@ -183,9 +184,9 @@ class activityavailable extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */

@@ -39,7 +39,6 @@ namespace notificationscondition_usergroupadd\privacy;
  * @group notificationsagent
  */
 class provider_test extends \advanced_testcase {
-
     /**
      * Test  get reason
      *

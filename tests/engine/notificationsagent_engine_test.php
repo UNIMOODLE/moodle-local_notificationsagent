@@ -44,7 +44,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class notificationsagent_engine_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -106,7 +105,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -140,7 +139,12 @@ class notificationsagent_engine_test extends \advanced_testcase {
      * @covers       ::notificationsagent_engine_evaluate_rule
      */
     public function test_notificationsagent_engine_evaluate_rule(
-            int $date, array $conditiondata, array $exceptiondata, array $actiondata, bool $genericuser, bool $expected
+        int $date,
+        array $conditiondata,
+        array $exceptiondata,
+        array $actiondata,
+        bool $genericuser,
+        bool $expected
     ) {
         global $DB, $USER;
         $conditions = [];
@@ -226,8 +230,12 @@ class notificationsagent_engine_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         notificationsagent_engine::notificationsagent_engine_evaluate_rule(
-                [self::$rule->get_id()], $date, $userid, self::$course->id, $context->get_triggercondition(),
-                $context->get_startdate()
+            [self::$rule->get_id()],
+            $date,
+            $userid,
+            self::$course->id,
+            $context->get_triggercondition(),
+            $context->get_startdate()
         );
         $results = $DB->get_records('notificationsagent_report');
         if ($expected) {
@@ -240,7 +248,6 @@ class notificationsagent_engine_test extends \advanced_testcase {
         } else {
             $this->assertEmpty($results);
         }
-
     }
 
     /**

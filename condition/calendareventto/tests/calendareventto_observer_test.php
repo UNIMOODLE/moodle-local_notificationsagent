@@ -43,7 +43,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class calendareventto_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -95,7 +94,7 @@ class calendareventto_observer_test extends \advanced_testcase {
         $rule = new rule();
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -104,7 +103,7 @@ class calendareventto_observer_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser(self::$user);
         self::$calendarevent = self::getDataGenerator()->create_event(
-                [
+            [
                         'repeatid' => 0,
                         'timestart' => self::COURSE_DATESTART,
                         'timeduration' => self::DURATION,
@@ -247,5 +246,4 @@ class calendareventto_observer_test extends \advanced_testcase {
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
         \uopz_unset_return('time');
     }
-
 }

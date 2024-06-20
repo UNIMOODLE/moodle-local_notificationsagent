@@ -44,7 +44,6 @@ use notificationscondition_coursestart\coursestart;
  * @group  notificationsagent
  */
 class coursestart_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -95,7 +94,6 @@ class coursestart_crontask_test extends \advanced_testcase {
             ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
@@ -149,7 +147,6 @@ class coursestart_crontask_test extends \advanced_testcase {
         $this->assertEquals($pluginname, $cache->pluginname);
         $this->assertEquals(self::$course->id, $cache->courseid);
         $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
-
     }
 
     /**
@@ -176,6 +173,5 @@ class coursestart_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(coursestart_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

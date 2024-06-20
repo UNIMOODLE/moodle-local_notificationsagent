@@ -58,7 +58,9 @@ $context = context_course::instance($courseid);
 if (get_config('local_notificationsagent', 'disable_user_use')) {
     if (!has_capability('local/notificationsagent:managecourserule', $context)) {
         throw new \moodle_exception(
-            'nopermissions', '', '',
+            'nopermissions',
+            '',
+            '',
             get_capability_string('local/notificationsagent:managecourserule')
         );
     }
@@ -180,7 +182,8 @@ foreach ($rules as $rule) {
             :
             get_string('type_template', 'local_notificationsagent'),
         'editurl' => new moodle_url(
-            "/local/notificationsagent/editrule.php", ['courseid' => $courseid, 'action' => 'clone', 'ruleid' => $rule->get_id()]
+            "/local/notificationsagent/editrule.php",
+            ['courseid' => $courseid, 'action' => 'clone', 'ruleid' => $rule->get_id()]
         ),
     ];
 }

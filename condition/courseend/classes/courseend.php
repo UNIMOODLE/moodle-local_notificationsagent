@@ -42,7 +42,6 @@ use local_notificationsagent\notificationconditionplugin;
  * Class representing the courseend condition plugin.
  */
 class courseend extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -119,7 +118,7 @@ class courseend extends notificationconditionplugin {
                 }
             }
         }
-        
+
         return $timeend;
     }
 

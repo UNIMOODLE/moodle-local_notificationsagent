@@ -38,7 +38,6 @@ use core_calendar\type_factory;
  * weekdays supluging class
  */
 class weekdays extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -115,10 +114,11 @@ class weekdays extends notificationconditionplugin {
 
             $weekdays = $calendar->get_weekdays();
             foreach ($weekdays as $weekday => $value) {
-                if (self::correct_weekday(
+                if (
+                    self::correct_weekday(
                         date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)),
                         $selecteddays
-                )
+                    )
                 ) {
                     return $timestamp;
                 }
@@ -132,10 +132,11 @@ class weekdays extends notificationconditionplugin {
 
             $weekdays = $calendar->get_weekdays();
             foreach ($weekdays as $weekday => $value) {
-                if (!self::correct_weekday(
+                if (
+                    !self::correct_weekday(
                         date('w', $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0, $CFG->timezone)),
                         $selecteddays
-                )
+                    )
                 ) {
                     return $timestamp;
                 }
@@ -159,16 +160,21 @@ class weekdays extends notificationconditionplugin {
         // Example of checkbox id: 15_weekdays_dayofweek0 for sunday.
         foreach ($weekdays as $key => $value) {
             $radioarray[] = $mform->createElement(
-                    'advcheckbox',
-                    $this->get_name_ui(self::UI_DAYOFWEEK . $key),
-                    '', $value['fullname'], $key
+                'advcheckbox',
+                $this->get_name_ui(self::UI_DAYOFWEEK . $key),
+                '',
+                $value['fullname'],
+                $key
             );
         }
 
         $radiogroup = $mform->createElement(
-                'group', $this->get_name_ui($this->get_subtype()),
-                '',
-                $radioarray, null, false
+            'group',
+            $this->get_name_ui($this->get_subtype()),
+            '',
+            $radioarray,
+            null,
+            false
         );
 
         $mform->insertElementBefore($radiogroup, 'new' . $type . '_group');
@@ -321,7 +327,6 @@ class weekdays extends notificationconditionplugin {
         foreach ($params->{self::NAME} as $param) {
             $key = $this->get_name_ui(self::UI_DAYOFWEEK . $param);
             $arrayparams[$key] = true;
-
         }
         return $arrayparams;
     }

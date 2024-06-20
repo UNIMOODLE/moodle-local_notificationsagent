@@ -42,7 +42,6 @@ use notificationscondition_activitystudentend\activitystudentend;
  * @group notificationsagent
  */
 class activitystudentend_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -94,7 +93,6 @@ class activitystudentend_observer_test extends \advanced_testcase {
             ])
         );
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
-
     }
 
     /**
@@ -163,6 +161,5 @@ class activitystudentend_observer_test extends \advanced_testcase {
 
         $this->assertIsNumeric($lastaccess);
         $this->assertEquals($event->timecreated, $lastaccess);
-
     }
 }

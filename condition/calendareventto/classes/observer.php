@@ -43,7 +43,6 @@ use local_notificationsagent\helper\helper;
  * Observer for calendareventto condition
  */
 class notificationscondition_calendareventto_observer {
-
     /**
      * Listen calendar updated event
      *
@@ -102,7 +101,8 @@ class notificationscondition_calendareventto_observer {
             $result = $subplugin->validation($event->courseid);
             if (!$result) {
                 update_rule_status::execute(
-                    $data->ruleid, rule::PAUSE_RULE,
+                    $data->ruleid,
+                    rule::PAUSE_RULE,
                 );
                 helper::broken_rule_notify($event->courseid, $data->ruleid);
             }

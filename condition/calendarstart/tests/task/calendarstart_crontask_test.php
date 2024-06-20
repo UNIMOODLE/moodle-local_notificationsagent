@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class calendarstart_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -117,7 +116,6 @@ class calendarstart_crontask_test extends \advanced_testcase {
                 'userid' => self::$user->id,
             ]
         );
-
     }
 
     /**
@@ -190,7 +188,6 @@ class calendarstart_crontask_test extends \advanced_testcase {
         }
 
         \uopz_unset_return('time');
-
     }
 
     /**
@@ -223,6 +220,5 @@ class calendarstart_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(calendarstart_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

@@ -36,7 +36,6 @@ use notificationscondition_sessionstart\sessionstart;
  * Observer for the notificationscondition_sessionstart plugin.
  */
 class notificationscondition_sessionstart_observer {
-
     /**
      * A function to handle the course_viewed event.
      *

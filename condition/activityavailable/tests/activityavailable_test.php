@@ -46,7 +46,6 @@ use local_notificationsagent\form\editrule_form;
  * @group notificationsagent
  */
 class activityavailable_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -146,7 +145,6 @@ class activityavailable_test extends \advanced_testcase {
         // Test evaluate.
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
-
     }
 
     /**
@@ -304,7 +302,6 @@ class activityavailable_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
         $result = $method->invoke(self::$subplugin, $params);
         $this->assertSame($expected, $result);
-
     }
 
     /**
@@ -375,5 +372,4 @@ class activityavailable_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
-
 }

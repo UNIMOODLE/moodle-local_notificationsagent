@@ -36,8 +36,6 @@ use local_notificationsagent\evaluationcontext;
  * Class representing the sessionend condition plugin.
  */
 class notificationscondition_sessionend_observer {
-
-
     /**
      * Called when a course is viewed.
      *

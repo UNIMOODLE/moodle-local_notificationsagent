@@ -45,7 +45,6 @@ use notificationscondition_sessionstart\sessionstart;
  * @group notificationsagent
  */
 class notificationsagent_observer_test extends \advanced_testcase {
-
     /**
      * @var \local_notificationsagent\rule
      */
@@ -103,7 +102,7 @@ class notificationsagent_observer_test extends \advanced_testcase {
 
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -152,7 +151,8 @@ class notificationsagent_observer_test extends \advanced_testcase {
         $objdbtrigger = new \stdClass();
         $objdbtrigger->ruleid = 1;
         $objdbtrigger->conditionid = 1;
-        $objdbtrigger->courseid = self::$course->id;;
+        $objdbtrigger->courseid = self::$course->id;
+        ;
         $objdbtrigger->userid = self::$user->id;
         $objdbtrigger->startdate = time();
         $objdbtrigger->ruleoff = time();
@@ -175,7 +175,5 @@ class notificationsagent_observer_test extends \advanced_testcase {
 
         $this->assertEmpty($deletereport);
         $this->assertEmpty($deletetrigger);
-
     }
-
 }

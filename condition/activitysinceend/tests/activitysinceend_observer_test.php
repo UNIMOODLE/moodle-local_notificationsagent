@@ -43,7 +43,6 @@ use notificationscondition_activitysinceend\activitysinceend;
  * @group notificationsagent
  */
 class activitysinceend_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -91,14 +90,13 @@ class activitysinceend_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                         'enablecompletion' => true,
                 ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
@@ -169,7 +167,6 @@ class activitysinceend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);
         \uopz_unset_return('time');
-
     }
 
     /**

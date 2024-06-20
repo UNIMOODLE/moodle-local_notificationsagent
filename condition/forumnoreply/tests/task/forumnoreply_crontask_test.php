@@ -48,7 +48,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class forumnoreply_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -99,7 +98,6 @@ class forumnoreply_crontask_test extends \advanced_testcase {
             ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
@@ -172,7 +170,6 @@ class forumnoreply_crontask_test extends \advanced_testcase {
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);
         $this->assertEquals($conditionid, $trigger->conditionid);
-
     }
 
     /**
@@ -197,6 +194,5 @@ class forumnoreply_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(forumnoreply_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

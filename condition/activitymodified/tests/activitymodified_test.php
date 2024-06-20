@@ -46,7 +46,6 @@ use local_notificationsagent\form\editrule_form;
  * @group notificationsagent
  */
 class activitymodified_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -357,7 +356,8 @@ class activitymodified_test extends \advanced_testcase {
         }
 
         $istherecontent = activitymodified::get_any_new_content(
-            $activity->cmid, $eventtimecreation
+            $activity->cmid,
+            $eventtimecreation
         );
 
         if (!is_null($fileuploadtime)) {

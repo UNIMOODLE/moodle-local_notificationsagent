@@ -43,7 +43,6 @@ use local_notificationsagent\notificationplugin;
  * @group notificationsagent
  */
 class notificationsagent_trigger_cron_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -129,7 +128,12 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
      */
 
     public function test_execute(
-        int $date, array $conditiondata, array $exceptiondata, array $actiondata, bool $genericuser, bool $expected
+        int $date,
+        array $conditiondata,
+        array $exceptiondata,
+        array $actiondata,
+        bool $genericuser,
+        bool $expected
     ) {
         global $DB, $USER;
 
@@ -238,7 +242,6 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
         } else {
             $this->assertEmpty($results);
         }
-
     }
 
     /**
@@ -388,7 +391,5 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(notificationsagent_trigger_cron::class);
 
         $this->assertIsString($task->get_name());
-
     }
-
 }

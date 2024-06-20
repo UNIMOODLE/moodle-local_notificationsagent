@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class courseend_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -91,13 +90,12 @@ class courseend_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
@@ -153,7 +151,6 @@ class courseend_crontask_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $cache->courseid);
         $this->assertEquals($conditionid, $cache->conditionid);
         $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $cache->userid);
-
     }
 
     /**
@@ -181,6 +178,5 @@ class courseend_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(courseend_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

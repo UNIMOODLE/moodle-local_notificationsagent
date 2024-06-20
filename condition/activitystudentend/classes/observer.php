@@ -40,7 +40,6 @@ use notificationscondition_activitystudentend\activitystudentend;
  * Class of activitystudentend observer
  */
 class notificationscondition_activitystudentend_observer {
-
     /**
      * Course module viewed event
      *

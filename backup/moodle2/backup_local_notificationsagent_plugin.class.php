@@ -36,7 +36,6 @@
  *  Plugin backup class
  */
 class backup_local_notificationsagent_plugin extends backup_local_plugin {
-
     /**
      * Define plugin structure
      *
@@ -94,13 +93,14 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
 
         // Rule source.
         $rule->set_source_sql(
-                '
+            '
             SELECT nr.*
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                AND nctx.contextid = ?
              WHERE nctx.objectid = ?
-        ', [
+        ',
+            [
                         backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
                 ]
         );
@@ -109,26 +109,28 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
         if ($this->task->get_courseid() == SITEID) {
             // Context source.
             $context->set_source_sql(
-                    '
+                '
                 SELECT nctx.*
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                  WHERE nr.id = ?
-            ', [
+            ',
+                [
                             backup::VAR_PARENTID,
                     ]
             );
         } else {
             // Context source.
             $context->set_source_sql(
-                    '
+                '
                 SELECT nctx.*
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = ?
                  WHERE nctx.objectid = ?
                    AND nr.id = ?
-            ', [
+            ',
+                [
                             backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
                     ]
             );
@@ -136,7 +138,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
 
         // Condition source.
         $condition->set_source_sql(
-                '
+            '
             SELECT nc.*
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -144,14 +146,15 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
               JOIN {notificationsagent_condition} nc ON nr.id = nc.ruleid
              WHERE nctx.objectid = ?
                AND nr.id = ?
-        ', [
+        ',
+            [
                         backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
                 ]
         );
 
         // Action source.
         $action->set_source_sql(
-                '
+            '
             SELECT na.*
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -159,14 +162,15 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
               JOIN {notificationsagent_action} na ON nr.id = na.ruleid
              WHERE nctx.objectid = ?
                AND nr.id = ?
-        ', [
+        ',
+            [
                         backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID, backup::VAR_PARENTID,
                 ]
         );
 
         // Launched source.
         $launched->set_source_sql(
-                '
+            '
             SELECT nl.*
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -175,7 +179,8 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                AND nl.courseid = ?
              WHERE nctx.objectid = ?
                AND nr.id = ?
-        ', [
+        ',
+            [
                         backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
                         backup::VAR_COURSEID, backup::VAR_PARENTID,
                 ]
@@ -183,7 +188,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
 
         // Launched source.
         $report->set_source_sql(
-                '
+            '
             SELECT nre.*
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -192,7 +197,8 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                AND nre.courseid = ?
              WHERE nctx.objectid = ?
                AND nr.id = ?
-        ', [
+        ',
+            [
                         backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
                         backup::VAR_COURSEID, backup::VAR_PARENTID,
                 ]

@@ -43,8 +43,10 @@ use core_privacy\local\request;
 /**
  * Provider user data class
  */
-class provider implements \core_privacy\local\request\core_userlist_provider, \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\subsystem\provider {
+class provider implements
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\subsystem\provider {
     /**
      * Privacy  notifications agent  provider.
      *
@@ -63,9 +65,9 @@ class provider implements \core_privacy\local\request\core_userlist_provider, \c
         ];
 
         $collection->add_database_table(
-                'notificationsagent_report',
-                $reportdata,
-                'privacy:metadata:notificationsagentreport'
+            'notificationsagent_report',
+            $reportdata,
+            'privacy:metadata:notificationsagentreport'
         );
 
         return $collection;
@@ -100,7 +102,7 @@ class provider implements \core_privacy\local\request\core_userlist_provider, \c
         if ($contextlist->get_component() != 'local_notificationsagent') {
             return;
         }
-        $contexts = array_filter($contextlist->get_contexts(), function($context) {
+        $contexts = array_filter($contextlist->get_contexts(), function ($context) {
             if ($context->contextlevel == CONTEXT_COURSE) {
                 return $context;
             }
@@ -125,8 +127,8 @@ class provider implements \core_privacy\local\request\core_userlist_provider, \c
             }
 
             request\writer::with_context($context)->export_data(
-                    [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
-                    (object) $exportdata
+                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
+                (object) $exportdata
             );
         }
     }

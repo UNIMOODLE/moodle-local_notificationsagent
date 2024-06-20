@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class activityavailable_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -97,7 +96,6 @@ class activityavailable_crontask_test extends \advanced_testcase {
             ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
-
     }
 
     /**
@@ -168,7 +166,5 @@ class activityavailable_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(activityavailable_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
-
 }

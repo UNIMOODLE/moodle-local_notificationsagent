@@ -43,7 +43,6 @@ use local_notificationsagent\evaluationcontext;
  *  Scheduled task for forumnoreply subplugin
  */
 class forumnoreply_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *

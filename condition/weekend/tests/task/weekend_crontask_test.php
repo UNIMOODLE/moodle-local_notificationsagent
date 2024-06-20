@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
  * @group notificationsagent
  */
 class weekend_crontask_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -91,7 +90,7 @@ class weekend_crontask_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-                ([
+            ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -177,6 +176,5 @@ class weekend_crontask_test extends \advanced_testcase {
         $task = \core\task\manager::get_scheduled_task(weekend_crontask::class);
 
         $this->assertIsString($task->get_name());
-
     }
 }

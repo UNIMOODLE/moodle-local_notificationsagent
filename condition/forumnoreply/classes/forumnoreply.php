@@ -42,7 +42,6 @@ use local_notificationsagent\rule;
  * Forumnoreply subplugin class
  */
 class forumnoreply extends notificationconditionplugin {
-
     /**
      * Subplugin name
      */
@@ -92,20 +91,20 @@ class forumnoreply extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
 
         $time = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
         );
 
         if (empty($time)) {
             return !empty(
-            self::get_unanswered_threads(
+                self::get_unanswered_threads(
                     $cmid,
                     $courseid,
                     $timeaccess,
                     $timenowandtime,
                     $userid
-            )
+                )
             );
         }
 
@@ -166,20 +165,22 @@ class forumnoreply extends notificationconditionplugin {
         }
 
         $element = $mform->createElement(
-                'select',
-                $this->get_name_ui(self::UI_ACTIVITY),
-                get_string(
-                        'editrule_condition_activity', 'notificationscondition_activitysinceend',
-                        ['typeelement' => '[FFFF]']
-                ),
-                $forums
+            'select',
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string(
+                'editrule_condition_activity',
+                'notificationscondition_activitysinceend',
+                ['typeelement' => '[FFFF]']
+            ),
+            $forums
         );
 
         $this->get_ui_select_date($mform, $type);
         $mform->insertElementBefore($element, 'new' . $type . '_group');
         $mform->addRule(
-                $this->get_name_ui(self::UI_ACTIVITY), get_string('editrule_required_error', 'local_notificationsagent'),
-                'required'
+            $this->get_name_ui(self::UI_ACTIVITY),
+            get_string('editrule_required_error', 'local_notificationsagent'),
+            'required'
         );
     }
 
@@ -283,7 +284,7 @@ class forumnoreply extends notificationconditionplugin {
         $whereuser = '';
         $params = [];
         if ($userid) {
-            list($useridsql, $params) = $DB->get_in_or_equal($userid, SQL_PARAMS_NAMED);
+            [$useridsql, $params] = $DB->get_in_or_equal($userid, SQL_PARAMS_NAMED);
             $whereuser = " AND fd.userid {$useridsql}";
         }
 

@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class usergroupadd_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -107,7 +106,7 @@ class usergroupadd_test extends \advanced_testcase {
         self::$subplugin = new usergroupadd(self::$rule->to_record());
         self::$subplugin->set_id(5);
         self::$course = self::getDataGenerator()->create_course(
-                ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
+            ['startdate' => self::COURSE_DATESTART, 'enddate' => self::COURSE_DATEEND]
         );
         self::$coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_user();
@@ -138,15 +137,14 @@ class usergroupadd_test extends \advanced_testcase {
         self::setUser(self::$user->id);
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
-                    'userid' => self::$user->id
-                , 'groupid' => self::$group->id,
+                    'userid' => self::$user->id, 'groupid' => self::$group->id,
             ]);
         }
         self::$context->set_complementary($complementary);
         self::$context->set_params(
-                json_encode(
-                        ['cmid' => self::$group->id],
-                )
+            json_encode(
+                ['cmid' => self::$group->id],
+            )
         );
         self::$context->set_timeaccess($timeaccess);
         self::$subplugin->set_id(self::CONDITIONID);
@@ -211,8 +209,8 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-                has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
-                self::$subplugin->check_capability(self::$coursecontext)
+            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            self::$subplugin->check_capability(self::$coursecontext)
         );
     }
 
@@ -236,21 +234,19 @@ class usergroupadd_test extends \advanced_testcase {
         set_config('calendar_usergroupadd', 65);
         date_default_timezone_set('Europe/Madrid');
         self::$context->set_params(
-                json_encode(
-                        ['cmid' => self::$group->id],
-                )
+            json_encode(
+                ['cmid' => self::$group->id],
+            )
         );
         if ($addingroup) {
             self::getDataGenerator()->create_group_member([
-                    'userid' => self::$user->id
-                , 'groupid' => self::$group->id,
+                    'userid' => self::$user->id, 'groupid' => self::$group->id,
             ]);
         }
         self::$context->set_timeaccess($timeaccess);
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
         \uopz_unset_return('time');
-
     }
 
     /**
@@ -296,8 +292,8 @@ class usergroupadd_test extends \advanced_testcase {
      */
     public function test_getdescription() {
         $this->assertSame(
-                self::$subplugin->get_description(),
-                [
+            self::$subplugin->get_description(),
+            [
                         'title' => self::$subplugin->get_title(),
                         'name' => self::$subplugin->get_subtype(),
                 ]
@@ -382,5 +378,4 @@ class usergroupadd_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$course->id));
     }
-
 }

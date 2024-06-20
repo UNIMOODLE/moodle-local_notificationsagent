@@ -39,7 +39,6 @@ namespace notificationscondition_forumnoreply\privacy;
  * @group notificationsagent
  */
 class provider_test extends \advanced_testcase {
-
     /**
      * Test  get reason
      *

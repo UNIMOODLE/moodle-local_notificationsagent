@@ -42,7 +42,6 @@ use notificationscondition_calendareventto\calendareventto;
  * Scheduled tak for condition
  */
 class calendareventto_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *

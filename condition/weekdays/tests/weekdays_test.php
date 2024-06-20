@@ -46,7 +46,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class weekdays_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -109,7 +108,6 @@ class weekdays_test extends \advanced_testcase {
         self::$context->set_courseid(self::$coursetest->id);
         self::$subtype = 'weekdays';
         self::$elements = ['LMXJVSD'];
-
     }
 
     /**
@@ -209,7 +207,6 @@ class weekdays_test extends \advanced_testcase {
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
         \uopz_unset_return('time');
-
     }
 
     /**
@@ -360,7 +357,6 @@ class weekdays_test extends \advanced_testcase {
             $indexday++;
         }
         $this->assertEquals($checkboxnames, $uigroupelements);
-
     }
 
     /**
@@ -409,5 +405,4 @@ class weekdays_test extends \advanced_testcase {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
-
 }

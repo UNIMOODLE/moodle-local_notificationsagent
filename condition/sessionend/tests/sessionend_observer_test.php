@@ -41,7 +41,6 @@ use local_notificationsagent\rule;
  * @group notificationsagent
  */
 class sessionend_observer_test extends \advanced_testcase {
-
     /**
      * @var rule
      */
@@ -92,7 +91,6 @@ class sessionend_observer_test extends \advanced_testcase {
                 'enddate' => self::COURSE_DATEEND,
             ])
         );
-
     }
 
     /**
@@ -155,7 +153,6 @@ class sessionend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);
-
     }
 
     /**
@@ -169,5 +166,4 @@ class sessionend_observer_test extends \advanced_testcase {
             [86400 * 3],
         ];
     }
-
 }

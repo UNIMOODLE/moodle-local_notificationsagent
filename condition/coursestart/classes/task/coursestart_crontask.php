@@ -42,7 +42,6 @@ use local_notificationsagent\evaluationcontext;
  * Class coursestart_crontask
  */
 class coursestart_crontask extends scheduled_task {
-
     /**
      * Get a descriptive name for the task (shown to admins)
      *
