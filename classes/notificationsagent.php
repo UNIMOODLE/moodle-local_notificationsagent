@@ -442,21 +442,21 @@ class notificationsagent {
         $courseid = $context->get_courseid();
         $coursecontext = \context_course::instance($courseid);
         $contextuser = $context->get_userid();  // 0 or userid>0
-        $student = $subplugin->rule->createdby;
+        $rulecreatedby = $subplugin->rule->createdby;
         // Avoid to set triggers for event or cron triggered by users who don't own the rule.
         if (
-            $contextuser > 0 && $contextuser != $student
+                $contextuser > 0 && $contextuser != $rulecreatedby
                 && !has_capability(
                     'local/notificationsagent:managecourserule',
                     $coursecontext,
-                    $student
+                    $rulecreatedby
                 )
         ) {
             return;
         }
         // Student or user is from event or cron per user.
-        if ($contextuser > 0 && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $student)) {
-            $userid = $student;
+        if ($contextuser > 0 && !has_capability('local/notificationsagent:managecourserule', $coursecontext, $rulecreatedby)) {
+            $userid = $rulecreatedby;
             $userslimit = rule::get_limit_reached_by_users(
                 $courseid,
                 $subplugin->rule->id,
@@ -464,7 +464,7 @@ class notificationsagent {
                 [$userid]
             );
             if (
-                !$userslimit[$userid]
+                    !$userslimit[$userid]
                     && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
@@ -491,15 +491,15 @@ class notificationsagent {
         if (!$subplugin->is_generic()) {
             // If $USER has student role, only generate triggers for its.
             if (
-                has_capability(
-                    'local/notificationsagent:managecourserule',
-                    $coursecontext,
-                    $student
-                )
+                    has_capability(
+                        'local/notificationsagent:managecourserule',
+                        $coursecontext,
+                        $rulecreatedby
+                    )
             ) {
                 $users = $contextuser ? [(object) ['id' => $contextuser]] : self::get_usersbycourse($coursecontext);
             } else {
-                $users = [(object) ['id' => $student]];
+                $users = [(object) ['id' => $rulecreatedby]];
             }
             $userslimit = rule::get_limit_reached_by_users(
                 $courseid,
@@ -536,15 +536,15 @@ class notificationsagent {
         if ($subplugin->is_generic()) {
             // If $USER has student role, only generate triggers for the user.
             if (
-                has_capability(
-                    'local/notificationsagent:managecourserule',
-                    $coursecontext,
-                    $student
-                )
+                    has_capability(
+                        'local/notificationsagent:managecourserule',
+                        $coursecontext,
+                        $rulecreatedby
+                    )
             ) {
                 $userid = self::GENERIC_USERID;
             } else {
-                $userid = $student;
+                $userid = $rulecreatedby;
             }
 
             $userslimit = rule::get_limit_reached_by_users(
@@ -555,7 +555,7 @@ class notificationsagent {
             );
 
             if (
-                !$userslimit[$userid]
+                    !$userslimit[$userid]
                     && !self::is_ruleoff($subplugin->rule->id, $userid, $courseid)
             ) {
                 $context->set_userid($userid);
@@ -634,13 +634,13 @@ class notificationsagent {
 
             if (empty($dates->timestart)) {
                 if ($course = helper::get_cache_course($modtype->course)) {
-                    $dates->timestart = $course->startdate;    
+                    $dates->timestart = $course->startdate;
                 }
             }
 
             if (empty($dates->timeend)) {
                 if ($course = helper::get_cache_course($modtype->course)) {
-                    $dates->timeend = $course->enddate;    
+                    $dates->timeend = $course->enddate;
                 }
             }
         }
