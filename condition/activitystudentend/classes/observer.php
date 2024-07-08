@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -31,6 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\event\course_module_viewed;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
@@ -43,9 +45,9 @@ class notificationscondition_activitystudentend_observer {
     /**
      * Course module viewed event
      *
-     * @param \core\event\course_module_viewed $event Course module viewed event
+     * @param course_module_viewed $event Course module viewed event
      */
-    public static function course_module_viewed(\core\event\course_module_viewed $event) {
+    public static function course_module_viewed(course_module_viewed $event) {
         $courseid = $event->courseid;
         $cmid = $event->contextinstanceid;
         $userid = $event->userid;

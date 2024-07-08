@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -32,16 +32,35 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace notificationscondition_activitystudentend\persistent;
 
-$capabilities = [
-        'local/notificationsagent:activitystudentend' => [
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
-                'archetypes' => [
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW,
-                        'student' => CAP_ALLOW,
-                ],
-        ],
-];
+use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\helper\test\phpunitutil;
+use local_notificationsagent\rule;
+use notificationsaction_bootstrapnotifications\bootstrapmessages;
+use notificationsaction_bootstrapnotifications\bootstrapnotifications;
+use local_notificationsagent\helper\test\mock_base_logger;
+
+/**
+ * Test boostrapnotificationss
+ *
+ * @group notificationsagent
+ */
+class cmlastaccess_test extends \advanced_testcase {
+    /**
+     * Test define properties.
+     *
+     * @covers      \notificationscondition_activitystudentend\persistent\cmlastaccess
+     *
+
+     */
+    public function test_define_properties() {
+        // Test persistant.
+        $this->assertTrue(cmlastaccess::has_property('userid'));
+        $this->assertTrue(cmlastaccess::has_property('courseid'));
+        $this->assertTrue(cmlastaccess::has_property('idactivity'));
+        $this->assertTrue(cmlastaccess::has_property('firstaccess'));
+    }
+}

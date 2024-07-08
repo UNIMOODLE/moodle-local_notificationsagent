@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -65,6 +68,33 @@ function xmldb_notificationscondition_activitystudentend_upgrade($oldversion) {
 
         // Activitystudentend savepoint reached.
         upgrade_plugin_savepoint(true, 2023101804, 'notificationscondition', 'activitystudentend');
+    }
+
+    if ($oldversion < 2023101811) {
+        // Define field timecreated to be added to notificationsagent_cmview.
+        $table = new xmldb_table('notificationsagent_cmview');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'firstaccess');
+
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timecreated');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timemodified');
+
+        // Conditionally launch add field usermodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Activitystudentend savepoint reached.
+        upgrade_plugin_savepoint(true, 2023101811, 'notificationscondition', 'activitystudentend');
     }
 
     return true;

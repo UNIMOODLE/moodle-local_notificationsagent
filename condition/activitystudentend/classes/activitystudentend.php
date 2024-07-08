@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -33,10 +34,12 @@
 
 namespace notificationscondition_activitystudentend;
 
+use enrol_wallet\util\cm;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
+use notificationscondition_activitystudentend\persistent\cmlastaccess;
 
 /**
  * Class activitystudentend condition
@@ -133,7 +136,7 @@ class activitystudentend extends notificationconditionplugin {
 
         // Exception.
         if (
-            $timeaccess >= $lastaccess
+                $timeaccess >= $lastaccess
                 && $timeaccess <= $lastaccess + $params->{self::UI_TIME}
                 && $context->is_complementary()
         ) {
@@ -275,26 +278,17 @@ class activitystudentend extends notificationconditionplugin {
      * @param int $timecreated
      */
     public static function set_activity_access($userid, $courseid, $idactivity, $timecreated) {
-        global $DB;
 
-        $exists = $DB->get_field(
-            'notificationsagent_cmview',
-            'id',
-            ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $idactivity],
-        );
-        $objdb = new \stdClass();
-        $objdb->userid = $userid;
-        $objdb->courseid = $courseid;
-        $objdb->idactivity = $idactivity;
-        $objdb->firstaccess = $timecreated;
+        $cmlastaccess = cmlastaccess::get_record(['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $idactivity]);
 
-        if (!$exists) {
-            // Si el registro no existe, inserta uno nuevo.
-            $DB->insert_record('notificationsagent_cmview', $objdb);
-        } else {
-            $objdb->id = $exists;
-            $DB->update_record('notificationsagent_cmview', $objdb);
+        if (empty($cmlastaccess)) {
+            $cmlastaccess = new cmlastaccess();
+            $cmlastaccess->set('userid', $userid);
+            $cmlastaccess->set('courseid', $courseid);
+            $cmlastaccess->set('idactivity', $idactivity);
         }
+        $cmlastaccess->set('firstaccess', $timecreated);
+        $cmlastaccess->save();
     }
 
     /**
@@ -308,11 +302,11 @@ class activitystudentend extends notificationconditionplugin {
      */
     public static function get_cmlastaccess($userid, $courseid, $cmid) {
         global $DB;
-        $lastaccess = $DB->get_field(
-            'notificationsagent_cmview',
-            'firstaccess',
-            ['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid],
-        );
+        $lastaccess = null;
+        $cmlastaccess = cmlastaccess::get_record(['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid]);
+        if (!empty($cmlastaccess)) {
+            $lastaccess = $cmlastaccess->get('firstaccess');
+        }
 
         if (empty($lastaccess)) {
             $query = "SELECT timecreated
@@ -336,10 +330,10 @@ class activitystudentend extends notificationconditionplugin {
             );
 
             if (!$result) {
-                $lastaccess = null;
-            } else {
-                $lastaccess = $result->timecreated;
+                return $lastaccess;
             }
+
+            $lastaccess = $result->timecreated;
         }
 
         return $lastaccess;
