@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -113,9 +114,9 @@ class weekdays_test extends \advanced_testcase {
     /**
      * Test evaluate
      *
-     * @param int    $timeaccess
+     * @param int $timeaccess
      * @param string $params
-     * @param bool   $expected
+     * @param bool $expected
      *
      * @covers       \notificationscondition_weekdays\weekdays::evaluate
      *
@@ -137,10 +138,10 @@ class weekdays_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Sat' => [1701598161, '{"weekdays":[4,5]}', false],
-            'Sun' => [1701511761, '{"weekdays":[4,5]}', false],
-            'Thu' => [1712786400, '{"weekdays":[4,5]}', true],
-            'Fri' => [1712872800, '{"weekdays":[4,5]}', true],
+                'Sat' => [1701598161, '{"weekdays":[4,5]}', false],
+                'Sun' => [1701511761, '{"weekdays":[4,5]}', false],
+                'Thu' => [1712786400, '{"weekdays":[4,5]}', true],
+                'Fri' => [1712872800, '{"weekdays":[4,5]}', true],
 
         ];
     }
@@ -191,10 +192,10 @@ class weekdays_test extends \advanced_testcase {
      * @covers       \notificationscondition_weekdays\weekdays::correct_weekday
      * @dataProvider dataweekdays
      *
-     * @param int    $timeaccess
-     * @param int    $expected
+     * @param int $timeaccess
+     * @param int $expected
      * @param string $param
-     * @param int    $complementary
+     * @param int $complementary
      *
      * @return void
      */
@@ -216,12 +217,12 @@ class weekdays_test extends \advanced_testcase {
      */
     public static function dataweekdays(): array {
         return [
-            'Condition Thursday 4' => [1712181600, 1712181600, '{"weekdays":[4]}', 0],
-            'Condition Monday 8' => [1712527200, 1712786400, '{"weekdays":[4]}', 0],
-            'Condition Monday 15' => [1713132000, 1713391200, '{"weekdays":[4]}', 0],
-            'Exception Thursday 4' => [1712181600, 1712268000, '{"weekdays":[4]}', 1],
-            'Exception Monday 8' => [1712527200, 1712527200, '{"weekdays":[4]}', 1],
-            'Exception Monday 15' => [1713132000, 1713132000, '{"weekdays":[4]}', 1],
+                'Condition Thursday 4' => [1712181600, 1712181600, '{"weekdays":[4]}', 0],
+                'Condition Monday 8' => [1712527200, 1712786400, '{"weekdays":[4]}', 0],
+                'Condition Monday 15' => [1713132000, 1713391200, '{"weekdays":[4]}', 0],
+                'Exception Thursday 4' => [1712181600, 1712268000, '{"weekdays":[4]}', 1],
+                'Exception Monday 8' => [1712527200, 1712527200, '{"weekdays":[4]}', 1],
+                'Exception Monday 15' => [1713132000, 1713132000, '{"weekdays":[4]}', 1],
         ];
     }
 
@@ -256,9 +257,9 @@ class weekdays_test extends \advanced_testcase {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -307,7 +308,7 @@ class weekdays_test extends \advanced_testcase {
         $weekdays = $calendar->get_weekdays();
         foreach ($paramsencoded->weekdays as $day) {
             empty($contentdays) ? $contentdays = $weekdays[$day]['fullname']
-                : $contentdays .= ', ' . $weekdays[$day]['fullname'];
+                    : $contentdays .= ', ' . $weekdays[$day]['fullname'];
         }
         $expected = str_replace(self::$subplugin->get_elements(), $contentdays, self::$subplugin->get_title());
 
@@ -325,10 +326,10 @@ class weekdays_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -379,8 +380,8 @@ class weekdays_test extends \advanced_testcase {
      */
     public static function datavalidation(): array {
         return [
-            '0 days selected' => ['{"weekdays":[]}', false],
-            '2 days selected' => ['{"weekdays":[4, 5]}', true],
+                '0 days selected' => ['{"weekdays":[]}', false],
+                '2 days selected' => ['{"weekdays":[4, 5]}', true],
         ];
     }
 

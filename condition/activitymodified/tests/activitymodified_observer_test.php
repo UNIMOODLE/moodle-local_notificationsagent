@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -77,9 +78,9 @@ class activitymodified_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$activity = self::getDataGenerator()->create_module('assign', ['course' => self::$course->id]);
     }
@@ -87,8 +88,8 @@ class activitymodified_observer_test extends \advanced_testcase {
     /**
      * Check if the user has added new content to the activity.
      *
-     * @param string $role           Role name
-     * @param int    $fileuploadtime File uploaded time
+     * @param string $role Role name
+     * @param int $fileuploadtime File uploaded time
      *
      * @covers       \notificationscondition_activitymodified_observer::course_module_updated
      * @dataProvider dataprovider
@@ -137,30 +138,30 @@ class activitymodified_observer_test extends \advanced_testcase {
         if (!is_null($fileuploadtime)) {
             $fs = get_file_storage();
             $filerecord = [
-                'contextid' => $assigncontext->id,
-                'component' => 'mod_assign',
-                'filearea' => 'content',
-                'itemid' => 0,
-                'filepath' => '/',
-                'filename' => 'user-test-file.txt',
-                'userid' => self::$user->id,
-                'timecreated' => $fileuploadtime + 60,
-                'timemodified' => $fileuploadtime + 60,
+                    'contextid' => $assigncontext->id,
+                    'component' => 'mod_assign',
+                    'filearea' => 'content',
+                    'itemid' => 0,
+                    'filepath' => '/',
+                    'filename' => 'user-test-file.txt',
+                    'userid' => self::$user->id,
+                    'timecreated' => $fileuploadtime + 60,
+                    'timemodified' => $fileuploadtime + 60,
             ];
 
             $fs->create_file_from_string($filerecord, 'User upload');
         }
 
         $event = \core\event\course_module_updated::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => self::$activity->cmid,
-            'other' => [
-                'modulename' => 'assign',
-                'instanceid' => self::$activity->cmid,
-                'name' => self::$activity->name,
-            ],
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => self::$activity->cmid,
+                'other' => [
+                        'modulename' => 'assign',
+                        'instanceid' => self::$activity->cmid,
+                        'name' => self::$activity->name,
+                ],
         ]);
         $event->trigger();
 
@@ -193,9 +194,9 @@ class activitymodified_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Testing a file that was not uploaded' => ['editingteacher', null],
-            'Testing a file that was uploaded by a student 1 minute ago' => ['student', 1709727168],
-            'Testing a file that was uploaded by a teacher 1 minute ago' => ['editingteacher', 1712142763],
+                'Testing a file that was not uploaded' => ['editingteacher', null],
+                'Testing a file that was uploaded by a student 1 minute ago' => ['student', 1709727168],
+                'Testing a file that was uploaded by a teacher 1 minute ago' => ['editingteacher', 1712142763],
         ];
     }
 }

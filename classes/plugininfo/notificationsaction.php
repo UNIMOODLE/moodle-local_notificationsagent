@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -87,7 +88,7 @@ class notificationsaction extends notificationsbaseinfo {
      * Enable or disable a plugin and return whether the value has changed.
      *
      * @param string $pluginname The name of the plugin to enable or disable.
-     * @param int    $enabled    The flag to enable (1) or disable (0) the plugin.
+     * @param int $enabled The flag to enable (1) or disable (0) the plugin.
      *
      * @return bool Whether the value has changed after enabling or disabling the plugin.
      */
@@ -134,8 +135,8 @@ class notificationsaction extends notificationsbaseinfo {
      * Alternatively it can create a link to some settings page (instance of admin_externalpage)
      *
      * @param \part_of_admin_tree $adminroot
-     * @param string              $parentnodename
-     * @param bool                $hassiteconfig whether the current user has moodle/site:config capability
+     * @param string $parentnodename
+     * @param bool $hassiteconfig whether the current user has moodle/site:config capability
      */
     public function load_settings(\part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.

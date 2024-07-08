@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -116,7 +117,7 @@ class activitynewcontent_test extends \advanced_testcase {
     /**
      * Test evaluate.
      *
-     * @param int  $timeaccess
+     * @param int $timeaccess
      * @param bool $usecache
      * @param bool $expected
      *
@@ -129,8 +130,8 @@ class activitynewcontent_test extends \advanced_testcase {
         self::$subplugin->set_id(self::CONDITIONID);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestnc = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
         ]);
 
         self::$context->set_params(json_encode(['cmid' => $cmtestnc->cmid]));
@@ -157,12 +158,12 @@ class activitynewcontent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [1704445200, true, true],
-            [1706173200, true, true],
-            [1707123600, true, true],
-            [1704445200, false, false],
-            [1706173200, false, false],
-            [1707123600, false, false],
+                [1704445200, true, true],
+                [1706173200, true, true],
+                [1707123600, true, true],
+                [1704445200, false, false],
+                [1706173200, false, false],
+                [1707123600, false, false],
         ];
     }
 
@@ -236,9 +237,9 @@ class activitynewcontent_test extends \advanced_testcase {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -251,7 +252,7 @@ class activitynewcontent_test extends \advanced_testcase {
         $modcomponent = 'mod_quiz';
         $quizgenerator = self::getDataGenerator()->get_plugin_generator($modcomponent);
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $params[self::$subplugin::MODNAME] = $modcomponent;
         $params = json_encode($params);
@@ -271,10 +272,10 @@ class activitynewcontent_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -298,7 +299,7 @@ class activitynewcontent_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_activitynewcontent_modname" => "quiz",
+                $id . "_activitynewcontent_modname" => "quiz",
         ];
         $expected = '{"modname":"quiz"}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -314,9 +315,9 @@ class activitynewcontent_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                'visible' => true,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmtestaa->cmid;

@@ -13,6 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -81,13 +85,13 @@ class rules extends system_report {
     public function add_columns() {
         $this->add_columns_from_entities(
             [
-                'rule:rulename',
-                'user:fullnamewithlink',
-                'course:coursefullnamewithlink',
-                'rule:actionname',
-                'rule:actiondetail',
-                'rule:timestamp',
-            ]
+                        'rule:rulename',
+                        'user:fullnamewithlink',
+                        'course:coursefullnamewithlink',
+                        'rule:actionname',
+                        'rule:actiondetail',
+                        'rule:timestamp',
+                ]
         );
 
         $this->set_initial_sort_column('rule:timestamp', SORT_DESC);
@@ -103,11 +107,11 @@ class rules extends system_report {
      */
     protected function add_filters(): void {
         $filters = [
-            'rule:rulename',
-            'rule:courseselector',
-            'rule:userfullname',
-            'rule:actiondetail',
-            'rule:timestamp',
+                'rule:rulename',
+                'rule:courseselector',
+                'rule:userfullname',
+                'rule:actiondetail',
+                'rule:timestamp',
         ];
         $this->add_filters_from_entities($filters);
     }

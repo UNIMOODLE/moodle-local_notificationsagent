@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -37,7 +38,7 @@ defined("MOODLE_INTERNAL") || die();
 $string['pluginname'] = 'Erabiltzaile indibidualaren jakinarazpena';
 $string['messageprovider:particular_message'] = 'Mezu pribatuen hornitzailea';
 $string['usermessageagent_action']
-    = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+        = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['subtype'] = 'usermessageagent';
 $string['editrule_action_element_title'] = 'Titulazioa {$a->typeelement}:';
 $string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}';

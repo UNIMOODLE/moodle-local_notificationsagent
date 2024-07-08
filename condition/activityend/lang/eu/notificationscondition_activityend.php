@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -43,5 +44,5 @@ $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
 $string['validation_editrule_form_dateend'] = 'Beharrezkoa da jarduera/ikastaroaren amaiera data gehitzea';
 $string['validation_editrule_form_supported_cm']
-    = 'Jarduera mota ez da onartzen. Jarri harremanetan guneko administratzailearekin.';
+        = 'Jarduera mota ez da onartzen. Jarri harremanetan guneko administratzailearekin.';
 $string['privacy:metadata'] = 'activityend pluginak ez du datu pertsonalik gordetzen.';

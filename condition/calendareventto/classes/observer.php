@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -92,8 +93,8 @@ class notificationscondition_calendareventto_observer {
                    AND mnc.cmid = :cmid';
 
         $dataobj = $DB->get_records_sql($sql, [
-            'name' => calendareventto::NAME,
-            'cmid' => $cmid,
+                'name' => calendareventto::NAME,
+                'cmid' => $cmid,
         ]);
 
         foreach ($dataobj as $data) {

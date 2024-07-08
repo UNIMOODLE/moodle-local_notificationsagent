@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -48,7 +49,7 @@ class behat_notificationsagent extends behat_base {
      * @When /^I click on the input element with placeholder "([^"]*)" inside div with id "([^"]*)"$/
      *
      * @param string $placeholder
-     * @param int    $divid
+     * @param int $divid
      *
      * @return void
      * @throws Exception

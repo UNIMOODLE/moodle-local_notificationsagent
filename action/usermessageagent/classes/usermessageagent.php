@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -53,8 +54,8 @@ class usermessageagent extends notificationactionplugin {
      * Get the elements for the usermessageagent plugin.
      *
      * @param \moodleform $mform
-     * @param int         $courseid
-     * @param int         $type
+     * @param int $courseid
+     * @param int $type
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -73,8 +74,8 @@ class usermessageagent extends notificationactionplugin {
         );
 
         $editoroptions = [
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'trusttext' => true,
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'trusttext' => true,
         ];
 
         // Message.
@@ -172,7 +173,7 @@ class usermessageagent extends notificationactionplugin {
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:usermessageagent', $context)
-            && has_capability('moodle/site:sendmessage', $context);
+                && has_capability('moodle/site:sendmessage', $context);
     }
 
     /**
@@ -201,9 +202,9 @@ class usermessageagent extends notificationactionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -219,9 +220,9 @@ class usermessageagent extends notificationactionplugin {
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
         $paramstoteplace = [
-            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
-            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
-            shorten_text($name),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
+                shorten_text($name),
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
@@ -233,7 +234,7 @@ class usermessageagent extends notificationactionplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -258,9 +259,9 @@ class usermessageagent extends notificationactionplugin {
             $conversation = \core_message\api::create_conversation(
                 \core_message\api::MESSAGE_CONVERSATION_TYPE_INDIVIDUAL,
                 [
-                    is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
-                    $userto,
-                ]
+                            is_object($message->userfrom) ? $message->userfrom->id : $message->userfrom,
+                            $userto,
+                    ]
             );
             // We creat one conversation.
             $message->convid = $conversation->id;
@@ -295,9 +296,9 @@ class usermessageagent extends notificationactionplugin {
         $parameters = json_decode($this->get_parameters());
 
         return json_encode([
-            self::UI_TITLE => $parameters->{self::UI_TITLE},
-            self::UI_MESSAGE => $parameters->{self::UI_MESSAGE}->text,
-            self::UI_USER => $parameters->{self::UI_USER},
+                self::UI_TITLE => $parameters->{self::UI_TITLE},
+                self::UI_MESSAGE => $parameters->{self::UI_MESSAGE}->text,
+                self::UI_USER => $parameters->{self::UI_USER},
         ]);
     }
 
@@ -316,9 +317,9 @@ class usermessageagent extends notificationactionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -36,11 +37,12 @@ namespace notificationscondition_itemgraded\privacy;
 /**
  *  Privacy provider class
  */
+
 /**
  *  Privacy provider class
  */
 class provider implements
-    // This plugin does not store any personal user data.
+        // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {
     /**
      * Get the language string identifier with the component's language

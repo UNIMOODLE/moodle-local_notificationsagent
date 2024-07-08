@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -88,9 +89,9 @@ class coursestart_observer_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
@@ -153,10 +154,10 @@ class coursestart_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [86400, 0],
-            [86400 * 3, 0],
-            [86400, 2],
-            [86400 * 3, 2],
+                [86400, 0],
+                [86400 * 3, 0],
+                [86400, 2],
+                [86400 * 3, 2],
         ];
     }
 }

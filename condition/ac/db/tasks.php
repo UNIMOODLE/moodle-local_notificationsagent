@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -34,13 +35,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
-    [
-        'classname' => 'notificationscondition_ac\task\ac_crontask',
-        'blocking' => 0,
-        'minute' => '15',
-        'hour' => '*/6',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*',
-    ],
+        [
+                'classname' => 'notificationscondition_ac\task\ac_crontask',
+                'blocking' => 0,
+                'minute' => '15',
+                'hour' => '*/6',
+                'day' => '*',
+                'dayofweek' => '*',
+                'month' => '*',
+        ],
 ];

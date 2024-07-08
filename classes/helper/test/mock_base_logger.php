@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -49,8 +50,8 @@ class mock_base_logger extends base_logger {
     /**
      * Log a message.
      *
-     * @param string     $message
-     * @param string     $level
+     * @param string $message
+     * @param string $level
      * @param array|null $options
      *
      * @return string

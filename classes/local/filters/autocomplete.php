@@ -13,6 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -84,22 +88,22 @@ class autocomplete extends coreautocomplete {
 
         // Let choose any rule in rule selector for this capability.
         if (
-            $name == 'rule:rulename'
-            && has_capability(
-                'local/notificationsagent:viewcourserule',
-                $context
-            )
+                $name == 'rule:rulename'
+                && has_capability(
+                    'local/notificationsagent:viewcourserule',
+                    $context
+                )
         ) {
             $multiple = true;
         }
 
         // Let choose any course in course selector for this capability.
         if (
-            $name == 'rule:courseselector'
-            && has_capability(
-                'local/notificationsagent:manageallrule',
-                $context
-            )
+                $name == 'rule:courseselector'
+                && has_capability(
+                    'local/notificationsagent:manageallrule',
+                    $context
+                )
         ) {
             $multiple = true;
         }
@@ -107,11 +111,11 @@ class autocomplete extends coreautocomplete {
         // Let choose any user in user selector for this capability.
         // Students only see themselves.
         if (
-            $name == 'rule:userfullname'
-            && has_capability(
-                'local/notificationsagent:viewcourserule',
-                $context
-            )
+                $name == 'rule:userfullname'
+                && has_capability(
+                    'local/notificationsagent:viewcourserule',
+                    $context
+                )
         ) {
             $multiple = true;
         }

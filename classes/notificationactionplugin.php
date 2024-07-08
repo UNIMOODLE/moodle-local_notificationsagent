@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -49,7 +50,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * Constructor for the class.
      *
      * @param int|stdClass $rule object from DB table 'notificationsagent_rule' or just a rule id
-     * @param int        $id       If is numeric => value is already in DB
+     * @param int $id If is numeric => value is already in DB
      *
      */
     public function __construct($rule, $id = null) {
@@ -103,8 +104,8 @@ abstract class notificationactionplugin extends notificationplugin {
      * Generate placeholders for the given form and insert them before a specific group.
      *
      * @param \moodleform $mform the moodle form object
-     * @param string      $type  the type of the form
-     * @param bool        $showuserplaceholders
+     * @param string $type the type of the form
+     * @param bool $showuserplaceholders
      */
     public function placeholders($mform, $type, $showuserplaceholders) {
         $id = $this->get_id();
@@ -122,9 +123,9 @@ abstract class notificationactionplugin extends notificationplugin {
             $placeholders .= \html_writer::start_tag(
                 'a',
                 [
-                    "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
-                    "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget,
-                ]
+                            "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
+                            "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget,
+                    ]
             );
             $placeholders .= \html_writer::start_tag('span');
             $placeholders .= "{" . $option . "}";
@@ -144,7 +145,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * Execute an action with the given parameters in the specified context.
      *
      * @param evaluationcontext $context The context in which the action is executed.
-     * @param string            $params  An associative array of parameters for the action.
+     * @param string $params An associative array of parameters for the action.
      *
      * @return mixed The result of the action execution.
      */
@@ -165,7 +166,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * Gets the message to send depending on the timesfired of the rule and the user
      *
      * @param evaluationcontext $context Evaluation Context
-     * @param string            $message Message
+     * @param string $message Message
      *
      * @return string $result Message to sent
      */
@@ -192,7 +193,7 @@ abstract class notificationactionplugin extends notificationplugin {
      * Save data to the database.
      *
      * @param string $action
-     * @param mixed  $data The data to be saved.
+     * @param mixed $data The data to be saved.
      *
      * @return void
      */
@@ -247,9 +248,9 @@ abstract class notificationactionplugin extends notificationplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required
      */

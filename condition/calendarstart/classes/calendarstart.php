@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -147,7 +148,7 @@ class calendarstart extends notificationconditionplugin {
                 }
             } else {
                 if (
-                    $timeaccess >= $timeevent + $timeduration
+                        $timeaccess >= $timeevent + $timeduration
                         && $timeaccess <= $timeevent + $timeduration + $params->{self::UI_TIME}
                 ) {
                     $timereturn = $timeevent + $timeduration + $params->{self::UI_TIME};
@@ -165,7 +166,7 @@ class calendarstart extends notificationconditionplugin {
                 }
             } else {
                 if (
-                    $timeaccess >= $timeevent + $timeduration
+                        $timeaccess >= $timeevent + $timeduration
                         && $timeaccess < $timeevent + $timeduration + $params->{self::UI_TIME}
                 ) {
                     $timereturn = time();

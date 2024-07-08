@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -34,187 +35,187 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'local/notificationsagent:managesiterule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'guest' => CAP_PROHIBIT,
-            'editingteacher' => CAP_PROHIBIT,
-            'teacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:managesiterule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'guest' => CAP_PROHIBIT,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'teacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:managecourserule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:managecourserule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'editingteacher' => CAP_ALLOW,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:manageownrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:manageownrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:viewcourserule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
+        'local/notificationsagent:viewcourserule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:manageallrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_PROHIBIT,
-            'teacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:manageallrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'teacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:createrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:createrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:editrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:editrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:checkrulecontext' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:checkrulecontext' => [
+                'captype' => 'read',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:deleterule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:deleterule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:updaterulestatus' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:updaterulestatus' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:exportrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:exportrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:importrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:importrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:assignrule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:assignrule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_PROHIBIT,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:forcerule' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:forcerule' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_PROHIBIT,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:updateruleshare' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:updateruleshare' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:shareruleall' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:shareruleall' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_PROHIBIT,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:unshareruleall' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_PROHIBIT,
-            'student' => CAP_PROHIBIT,
+        'local/notificationsagent:unshareruleall' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_PROHIBIT,
+                        'editingteacher' => CAP_PROHIBIT,
+                        'student' => CAP_PROHIBIT,
+                ],
         ],
-    ],
-    'local/notificationsagent:viewassistantreport' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:viewassistantreport' => [
+                'captype' => 'read',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
-    'local/notificationsagent:managesessions' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
+        'local/notificationsagent:managesessions' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
+                ],
         ],
-    ],
 ];

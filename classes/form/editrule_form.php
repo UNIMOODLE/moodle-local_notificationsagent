@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -522,7 +523,7 @@ class editrule_form extends \moodleform {
         // If timesfired > 1, runtime > 0.
         if ($data["timesfired"] > 1) {
             if (
-                empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
+                    empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
                     && empty($data["runtime_group"]["runtime_minutes"])
             ) {
                 $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
@@ -757,17 +758,17 @@ class frontendCustom extends \core_availability\frontend {
         );
         $PAGE->requires->strings_for_js(
             [
-                'addrestriction', 'invalid',
-                'listheader_sign_before', 'listheader_sign_pos',
-                'listheader_sign_neg', 'listheader_single',
-                'listheader_multi_after', 'listheader_multi_before',
-                'listheader_multi_or', 'listheader_multi_and',
-                'unknowncondition', 'hide_verb', 'hidden_individual',
-                'show_verb', 'shown_individual', 'hidden_all', 'shown_all',
-                'condition_group', 'condition_group_info', 'and', 'or',
-                'label_multi', 'label_sign', 'setheading', 'itemheading',
-                'missingplugin',
-            ],
+                        'addrestriction', 'invalid',
+                        'listheader_sign_before', 'listheader_sign_pos',
+                        'listheader_sign_neg', 'listheader_single',
+                        'listheader_multi_after', 'listheader_multi_before',
+                        'listheader_multi_or', 'listheader_multi_and',
+                        'unknowncondition', 'hide_verb', 'hidden_individual',
+                        'show_verb', 'shown_individual', 'hidden_all', 'shown_all',
+                        'condition_group', 'condition_group_info', 'and', 'or',
+                        'label_multi', 'label_sign', 'setheading', 'itemheading',
+                        'missingplugin',
+                ],
             'availability'
         );
     }
@@ -794,7 +795,7 @@ class frontendCustom extends \core_availability\frontend {
         if (!empty($decoded->errors)) {
             $error = '';
             foreach ($decoded->errors as $stringinfo) {
-                 [$component, $stringname] = explode(':', $stringinfo);
+                [$component, $stringname] = explode(':', $stringinfo);
                 if ($error !== '') {
                     $error .= ' ';
                 }

@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -48,15 +49,15 @@ class update_rule_share extends \external_api {
      */
     public static function execute_parameters(): \external_function_parameters {
         return new \external_function_parameters([
-            'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
-            'status' => new \external_value(PARAM_BOOL, 'Whether to share, or stop sharing a rule', VALUE_REQUIRED),
+                'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
+                'status' => new \external_value(PARAM_BOOL, 'Whether to share, or stop sharing a rule', VALUE_REQUIRED),
         ]);
     }
 
     /**
      * Return a list of the required fields
      *
-     * @param int  $ruleid The rule ID
+     * @param int $ruleid The rule ID
      * @param bool $status Whether to pause, or resume a rule
      *
      * @return array
@@ -65,12 +66,12 @@ class update_rule_share extends \external_api {
         global $DB;
 
         [
-            'ruleid' => $ruleid,
-            'status' => $status,
+                'ruleid' => $ruleid,
+                'status' => $status,
         ]
-            = self::validate_parameters(self::execute_parameters(), [
-            'ruleid' => $ruleid,
-            'status' => $status,
+                = self::validate_parameters(self::execute_parameters(), [
+                'ruleid' => $ruleid,
+                'status' => $status,
         ]);
 
         $result = ['warnings' => []];
@@ -86,9 +87,9 @@ class update_rule_share extends \external_api {
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
-                    'item' => 'local_notificationsagent',
-                    'warningcode' => $e->errorcode,
-                    'message' => $e->getMessage(),
+                        'item' => 'local_notificationsagent',
+                        'warningcode' => $e->errorcode,
+                        'message' => $e->getMessage(),
                 ];
                 return $result;
             }
@@ -125,10 +126,10 @@ class update_rule_share extends \external_api {
             }
         } catch (\moodle_exception $e) {
             $result['warnings'][] = [
-                'item' => 'local_notificationsagent',
-                'itemid' => $instance->get_id(),
-                'warningcode' => $e->errorcode,
-                'message' => $e->getMessage(),
+                    'item' => 'local_notificationsagent',
+                    'itemid' => $instance->get_id(),
+                    'warningcode' => $e->errorcode,
+                    'message' => $e->getMessage(),
             ];
         }
 
@@ -143,8 +144,8 @@ class update_rule_share extends \external_api {
     public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(
             [
-                'warnings' => new \external_warnings(),
-            ]
+                        'warnings' => new \external_warnings(),
+                ]
         );
     }
 }

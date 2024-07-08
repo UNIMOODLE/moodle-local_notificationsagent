@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -89,9 +90,9 @@ class activityopen_observer_test extends \advanced_testcase {
 
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
     }
@@ -109,7 +110,7 @@ class activityopen_observer_test extends \advanced_testcase {
         \uopz_set_return('time', self::COURSE_DATESTART);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$course->id,
+                'course' => self::$course->id,
         ]);
         $cmgen->timeopen = self::COURSE_DATESTART;
 
@@ -139,15 +140,15 @@ class activityopen_observer_test extends \advanced_testcase {
         self::setUser(self::$user->id);
 
         $event = \core\event\course_module_updated::create([
-            'context' => \context_module::instance($cmgen->cmid),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => $cmgen->cmid,
-            'other' => [
-                'modulename' => 'quiz',
-                'instanceid' => $cmgen->id,
-                'name' => $cmgen->name,
-            ],
+                'context' => \context_module::instance($cmgen->cmid),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => $cmgen->cmid,
+                'other' => [
+                        'modulename' => 'quiz',
+                        'instanceid' => $cmgen->id,
+                        'name' => $cmgen->name,
+                ],
         ]);
         $event->trigger();
 
@@ -171,8 +172,8 @@ class activityopen_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [0],
-            [2],
+                [0],
+                [2],
         ];
     }
 }

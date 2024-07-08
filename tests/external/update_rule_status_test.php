@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -128,9 +129,9 @@ class update_rule_status_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
     }
 
@@ -142,10 +143,10 @@ class update_rule_status_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\external\update_rule_status::execute_parameters
      * @dataProvider dataprovider
      *
-     * @param int    $user
-     * @param int    $useinstance
+     * @param int $user
+     * @param int $useinstance
      * @param string $expected
-     * @param int    $status
+     * @param int $status
      *
      * @return void
      */
@@ -209,10 +210,10 @@ class update_rule_status_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'No instance' => [1, 0, 'nosuchinstance', rule::RESUME_RULE],
-            'Permissions resume' => [2, 1, '', rule::RESUME_RULE],
-            'Permissions pause' => [2, 1, '', rule::PAUSE_RULE],
-            'No Permissions' => [0, 1, 'nopermissions', rule::RESUME_RULE],
+                'No instance' => [1, 0, 'nosuchinstance', rule::RESUME_RULE],
+                'Permissions resume' => [2, 1, '', rule::RESUME_RULE],
+                'Permissions pause' => [2, 1, '', rule::PAUSE_RULE],
+                'No Permissions' => [0, 1, 'nopermissions', rule::RESUME_RULE],
         ];
     }
 }

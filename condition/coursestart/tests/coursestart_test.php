@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -237,7 +238,7 @@ class coursestart_test extends \advanced_testcase {
         // Condition.
         if (!self::$context->is_complementary()) {
             if (
-                $timeaccess >= self::COURSE_DATESTART
+                    $timeaccess >= self::COURSE_DATESTART
                     && ($timeaccess <= self::COURSE_DATESTART +
                             $params->{notificationplugin::UI_TIME})
             ) {
@@ -252,7 +253,7 @@ class coursestart_test extends \advanced_testcase {
         // Exception.
         if (self::$context->is_complementary()) {
             if (
-                $timeaccess >= self::COURSE_DATESTART
+                    $timeaccess >= self::COURSE_DATESTART
                     && $timeaccess <= self::COURSE_DATESTART +
                     $params->{notificationplugin::UI_TIME}
             ) {

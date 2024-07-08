@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -34,12 +35,12 @@
 // Used for updating temporary triggers in case of delete in a group/grouping.
 defined('MOODLE_INTERNAL') || die();
 $observers = [
-    [
-        'eventname' => '\core\event\group_deleted',
-        'callback' => 'notificationscondition_ac_observer::group_deleted',
-    ],
-    [
-        'eventname' => '\core\event\grouping_deleted',
-        'callback' => 'notificationscondition_ac_observer::grouping_deleted',
-    ],
+        [
+                'eventname' => '\core\event\group_deleted',
+                'callback' => 'notificationscondition_ac_observer::group_deleted',
+        ],
+        [
+                'eventname' => '\core\event\grouping_deleted',
+                'callback' => 'notificationscondition_ac_observer::grouping_deleted',
+        ],
 ];

@@ -13,6 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -88,8 +92,8 @@ class usergroupadd extends notificationconditionplugin {
         $cache = $DB->record_exists(
             'notificationsagent_cache',
             ['pluginname' => $pluginname, 'conditionid' => $conditionid,
-            'courseid' => $courseid,
-            'userid' => $userid]
+                        'courseid' => $courseid,
+                        'userid' => $userid]
         );
 
         if (!$cache) {

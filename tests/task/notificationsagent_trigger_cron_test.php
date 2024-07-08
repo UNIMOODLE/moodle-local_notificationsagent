@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -94,18 +95,18 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::getDataGenerator()->create_user_course_lastaccess(self::$user, self::$course, self::USER_LASTACCESS);
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         self::$cmtesttc = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$course->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
+                'name' => 'Quiz unittest',
+                'course' => self::$course->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
         ]);
 
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
@@ -114,12 +115,12 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
     /**
      * Testing execute methd of
      *
-     * @param int   $date
+     * @param int $date
      * @param array $conditiondata
      * @param array $exceptiondata
      * @param array $actiondata
-     * @param bool  $genericuser
-     * @param bool  $expected
+     * @param bool $genericuser
+     * @param bool $expected
      *
      * @return void
      * @dataProvider dataprovider_cron
@@ -218,12 +219,12 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
         $DB->insert_record(
             'notificationsagent_triggers',
             [
-                'ruleid' => self::$rule->get_id(),
-                'conditionid' => $conditionid,
-                'courseid' => self::$course->id,
-                'userid' => $userid,
-                'startdate' => $date,
-            ]
+                        'ruleid' => self::$rule->get_id(),
+                        'conditionid' => $conditionid,
+                        'courseid' => self::$course->id,
+                        'userid' => $userid,
+                        'startdate' => $date,
+                ]
         );
 
         $task = \core\task\manager::get_scheduled_task(notificationsagent_trigger_cron::class);
@@ -251,133 +252,133 @@ class notificationsagent_trigger_cron_test extends \advanced_testcase {
      */
     public static function dataprovider_cron(): array {
         return [
-            [ // ACCION A UNO.
-                1706173200,
-                [
-                    ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                [ // ACCION A UNO.
+                        1706173200,
+                        [
+                                ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        false,
+                        true,
                 ],
-                false,
-                true,
-            ],
-            [ // ACCION A TODOS.
-                1706173200,
-                [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
-                    ['pluginname' => 'courseend', 'params' => '{"time":864001}'],
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                [ // ACCION A TODOS.
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
+                                ['pluginname' => 'courseend', 'params' => '{"time":864001}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        true,
                 ],
-                true,
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                        1706173200,
+                        [
+                                ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        true,
                 ],
-                true,
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
-                    ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
+                                ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        true,
                 ],
-                true,
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":864001}'],
 
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        true,
                 ],
-                true,
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'usermessageagent',
-                        'params' => '{"title":"Title" ,"message":{"text":"Message"}, "user":"104000"}',
-                    ],
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                        1706173200,
+                        [
+                                ['pluginname' => 'sessionend', 'params' => '{"time":864001}'],
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'usermessageagent',
+                                        'params' => '{"title":"Title" ,"message":{"text":"Message"}, "user":"104000"}',
+                                ],
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        true,
                 ],
-                true,
-                true,
-            ],
-            [
-                1706173200,
                 [
-                    ['pluginname' => 'coursestart', 'params' => '{"time":86400000}'],
+                        1706173200,
+                        [
+                                ['pluginname' => 'coursestart', 'params' => '{"time":86400000}'],
 
-                ],
-                [['pluginname' => '', 'params' => '']],
-                [
-                    [
-                        'pluginname' => 'messageagent',
-                        'params' => '{
+                        ],
+                        [['pluginname' => '', 'params' => '']],
+                        [
+                                [
+                                        'pluginname' => 'messageagent',
+                                        'params' => '{
                         "title":"Title" ,"message":{"text":"Message to {User_FirstName}"}
                         }',
-                    ],
+                                ],
+                        ],
+                        true,
+                        false,
                 ],
-                true,
-                false,
-            ],
         ];
     }
 

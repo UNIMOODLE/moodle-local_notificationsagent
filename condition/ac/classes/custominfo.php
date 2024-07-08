@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the \"Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
@@ -283,12 +284,12 @@ class customtree extends \core_availability\tree {
         }
         $this->op = $structure->op;
         if (
-            !in_array($this->op, [
-                self::OP_AND,
-                self::OP_OR,
-                self::OP_NOT_AND,
-                self::OP_NOT_OR,
-            ], true)
+                !in_array($this->op, [
+                        self::OP_AND,
+                        self::OP_OR,
+                        self::OP_NOT_AND,
+                        self::OP_NOT_OR,
+                ], true)
         ) {
             throw new \coding_exception('Invalid availability structure (unknown ->op)');
         }

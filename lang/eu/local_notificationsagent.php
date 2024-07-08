@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -331,3 +332,8 @@ $string['brokenrulebody'] = 'Araua: {$a->rule} ikastaroaren :{$a->course} pausat
 
 // Engine.
 $string['actionerror'] = 'Errorea ekintza burutzean ';
+
+$string['subplugintype_notificationscondition'] = 'Baldintzaren plugina';
+$string['subplugintype_notificationsaction'] = 'Ekintzaren plugina';
+$string['subplugintype_notificationscondition_plural'] = 'Baldintzen pluginak';
+$string['subplugintype_notificationsaction_plural'] = 'Ekintza-pluginak';

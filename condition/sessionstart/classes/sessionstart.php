@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
+// Funded by the European Union - Next GenerationEU".
+//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -64,7 +67,7 @@ class sessionstart extends notificationconditionplugin {
 
     /** Evaluates this condition using the context variables or the system's state and the complementary flag.
      *
-     * @param evaluationcontext $context  |null collection of variables to evaluate the condition.
+     * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      *                                    If null the system's state is used.
      *
      * @return bool true if the condition is true, false otherwise.
@@ -103,9 +106,9 @@ class sessionstart extends notificationconditionplugin {
     /**
      * Get the UI elements for the subplugin.
      *
-     * @param \MoodleQuickForm $mform    The Moodle quick form object.
-     * @param int              $courseid The ID of the course.
-     * @param string           $type     The type of the notification plugin.
+     * @param \MoodleQuickForm $mform The Moodle quick form object.
+     * @param int $courseid The ID of the course.
+     * @param string $type The type of the notification plugin.
      */
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
@@ -171,9 +174,9 @@ class sessionstart extends notificationconditionplugin {
      * This function should handle any markup logic specific to a notification plugin,
      * such as replacing placeholders with dynamic data, formatting content, etc.
      *
-     * @param array $content  The content to be processed, passed by reference.
-     * @param int   $courseid The ID of the course related to the content.
-     * @param mixed $options  Additional options if any, null by default.
+     * @param array $content The content to be processed, passed by reference.
+     * @param int $courseid The ID of the course related to the content.
+     * @param mixed $options Additional options if any, null by default.
      *
      * @return void Processed content with markups handled.
      */
@@ -234,7 +237,7 @@ class sessionstart extends notificationconditionplugin {
     /**
      * Get the first access time for a specific user and course.
      *
-     * @param int $userid   user id
+     * @param int $userid user id
      * @param int $courseid course id
      *
      * @return mixed  return firstacces to a course
@@ -259,10 +262,10 @@ class sessionstart extends notificationconditionplugin {
             $result = $DB->get_record_sql(
                 $query,
                 [
-                    'courseid' => $courseid,
-                    'userid' => $userid,
-                    'eventname' => '\\core\\event\\course_viewed',
-                ]
+                            'courseid' => $courseid,
+                            'userid' => $userid,
+                            'eventname' => '\\core\\event\\course_viewed',
+                    ]
             );
 
             if (!$result) {
@@ -279,9 +282,9 @@ class sessionstart extends notificationconditionplugin {
      * Update any necessary ids and json parameters in the database.
      * It is called near the completion of course restoration.
      *
-     * @param string       $restoreid Restore identifier
-     * @param integer      $courseid  Course identifier
-     * @param \base_logger $logger    Logger if any warnings
+     * @param string $restoreid Restore identifier
+     * @param integer $courseid Course identifier
+     * @param \base_logger $logger Logger if any warnings
      *
      * @return bool False if restore is not required
      */

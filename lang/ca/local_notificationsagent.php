@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -331,3 +332,8 @@ $string['brokenrulebody'] = 'La regla: {$a->rule} del curs :{$a->course} s\'ha p
 
 // Engine.
 $string['actionerror'] = 'Erro ao realizar a acción ';
+
+$string['subplugintype_notificationscondition'] = 'Plugin de condició';
+$string['subplugintype_notificationsaction'] = 'Plugin d\'acció';
+$string['subplugintype_notificationscondition_plural'] = 'Plugins de condició';
+$string['subplugintype_notificationsaction_plural'] = 'Plugins d\'acció';

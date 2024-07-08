@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU".
 //
@@ -122,8 +123,8 @@ class activityavailable_test extends \advanced_testcase {
      * Test evaluate.
      *
      * @param string $conditionjson
-     * @param int    $visible
-     * @param bool   $expected
+     * @param int $visible
+     * @param bool $expected
      *
      * @covers       \notificationscondition_activityavailable\activityavailable::evaluate
      *
@@ -132,12 +133,12 @@ class activityavailable_test extends \advanced_testcase {
     public function test_evaluate(string $conditionjson, int $visible, bool $expected) {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
-            'availability' => $conditionjson,
-            'visible' => $visible,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
+                'availability' => $conditionjson,
+                'visible' => $visible,
         ]);
 
         self::$context->set_params(json_encode(['cmid' => $cmtestaa->cmid]));
@@ -152,15 +153,18 @@ class activityavailable_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 1, true,
-            ],
-            [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 0, false,
-            ],
-            [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}', 1, false,
-            ],
+                [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 1,
+                        true,
+                ],
+                [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}', 0,
+                        false,
+                ],
+                [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}', 1,
+                        false,
+                ],
         ];
     }
 
@@ -209,8 +213,8 @@ class activityavailable_test extends \advanced_testcase {
      * @covers       \notificationscondition_activityavailable\activityavailable::estimate_next_time
      * @dataProvider dataestimate
      *
-     * @param string   $conditionjson
-     * @param int      $complementary
+     * @param string $conditionjson
+     * @param int $complementary
      * @param int|null $expected
      *
      * @return void
@@ -220,9 +224,9 @@ class activityavailable_test extends \advanced_testcase {
         \uopz_set_return('time', 1704099600);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestent = $quizgen->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            'availability' => $conditionjson,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                'availability' => $conditionjson,
         ]);
 
         self::$context->set_params(json_encode(['cmid' => $cmtestent->cmid]));
@@ -242,22 +246,22 @@ class activityavailable_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-            'condition. available' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_CONDITION, 1704099600,
-            ],
-            'condition. not available' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_CONDITION, null,
-            ],
-            'exception. available' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_EXCEPTION, null,
-            ],
-            'exception. not available' => [
-                '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
-                notificationplugin::COMPLEMENTARY_EXCEPTION, 1704099600,
-            ],
+                'condition. available' => [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
+                        notificationplugin::COMPLEMENTARY_CONDITION, 1704099600,
+                ],
+                'condition. not available' => [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
+                        notificationplugin::COMPLEMENTARY_CONDITION, null,
+                ],
+                'exception. available' => [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}],"showc":[true]}',
+                        notificationplugin::COMPLEMENTARY_EXCEPTION, null,
+                ],
+                'exception. not available' => [
+                        '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
+                        notificationplugin::COMPLEMENTARY_EXCEPTION, 1704099600,
+                ],
         ];
     }
 
@@ -282,9 +286,9 @@ class activityavailable_test extends \advanced_testcase {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
-                'title' => self::$subplugin->get_title(),
-                'name' => self::$subplugin->get_subtype(),
-            ]
+                        'title' => self::$subplugin->get_title(),
+                        'name' => self::$subplugin->get_subtype(),
+                ]
         );
     }
 
@@ -296,7 +300,7 @@ class activityavailable_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-            $id . "_activityavailable_cmid" => "7",
+                $id . "_activityavailable_cmid" => "7",
         ];
         $expected = '{"cmid":7}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -312,7 +316,7 @@ class activityavailable_test extends \advanced_testcase {
     public function test_processmarkups() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$coursetest->id,
+                'course' => self::$coursetest->id,
         ]);
         $expected = str_replace(self::$subplugin->get_elements(), [$cmgen->name], self::$subplugin->get_title());
         $params[self::$subplugin::UI_ACTIVITY] = $cmgen->cmid;
@@ -333,10 +337,10 @@ class activityavailable_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-            'rule' => self::$rule->to_record(),
-            'timesfired' => rule::MINIMUM_EXECUTION,
-            'courseid' => $courseid,
-            'getaction' => $typeaction,
+                'rule' => self::$rule->to_record(),
+                'timesfired' => rule::MINIMUM_EXECUTION,
+                'courseid' => $courseid,
+                'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -360,11 +364,11 @@ class activityavailable_test extends \advanced_testcase {
     public function test_validation() {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
-            'name' => 'Quiz unittest',
-            'course' => self::$coursetest->id,
-            "timeopen" => self::CM_DATESTART,
-            "timeclose" => self::CM_DATEEND,
-            'visible' => true,
+                'name' => 'Quiz unittest',
+                'course' => self::$coursetest->id,
+                "timeopen" => self::CM_DATESTART,
+                "timeclose" => self::CM_DATEEND,
+                'visible' => true,
         ]);
         $objparameters = new \stdClass();
         $objparameters->cmid = $cmtestaa->cmid;

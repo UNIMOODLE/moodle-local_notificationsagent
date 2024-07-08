@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -48,7 +49,7 @@ class check_rule_context extends \external_api {
      */
     public static function execute_parameters(): \external_function_parameters {
         return new \external_function_parameters([
-            'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
+                'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
         ]);
     }
 
@@ -61,10 +62,10 @@ class check_rule_context extends \external_api {
      */
     public static function execute(int $ruleid) {
         [
-            'ruleid' => $ruleid,
+                'ruleid' => $ruleid,
         ]
-            = self::validate_parameters(self::execute_parameters(), [
-            'ruleid' => $ruleid,
+                = self::validate_parameters(self::execute_parameters(), [
+                'ruleid' => $ruleid,
         ]);
 
         $result = ['warnings' => [], 'hascontext' => false];
@@ -80,9 +81,9 @@ class check_rule_context extends \external_api {
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
-                    'item' => 'local_notificationsagent',
-                    'warningcode' => $e->errorcode,
-                    'message' => $e->getMessage(),
+                        'item' => 'local_notificationsagent',
+                        'warningcode' => $e->errorcode,
+                        'message' => $e->getMessage(),
                 ];
                 return $result;
             }
@@ -102,10 +103,10 @@ class check_rule_context extends \external_api {
             }
         } catch (\moodle_exception $e) {
             $result['warnings'][] = [
-                'item' => 'local_notificationsagent',
-                'itemid' => $instance->get_id(),
-                'warningcode' => $e->errorcode,
-                'message' => $e->getMessage(),
+                    'item' => 'local_notificationsagent',
+                    'itemid' => $instance->get_id(),
+                    'warningcode' => $e->errorcode,
+                    'message' => $e->getMessage(),
             ];
         }
 
@@ -120,9 +121,9 @@ class check_rule_context extends \external_api {
     public static function execute_returns(): \external_function_parameters {
         return new \external_function_parameters(
             [
-                'warnings' => new \external_warnings(),
-                'hascontext' => new \external_value(PARAM_BOOL, 'has context', VALUE_REQUIRED),
-            ]
+                        'warnings' => new \external_warnings(),
+                        'hascontext' => new \external_value(PARAM_BOOL, 'has context', VALUE_REQUIRED),
+                ]
         );
     }
 }

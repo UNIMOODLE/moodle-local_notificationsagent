@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -73,10 +74,10 @@ class notificationsagent_admin_page_manage_notificationsagent_plugins extends ad
 
         foreach (core_component::get_plugin_list($this->subtype) as $name => $notused) {
             if (
-                strpos(
-                    core_text::strtolower(get_string('pluginname', $this->subtype . '_' . $name)),
-                    $query
-                ) !== false
+                    strpos(
+                        core_text::strtolower(get_string('pluginname', $this->subtype . '_' . $name)),
+                        $query
+                    ) !== false
             ) {
                 $found = true;
                 break;
@@ -148,8 +149,8 @@ class notificationsagent_plugin_manager {
      *
      * @param string $action URL parameter to include in the link
      * @param string $plugin URL parameter to include in the link
-     * @param string $icon   The key to the icon to use (e.g. 't/up')
-     * @param string $alt    The string description of the link used as the title and alt text
+     * @param string $icon The key to the icon to use (e.g. 't/up')
+     * @param string $alt The string description of the link used as the title and alt text
      *
      * @return string The icon/link
      */
@@ -191,13 +192,13 @@ class notificationsagent_plugin_manager {
         $table = new flexible_table($this->subtype . 'pluginsadminttable');
         $table->define_baseurl($this->pageurl);
         $table->define_columns([
-            'pluginname', 'version', 'hideshow', 'order',
-            'settings', 'uninstall',
+                'pluginname', 'version', 'hideshow', 'order',
+                'settings', 'uninstall',
         ]);
         $table->define_headers([
-            get_string($this->subtype . 'pluginname', 'local_notificationsagent'),
-            get_string('version'), get_string('hideshow', 'local_notificationsagent'),
-            get_string('order'), get_string('settings'), get_string('uninstallplugin', 'core_admin'),
+                get_string($this->subtype . 'pluginname', 'local_notificationsagent'),
+                get_string('version'), get_string('hideshow', 'local_notificationsagent'),
+                get_string('order'), get_string('settings'), get_string('uninstallplugin', 'core_admin'),
         ]);
         $table->set_attribute('id', $this->subtype . 'plugins');
         $table->set_attribute('class', 'admintable generaltable');
@@ -307,7 +308,7 @@ class notificationsagent_plugin_manager {
      * Change the order of this plugin.
      *
      * @param string $plugintomove - The plugin to move
-     * @param string $dir          - up or down
+     * @param string $dir - up or down
      *
      * @return string The next page to display
      */

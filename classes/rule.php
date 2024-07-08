@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -292,7 +293,7 @@ class rule {
             $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
         if (
-            has_capability('local/notificationsagent:viewcourserule', $context)
+                has_capability('local/notificationsagent:viewcourserule', $context)
                 || has_capability(
                     'local/notificationsagent:managecourserule',
                     $context
@@ -527,10 +528,10 @@ class rule {
         global $DB;
 
         if (
-            $ac = $DB->get_record(
-                'notificationsagent_condition',
-                ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_CONDITION, 'pluginname' => 'ac']
-            )
+                $ac = $DB->get_record(
+                    'notificationsagent_condition',
+                    ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_CONDITION, 'pluginname' => 'ac']
+                )
         ) {
             $this->ac = notificationplugin::create_instance($ac->id, $ac->type, $ac->pluginname, $this->to_record());
         }
@@ -1356,11 +1357,11 @@ class rule {
 
         // If $USER has student role, only generate triggers for the user.
         if (
-            has_capability(
-                'local/notificationsagent:managecourserule',
-                $context,
-                $USER->id
-            )
+                has_capability(
+                    'local/notificationsagent:managecourserule',
+                    $context,
+                    $USER->id
+                )
         ) {
             $students = notificationsagent::get_usersbycourse($context);
         } else {
@@ -1380,12 +1381,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                    $subplugin = notificationplugin::create_instance(
-                        $idname,
-                        notificationplugin::TYPE_CONDITION,
-                        $pluginname,
-                        $this->to_record()
-                    )
+                        $subplugin = notificationplugin::create_instance(
+                            $idname,
+                            notificationplugin::TYPE_CONDITION,
+                            $pluginname,
+                            $this->to_record()
+                        )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
                 }
@@ -1398,12 +1399,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                    $subplugin = notificationplugin::create_instance(
-                        $idname,
-                        notificationplugin::TYPE_CONDITION,
-                        $pluginname,
-                        $this->to_record()
-                    )
+                        $subplugin = notificationplugin::create_instance(
+                            $idname,
+                            notificationplugin::TYPE_CONDITION,
+                            $pluginname,
+                            $this->to_record()
+                        )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_EXCEPTION, $arraytimer, $students);
                 }
@@ -1428,12 +1429,12 @@ class rule {
     private function save_form_ac($data, &$arraytimer, $students) {
         $id = $this->get_ac() ? $this->get_ac()->id : null;
         if (
-            $subpluginac = notificationplugin::create_instance(
-                $id,
-                notificationplugin::TYPE_CONDITION,
-                ac::NAME,
-                $this->to_record()
-            )
+                $subpluginac = notificationplugin::create_instance(
+                    $id,
+                    notificationplugin::TYPE_CONDITION,
+                    ac::NAME,
+                    $this->to_record()
+                )
         ) {
             $action = $this->get_ac() ? editrule_form::FORM_JSON_ACTION_UPDATE : editrule_form::FORM_JSON_ACTION_INSERT;
             $subpluginac->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
@@ -1475,11 +1476,11 @@ class rule {
             } else {
                 // If $USER has student role, only generate triggers for the user.
                 if (
-                    has_capability(
-                        'local/notificationsagent:managecourserule',
-                        $context,
-                        $USER->id
-                    )
+                        has_capability(
+                            'local/notificationsagent:managecourserule',
+                            $context,
+                            $USER->id
+                        )
                 ) {
                     $studentid = notificationsagent::GENERIC_USERID;
                 } else {
@@ -1511,12 +1512,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                    $subplugin = notificationplugin::create_instance(
-                        $idname,
-                        notificationplugin::TYPE_ACTION,
-                        $pluginname,
-                        $this->to_record()
-                    )
+                        $subplugin = notificationplugin::create_instance(
+                            $idname,
+                            notificationplugin::TYPE_ACTION,
+                            $pluginname,
+                            $this->to_record()
+                        )
                 ) {
                     $subplugin->save($action, $data);
                 }
@@ -2019,7 +2020,7 @@ class rule {
 
         $context = \context_course::instance($this->get_default_context(), IGNORE_MISSING);
         if (
-            $this->get_createdby() == $USER->id
+                $this->get_createdby() == $USER->id
                 || ($context
                         && has_capability(
                             'local/notificationsagent:managesiterule',

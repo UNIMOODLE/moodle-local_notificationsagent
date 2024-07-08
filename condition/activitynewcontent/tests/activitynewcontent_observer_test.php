@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-// Project implemented by the \"Recovery, Transformation and Resilience Plan.
+
+// Project implemented by the "Recovery, Transformation and Resilience Plan.
 // Funded by the European Union - Next GenerationEU\".
 //
 // Produced by the UNIMOODLE University Group: Universities of
@@ -89,16 +90,16 @@ class activitynewcontent_observer_test extends \advanced_testcase {
 
         self::$course = self::getDataGenerator()->create_course(
             ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
+                        'startdate' => self::COURSE_DATESTART,
+                        'enddate' => self::COURSE_DATEEND,
+                ])
         );
         self::$user = self::getDataGenerator()->create_and_enrol(self::$course);
     }
 
     /**
      * @param string $modname
-     * @param bool   $expected
+     * @param bool $expected
      *
      * @return void
      * @throws \coding_exception
@@ -112,7 +113,7 @@ class activitynewcontent_observer_test extends \advanced_testcase {
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_' . $modname);
         $cmgen = $quizgenerator->create_instance([
-            'course' => self::$course->id,
+                'course' => self::$course->id,
         ]);
 
         $dataform = new \StdClass();
@@ -140,15 +141,15 @@ class activitynewcontent_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
         $event = \core\event\course_module_created::create([
-            'context' => \context_course::instance(self::$course->id),
-            'userid' => self::$user->id,
-            'courseid' => self::$course->id,
-            'objectid' => self::$course->id,
-            'other' => [
-                'modulename' => $modname,
-                'instanceid' => $cmgen->id,
-                'name' => $cmgen->name,
-            ],
+                'context' => \context_course::instance(self::$course->id),
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'objectid' => self::$course->id,
+                'other' => [
+                        'modulename' => $modname,
+                        'instanceid' => $cmgen->id,
+                        'name' => $cmgen->name,
+                ],
         ]);
         $event->trigger();
 
@@ -176,10 +177,10 @@ class activitynewcontent_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-            'Module quiz' => ['quiz', 0, true],
-            'Module label' => ['label', 0, false],
-            'Module quiz admin' => ['quiz', 2, true],
-            'Module label admin' => ['label', 2, false],
+                'Module quiz' => ['quiz', 0, true],
+                'Module label' => ['label', 0, false],
+                'Module quiz admin' => ['quiz', 2, true],
+                'Module label admin' => ['label', 2, false],
         ];
     }
 }
