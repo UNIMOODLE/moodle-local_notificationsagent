@@ -32,6 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\event\course_viewed;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_sessionstart\sessionstart;
@@ -43,9 +44,9 @@ class notificationscondition_sessionstart_observer {
     /**
      * A function to handle the course_viewed event.
      *
-     * @param \core\event\course_viewed $event The course_viewed event object
+     * @param course_viewed $event The course_viewed event object
      */
-    public static function course_viewed(\core\event\course_viewed $event) {
+    public static function course_viewed(course_viewed $event) {
         if ($event->courseid == SITEID || !isloggedin()) {
             return;
         }

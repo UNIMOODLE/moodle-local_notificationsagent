@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-// Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU".
-//
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
 // Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
@@ -31,7 +28,34 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2024070802;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationscondition_sessionstart';
+
+namespace notificationscondition_sessionstart\persistent;
+
+use core\persistent;
+
+/**
+ * Class representing cmlastaccess persistent.
+ */
+class coursefirstaccess extends persistent {
+    /** Table name for the persistent. */
+    const TABLE = 'notificationsagent_crseview';
+
+    /**
+     * Return the definition of the properties of this model.
+     *
+     * @return array
+     */
+    protected static function define_properties() {
+        return [
+                'userid' => [
+                        'type' => PARAM_INT,
+                ],
+                'courseid' => [
+                        'type' => PARAM_INT,
+                ],
+                'firstaccess' => [
+                        'type' => PARAM_INT,
+                ],
+        ];
+    }
+}

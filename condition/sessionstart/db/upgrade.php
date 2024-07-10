@@ -63,5 +63,32 @@ function xmldb_notificationscondition_sessionstart_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023101804, 'notificationscondition', 'sessionstart');
     }
 
+    if ($oldversion < 2024070802) {
+        // Define field usermodified to be added to notificationsagent_crseview.
+        $table = new xmldb_table('notificationsagent_crseview');
+        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'firstaccess');
+
+        // Conditionally launch add field usermodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'usermodified');
+
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Sessionstart savepoint reached.
+        upgrade_plugin_savepoint(true, 2024070802, 'notificationscondition', 'sessionstart');
+    }
+
     return true;
 }

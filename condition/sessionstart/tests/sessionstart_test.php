@@ -169,10 +169,10 @@ class sessionstart_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-                [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-                [1707987600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
-                [1704099600, true, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
-                [1707987600, false, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1704099600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1707987600, false, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, true],
+            [1704099600, true, true, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
+            [1707987600, false, false, '{"time":864000}', notificationplugin::COMPLEMENTARY_CONDITION, false],
 
         ];
     }
@@ -266,9 +266,9 @@ class sessionstart_test extends \advanced_testcase {
      */
     public static function dataestimate(): array {
         return [
-                'condition user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-                'condition no cache' => [1704099600, false, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
-                'exception user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
+            'condition user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'condition no cache' => [1704099600, false, notificationplugin::COMPLEMENTARY_CONDITION, '{"time":864000}'],
+            'exception user cache' => [1704099600, true, notificationplugin::COMPLEMENTARY_EXCEPTION, '{"time":864000}'],
         ];
     }
 
@@ -293,9 +293,9 @@ class sessionstart_test extends \advanced_testcase {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
-                        'title' => self::$subplugin->get_title(),
-                        'name' => self::$subplugin->get_subtype(),
-                ]
+                'title' => self::$subplugin->get_title(),
+                'name' => self::$subplugin->get_subtype(),
+            ]
         );
     }
 
@@ -307,9 +307,9 @@ class sessionstart_test extends \advanced_testcase {
     public function test_convertparameters() {
         $id = self::$subplugin->get_id();
         $params = [
-                $id . "_sessionstart_days" => "1",
-                $id . "_sessionstart_hours" => "0",
-                $id . "_sessionstart_minutes" => "1",
+            $id . "_sessionstart_days" => "1",
+            $id . "_sessionstart_hours" => "0",
+            $id . "_sessionstart_minutes" => "1",
         ];
         $expected = '{"time":86460}';
         $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
@@ -346,10 +346,10 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-                'rule' => self::$rule->to_record(),
-                'timesfired' => rule::MINIMUM_EXECUTION,
-                'courseid' => $courseid,
-                'getaction' => $typeaction,
+            'rule' => self::$rule->to_record(),
+            'timesfired' => rule::MINIMUM_EXECUTION,
+            'courseid' => $courseid,
+            'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -384,10 +384,10 @@ class sessionstart_test extends \advanced_testcase {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
-                'rule' => self::$rule->to_record(),
-                'timesfired' => rule::MINIMUM_EXECUTION,
-                'courseid' => $courseid,
-                'getaction' => $typeaction,
+            'rule' => self::$rule->to_record(),
+            'timesfired' => rule::MINIMUM_EXECUTION,
+            'courseid' => $courseid,
+            'getaction' => $typeaction,
         ];
 
         $form = new editrule_form(new \moodle_url('/'), $customdata);
@@ -438,7 +438,8 @@ class sessionstart_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\sessionstart::set_first_course_access
      */
     public function test_set_first_course_access() {
-        $this->assertIsNumeric(sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time()));
+        sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time());
+        $this->assertIsInt(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
     }
 
     /**

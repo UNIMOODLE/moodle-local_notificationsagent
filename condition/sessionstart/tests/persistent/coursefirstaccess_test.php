@@ -31,7 +31,28 @@
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2024070802;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationscondition_sessionstart';
+
+namespace notificationscondition_sessionstart\persistent;
+
+use notificationscondition_activitystudentend\persistent\cmlastaccess;
+
+/**
+ * Test coursefirstaccess
+ *
+ * @group notificationsagent
+ */
+class coursefirstaccess_test extends \advanced_testcase {
+    /**
+     * Test define properties.
+     *
+     * @covers \notificationscondition_sessionstart\persistent\coursefirstaccess::define_properties
+     *
+     */
+    public function test_define_properties() {
+        // Test persistant.
+        $this->assertTrue(cmlastaccess::has_property('userid'));
+        $this->assertTrue(cmlastaccess::has_property('courseid'));
+        $this->assertTrue(cmlastaccess::has_property('idactivity'));
+        $this->assertTrue(cmlastaccess::has_property('firstaccess'));
+    }
+}

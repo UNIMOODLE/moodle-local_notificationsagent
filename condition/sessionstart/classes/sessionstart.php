@@ -37,6 +37,7 @@ namespace notificationscondition_sessionstart;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use notificationscondition_sessionstart\persistent\coursefirstaccess;
 
 /**
  * This class handles the condition of session start.
@@ -218,20 +219,18 @@ class sessionstart extends notificationconditionplugin {
      * @param int $courseid
      * @param int $timeaccess
      *
-     * @return bool
      */
     public static function set_first_course_access($userid, $courseid, $timeaccess) {
-        global $DB;
-        $exists = $DB->record_exists('notificationsagent_crseview', ['userid' => $userid, 'courseid' => $courseid]);
-        if (!$exists) {
-            $objdb = new \stdClass();
-            $objdb->userid = $userid;
-            $objdb->courseid = $courseid;
-            $objdb->firstaccess = $timeaccess;
-            $exists = $DB->insert_record('notificationsagent_crseview', $objdb);
-        }
 
-        return $exists;
+        $crsefirstaccess = coursefirstaccess::get_record(['courseid' => $courseid, 'userid' => $userid]);
+
+        if (empty($crsefirstaccess)) {
+            $crsefirstaccess = new coursefirstaccess();
+            $crsefirstaccess->set('userid', $userid);
+            $crsefirstaccess->set('courseid', $courseid);
+        }
+        $crsefirstaccess->set('firstaccess', $timeaccess);
+        $crsefirstaccess->save();
     }
 
     /**
@@ -242,40 +241,39 @@ class sessionstart extends notificationconditionplugin {
      *
      * @return mixed  return firstacces to a course
      */
-    public static function get_first_course_access($userid, $courseid) {
+    public static function get_first_course_access(int $userid, int $courseid) {
         global $DB;
-        $firstacces = $DB->get_field(
-            'notificationsagent_crseview',
-            'firstaccess',
-            ['userid' => $userid, 'courseid' => $courseid]
-        );
+        $firstaccess = null;
+        $crsefirstaccess = coursefirstaccess::get_record(['courseid' => $courseid, 'userid' => $userid]);
+        if (!empty($crsefirstaccess)) {
+            $firstaccess = $crsefirstaccess->get('firstaccess');
+        }
 
-        if (empty($firstacces)) {
+        if (empty($firstaccess)) {
             $query = 'SELECT timecreated
-                    FROM {logstore_standard_log}
-                   WHERE courseid = :courseid
-                    AND userid = :userid
-                    AND eventname = :eventname
-               ORDER BY timecreated
-                  LIMIT 1';
+                               FROM {logstore_standard_log}
+                            WHERE courseid = :courseid
+                                 AND userid = :userid
+                                AND eventname = :eventname
+                      ORDER BY timecreated
+                            LIMIT 1';
 
             $result = $DB->get_record_sql(
                 $query,
                 [
-                            'courseid' => $courseid,
-                            'userid' => $userid,
-                            'eventname' => '\\core\\event\\course_viewed',
-                    ]
+                    'courseid' => $courseid,
+                    'userid' => $userid,
+                    'eventname' => '\\core\\event\\course_viewed',
+                ]
             );
 
             if (!$result) {
-                $firstacces = null;
-            } else {
-                $firstacces = $result->timecreated;
+                return $firstaccess;
             }
+            $firstaccess = $result->timecreated;
         }
 
-        return $firstacces;
+        return $firstaccess;
     }
 
     /**

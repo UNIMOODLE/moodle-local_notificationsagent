@@ -88,7 +88,7 @@ class sessionstart_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course(
-            ([
+                ([
                         'startdate' => self::COURSE_DATESTART,
                         'enddate' => self::COURSE_DATEEND,
                 ])
@@ -134,9 +134,13 @@ class sessionstart_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
 
+        $precache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
+        $pretrigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
+        $this->assertEmpty($pretrigger);
+        $this->assertEmpty($precache);
+
         if ($firstaccess) {
-            $setaccess = sessionstart::set_first_course_access(self::$user->id, self::$course->id, self::USER_FIRSTACCESS);
-            $this->assertIsInt($setaccess);
+            sessionstart::set_first_course_access(self::$user->id, self::$course->id, self::USER_FIRSTACCESS);
         }
 
         $event = \core\event\course_viewed::create([
