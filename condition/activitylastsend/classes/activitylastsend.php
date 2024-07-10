@@ -115,9 +115,9 @@ class activitylastsend extends notificationconditionplugin {
         // Condition.
         if (!$context->is_complementary()) {
             if (
-                    $timeaccess >= $lastsendtime->timemodified
-                    && $timeaccess <= $lastsendtime->timemodified +
-                    $params->{self::UI_TIME}
+                $timeaccess >= $lastsendtime->timemodified
+                && $timeaccess <= $lastsendtime->timemodified +
+                $params->{self::UI_TIME}
             ) {
                 $nexttime = $lastsendtime->timemodified + $params->{self::UI_TIME};
             } else if ($timeaccess > $lastsendtime->timemodified + $params->{self::UI_TIME}) {
@@ -127,9 +127,9 @@ class activitylastsend extends notificationconditionplugin {
 
         // Exception.
         if (
-                $timeaccess >= $lastsendtime->timemodified
-                && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
-                && $context->is_complementary()
+            $timeaccess >= $lastsendtime->timemodified
+            && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
+            && $context->is_complementary()
         ) {
             $nexttime = time();
         }
@@ -232,7 +232,7 @@ class activitylastsend extends notificationconditionplugin {
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
         $paramstoreplace =
-                [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
+            [\local_notificationsagent\helper\helper::to_human_format($jsonparams->{self::UI_TIME}, true), $activityname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;
@@ -272,27 +272,25 @@ class activitylastsend extends notificationconditionplugin {
     public static function get_cmidfiles($cmid, $userid, $conditiontime, $crontasktime) {
         global $DB;
 
-        $sql = '
+        $sql = "
             SELECT f.id, f.userid, f.timemodified
               FROM {context} ctx
               JOIN {files} f
                 ON ctx.id = f.contextid
                AND ctx.instanceid = :cmid
              WHERE f.filesize <> 0
-               AND f.timemodified < :now + :time
+               AND f.timemodified < " . $DB->sql_cast_char2int($crontasktime) . " + " . $DB->sql_cast_char2int($conditiontime) . "
                AND f.userid = :userid
           ORDER BY timemodified DESC
              LIMIT 1
-        ';
+        ";
 
         return $DB->get_record_sql(
             $sql,
             [
-                        'cmid' => $cmid,
-                        'userid' => $userid,
-                        'time' => $conditiontime,
-                        'now' => $crontasktime,
-                ]
+                'cmid' => $cmid,
+                'userid' => $userid,
+            ]
         );
     }
 }
