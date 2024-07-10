@@ -47,18 +47,18 @@ class cmlastaccess extends persistent {
      */
     protected static function define_properties() {
         return [
-                'userid' => [
-                        'type' => PARAM_INT,
-                ],
-                'courseid' => [
-                        'type' => PARAM_INT,
-                ],
-                'idactivity' => [
-                        'type' => PARAM_RAW,
-                ],
-                'firstaccess' => [
-                        'type' => PARAM_INT,
-                ],
+            'userid' => [
+                'type' => PARAM_INT,
+            ],
+            'courseid' => [
+                'type' => PARAM_INT,
+            ],
+            'idactivity' => [
+                'type' => PARAM_INT,
+            ],
+            'firstaccess' => [
+                'type' => PARAM_INT,
+            ],
         ];
     }
 }

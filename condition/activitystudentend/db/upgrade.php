@@ -97,5 +97,55 @@ function xmldb_notificationscondition_activitystudentend_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023101811, 'notificationscondition', 'activitystudentend');
     }
 
+    if ($oldversion < 2024071002) {
+        // Set values.
+        $recordset = $DB->get_recordset('notificationsagent_cmview');
+        foreach ($recordset as $record) {
+
+            if ($record->usermodified == null) {
+                $record->usermodified = $record->userid;
+            }
+            if ($record->timecreated == null) {
+                $record->timecreated = $record->firstaccess;
+            }
+            if ($record->timemodified == null) {
+                $record->timemodified = $record->firstaccess;
+            }
+
+            $DB->update_record('notificationsagent_cmview', $record);
+
+        }
+        $recordset->close();
+
+        // Changing nullability of field usermodified on table notificationsagent_cmview to not null.
+        $table = new xmldb_table('notificationsagent_cmview');
+        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'firstaccess');
+
+        // Launch change of nullability for field usermodified.
+        $dbman->change_field_notnull($table, $field);
+
+        // Launch change of default for field usermodified.
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'usermodified');
+
+        // Launch change of nullability for field timecreated.
+        $dbman->change_field_notnull($table, $field);
+
+        // Launch change of default for field timecreated.
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+
+        // Launch change of nullability for field timemodified.
+        $dbman->change_field_notnull($table, $field);
+
+        // Launch change of default for field timemodified.
+        $dbman->change_field_default($table, $field);
+
+        // Activitystudentend savepoint reached.
+        upgrade_plugin_savepoint(true, 2024071002, 'notificationscondition', 'activitystudentend');
+    }
+
     return true;
 }
