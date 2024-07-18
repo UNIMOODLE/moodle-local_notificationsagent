@@ -43,6 +43,7 @@ use local_notificationsagent\notificationactionplugin;
 class messageagent extends notificationactionplugin {
     /** @var UI ELEMENTS */
     public const NAME = 'messageagent';
+    const UI_ANONYMIZE = 'anonymize';
 
     /**
      * Get the elements for the messageagent plugin.
@@ -81,9 +82,22 @@ class messageagent extends notificationactionplugin {
             ['class' => 'fitem_id_templatevars_editor'],
             $editoroptions
         );
+
+        $anonymize = $mform->createElement(
+            'checkbox',
+            $this->get_name_ui(self::UI_ANONYMIZE),
+            get_string('editrule_action_anonymize', 'notificationsaction_messageagent'),
+        );
+
         $this->placeholders($mform, $type, $this->show_user_placeholders());
         $mform->insertElementBefore($title, 'new' . $type . '_group');
         $mform->insertElementBefore($message, 'new' . $type . '_group');
+        $mform->insertElementBefore($anonymize, 'new' . $type . '_group');
+        $mform->addHelpButton(
+            $this->get_name_ui(self::UI_ANONYMIZE),
+            'editrule_action_anonymize',
+            'notificationsaction_messageagent'
+        );
         $mform->setType($this->get_name_ui(self::UI_TITLE), PARAM_TEXT);
         $mform->addRule($this->get_name_ui(self::UI_TITLE), ' ', 'required');
         $mform->setType($this->get_name_ui(self::UI_MESSAGE), PARAM_RAW);
@@ -134,7 +148,14 @@ class messageagent extends notificationactionplugin {
         $params = (array) $params;
         $title = $params[$this->get_name_ui(self::UI_TITLE)] ?? 0;
         $message = $params[$this->get_name_ui(self::UI_MESSAGE)] ?? 0;
-        $this->set_parameters(json_encode(['title' => $title, 'message' => $message]));
+        $parameters = [
+            'title' => $title,
+            'message' => $message,
+        ];
+        if(isset($params[$this->get_name_ui(self::UI_ANONYMIZE)])) {
+            $parameters['anonymize'] = true;
+        }
+        $this->set_parameters(json_encode($parameters));
         return $this->get_parameters();
     }
 
@@ -174,18 +195,22 @@ class messageagent extends notificationactionplugin {
     public function execute_action($context, $params) {
         $placeholdershuman = json_decode($params);
         $sendmessage = notificationactionplugin::get_message_by_timesfired($context, $placeholdershuman->{self::UI_MESSAGE});
+
         $userfrom = $context->get_rule()->get_createdby();
         $userto = $context->get_userid();
+
+        $msg_is_anonymous = $placeholdershuman->{self::UI_ANONYMIZE} || ($userfrom == $userto);
+
         $message = new \core\message\message();
         $message->component = 'notificationsaction_messageagent'; // Your plugin's name.
         $message->name = 'individual_message'; // Your notification name from message.php.
-        $message->userfrom = $userfrom == $userto ? \core_user::get_noreply_user() : $userfrom;
-        $message->subject = format_text($placeholdershuman->{self::UI_TITLE});
+        $message->userfrom = $msg_is_anonymous ? \core_user::get_noreply_user() : $userfrom;
+        $message->subject = format_string($placeholdershuman->{self::UI_TITLE});
         $message->fullmessage = format_text($sendmessage);
         $message->fullmessageformat = FORMAT_MOODLE;
         $message->fullmessagehtml = '<p>' . format_text($sendmessage) . '</p>';
         $message->smallmessage = format_text($sendmessage);
-        $message->notification = $userfrom == $userto ? 1 : 0;
+        $message->notification = $msg_is_anonymous ? 1 : 0;
         if ($message->notification === 0) {
             // It's a private conversation between users.
             $conversation = \core_message\api::create_conversation(
@@ -231,6 +256,7 @@ class messageagent extends notificationactionplugin {
         return json_encode([
                 'title' => $parameters->{self::UI_TITLE},
                 'message' => $parameters->{self::UI_MESSAGE}->text,
+                'anonymize' => isset($parameters->{self::UI_ANONYMIZE})
         ]);
     }
 
