@@ -444,8 +444,14 @@ abstract class notificationplugin {
 
         return $validation;
     }
+
     /**
-     * Get activity id from $data.
+     * Get the activity id.
+     *
+     * @param array $data Data parameters.
+     * @param int $courseid The course identifier.
+     *
+     * @return int $cmid The course module identifier.
      */
     public function get_activity_cmid($data, $courseid) {
         return ((object)$data)->{self::UI_ACTIVITY} ?? null;

@@ -91,8 +91,8 @@ class forummessage extends notificationactionplugin {
         );
 
         $editoroptions = [
-                'maxfiles' => EDITOR_UNLIMITED_FILES,
-                'trusttext' => true,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'trusttext' => true,
         ];
 
         // Message.
@@ -159,9 +159,9 @@ class forummessage extends notificationactionplugin {
      */
     public function check_capability($context) {
         return has_capability('local/notificationsagent:forummessage', $context)
-                && has_capability('mod/forum:addnews', $context)
-                && has_capability('mod/forum:addquestion', $context)
-                && has_capability('mod/forum:startdiscussion', $context);
+            && has_capability('mod/forum:addnews', $context)
+            && has_capability('mod/forum:addquestion', $context)
+            && has_capability('mod/forum:startdiscussion', $context);
     }
 
     /**
@@ -184,19 +184,27 @@ class forummessage extends notificationactionplugin {
         );
         return $this->get_parameters();
     }
-    /** Get activity id from $data */
+
+    /**
+     * Get the activity id.
+     *
+     * @param array $data Data parameters.
+     * @param int $courseid The course identifier.
+     *
+     * @return int $cmid The course module identifier.
+     */
     public function get_activity_cmid($data, $courseid) {
-        $cmid = ((object)$data)->{self::UI_ACTIVITY};
-        // notificationsagent::FORUM_NEWS_CMID is the mark value for the forum news.
+        $cmid = ((object) $data)->{self::UI_ACTIVITY};
+        // The notificationsagent::FORUM_NEWS_CMID is the mark value for the forum news.
         if ($cmid == notificationsagent::FORUM_NEWS_CMID) {
-            // Return the forum news cmid.
-            $instanced = notificationactionplugin::get_news_forum($courseid);            
-            // Get cmid.
+            $instance = notificationactionplugin::get_news_forum($courseid);
             $fastmodinfo = get_fast_modinfo($courseid);
-            $cmid = $fastmodinfo->get_instances_of('forum')[$instanced]->id;
-        } 
+            $cmid = $fastmodinfo->get_instances_of('forum')[$instance]->id;
+        }
+
         return $cmid;
     }
+
     /**
      * Process and replace markups in the supplied content.
      *
@@ -224,9 +232,9 @@ class forummessage extends notificationactionplugin {
 
         $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
         $paramstoteplace = [
-                shorten_text($activityname),
-                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
-                shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
+            shorten_text($activityname),
+            shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+            shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
         ];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
@@ -307,9 +315,9 @@ class forummessage extends notificationactionplugin {
         $parameters = json_decode($this->get_parameters());
 
         return json_encode([
-                'title' => $parameters->{self::UI_TITLE},
-                'message' => $parameters->{self::UI_MESSAGE}->text,
-                'cmid' => $parameters->{self::UI_ACTIVITY},
+            'title' => $parameters->{self::UI_TITLE},
+            'message' => $parameters->{self::UI_MESSAGE}->text,
+            'cmid' => $parameters->{self::UI_ACTIVITY},
         ]);
     }
 
