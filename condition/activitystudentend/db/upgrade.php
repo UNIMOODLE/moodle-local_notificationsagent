@@ -101,7 +101,6 @@ function xmldb_notificationscondition_activitystudentend_upgrade($oldversion) {
         // Set values.
         $recordset = $DB->get_recordset('notificationsagent_cmview');
         foreach ($recordset as $record) {
-
             if ($record->usermodified == null) {
                 $record->usermodified = $record->userid;
             }
@@ -113,7 +112,6 @@ function xmldb_notificationscondition_activitystudentend_upgrade($oldversion) {
             }
 
             $DB->update_record('notificationsagent_cmview', $record);
-
         }
         $recordset->close();
 
