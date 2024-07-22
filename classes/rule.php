@@ -299,10 +299,14 @@ class rule {
                     $context
                 )
         ) {
-            $rules = [...$rules, ...self::get_course_rules($courseid, true), ...self::get_course_rules_forced($courseid)];
+            $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false),
+                ...self::get_course_rules_forced($courseid),
+            ];
         }
         if (has_capability('local/notificationsagent:manageallrule', $context)) {
-            $rules = [...$rules, ...self::get_course_rules($courseid), ...self::get_course_rules_forced($courseid)];
+            $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false),
+                ...self::get_course_rules_forced($courseid),
+            ];
         }
 
         $rules = array_unique($rules, SORT_REGULAR);
@@ -1768,10 +1772,11 @@ class rule {
      * @param integer $courseid Course id
      * @param bool $notstudent Filter
      * @param int $ruleid Concrete ruleid
+     * @param bool $notcatcontext Filter
      *
      * @return array $data rules
      */
-    private static function get_course_rules($courseid, $notstudent = false, $ruleid = null) {
+    private static function get_course_rules($courseid, $notstudent = false, $ruleid = null, $notcatcontext = true) {
         global $DB;
 
         $data = [];
@@ -1800,6 +1805,25 @@ class rule {
                     ] + $params;
         }
 
+        $unioncatcontext = '';
+        if ($notcatcontext) {
+            $unioncatcontext =
+            "UNION
+            SELECT nr.id
+              FROM {notificationsagent_rule} nr
+              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+               AND nctx.contextid = :categorycontextid AND nr.deleted = 0
+              JOIN {course_categories} cc ON nctx.objectid = cc.id
+              JOIN {course} c ON cc.id = c.category
+              $notstudentjoin
+             WHERE cc.id $sqlparents
+             $ruleidwheresql2";
+
+            $params = [
+                'categorycontextid' => CONTEXT_COURSECAT,
+            ] + $params;
+        }
+
         $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -1808,22 +1832,12 @@ class rule {
                   $notstudentjoin
                  WHERE c.id = :coursecontext
                  $ruleidwheresql1
-                 UNION
-                SELECT nr.id
-                  FROM {notificationsagent_rule} nr
-                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :categorycontextid AND nr.deleted = 0
-                  JOIN {course_categories} cc ON nctx.objectid = cc.id
-                  JOIN {course} c ON cc.id = c.category
-                  $notstudentjoin
-                 WHERE cc.id $sqlparents
-                 $ruleidwheresql2
+                 $unioncatcontext
         ";
 
         $params = [
                         'coursecontextid' => CONTEXT_COURSE,
                         'coursecontext' => $courseid,
-                        'categorycontextid' => CONTEXT_COURSECAT,
                 ] + $params;
 
         $data = $DB->get_records_sql($sql, $params);
