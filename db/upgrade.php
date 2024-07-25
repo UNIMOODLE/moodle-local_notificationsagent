@@ -319,13 +319,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        // Notificationsagent savepoint reached.
-        upgrade_plugin_savepoint(true, 2024043009, 'local', 'notificationsagent');
-    }
-
-    if ($oldversion < 2024043009) {
-        // Define index idx_courseid (not unique) to be added to notificationsagent_report.
-        $table = new xmldb_table('notificationsagent_report');
         $index = new xmldb_index('idx_courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
 
         // Conditionally launch add index idx_courseid.
