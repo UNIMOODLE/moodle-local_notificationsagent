@@ -43,3 +43,5 @@ $string['editrule_action_message'] = 'Message {$a->typeelement}';
 $string['subtype'] = 'messageagent';
 $string['messageagent_event'] = 'Message agent';
 $string['privacy:metadata'] = 'The messageagent plugin does not store any personal data.';
+$string['editrule_action_anonymize'] = 'Anonymize';
+$string['editrule_action_anonymize_help'] = "Mark this option to send the message from the system instead of from the rule owner.";

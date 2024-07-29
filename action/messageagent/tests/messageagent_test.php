@@ -34,6 +34,7 @@
 
 namespace notificationsaction_messageagent;
 
+use core_user;
 use Generator;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
@@ -130,11 +131,14 @@ class messageagent_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
     public function test_execute_action($param, $user) {
+        $this->preventResetByRollback();
+
         $auxarray = json_decode($param, true);
+        $msg_is_anonymous = $auxarray['anonymize'];
         self::$context->set_params($param);
         self::$context->set_rule(self::$rule);
         self::$context->set_userid(self::$user->id);
-        self::$context->set_courseid(self::$coursecontext->id);
+        self::$context->set_courseid(self::$coursetest->id);
         self::$context->set_usertimesfired(1);
         self::$subplugin->set_id(self::CONDITIONID);
         self::$rule->set_createdby($user === 0 ? self::$user->id : $user);
@@ -146,8 +150,9 @@ class messageagent_test extends \advanced_testcase {
         $this->assertCount(1, $messages);
         $this->assertIsInt($result);
         $this->assertSame(self::$user->email, $messages[0]->to);
-        if ($user !== 0) {
-            $this->assertStringContainsString('Admin', $messages[0]->subject);
+        if ($user !== 0 && !$msg_is_anonymous) {
+            $userfrom = core_user::get_user($user);
+            $this->assertStringContainsString(fullname($userfrom), $messages[0]->subject);
         } else {
             $this->assertStringContainsString($auxarray['title'], $messages[0]->subject);
         }
@@ -159,8 +164,9 @@ class messageagent_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-                ['{"title":"TEST","message":"Message body"}', 2],
-                ['{"title":"TEST","message":"Message body"}', 0],
+                ['{"title":"TEST","message":"Message body","anonymize":false}', 2],
+                ['{"title":"TEST","message":"Message body","anonymize":true}', 2],
+                ['{"title":"TEST","message":"Message body","anonymize":false}', 0],
         ];
     }
 
@@ -269,9 +275,11 @@ class messageagent_test extends \advanced_testcase {
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
         $uititlename = $method->invoke(self::$subplugin, self::$subplugin::UI_TITLE);
         $uiamessagename = $method->invoke(self::$subplugin, self::$subplugin::UI_MESSAGE);
+        $uianonymizename = $method->invoke(self::$subplugin, self::$subplugin::UI_ANONYMIZE);
 
         $this->assertTrue($mform->elementExists($uititlename));
         $this->assertTrue($mform->elementExists($uiamessagename));
+        $this->assertTrue($mform->elementExists($uianonymizename));
     }
 
     /**
@@ -312,6 +320,8 @@ class messageagent_test extends \advanced_testcase {
 
         // Format message text // delete ['text'].
         $auxarray['message'] = $auxarray[self::$subplugin::UI_MESSAGE]['text'];
+        // anonymize should default to false if it's not set
+        $auxarray['anonymize'] = isset($auxarray[self::$subplugin::UI_ANONYMIZE]);
 
         self::$subplugin->set_parameters($param);
         $actual = self::$subplugin->get_parameters_placeholders();
