@@ -74,7 +74,7 @@ class activitycompleted extends notificationconditionplugin {
      */
     public function evaluate(evaluationcontext $context): bool {
         global $DB;
-        $cache = false;
+
         $meetcondition = false;
         $cmiscompleted = false;
         $pluginname = $this->get_subtype();
@@ -82,14 +82,12 @@ class activitycompleted extends notificationconditionplugin {
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
         $params = json_decode($context->get_params());
-        // Check for new rules.
-        if(is_int($conditionid)){
-            $cache = $DB->record_exists('notificationsagent_cache', [
-                'pluginname' => $pluginname, 'conditionid' => $conditionid,
-                'courseid' => $courseid, 'userid' => $userid,
-            ]);
-        }
 
+        $cache = $DB->record_exists('notificationsagent_cache', [
+            'pluginname' => $pluginname, 'conditionid' => $conditionid,
+            'courseid' => $courseid, 'userid' => $userid,
+        ]);
+        
         if (!$cache) {
             [$course, $cm] = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
 

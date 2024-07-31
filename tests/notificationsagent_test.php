@@ -226,10 +226,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_timer_cache(
             [
-                        'userid' => self::$user->id,
-                        'courseid' => self::$course->id,
-                        'startdate' => self::CM_DATESTART,
-                        'cmid' => self::CMID,
+                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
                 ],
             [
                         [
@@ -257,11 +254,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_timer_cache(
             [
-                        'userid' => self::$user->id,
-                        'courseid' => self::$course->id,
-                        'startdate' => self::CM_DATESTART + 86400,
-
-                        'cmid' => self::CMID,
+                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
                 ],
             [
                         [
@@ -300,10 +293,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_time_trigger(
             [
-                        'ruleid' => self::$rule->get_id(),
-                        'userid' => self::$user->id,
-                        'courseid' => self::$course->id,
-                        'conditionid' => self::CMID,
+                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
                 ],
             [
                         [
@@ -333,10 +323,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_time_trigger(
             [
-                        'ruleid' => self::$rule->get_id(),
-                        'userid' => self::$user->id,
-                        'courseid' => self::$course->id,
-                        'conditionid' => self::CMID,
+                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
                 ],
             [
                         [
@@ -417,7 +404,13 @@ class notificationsagent_test extends \advanced_testcase {
         $data = $data[key($data)];
         $this->assertEquals(self::$rule->get_id(), $data->ruleid);
         $this->assertEquals($pluginname, $data->pluginname);
-        $this->assertEquals(self::$course->category, $data->objectid);
+        if ($data->contextid === CONTEXT_COURSE) {
+            $this->assertEquals(self::$course->id, $data->objectid);
+        }
+        if ($data->contextid === CONTEXT_COURSECAT) {
+            $this->assertEquals(self::$course->category, $data->objectid);
+        }
+
     }
 
     /**

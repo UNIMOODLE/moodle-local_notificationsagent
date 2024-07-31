@@ -75,7 +75,7 @@ class activitymodified extends notificationconditionplugin {
     public function evaluate(evaluationcontext $context): bool {
         // Params being like "time": "cmid":"" .
         global $DB;
-        $timelastsend = false;
+        
         $meetcondition = false;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
@@ -83,14 +83,13 @@ class activitymodified extends notificationconditionplugin {
         $timeaccess = $context->get_timeaccess();
         $conditionid = $this->get_id();
         $cmid = (json_decode($context->get_params()))->{self::UI_ACTIVITY};
-        // Check for new rules.
-        if(is_int($conditionid)) {
-            $timelastsend = $DB->get_field(
-                'notificationsagent_cache',
-                'startdate',
-                ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
-            );
-        }
+
+        $timelastsend = $DB->get_field(
+            'notificationsagent_cache',
+            'startdate',
+            ['conditionid' => $conditionid, 'courseid' => $courseid, 'userid' => $userid, 'pluginname' => $pluginname],
+        );
+
         if (empty($timelastsend)) {
             return self::get_any_new_content($cmid, $timeaccess);
         }

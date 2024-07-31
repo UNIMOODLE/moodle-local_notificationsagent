@@ -476,6 +476,7 @@ abstract class notificationplugin {
             if (!$dataplugin->id = $DB->insert_record($table, $dataplugin)) {
                 throw new moodle_exception('errorinserting', 'notificationplugin');
             }
+            $this->set_id($dataplugin->id);
             return true;
 
             // Update plugin.

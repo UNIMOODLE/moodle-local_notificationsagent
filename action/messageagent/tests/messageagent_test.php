@@ -140,18 +140,19 @@ class messageagent_test extends \advanced_testcase {
         self::$rule->set_createdby($user === 0 ? self::$user->id : $user);
         // Test action.
         unset_config('noemailever');
-        $sink = $this->redirectEmails();
+        $sink = $this->redirectMessages();
         $result = self::$subplugin->execute_action(self::$context, $param);
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
         $this->assertIsInt($result);
-        $this->assertSame(self::$user->email, $messages[0]->to);
         if ($user !== 0) {
-            $this->assertStringContainsString('Admin', $messages[0]->subject);
+            $this->assertEquals(2, $messages[0]->useridfrom);
         } else {
             $this->assertStringContainsString($auxarray['title'], $messages[0]->subject);
+            $this->assertSame(self::$user->id, $messages[0]->useridto);
         }
-        $this->assertStringContainsString($auxarray['message'], $messages[0]->body);
+        $this->assertStringContainsString($auxarray['message'], $messages[0]->fullmessage);
+        $sink->close();
     }
 
     /**
