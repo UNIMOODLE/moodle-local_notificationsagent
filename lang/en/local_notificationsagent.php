@@ -154,7 +154,7 @@ $string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is availab
 $string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-        = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
+    = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
 
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
@@ -167,7 +167,7 @@ $string['editrule_condition_error'] = 'You must add at least one condition';
 $string['editrule_newaction'] = 'New action:';
 $string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_notificationtouser']
-        = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
+    = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
@@ -186,6 +186,8 @@ $string['editrule_action_error'] = 'You must add at least one action';
 
 // Rule.
 $string['rulecancelled'] = 'Rule cancelled';
+
+$string['Rule cancelled_help'] = 'Rule cancelled';
 $string['rulesaved'] = 'Rule saved';
 
 // Rule errors.
@@ -194,8 +196,8 @@ $string['editrule_runtime_error'] = 'If ' . $string['editrule_timesfired'] . ' i
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' between {$a->minimum} and {$a->maximum}';
 
 // Card content.
-$string['cardif'] = 'If:';
-$string['cardunless'] = 'Unless:';
+$string['cardif'] = 'If all of:';
+$string['cardunless'] = 'Unless any of:';
 $string['cardthen'] = 'Then:';
 $string['cardsharedby'] = 'Shared by {$a->username} in course {$a->coursename}';
 
@@ -223,7 +225,7 @@ $string['statusactivate'] = 'Activate';
 $string['deletetitle'] = 'Delete {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = 'You are going to delete the {$a->type} {$a->title}, do you want to continue?';
 $string['deletecontent_hascontext']
-        = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
+    = 'The {$a->type} {$a->title} you want to delete is associated with other contexts, do you want to continue?';
 $string['deleteaccept'] = 'Rule deleted';
 
 // Assign modal.
@@ -333,3 +335,8 @@ $string['subplugintype_notificationscondition'] = 'Condition plugin';
 $string['subplugintype_notificationsaction'] = 'Action plugin';
 $string['subplugintype_notificationscondition_plural'] = 'Condition plugins';
 $string['subplugintype_notificationsaction_plural'] = 'Action plugins';
+
+// Help.
+$string['evaluaterule_help'] =
+    'Rule is evaluated as follows:
+     ([Condition 1] **AND** [Condition 2]  **AND** ... ) **AND NOT** ([Exception 1] **OR** [Exception 2] ...) -> [Action 1]->[Action 2]';

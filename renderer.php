@@ -59,7 +59,8 @@ class local_notificationsagent_renderer extends plugin_renderer_base {
                 ) . '</a>
                 <a class="' . $classnavactions . '" id="nav-actions-tab" data-toggle="tab" href="#nav-actions"
                 role="tab" aria-controls="nav-actions" aria-selected="false">
-                ' . get_string('actions', 'local_notificationsagent') . '</a>
+                ' . get_string('actions', 'local_notificationsagent') .
+            $this->help_icon('evaluaterule', 'local_notificationsagent') . '</a>
             </div>
         </nav>';
         return $tab;

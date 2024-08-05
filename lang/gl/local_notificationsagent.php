@@ -135,7 +135,7 @@ $string['editrule_condition_title_activeactivity'] = 'A actividade [AAAA] está 
 $string['editrule_condition_title_betweendates'] = 'Estamos entre a data [FFFF-1] e [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas as actividades para acceder a este foro [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-        = 'Unha conversa aberta polo usuario no foro [FFFF] sen responder durante máis de [TTTT] tempo';
+    = 'Unha conversa aberta polo usuario no foro [FFFF] sen responder durante máis de [TTTT] tempo';
 
 $string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Actividade {$a->typeelement}:';
@@ -148,11 +148,11 @@ $string['editrule_condition_error'] = 'Debes engadir polo menos unha condición'
 $string['editrule_newaction'] = 'Nova acción:';
 $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] e mensaxe [BBBB]';
 $string['editrule_action_title_notificationtouser']
-        = 'Enviar notificación a un usuario específico [UUUU] con título [TTTT] e mensaxe [BBBB]';
+    = 'Enviar notificación a un usuario específico [UUUU] con título [TTTT] e mensaxe [BBBB]';
 $string['editrule_action_title_postgeneralforum']
-        = 'Publicar unha publicación xeral no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
+    = 'Publicar unha publicación xeral no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
 $string['editrule_action_title_postprivateforum']
-        = 'Publicar unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
+    = 'Publicar unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Engadir usuario ao grupo [GGGG]';
 $string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario dun grupo [GGGG]';
 $string['editrule_action_title_bootstrapnotification'] = 'Notificación de arranque';
@@ -177,8 +177,8 @@ $string['editrule_runtime_error'] = 'Si ' . $string['editrule_timesfired'] . ' �
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' entre {$a->minimum} e {$a->maximum}';
 
 // Contido da tarxeta.
-$string['cardif'] = 'Si:';
-$string['cardunless'] = 'Excepto se:';
+$string['cardif'] = 'Se todo:';
+$string['cardunless'] = 'A non ser que:';
 $string['cardthen'] = 'Entón:';
 $string['cardsharedby'] = 'Compartido por {$a->username} no curso {$a->coursename}';
 
@@ -206,7 +206,7 @@ $string['statusactivate'] = 'Activar';
 $string['deletetitle'] = 'Eliminar o {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = '{$a->type} {$a->title} estase a eliminar, queres continuar?';
 $string['deletecontent_hascontext']
-        = 'O {$a->type} {$a->title} que quere eliminar está asociado con outros contextos, quere continuar?';
+    = 'O {$a->type} {$a->title} que quere eliminar está asociado con outros contextos, quere continuar?';
 $string['deleteaccept'] = 'Regra eliminada';
 
 // Asignar modal.
@@ -262,7 +262,7 @@ $string['notificationsagent:activitymodified'] = 'Capacidade necesaria para util
 $string['notificationsagent:activitynewcontent'] = 'Capacidade necesaria para utilizar a condición de contido novo da actividade';
 $string['notificationsagent:activitysinceend'] = 'Capacidade necesaria para utilizar a actividade desde a condición final';
 $string['notificationsagent:activitystudentend']
-        = 'Capacidade necesaria para utilizar a condición de finalización do alumno da actividade';
+    = 'Capacidade necesaria para utilizar a condición de finalización do alumno da actividade';
 $string['notificationsagent:calendareventto'] = 'Capacidade necesaria para usar o evento do calendario para condicionar';
 $string['notificationsagent:courseend'] = 'Capacidade necesaria para utilizar a condición de fin de curso';
 $string['notificationsagent:forumnoreply'] = 'Necesítase capacidade para utilizar a condición de sen resposta do foro';
@@ -273,7 +273,7 @@ $string['notificationsagent:itemgraded'] = 'Capacidade necesaria para utilizar a
 $string['notificationsagent:weekdays'] = 'Capacidade necesaria para usar a condición dos días da semana';
 $string['notificationsagent:ondates'] = 'Capacidade necesaria para usar a condición entre datas';
 $string['notificationsagent:usergroupadd']
-        = 'Capacidade necesaria para usar a condición de engadir usuario a unha condición de grupo';
+    = 'Capacidade necesaria para usar a condición de engadir usuario a unha condición de grupo';
 
 $string['notificationsagent:addusergroup'] = 'Capacidade de usar a acción addusergroup';
 $string['notificationsagent:bootstrapnotifications'] = 'Capacidade de usar a acción bootstrapnotifications';
@@ -321,7 +321,7 @@ $string['privacy:metadata:actionid'] = 'Un identificador para unha acción';
 $string['privacy:metadata:ruleid'] = 'Un identificador para unha regra';
 $string['privacy:metadata:actiondetail'] = 'Detalle da acción enviada ao usuario.';
 $string['privacy:metadata:notificationsagentreport']
-        = 'Rexistra as mensaxes enviadas aos usuarios que poden conter algúns datos do usuario.';
+    = 'Rexistra as mensaxes enviadas aos usuarios que poden conter algúns datos do usuario.';
 $string['privacy:metadata:timestamp'] = 'Marca de tempo da acción enviada.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Informe do axente de notificacións.';
 
@@ -336,3 +336,8 @@ $string['subplugintype_notificationscondition'] = 'Complemento de condición';
 $string['subplugintype_notificationsaction'] = 'Complemento de acción';
 $string['subplugintype_notificationscondition_plural'] = 'Condición de complementos';
 $string['subplugintype_notificationsaction_plural'] = 'Complementos de acción';
+
+// Help.
+$string['evaluaterule_help'] =
+    'A regra avalíase do seguinte xeito:
+ ([Condición 1] **AND** [Condición 2] **AND** ... ) **AND NOT** ([Excepción 1] **OU** [Excepción 2] ...) -> [Acción 1]->[Acción 2 ]';

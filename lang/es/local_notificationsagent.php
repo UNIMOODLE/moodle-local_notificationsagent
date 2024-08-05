@@ -136,9 +136,9 @@ $string['editrule_condition_title_usercompleteactivity'] = 'El usuario tiene com
 $string['editrule_condition_title_activeactivity'] = 'La actividad [AAAA] está disponible';
 $string['editrule_condition_title_betweendates'] = 'Estamos entre la fecha [FFFF-1] y [FFFF-2]';
 $string['editrule_condition_title_accessforumactivitiescomplete']
-        = 'Completa todas las actividades para acceder a este foro [FFFF]';
+    = 'Completa todas las actividades para acceder a este foro [FFFF]';
 $string['editrule_condition_title_forumnotanswer']
-        = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
+    = 'Un hilo abierto por el usuario en el foro [FFFF] sin responder más de [TTTT] tiempo';
 
 $string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Actividad {$a->typeelement}:';
@@ -151,7 +151,7 @@ $string['editrule_condition_error'] = 'Debe añadir al menos una condición';
 $string['editrule_newaction'] = 'Nueva acción:';
 $string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] y mensaje [BBBB]';
 $string['editrule_action_title_notificationtouser']
-        = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
+    = 'Enviar notificación a un usuario concreto [UUUU] con título [TTTT] y mensaje [BBBB]';
 $string['editrule_action_title_postgeneralforum'] = 'Publicar un post general en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
 $string['editrule_action_title_postprivateforum'] = 'Publicar un post privado en el foro [FFFF] con título [TTTT] y mensaje [BBBB]';
 $string['editrule_action_title_addusertogroup'] = 'Añadir un usuario a grupo [GGGG]';
@@ -178,8 +178,8 @@ $string['editrule_runtime_error'] = 'Si ' . $string['editrule_timesfired'] . ' e
 $string['editrule_execution_error'] = $string['editrule_timesfired'] . ' entre {$a->minimum} y {$a->maximum}';
 
 // Card content.
-$string['cardif'] = 'Si:';
-$string['cardunless'] = 'Excepto si:';
+$string['cardif'] = 'Si todas de:';
+$string['cardunless'] = 'Excepto si alguna de:';
 $string['cardthen'] = 'Entonces:';
 $string['cardsharedby'] = 'Compartida por {$a->username} en el curso {$a->coursename}';
 
@@ -207,7 +207,7 @@ $string['statusactivate'] = 'Activar';
 $string['deletetitle'] = 'Borrar la {$a->type} {$a->title}';
 $string['deletecontent_nocontext'] = 'Se va a borrar {$a->type} {$a->title}, ¿desea continuar?';
 $string['deletecontent_hascontext']
-        = 'La {$a->type} {$a->title} que desea borrar, se encuentra asociada a otros contextos, ¿desea continuar?';
+    = 'La {$a->type} {$a->title} que desea borrar, se encuentra asociada a otros contextos, ¿desea continuar?';
 $string['deleteaccept'] = 'Regla borrada';
 
 // Assign modal.
@@ -261,7 +261,7 @@ $string['notificationsagent:activityend'] = 'Capacidad necesaria para utilizar l
 $string['notificationsagent:activitylastsend'] = 'Capacidad necesaria para utilizar la condición de último envío de la actividad';
 $string['notificationsagent:activitymodified'] = 'Capacidad necesaria para utilizar la condición de actividad modificada';
 $string['notificationsagent:activitynewcontent']
-        = 'Capacidad necesaria para utilizar la condición de contenido nuevo de la actividad';
+    = 'Capacidad necesaria para utilizar la condición de contenido nuevo de la actividad';
 $string['notificationsagent:activitysinceend'] = 'Capacidad necesaria para utilizar la actividad desde la condición final';
 $string['notificationsagent:activitystudentend'] = 'Capacidad necesaria para utilizar la actividad condición final del estudiante';
 $string['notificationsagent:calendareventto'] = 'Capacidad necesaria para utilizar el evento del calendario para condicionar';
@@ -322,7 +322,7 @@ $string['privacy:metadata:actionid'] = 'El id de una acción';
 $string['privacy:metadata:ruleid'] = 'Un id para una regla';
 $string['privacy:metadata:actiondetail'] = 'Detalle de la acción enviada al usuario';
 $string['privacy:metadata:notificationsagentreport']
-        = 'Registra los mensajes enviados a los usuarios que puedan contener algún dato del usuario';
+    = 'Registra los mensajes enviados a los usuarios que puedan contener algún dato del usuario';
 $string['privacy:metadata:timestamp'] = 'Marca de tiempo de la acción enviada';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Informe del agente de notificaciones.';
 
@@ -337,3 +337,6 @@ $string['subplugintype_notificationscondition'] = 'Plugin de condición';
 $string['subplugintype_notificationsaction'] = 'Plugin de acción';
 $string['subplugintype_notificationscondition_plural'] = 'Plugins de condición';
 $string['subplugintype_notificationsaction_plural'] = 'Plugins de acción';
+
+$string['evaluaterule_help'] =
+    'La regla se evalua como sigue: ([Condtion 1] **AND** [Condition 2] **AND** ...) **AND NOT** ([Exception 1] OR [Exception 2] ...) -> [Action 1]->[Action 2]';
