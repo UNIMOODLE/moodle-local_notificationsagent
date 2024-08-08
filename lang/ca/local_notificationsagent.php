@@ -339,6 +339,7 @@ $string['subplugintype_notificationscondition_plural'] = 'Plugins de condició';
 $string['subplugintype_notificationsaction_plural'] = 'Plugins d\'acció';
 
 // Help.
+$string['evaluaterule'] = 'Avalua la regla';
 $string['evaluaterule_help'] =
     'La regla s\'avalua de la següent manera:
  ([Condició 1] **AND** [Condició 2] **AND** ... ) **I NO** ([Excepció 1] **OR** [Excepció 2] ...) -> [Acció 1]->[Acció 2 ]';

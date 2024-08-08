@@ -337,6 +337,7 @@ $string['subplugintype_notificationscondition_plural'] = 'Condition plugins';
 $string['subplugintype_notificationsaction_plural'] = 'Action plugins';
 
 // Help.
+$string['evaluaterule'] = 'Evaluate rule';
 $string['evaluaterule_help'] =
     'Rule is evaluated as follows:
      ([Condition 1] **AND** [Condition 2]  **AND** ... ) **AND NOT** ([Exception 1] **OR** [Exception 2] ...) -> [Action 1]->[Action 2]';

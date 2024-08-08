@@ -338,6 +338,7 @@ $string['subplugintype_notificationscondition_plural'] = 'Condición de compleme
 $string['subplugintype_notificationsaction_plural'] = 'Complementos de acción';
 
 // Help.
+$string['evaluaterule'] = 'Avaliar a regra';
 $string['evaluaterule_help'] =
     'A regra avalíase do seguinte xeito:
  ([Condición 1] **AND** [Condición 2] **AND** ... ) **AND NOT** ([Excepción 1] **OU** [Excepción 2] ...) -> [Acción 1]->[Acción 2 ]';

@@ -337,6 +337,7 @@ $string['subplugintype_notificationscondition'] = 'Plugin de condición';
 $string['subplugintype_notificationsaction'] = 'Plugin de acción';
 $string['subplugintype_notificationscondition_plural'] = 'Plugins de condición';
 $string['subplugintype_notificationsaction_plural'] = 'Plugins de acción';
-
+// Help
+$string['evaluaterule'] = 'Evaluar regla';
 $string['evaluaterule_help'] =
     'La regla se evalúa como sigue: ([Condtion 1] **AND** [Condition 2] **AND** ...) **AND NOT** ([Exception 1] OR [Exception 2] ...) -> [Action 1]->[Action 2]';

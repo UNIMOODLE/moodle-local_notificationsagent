@@ -339,6 +339,7 @@ $string['subplugintype_notificationscondition_plural'] = 'Baldintzen pluginak';
 $string['subplugintype_notificationsaction_plural'] = 'Ekintza-pluginak';
 
 // Help.
+$string['evaluaterule'] = 'Ebaluatu araua';
 $string['evaluaterule_help'] =
     'Araua honela ebaluatzen da:
  ([1 Baldintza] **ETA** [2. Baldintza] **ETA** ... ) **ETA EZ** ([1. Salbuespena] **OR** [2. Salbuespena] ...) -> [1. Ekintza]->[2. Ekintza ]';
