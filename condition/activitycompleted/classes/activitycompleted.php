@@ -87,7 +87,7 @@ class activitycompleted extends notificationconditionplugin {
             'pluginname' => $pluginname, 'conditionid' => $conditionid,
             'courseid' => $courseid, 'userid' => $userid,
         ]);
-        
+
         if (!$cache) {
             [$course, $cm] = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
 

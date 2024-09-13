@@ -226,7 +226,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_timer_cache(
             [
-                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
+                "(userid =" . self::$user->id . "  AND courseid= " . self::$course->id . " AND conditionid=" . self::CMID . ")",
                 ],
             [
                         [
@@ -254,7 +254,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_timer_cache(
             [
-                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
+                "(userid =" . self::$user->id . "  AND courseid= " . self::$course->id . " AND conditionid=" . self::CMID . ")",
                 ],
             [
                         [
@@ -293,7 +293,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_time_trigger(
             [
-                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
+                "(userid =" . self::$user->id . "  AND courseid= " . self::$course->id . " AND conditionid=" . self::CMID . ")",
                 ],
             [
                         [
@@ -323,7 +323,7 @@ class notificationsagent_test extends \advanced_testcase {
 
         notificationsagent::set_time_trigger(
             [
-                "(userid =" . self::$user->id ."  AND courseid= ".self::$course->id." AND conditionid=" . self::CMID .")"
+                "(userid =" . self::$user->id . "  AND courseid= " . self::$course->id . " AND conditionid=" . self::CMID . ")",
                 ],
             [
                         [
@@ -410,7 +410,6 @@ class notificationsagent_test extends \advanced_testcase {
         if ($data->contextid === CONTEXT_COURSECAT) {
             $this->assertEquals(self::$course->category, $data->objectid);
         }
-
     }
 
     /**

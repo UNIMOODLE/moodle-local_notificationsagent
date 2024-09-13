@@ -23,6 +23,123 @@
 import {get_string as getString} from 'core/str';
 import Url from 'core/url';
 
+/**
+ * Selectors for the Assign Modal.
+ *
+ * @property {string} selectAllId The element ID of the Select All link.
+*/
+const selectors = {
+    selectAllId: '[id^="select-all-"]',
+};
+
+/**
+ * Get the count of selected items for all categories.
+ *
+ * @returns {void}
+ */
+const getCountAll = async () => {
+    const categories = document.querySelectorAll('#category-listing-content-0 > li[id^="listitem-category-"]');
+    Array.from(categories).map((category) => {
+        getCountBy(category.id.replace('listitem-category-', ''));
+    });
+}
+
+/**
+ * Count selected items in a category.
+ * 
+ * @param {integer} categoryId 
+ * 
+ * @returns {void}
+ */
+const getCountBy = async (categoryId) => {
+    // Count selected items for the current category.
+    setCount(categoryId);
+
+    // Update the count for the parent category.
+    let hasParent = document.getElementById(`checkboxcategory-${categoryId}`).getAttribute('data-parent');
+    if (hasParent) {
+        let parentCategoryId = hasParent.replace('#category-listing-content-', '');       
+        setCount(parentCategoryId);
+    }
+
+    // Update the count for the children categories.
+    let children = document.querySelectorAll(`#category-listing-content-${categoryId} li[id^="listitem-category-"]`);
+    children.forEach((child) => {
+        setCount(child.id.replace('listitem-category-', ''));
+    })
+};
+
+/**
+ * Display the count of selected items in a category.
+ * 
+ * @param {integer} categoryId 
+ * 
+ * @returns {void}
+ */
+const setCount = async (categoryId) => {
+    if (categoryId == 0) {
+        return;
+    }
+    
+    let obj = {};
+    obj.categories = document.querySelectorAll(
+        `#category-listing-content-${categoryId} > li[id^="listitem-category-"] > div > div > input[type="checkbox"][id^="checkboxcategory-"]:checked`
+    ).length;
+    obj.courses = document.querySelectorAll(
+        `#category-listing-content-${categoryId} > li[id^="listitem-course-"] > div > div > input[type="checkbox"][id^="checkboxcourse-"]:checked`
+    ).length;
+
+    document.getElementById(`selected-info-${categoryId}`).textContent = await getString('assignselectedinfo', 'local_notificationsagent', obj);
+    document.getElementById(`selected-info-${categoryId}`).classList.remove("d-none");
+}
+
+/**
+ * Handles the click event on the Select Courses link.
+ * Selects or unselects all courses in the category.
+ *
+ * @param {Event} event The event object.
+ *
+ * @returns {void}
+ */
+const onClickSelectCourses = async (event) => {
+    const selectItem = event.target.closest(selectors.selectAllId);
+    const categoryId = selectItem.getAttribute('data-category');
+    const isCategoryChecked = document.getElementById('checkboxcategory-' + categoryId + '').checked;
+    if (isCategoryChecked) {
+        return;
+    }
+
+    const checkboxes = document.querySelectorAll(`#category-listing-content-${categoryId} > li[id^="listitem-course-"] > div > div > input[type="checkbox"][id^="checkboxcourse-"]`); 
+    const isAllSelected = (selectItem.getAttribute('data-forceselected') == 'true') ? false : true; 
+    selectItem.setAttribute('data-forceselected', isAllSelected);
+    selectItem.textContent = isAllSelected ? 
+        await getString('assignunselectcourses', 'local_notificationsagent') : 
+        await getString('assignselectcourses', 'local_notificationsagent');
+    
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isAllSelected;
+    });
+
+    getCountBy(categoryId);
+}
+
+/**
+ * Registers click event listeners for all Select Courses links.
+ *
+ * @returns {Promise<void>}
+ */
+const registerEventListeners = async () => {
+    const selectAllItems = document.querySelectorAll(selectors.selectAllId);
+    Array.from(selectAllItems).map((selectAllItem) => {
+        selectAllItem.addEventListener('click', onClickSelectCourses); 
+    });
+}
+
+/**
+ * Initialise the module.
+ * @method init
+ * 
+ */
 export const init = () => {
 
     /**
@@ -45,8 +162,14 @@ export const init = () => {
         NONFORCED: 1,
     }
 
+    registerEventListeners();
+
     var idtemplate;
     $('#assignTemplateModal').on('show.bs.modal', function (event) {
+        resetDefaultCheckboxes('input[type="checkbox"][id^="checkboxcategory-"]');
+        resetDefaultCheckboxes('input[type="checkbox"][id^="checkboxcourse-"]');
+        resetDefaultSelectCourses();
+
         var button = $(event.relatedTarget);
         idtemplate = button.data('idtemplate');
         var isRuleForced;
@@ -89,6 +212,7 @@ export const init = () => {
                     if (category.length) {
                         category.prop('checked', true);
                         $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
+                        $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("disabled", true);
                         $('#listitem-category-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
                     }
                 });
@@ -99,6 +223,9 @@ export const init = () => {
                         course.prop('checked', true);
                     }
                 });
+
+                // After displaying the selected info, display the count of selected items.
+                getCountAll();
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log("Status: " + textStatus);
@@ -121,10 +248,17 @@ export const init = () => {
     $('#assignTemplateModal #course-category-select-all').on('click', function () {
         var checkassign = $('#assignTemplateModal .category-listing .custom-control-input');
         checkassign.prop('checked', $(this).prop('checked'));
+
+        // After checking Select all, display the count of selected items.
+        getCountAll();
     });
     $('#assignTemplateModal .category-listing').on('change', 'input[type=checkbox]', function () {
         var checkssubcategoriescourses = '#category-listing-content-' + $(this).attr("id").replace('checkboxcategory-', '') + ' .custom-control-input';
         $('#assignTemplateModal .category-listing ' + checkssubcategoriescourses).prop('checked', $(this).prop('checked'));
+        $('#assignTemplateModal .category-listing ' + checkssubcategoriescourses).prop('disabled', $(this).prop('checked'));
+
+        // After checking any category or course box, display the count of selected items of its category.
+        getCountBy(this.getAttribute("data-category"));
     });
 
     $('#assignTemplateModal #saveassignTemplateModal').on('click', function () {
@@ -203,4 +337,29 @@ export const init = () => {
         });
 
     });
+
+    /**
+     * Reset default checkboxes.
+     * @param {string} selector 
+     */
+    const resetDefaultCheckboxes = (selector) => {
+        document.querySelectorAll(selector).forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.disabled = false;
+        });
+    }
+
+    /**
+     * Resets all Select Courses links to their default state.
+     *
+     * @return {Promise<void>}
+     */
+    const resetDefaultSelectCourses = async () => {
+        const selectItems = document.querySelectorAll(selectors.selectAllId);
+
+        Promise.all(Array.from(selectItems).map(async (selectItem) => {
+            selectItem.setAttribute('data-forceselected', 'false');
+            selectItem.textContent = await getString('assignselectcourses', 'local_notificationsagent');
+        }));
+    }
 }

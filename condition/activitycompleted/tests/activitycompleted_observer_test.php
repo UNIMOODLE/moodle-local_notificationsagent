@@ -33,15 +33,13 @@
  */
 
 namespace notificationscondition_activitycompleted;
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->libdir . '/completionlib.php');
 
 use local_notificationsagent\evaluationcontext;
-use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\helper\test\mock_base_logger;
-use local_notificationsagent\helper\test\phpunitutil;
-use local_notificationsagent\notificationplugin;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
-use notificationscondition_activitycompleted\activitycompleted;
 
 /**
  * Tests for the activitycompleted observer condition.
@@ -105,10 +103,10 @@ class activitycompleted_observer_test extends \advanced_testcase {
         self::$rule = $rule;
         self::$course = self::getDataGenerator()->create_course(
             ([
-                        'startdate' => self::COURSE_DATESTART,
-                        'enddate' => self::COURSE_DATEEND,
-                        'enablecompletion' => true,
-                ])
+                'startdate' => self::COURSE_DATESTART,
+                'enddate' => self::COURSE_DATEEND,
+                'enablecompletion' => true,
+            ])
         );
         self::$user = self::getDataGenerator()->create_user();
         self::setUser(self::$user);
@@ -136,8 +134,8 @@ class activitycompleted_observer_test extends \advanced_testcase {
         $pluginname = activitycompleted::NAME;
 
         $modinstance = self::getDataGenerator()->create_module('quiz', [
-                'course' => self::$course,
-                'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'course' => self::$course,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
 
         $cmtestac = get_coursemodule_from_instance('quiz', $modinstance->id, self::$course->id, false, MUST_EXIST);
@@ -197,8 +195,8 @@ class activitycompleted_observer_test extends \advanced_testcase {
      */
     public static function dataprovider(): array {
         return [
-                [COMPLETION_COMPLETE],
-                [COMPLETION_INCOMPLETE],
+            [COMPLETION_COMPLETE],
+            [COMPLETION_INCOMPLETE],
         ];
     }
 }

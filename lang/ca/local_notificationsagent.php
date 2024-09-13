@@ -214,6 +214,9 @@ $string['assignassign'] = 'Assignar: ';
 $string['assigncancel'] = 'Cancel·la';
 $string['assignsave'] = 'Desa els canvis';
 $string['assignforced'] = 'Assignar la regla forçosament';
+$string['assignselectcourses'] = 'Marqueu curs';
+$string['assignunselectcourses'] = 'Desmarqueu curs';
+$string['assignselectedinfo'] = '{$a->courses} cursos i {$a->categories} categories seleccionats';
 
 // Share modal.
 $string['sharetitle'] = 'Comparteix la regla {$a->title}';

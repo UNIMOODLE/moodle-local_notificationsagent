@@ -217,6 +217,9 @@ $string['assignassign'] = 'Esleitu: ';
 $string['assigncancel'] = 'Utzi';
 $string['assignsave'] = 'Gorde aldaketak';
 $string['assignforced'] = 'Indarrean esleitu araua';
+$string['assignselectcourses'] = 'Markatu ikastaroak';
+$string['assignunselectcourses'] = 'Desmarkatu ikastaroak';
+$string['assignselectedinfo'] = '{$a->courses} aukeratutako ikastaroak eta {$a->categories} kategoriak';
 
 // Partekatu modala.
 $string['sharetitle'] = 'Partekatu {$a->title} araua';

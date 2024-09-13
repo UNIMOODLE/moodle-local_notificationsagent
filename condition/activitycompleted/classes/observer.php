@@ -35,7 +35,6 @@
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activitycompleted\activitycompleted;
-use local_notificationsagent\rule;
 
 /**
  * Event handler for activitycompleted subplugin.

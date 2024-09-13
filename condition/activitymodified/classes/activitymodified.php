@@ -75,7 +75,7 @@ class activitymodified extends notificationconditionplugin {
     public function evaluate(evaluationcontext $context): bool {
         // Params being like "time": "cmid":"" .
         global $DB;
-        
+
         $meetcondition = false;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();

@@ -248,6 +248,7 @@ class helper {
                     "id" => "checkboxcategory-" . $category["id"],
                     "type" => "checkbox", "class" => "custom-control-input",
                     "data-parent" => "#category-listing-content-" . $categoryid,
+                    "data-category" => $category["id"],
             ]);
             $output .= html_writer::tag(
                 "label",
@@ -265,6 +266,11 @@ class helper {
             $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
             $output .= html_writer::end_div(); // ....categoryname
             $output .= html_writer::end_div(); // ... .data-toggle
+            $output .= html_writer::span(
+                "",
+                "",
+                ["id" => "selected-info-" . $category["id"], "class" => "bg-primary"]
+            );
             $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);
             $output .= html_writer::start_tag("span", ["class" => "course-count text-muted"]);
             $output .= $category["countsubcategoriescourses"];
@@ -276,6 +282,14 @@ class helper {
                     "id" => "category-listing-content-" . $category["id"],
                     "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
             ]);
+            if (!empty($category['courses'])) {
+                $output .= html_writer::link(
+                    "#",
+                    get_string("assignselectcourses", "local_notificationsagent"),
+                    ["id" => "select-all-" . $category["id"],
+                    "data-category" => $category["id"], "data-forceselected" => "false"]
+                );
+            }
             if (!empty($category["categories"])) {
                 $output .= self::build_output_categories($category["categories"], $category["id"]);
             }
@@ -294,6 +308,7 @@ class helper {
                                     "id" => "checkboxcourse-" . $course["id"],
                                     "type" => "checkbox", "class" => "custom-control-input",
                                     "data-parent" => "#category-listing-content-" . $category["id"],
+                                    "data-category" => $category["id"],
                             ]
                     );
                     $output .= html_writer::tag(

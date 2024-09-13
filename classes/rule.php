@@ -119,26 +119,26 @@ class rule {
 
     /** @var string[] List of allowed placeholders in rule templates */
     private const PLACEHOLDERS
-            = [
-                    'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
-            ];
+        = [
+            'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
+        ];
 
     /** @var string[] List of allowed placeholders in rule templates */
     private const PLACEHOLDERS_GEN
-            = [
-                    'Course_FullName', 'Course_Url', 'Course_Category_Name', 'Teacher_FirstName', 'Teacher_LastName',
-                    'Teacher_Email',
-                    'Teacher_Username',
-                    'Teacher_Address', 'Current_time',
-                    self::SEPARATOR, 'Follow_Link',
-            ];
+        = [
+            'Course_FullName', 'Course_Url', 'Course_Category_Name', 'Teacher_FirstName', 'Teacher_LastName',
+            'Teacher_Email',
+            'Teacher_Username',
+            'Teacher_Address', 'Current_time',
+            self::SEPARATOR, 'Follow_Link',
+        ];
 
     /** @var array Types of a rule */
     private const RULE_TYPES
-            = [
-                    0 => 'template',
-                    1 => 'rule',
-            ];
+        = [
+            0 => 'template',
+            1 => 'rule',
+        ];
     /** @var int Template type identifier */
     public const TEMPLATE_TYPE = 0;
     /** @var int Rule type identifier */
@@ -233,18 +233,18 @@ class rule {
      */
     public function to_record() {
         $record = [
-                'id' => $this->get_id(),
-                'name' => $this->get_name(),
-                'description' => $this->get_description(),
-                'status' => $this->get_status(),
-                'createdby' => $this->get_createdby(),
-                'createdat' => $this->get_createdat(),
-                'shared' => $this->get_shared(),
-                'defaultrule' => $this->get_defaultrule(),
-                'template' => $this->get_template(),
-                'forced' => $this->get_forced(),
-                'timesfired' => $this->get_timesfired(),
-                'runtime' => $this->get_runtime(),
+            'id' => $this->get_id(),
+            'name' => $this->get_name(),
+            'description' => $this->get_description(),
+            'status' => $this->get_status(),
+            'createdby' => $this->get_createdby(),
+            'createdat' => $this->get_createdat(),
+            'shared' => $this->get_shared(),
+            'defaultrule' => $this->get_defaultrule(),
+            'template' => $this->get_template(),
+            'forced' => $this->get_forced(),
+            'timesfired' => $this->get_timesfired(),
+            'runtime' => $this->get_runtime(),
         ];
 
         return (object) $record;
@@ -292,20 +292,21 @@ class rule {
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
             $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
+        $forcedrules = self::get_course_rules_forced($courseid);
         if (
-                has_capability('local/notificationsagent:viewcourserule', $context)
-                || has_capability(
-                    'local/notificationsagent:managecourserule',
-                    $context
-                )
+            has_capability('local/notificationsagent:viewcourserule', $context)
+            || has_capability(
+                'local/notificationsagent:managecourserule',
+                $context
+            )
         ) {
             $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false),
-                ...self::get_course_rules_forced($courseid),
+                ...$forcedrules,
             ];
         }
         if (has_capability('local/notificationsagent:manageallrule', $context)) {
             $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false),
-                ...self::get_course_rules_forced($courseid),
+                ...$forcedrules,
             ];
         }
 
@@ -423,7 +424,7 @@ class rule {
      */
     public function load_dataform(): void {
         $ruleaction = $this->ruleaction == self::RULE_CLONE ? editrule_form::FORM_JSON_ACTION_INSERT
-                : editrule_form::FORM_JSON_ACTION_UPDATE;
+            : editrule_form::FORM_JSON_ACTION_UPDATE;
 
         $data = [];
         $data["title"] = $this->get_name();
@@ -532,10 +533,10 @@ class rule {
         global $DB;
 
         if (
-                $ac = $DB->get_record(
-                    'notificationsagent_condition',
-                    ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_CONDITION, 'pluginname' => 'ac']
-                )
+            $ac = $DB->get_record(
+                'notificationsagent_condition',
+                ['ruleid' => $this->id, 'type' => notificationplugin::TYPE_CONDITION, 'pluginname' => 'ac']
+            )
         ) {
             $this->ac = notificationplugin::create_instance($ac->id, $ac->type, $ac->pluginname, $this->to_record());
         }
@@ -1033,12 +1034,12 @@ class rule {
                 // Event driven conditions return a null timetrigger.
                 if (!empty($timetrigger)) {
                     $insertdata[] = [
-                            'userid' => $context->get_userid(),
-                            'courseid' => $context->get_courseid(),
-                            'startdate' => $timetrigger,
-                            'pluginname' => $condition->get_subtype(),
-                            'conditionid' => $condition->get_id(),
-                            'ruleid' => $this->get_id(),
+                        'userid' => $context->get_userid(),
+                        'courseid' => $context->get_courseid(),
+                        'startdate' => $timetrigger,
+                        'pluginname' => $condition->get_subtype(),
+                        'conditionid' => $condition->get_id(),
+                        'ruleid' => $this->get_id(),
                     ];
                 }
 
@@ -1066,12 +1067,12 @@ class rule {
                 // Event driven exceptions return a null timetrigger.
                 if (!empty($timetrigger)) {
                     $insertdata[] = [
-                            'userid' => $context->get_userid(),
-                            'courseid' => $context->get_courseid(),
-                            'startdate' => $timetrigger,
-                            'pluginname' => $exception->get_subtype(),
-                            'conditionid' => $exception->get_id(),
-                            'ruleid' => $this->get_id(),
+                        'userid' => $context->get_userid(),
+                        'courseid' => $context->get_courseid(),
+                        'startdate' => $timetrigger,
+                        'pluginname' => $exception->get_subtype(),
+                        'conditionid' => $exception->get_id(),
+                        'ruleid' => $this->get_id(),
                     ];
                 }
 
@@ -1091,12 +1092,12 @@ class rule {
             AND conditionid = {$context->get_triggercondition()})";
 
         $insertdata[] = [
-                'userid' => $context->get_userid(),
-                'courseid' => $context->get_courseid(),
-                'startdate' => time() + $this->get_runtime(),
-                'ruleoff' => time(),
-                'conditionid' => $context->get_triggercondition(),
-                'ruleid' => $this->get_id(),
+            'userid' => $context->get_userid(),
+            'courseid' => $context->get_courseid(),
+            'startdate' => time() + $this->get_runtime(),
+            'ruleoff' => time(),
+            'conditionid' => $context->get_triggercondition(),
+            'ruleid' => $this->get_id(),
         ];
 
         notificationsagent::set_time_trigger(
@@ -1194,7 +1195,7 @@ class rule {
 
                         case 'Course_Url':
                             $paramstoreplace[] = new moodle_url('/course/view.php', [
-                                    'id' => $courseid,
+                                'id' => $courseid,
                             ]);
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
                             break;
@@ -1287,12 +1288,12 @@ class rule {
     public function record_report($ruleid, $userid, $courseid, $actionid, $parameters, $timeaccess) {
         global $DB;
         $params = [
-                'ruleid' => $ruleid,
-                'userid' => $userid,
-                'courseid' => $courseid,
-                'actionid' => $actionid,
-                'actiondetail' => $parameters,
-                'timestamp' => $timeaccess,
+            'ruleid' => $ruleid,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'actionid' => $actionid,
+            'actiondetail' => $parameters,
+            'timestamp' => $timeaccess,
         ];
         $DB->insert_record('notificationsagent_report', $params);
     }
@@ -1361,11 +1362,11 @@ class rule {
 
         // If $USER has student role, only generate triggers for the user.
         if (
-                has_capability(
-                    'local/notificationsagent:managecourserule',
-                    $context,
-                    $USER->id
-                )
+            has_capability(
+                'local/notificationsagent:managecourserule',
+                $context,
+                $USER->id
+            )
         ) {
             $students = notificationsagent::get_usersbycourse($context);
         } else {
@@ -1385,12 +1386,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                        $subplugin = notificationplugin::create_instance(
-                            $idname,
-                            notificationplugin::TYPE_CONDITION,
-                            $pluginname,
-                            $this->to_record()
-                        )
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_CONDITION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
                 }
@@ -1403,12 +1404,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                        $subplugin = notificationplugin::create_instance(
-                            $idname,
-                            notificationplugin::TYPE_CONDITION,
-                            $pluginname,
-                            $this->to_record()
-                        )
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_CONDITION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data, notificationplugin::COMPLEMENTARY_EXCEPTION, $arraytimer, $students);
                 }
@@ -1433,12 +1434,12 @@ class rule {
     private function save_form_ac($data, &$arraytimer, $students) {
         $id = $this->get_ac() ? $this->get_ac()->id : null;
         if (
-                $subpluginac = notificationplugin::create_instance(
-                    $id,
-                    notificationplugin::TYPE_CONDITION,
-                    ac::NAME,
-                    $this->to_record()
-                )
+            $subpluginac = notificationplugin::create_instance(
+                $id,
+                notificationplugin::TYPE_CONDITION,
+                ac::NAME,
+                $this->to_record()
+            )
         ) {
             $action = $this->get_ac() ? editrule_form::FORM_JSON_ACTION_UPDATE : editrule_form::FORM_JSON_ACTION_INSERT;
             $subpluginac->save($action, $data, notificationplugin::COMPLEMENTARY_CONDITION, $arraytimer, $students);
@@ -1470,32 +1471,32 @@ class rule {
                     $conditionid = $generictimer > $value["timer"] ? $genericconditionid : $value["conditionid"];
 
                     $insertdata[] = [
-                            'userid' => $studentid,
-                            'courseid' => $courseid,
-                            'startdate' => $timer,
-                            'conditionid' => $conditionid,
-                            'ruleid' => $this->get_id(),
+                        'userid' => $studentid,
+                        'courseid' => $courseid,
+                        'startdate' => $timer,
+                        'conditionid' => $conditionid,
+                        'ruleid' => $this->get_id(),
                     ];
                 }
             } else {
                 // If $USER has student role, only generate triggers for the user.
                 if (
-                        has_capability(
-                            'local/notificationsagent:managecourserule',
-                            $context,
-                            $USER->id
-                        )
+                    has_capability(
+                        'local/notificationsagent:managecourserule',
+                        $context,
+                        $USER->id
+                    )
                 ) {
                     $studentid = notificationsagent::GENERIC_USERID;
                 } else {
                     $studentid = $USER->id;
                 }
                 $insertdata[] = [
-                        'userid' => $studentid,
-                        'courseid' => $courseid,
-                        'startdate' => $generictimer,
-                        'conditionid' => $genericconditionid,
-                        'ruleid' => $this->get_id(),
+                    'userid' => $studentid,
+                    'courseid' => $courseid,
+                    'startdate' => $generictimer,
+                    'conditionid' => $genericconditionid,
+                    'ruleid' => $this->get_id(),
                 ];
             }
 
@@ -1516,12 +1517,12 @@ class rule {
                 $pluginname = $value["pluginname"];
                 $action = $value["action"];
                 if (
-                        $subplugin = notificationplugin::create_instance(
-                            $idname,
-                            notificationplugin::TYPE_ACTION,
-                            $pluginname,
-                            $this->to_record()
-                        )
+                    $subplugin = notificationplugin::create_instance(
+                        $idname,
+                        notificationplugin::TYPE_ACTION,
+                        $pluginname,
+                        $this->to_record()
+                    )
                 ) {
                     $subplugin->save($action, $data);
                 }
@@ -1740,8 +1741,8 @@ class rule {
                    AND nctx.contextid = :coursecontextid AND nctx.objectid = :siteid
         ';
         $data = $DB->get_records_sql($sql, [
-                'coursecontextid' => CONTEXT_COURSE,
-                'siteid' => SITEID,
+            'coursecontextid' => CONTEXT_COURSE,
+            'siteid' => SITEID,
         ]);
 
         return $data;
@@ -1800,15 +1801,15 @@ class rule {
             $ruleidwheresql1 = " AND nr.id = :ruleid1";
             $ruleidwheresql2 = " AND nr.id = :ruleid2";
             $params = [
-                            'ruleid1' => $ruleid,
-                            'ruleid2' => $ruleid,
-                    ] + $params;
+                    'ruleid1' => $ruleid,
+                    'ruleid2' => $ruleid,
+                ] + $params;
         }
 
         $unioncatcontext = '';
         if ($notcatcontext) {
             $unioncatcontext =
-            "UNION
+                "UNION
             SELECT nr.id
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
@@ -1820,8 +1821,8 @@ class rule {
              $ruleidwheresql2";
 
             $params = [
-                'categorycontextid' => CONTEXT_COURSECAT,
-            ] + $params;
+                    'categorycontextid' => CONTEXT_COURSECAT,
+                ] + $params;
         }
 
         $sql = "SELECT nr.id
@@ -1836,9 +1837,9 @@ class rule {
         ";
 
         $params = [
-                        'coursecontextid' => CONTEXT_COURSE,
-                        'coursecontext' => $courseid,
-                ] + $params;
+                'coursecontextid' => CONTEXT_COURSE,
+                'coursecontext' => $courseid,
+            ] + $params;
 
         $data = $DB->get_records_sql($sql, $params);
 
@@ -1878,12 +1879,12 @@ class rule {
         ";
 
         $params = [
-                        'coursecontextid' => CONTEXT_COURSE,
-                        'coursecontext' => $courseid,
-                        'categorycontextid' => CONTEXT_COURSECAT,
-                        'forcedcourse' => $forced,
-                        'forcedcat' => $forced,
-                ] + $params;
+                'coursecontextid' => CONTEXT_COURSE,
+                'coursecontext' => $courseid,
+                'categorycontextid' => CONTEXT_COURSECAT,
+                'forcedcourse' => $forced,
+                'forcedcat' => $forced,
+            ] + $params;
 
         $data = $DB->get_records_sql($sql, $params);
 
@@ -1911,9 +1912,9 @@ class rule {
               ORDER BY nr.status, nr.createdat ASC
         ';
         $data = $DB->get_records_sql($sql, [
-                'coursecontextid' => CONTEXT_COURSE,
-                'objectid' => $courseid,
-                'createdby' => $USER->id,
+            'coursecontextid' => CONTEXT_COURSE,
+            'objectid' => $courseid,
+            'createdby' => $USER->id,
         ]);
 
         return $data;
@@ -1934,7 +1935,7 @@ class rule {
                  WHERE nr.createdby = :createdby AND nr.deleted = 0
         ';
         $data = $DB->get_records_sql($sql, [
-                'createdby' => $USER->id,
+            'createdby' => $USER->id,
         ]);
 
         return $data;
@@ -1978,9 +1979,9 @@ class rule {
      */
     public function is_use_template($courseid, $context) {
         return
-                $courseid != SITEID
-                && has_capability('local/notificationsagent:managecourserule', $context)
-                && !$this->get_template();
+            $courseid != SITEID
+            && has_capability('local/notificationsagent:managecourserule', $context)
+            && !$this->get_template();
     }
 
     /**
@@ -2011,9 +2012,9 @@ class rule {
                    AND nr.id = :id
         ';
         $data = $DB->get_records_sql($sql, [
-                'contextid' => CONTEXT_COURSE,
-                'objectid' => $this->get_default_context(),
-                'id' => $this->get_id(),
+            'contextid' => CONTEXT_COURSE,
+            'objectid' => $this->get_default_context(),
+            'id' => $this->get_id(),
         ]);
 
         if ($data) {
@@ -2034,12 +2035,12 @@ class rule {
 
         $context = \context_course::instance($this->get_default_context(), IGNORE_MISSING);
         if (
-                $this->get_createdby() == $USER->id
-                || ($context
-                        && has_capability(
-                            'local/notificationsagent:managesiterule',
-                            $context
-                        ))
+            $this->get_createdby() == $USER->id
+            || ($context
+                && has_capability(
+                    'local/notificationsagent:managesiterule',
+                    $context
+                ))
         ) {
             $hasdelete = true;
         }
@@ -2069,9 +2070,9 @@ class rule {
         $minutes = trim($runtime['runtime_minutes']);
         if (!empty($days) || !empty($hours) || !empty($minutes)) {
             $data = \local_notificationsagent\helper\helper::to_seconds_format([
-                    'days' => $days,
-                    'hours' => $hours,
-                    'minutes' => $minutes,
+                'days' => $days,
+                'hours' => $hours,
+                'minutes' => $minutes,
             ]);
         } else {
             $data = \local_notificationsagent\helper\helper::to_seconds_format(['days' => self::MINIMUM_RUNTIME]);
@@ -2095,9 +2096,9 @@ class rule {
 
         if (!isset($rulecache[$context->get_courseid()][$context->get_userid()])) {
             $record = $DB->get_record('notificationsagent_launched', [
-                    'ruleid' => $this->get_id(),
-                    'courseid' => $context->get_courseid(),
-                    'userid' => $context->get_userid(),
+                'ruleid' => $this->get_id(),
+                'courseid' => $context->get_courseid(),
+                'userid' => $context->get_userid(),
             ], '*');
 
             if ($record) {
@@ -2214,9 +2215,9 @@ class rule {
                 // There is no cache for this user, we have to get it from the database and set the cache.
                 if (empty($coursecache[$userid])) {
                     $userlaunched = $DB->get_record('notificationsagent_launched', [
-                            'ruleid' => $ruleid,
-                            'courseid' => $courseid,
-                            'userid' => $userid,
+                        'ruleid' => $ruleid,
+                        'courseid' => $courseid,
+                        'userid' => $userid,
                     ]);
 
                     if ($userlaunched) {
@@ -2338,8 +2339,8 @@ class rule {
         $data = [];
         if ($coursename = get_course($this->get_default_context())) {
             $data = [
-                    'username' => $username,
-                    'coursename' => $coursename->shortname,
+                'username' => $username,
+                'coursename' => $coursename->shortname,
             ];
             return get_string('cardsharedby', 'local_notificationsagent', $data);
         }
@@ -2370,8 +2371,8 @@ class rule {
         $hasmanagecourserule = has_capability('local/notificationsagent:managecourserule', $context);
 
         $capabilities = $isownrule || $hasmanagecourserule
-                ? \local_notificationsagent\helper\helper::get_capabilities($context)
-                : \local_notificationsagent\helper\helper::get_default_capabilities($context);
+            ? \local_notificationsagent\helper\helper::get_capabilities($context)
+            : \local_notificationsagent\helper\helper::get_default_capabilities($context);
 
         return $capabilities;
     }

@@ -87,24 +87,26 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
 
     if (!empty($categories)) {
         foreach ($categories as $category) {
-            $paramscat = [
-                    'ruleid' => $idrule,
-                    'contextid' => CONTEXT_COURSECAT,
-                    'objectid' => $category,
+            $paramscat[] = [
+                'ruleid' => $idrule,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => $category,
             ];
-            $DB->insert_record('notificationsagent_context', $paramscat);
+
         }
+        $DB->insert_records('notificationsagent_context', $paramscat);
     }
 
     if (!empty($courses)) {
         foreach ($courses as $course) {
-            $paramscourse = [
-                    'ruleid' => $idrule,
-                    'contextid' => CONTEXT_COURSE,
-                    'objectid' => $course,
+            $paramscourse[] = [
+                'ruleid' => $idrule,
+                'contextid' => CONTEXT_COURSE,
+                'objectid' => $course,
             ];
-            $DB->insert_record('notificationsagent_context', $paramscourse);
+
         }
+        $DB->insert_records('notificationsagent_context', $paramscourse);
     }
 }
 

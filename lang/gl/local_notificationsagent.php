@@ -214,6 +214,9 @@ $string['assignassign'] = 'Asignar: ';
 $string['assigncancel'] = 'Cancelar';
 $string['assignsave'] = 'Gardar os cambios';
 $string['assignforced'] = 'Asignar a regra á forza';
+$string['assignselectcourses'] = 'Marcar cursos';
+$string['assignunselectcourses'] = 'Desmarcar cursos';
+$string['assignselectedinfo'] = '{$a->courses} cursos seleccionados e categorías {$a->categorías}';
 
 // Compartir modal.
 $string['sharetitle'] = 'Compartir regra {$a->title}';

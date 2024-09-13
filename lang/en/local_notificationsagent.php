@@ -233,6 +233,9 @@ $string['assignassign'] = 'Assign: ';
 $string['assigncancel'] = 'Cancel';
 $string['assignsave'] = 'Save changes';
 $string['assignforced'] = 'Assign rule as forced';
+$string['assignselectcourses'] = 'Select courses';
+$string['assignunselectcourses'] = 'Unselect courses';
+$string['assignselectedinfo'] = '{$a->courses} courses and {$a->categories} categories selected';
 
 // Capabilities.
 $string['notificationsagent:createrule'] = 'Create a rule';
