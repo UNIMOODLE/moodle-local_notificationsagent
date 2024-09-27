@@ -155,7 +155,7 @@ Feature: Testing templates management in notifications agent plugin
     And I wait "1" seconds
     And I click on "Add rule" "link"
     And I wait "1" seconds
-    And I click on "Select" "link"
+    And I click on "Create from this template" "link"
     And I set the following fields to these values:
       | Title | template1 ASSIGNED |
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"

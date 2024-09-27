@@ -200,7 +200,7 @@ Feature: Testing rules management in notifications agent plugin
     And I wait "2" seconds
     And I click on "Add rule" "link"
     And I wait "1" seconds
-    And I click on "Select" "link"
+    And I click on "Create from this template" "link"
     And I set the following fields to these values:
       | Title | rule1 CLONED |
     And I click on "Save changes" "button"
