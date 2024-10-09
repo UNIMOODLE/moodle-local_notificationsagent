@@ -1174,6 +1174,29 @@ section.lazy-placeholder:after {
 .cid-uaccWPQLZX .mbr-section-btn {
   color: #000000;
 }
+.cid-uqGIWXywvH {
+  background: #ffffff;
+}
+.cid-uqGIWXywvH .image-block {
+  margin: auto;
+  width: 100% !important;
+}
+.cid-uqGIWXywvH .mbr-figure {
+  margin: 0 auto;
+}
+.cid-uqGIWXywvH figcaption {
+  position: relative;
+}
+.cid-uqGIWXywvH figcaption div {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .cid-uqGIWXywvH .image-block {
+    width: 100% !important;
+  }
+}
 .cid-uaccXbh46d {
   padding-top: 60px;
   padding-bottom: 0px;
