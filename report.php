@@ -68,10 +68,10 @@ if ($ruleid) {
 
 // Only show my own name.
 if (
-        !has_capability(
-            'local/notificationsagent:viewcourserule',
-            $context
-        )
+    !has_capability(
+        'local/notificationsagent:viewcourserule',
+        $context
+    )
 ) {
     $filters['rule:userfullname_operator'] = select::EQUAL_TO;
     $filters['rule:userfullname_values'] = $USER->id;
@@ -102,7 +102,7 @@ if (!$courseid) {
         new moodle_url('/')
     );
     $PAGE->navbar->add(
-        'Notification Agent Admin',
+        get_string('admin_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
@@ -111,7 +111,7 @@ if (!$courseid) {
         new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-        'Notification Agent',
+        get_string('course_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }
