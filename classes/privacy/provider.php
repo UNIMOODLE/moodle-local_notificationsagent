@@ -57,12 +57,12 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
         $reportdata = [
-                'userid' => 'privacy:metadata:userid',
-                'courseid' => 'privacy:metadata:courseid',
-                'ruleid' => 'privacy:metadata:ruleid',
-                'actionid' => 'privacy:metadata:actionid',
-                'actiondetail' => 'privacy:metadata:actiondetail',
-                'timestamp' => 'privacy:metadata:timestamp',
+            'userid' => 'privacy:metadata:userid',
+            'courseid' => 'privacy:metadata:courseid',
+            'ruleid' => 'privacy:metadata:ruleid',
+            'actionid' => 'privacy:metadata:actionid',
+            'actiondetail' => 'privacy:metadata:actiondetail',
+            'timestamp' => 'privacy:metadata:timestamp',
         ];
 
         $collection->add_database_table(
@@ -207,7 +207,7 @@ class provider implements
      * @param int|null $userid User id to delete..
      *
      */
-    protected static function delete_user_report(int $courseid, int $userid = null) {
+    protected static function delete_user_report(int $courseid, ?int $userid = null) {
         global $DB;
         $params = (isset($userid)) ? ['courseid' => $courseid, 'userid' => $userid] : ['courseid' => $courseid];
         $DB->delete_records('notificationsagent_report', $params);
