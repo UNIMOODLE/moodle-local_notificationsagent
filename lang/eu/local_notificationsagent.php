@@ -141,8 +141,6 @@ $string['editrule_condition_title_forumnotanswer']
 
 $string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = '{$a->typeelement} jarduera:';
-$string['editrule_condition_element_date_from'] = get_string('from') . ' {$a->typeelement}:';
-$string['editrule_condition_element_date_to'] = get_string('to') . ' {$a->typeelement}:';
 
 $string['editrule_condition_error'] = 'Gutxienez baldintza bat gehitu behar duzu';
 

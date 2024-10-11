@@ -141,8 +141,6 @@ $string['editrule_condition_title_forumnotanswer']
 
 $string['editrule_condition_element_time'] = 'Temps {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activitat {$a->typeelement}:';
-$string['editrule_condition_element_date_from'] = get_string('from') . ' {$a->typeelement}:';
-$string['editrule_condition_element_date_to'] = get_string('to') . ' {$a->typeelement}:';
 
 $string['editrule_condition_error'] = 'Heu d\'afegir almenys una condició';
 

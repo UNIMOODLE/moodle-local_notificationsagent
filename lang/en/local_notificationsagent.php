@@ -158,8 +158,6 @@ $string['editrule_condition_title_forumnotanswer']
 
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
-$string['editrule_condition_element_date_from'] = get_string('from') . ' {$a->typeelement}:';
-$string['editrule_condition_element_date_to'] = get_string('to') . ' {$a->typeelement}:';
 
 $string['editrule_condition_error'] = 'You must add at least one condition';
 
