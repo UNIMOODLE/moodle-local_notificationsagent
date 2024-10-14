@@ -44,9 +44,9 @@ global $DB, $PAGE, $COURSE;
 $isroleadmin = false;
 if (is_siteadmin() || !empty($PAGE->settingsnav)) {
     if (
-            is_siteadmin()
-            || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
-                    || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
+        is_siteadmin()
+        || ($PAGE->settingsnav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)
+            || $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN))
     ) {
         $isroleadmin = true;
     }
@@ -77,25 +77,25 @@ $url = new moodle_url('/local/notificationsagent/editrule.php');
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 $heading = rule::RULE_TYPE === $ruletype
-        ? get_string('editrule_newrule', 'local_notificationsagent')
-        : get_string(
-            'editrule_newtemplate',
-            'local_notificationsagent'
-        );
+    ? get_string('editrule_newrule', 'local_notificationsagent')
+    : get_string(
+        'editrule_newtemplate',
+        'local_notificationsagent'
+    );
 $PAGE->set_title(
     $heading . " - " .
-        get_string('heading', 'local_notificationsagent')
+    get_string('heading', 'local_notificationsagent')
 );
 
 $PAGE->set_heading(
     ($typeaction == 'add' || $typeaction == 'clone'
-                ? $heading
-                : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
-        get_string('heading', 'local_notificationsagent')
+        ? $heading
+        : get_string('editrule_editrule', 'local_notificationsagent')) . " - " .
+    get_string('heading', 'local_notificationsagent')
 );
 $PAGE->navbar->add(
     get_string('editrule_newrule', 'local_notificationsagent') . " - " .
-        get_string('heading', 'local_notificationsagent')
+    get_string('heading', 'local_notificationsagent')
 );
 $PAGE->navbar->ignore_active();
 if ($isroleadmin && $courseid == SITEID) {
@@ -104,7 +104,7 @@ if ($isroleadmin && $courseid == SITEID) {
         new moodle_url('/')
     );
     $PAGE->navbar->add(
-        'Notification Agent Admin',
+        get_string('admin_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php')
     );
 } else {
@@ -113,7 +113,7 @@ if ($isroleadmin && $courseid == SITEID) {
         new moodle_url('/course/view.php', ['id' => $courseid])
     );
     $PAGE->navbar->add(
-        'Notification Agent',
+        get_string('course_breadcrumb', 'local_notificationsagent'),
         new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
     );
 }
@@ -158,10 +158,10 @@ $rule = new rule($ruleid, $ruletype, $typeaction);
 $rule->check_permission($context, $courseid);
 
 $customdata = [
-        'rule' => $rule->to_record(),
-        'timesfired' => rule::MINIMUM_EXECUTION,
-        'courseid' => $courseid,
-        'getaction' => $typeaction,
+    'rule' => $rule->to_record(),
+    'timesfired' => rule::MINIMUM_EXECUTION,
+    'courseid' => $courseid,
+    'getaction' => $typeaction,
 ];
 
 $mform = new editrule_form($PAGE->url->out(false), $customdata);

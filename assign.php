@@ -78,7 +78,7 @@ $PAGE->navbar->add(
     new moodle_url('/course/view.php', ['id' => $courseid])
 );
 $PAGE->navbar->add(
-    'Notification Agent',
+    get_string('course_breadcrumb', 'local_notificationsagent'),
     new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid])
 );
 $PAGE->navbar->add(
@@ -91,11 +91,11 @@ echo $output->header();
 
 $renderer = $PAGE->get_renderer('core');
 $templatecontext = [
-        "courseid" => $courseid,
+    "courseid" => $courseid,
 ];
 
 $templatecontext['url']['addrule'] = new moodle_url("/local/notificationsagent/editrule.php", [
-        'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
+    'courseid' => $courseid, 'action' => 'add', 'type' => rule::RULE_TYPE,
 ]);
 
 $rules = rule::get_rules_assign($context, $courseid);
@@ -135,13 +135,13 @@ foreach ($rules as $rule) {
     }
 
     $conditionsarray = [
-            'hascontent' => !empty($conditionscontent),
-            'content' => $conditionscontent,
+        'hascontent' => !empty($conditionscontent),
+        'content' => $conditionscontent,
     ];
 
     $exceptionsarray = [
-            'hascontent' => !empty($exceptionscontent),
-            'content' => $exceptionscontent,
+        'hascontent' => !empty($exceptionscontent),
+        'content' => $exceptionscontent,
     ];
 
     // Actions.
@@ -151,41 +151,41 @@ foreach ($rules as $rule) {
         }
     }
     $actionsarray = [
-            'hascontent' => !empty($actionscontent),
-            'content' => $actionscontent,
+        'hascontent' => !empty($actionscontent),
+        'content' => $actionscontent,
     ];
 
     $rulecontent[] = [
-            'id' => $rule->get_id(),
-            'name' => format_text($rule->get_name()),
-            'owner' => $rule->get_owner(),
-            'status' => $rule->get_status(),
-            'status_lang' => $rule->get_forced() ?
-                    ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
-                            : get_string('status_active', 'local_notificationsagent')
-                    ) : get_string('status_required', 'local_notificationsagent'),
-            'conditions' => $conditionsarray,
-            'exceptions' => $exceptionsarray,
-            'actions' => $actionsarray,
-            'type' => $rule->get_type(),
-            'isrule' => $rule->get_template(),
-            'forced' => $rule->get_forced(),
-            'shared' => $rule->get_shared(),
-            'canshare' => $rule->can_share(),
-            'isallshared' => $rule->get_defaultrule(),
-            'type_lang' => $rule->get_template()
-                    ?
-                    ($rule->get_shared() == 0
-                            ?
-                            get_string('type_sharedrule', 'local_notificationsagent')
-                            :
-                            get_string('type_rule', 'local_notificationsagent'))
-                    :
-                    get_string('type_template', 'local_notificationsagent'),
-            'editurl' => new moodle_url(
-                "/local/notificationsagent/editrule.php",
-                ['courseid' => $courseid, 'action' => 'clone', 'ruleid' => $rule->get_id()]
-            ),
+        'id' => $rule->get_id(),
+        'name' => format_text($rule->get_name()),
+        'owner' => $rule->get_owner(),
+        'status' => $rule->get_status(),
+        'status_lang' => $rule->get_forced() ?
+            ($rule->get_status() ? get_string('status_paused', 'local_notificationsagent')
+                : get_string('status_active', 'local_notificationsagent')
+            ) : get_string('status_required', 'local_notificationsagent'),
+        'conditions' => $conditionsarray,
+        'exceptions' => $exceptionsarray,
+        'actions' => $actionsarray,
+        'type' => $rule->get_type(),
+        'isrule' => $rule->get_template(),
+        'forced' => $rule->get_forced(),
+        'shared' => $rule->get_shared(),
+        'canshare' => $rule->can_share(),
+        'isallshared' => $rule->get_defaultrule(),
+        'type_lang' => $rule->get_template()
+            ?
+            ($rule->get_shared() == 0
+                ?
+                get_string('type_sharedrule', 'local_notificationsagent')
+                :
+                get_string('type_rule', 'local_notificationsagent'))
+            :
+            get_string('type_template', 'local_notificationsagent'),
+        'editurl' => new moodle_url(
+            "/local/notificationsagent/editrule.php",
+            ['courseid' => $courseid, 'action' => 'clone', 'ruleid' => $rule->get_id()]
+        ),
     ];
 }
 
