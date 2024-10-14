@@ -1,5 +1,5 @@
 @managerules_teacher @notificationsagent @javascript
-Feature: Testing rules management in notifications agent plugin
+Feature: Testing rules management for teachers in notifications agent plugin
   In order to test the rule management in a course
   As a teacher
   I should be able to configure and manage rules in the notifications agent plugin

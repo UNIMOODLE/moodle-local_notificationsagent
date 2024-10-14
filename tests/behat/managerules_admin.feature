@@ -1,5 +1,5 @@
 @managerules_admin @notificationsagent @javascript
-Feature: Testing rules management in notifications agent plugin
+Feature: Testing rules management for admin in notifications agent plugin
   In order to test the rule management
   As an admin
   I should be able to configure and manage rules in the notifications agent plugin.
@@ -32,7 +32,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
@@ -61,7 +61,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
@@ -101,7 +101,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
@@ -140,7 +140,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
@@ -182,7 +182,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect
@@ -297,7 +297,7 @@ Feature: Testing rules management in notifications agent plugin
     And I click on "newcondition_button" "button"
     And I click on the input element with placeholder "Days" inside div with id "nav-conditions"
     And I press the left key
-    And I press the delete key  
+    And I press the delete key
     And I type "3"
     And I click on "Actions" "link"
     And I select "Send notification to user [UUUU] with title [TTTT] and message [BBBB]" from the "id_newaction_select" singleselect

@@ -45,7 +45,7 @@ Feature: Testing templates management in notifications agent plugin
     And I should see "Testing template1"
     And I should see "template"
     And I wait "2" seconds
-  
+
   Scenario: Edit template for plugin notification agent
     Given I click on "Site administration" "link"
     And I wait "1" seconds
