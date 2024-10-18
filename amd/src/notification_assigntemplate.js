@@ -37,28 +37,28 @@ const selectors = {
  *
  * @returns {void}
  */
-const getCountAll = async () => {
+const getCountAll = async() => {
     const categories = document.querySelectorAll('#category-listing-content-0 > li[id^="listitem-category-"]');
     Array.from(categories).map((category) => {
         getCountBy(category.id.replace('listitem-category-', ''));
     });
-}
+};
 
 /**
  * Count selected items in a category.
- * 
- * @param {integer} categoryId 
- * 
+ *
+ * @param {integer} categoryId
+ *
  * @returns {void}
  */
-const getCountBy = async (categoryId) => {
+const getCountBy = async(categoryId) => {
     // Count selected items for the current category.
     setCount(categoryId);
 
     // Update the count for the parent category.
     let hasParent = document.getElementById(`checkboxcategory-${categoryId}`).getAttribute('data-parent');
     if (hasParent) {
-        let parentCategoryId = hasParent.replace('#category-listing-content-', '');       
+        let parentCategoryId = hasParent.replace('#category-listing-content-', '');
         setCount(parentCategoryId);
     }
 
@@ -66,21 +66,21 @@ const getCountBy = async (categoryId) => {
     let children = document.querySelectorAll(`#category-listing-content-${categoryId} li[id^="listitem-category-"]`);
     children.forEach((child) => {
         setCount(child.id.replace('listitem-category-', ''));
-    })
+    });
 };
 
 /**
  * Display the count of selected items in a category.
- * 
- * @param {integer} categoryId 
- * 
+ *
+ * @param {integer} categoryId
+ *
  * @returns {void}
  */
-const setCount = async (categoryId) => {
+const setCount = async(categoryId) => {
     if (categoryId == 0) {
         return;
     }
-    
+
     let obj = {};
     obj.categories = document.querySelectorAll(
         `#category-listing-content-${categoryId} > li[id^="listitem-category-"] > div > div > input[type="checkbox"][id^="checkboxcategory-"]:checked`
@@ -89,9 +89,11 @@ const setCount = async (categoryId) => {
         `#category-listing-content-${categoryId} > li[id^="listitem-course-"] > div > div > input[type="checkbox"][id^="checkboxcourse-"]:checked`
     ).length;
 
-    document.getElementById(`selected-info-${categoryId}`).textContent = await getString('assignselectedinfo', 'local_notificationsagent', obj);
+    document.getElementById(
+        `selected-info-${categoryId}`).textContent = await getString('assignselectedinfo', 'local_notificationsagent', obj
+    );
     document.getElementById(`selected-info-${categoryId}`).classList.remove("d-none");
-}
+};
 
 /**
  * Handles the click event on the Select Courses link.
@@ -101,7 +103,7 @@ const setCount = async (categoryId) => {
  *
  * @returns {void}
  */
-const onClickSelectCourses = async (event) => {
+const onClickSelectCourses = async(event) => {
     const selectItem = event.target.closest(selectors.selectAllId);
     const categoryId = selectItem.getAttribute('data-category');
     const isCategoryChecked = document.getElementById('checkboxcategory-' + categoryId + '').checked;
@@ -109,42 +111,44 @@ const onClickSelectCourses = async (event) => {
         return;
     }
 
-    const checkboxes = document.querySelectorAll(`#category-listing-content-${categoryId} > li[id^="listitem-course-"] > div > div > input[type="checkbox"][id^="checkboxcourse-"]`); 
-    const isAllSelected = (selectItem.getAttribute('data-forceselected') == 'true') ? false : true; 
+    const checkboxes = document.querySelectorAll(
+        `#category-listing-content-${categoryId} > li[id^="listitem-course-"] > div > div > input[type="checkbox"][id^="checkboxcourse-"]`
+    );
+    const isAllSelected = (selectItem.getAttribute('data-forceselected') == 'true') ? false : true;
     selectItem.setAttribute('data-forceselected', isAllSelected);
-    selectItem.textContent = isAllSelected ? 
-        await getString('assignunselectcourses', 'local_notificationsagent') : 
+    selectItem.textContent = isAllSelected ?
+        await getString('assignunselectcourses', 'local_notificationsagent') :
         await getString('assignselectcourses', 'local_notificationsagent');
-    
+
     checkboxes.forEach(function(checkbox) {
         checkbox.checked = isAllSelected;
     });
 
     getCountBy(categoryId);
-}
+};
 
 /**
  * Registers click event listeners for all Select Courses links.
  *
  * @returns {Promise<void>}
  */
-const registerEventListeners = async () => {
+const registerEventListeners = async() => {
     const selectAllItems = document.querySelectorAll(selectors.selectAllId);
     Array.from(selectAllItems).map((selectAllItem) => {
-        selectAllItem.addEventListener('click', onClickSelectCourses); 
+        selectAllItem.addEventListener('click', onClickSelectCourses);
     });
-}
+};
 
 /**
  * Initialise the module.
  * @method init
- * 
+ *
  */
 export const init = () => {
 
     /**
  * Types of rule type
- * 
+ *
  * @type {{RULE_TYPE: boolean}}
  */
     const RULE_TYPE = [
@@ -160,12 +164,12 @@ export const init = () => {
     const RULE_FORCED_TYPE = {
         FORCED: 0,
         NONFORCED: 1,
-    }
+    };
 
     registerEventListeners();
 
     var idtemplate;
-    $('#assignTemplateModal').on('show.bs.modal', function (event) {
+    $('#assignTemplateModal').on('show.bs.modal', function(event) {
         resetDefaultCheckboxes('input[type="checkbox"][id^="checkboxcategory-"]');
         resetDefaultCheckboxes('input[type="checkbox"][id^="checkboxcourse-"]');
         resetDefaultSelectCourses();
@@ -206,7 +210,7 @@ export const init = () => {
                 ruleid: idtemplate,
                 action: ACTION[0]
             },
-            success: function (data) {
+            success: function(data) {
                 data['category'].forEach((categoryid) => {
                     let category = $('#assignTemplateModal .category-listing input#checkboxcategory-' + categoryid);
                     if (category.length) {
@@ -227,33 +231,34 @@ export const init = () => {
                 // After displaying the selected info, display the count of selected items.
                 getCountAll();
             },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
             },
             dataType: 'json'
         });
     });
-    $('#assignTemplateModal').on('hide.bs.modal', function () {
+    $('#assignTemplateModal').on('hide.bs.modal', function() {
         $('#assignTemplateModal .custom-control-input').prop('checked', false);
     });
-    $('#assignTemplateModal .collapse').on('show.bs.collapse', function () {
+    $('#assignTemplateModal .collapse').on('show.bs.collapse', function() {
         $(this).parents('.listitem-category').removeClass('collapsed');
     });
-    $('#assignTemplateModal .collapse').on('hide.bs.collapse', function () {
+    $('#assignTemplateModal .collapse').on('hide.bs.collapse', function() {
         $(this).parents('.listitem-category').addClass('collapsed');
     });
 
     /* checkbox */
-    $('#assignTemplateModal #course-category-select-all').on('click', function () {
+    $('#assignTemplateModal #course-category-select-all').on('click', function() {
         var checkassign = $('#assignTemplateModal .category-listing .custom-control-input');
         checkassign.prop('checked', $(this).prop('checked'));
 
         // After checking Select all, display the count of selected items.
         getCountAll();
     });
-    $('#assignTemplateModal .category-listing').on('change', 'input[type=checkbox]', function () {
-        var checkssubcategoriescourses = '#category-listing-content-' + $(this).attr("id").replace('checkboxcategory-', '') + ' .custom-control-input';
+    $('#assignTemplateModal .category-listing').on('change', 'input[type=checkbox]', function() {
+        var checkssubcategoriescourses =
+            '#category-listing-content-' + $(this).attr("id").replace('checkboxcategory-', '') + ' .custom-control-input';
         $('#assignTemplateModal .category-listing ' + checkssubcategoriescourses).prop('checked', $(this).prop('checked'));
         $('#assignTemplateModal .category-listing ' + checkssubcategoriescourses).prop('disabled', $(this).prop('checked'));
 
@@ -261,21 +266,22 @@ export const init = () => {
         getCountBy(this.getAttribute("data-category"));
     });
 
-    $('#assignTemplateModal #saveassignTemplateModal').on('click', function () {
+    $('#assignTemplateModal #saveassignTemplateModal').on('click', function() {
         var data = {};
         data['category'] = [];
         data['course'] = [];
         var allCategories = [];
 
-        forced = RULE_FORCED_TYPE.NONFORCED;
+        let forced = RULE_FORCED_TYPE.NONFORCED;
         if ($('#assignTemplateModal #forced').prop('checked')) {
             forced = RULE_FORCED_TYPE.FORCED;
         }
 
-        let mainCategories = $('#assignTemplateModal #category-listing-content-0 > li[id^="listitem-category-"]').has('input[id^="checkboxcategory-"]:checked');
+        let mainCategories = $('#assignTemplateModal #category-listing-content-0 > li[id^="listitem-category-"]')
+            .has('input[id^="checkboxcategory-"]:checked');
 
-        mainCategories.each(function () {
-            let items = $('#' + this.id + ' input[id^="checkboxcategory-"]:checked').map(function () {
+        mainCategories.each(function() {
+            let items = $('#' + this.id + ' input[id^="checkboxcategory-"]:checked').map(function() {
                 let id = $(this).attr('id').replace('checkboxcategory-', '');
                 let parent = $(this).data('parent').replace('#category-listing-content-', '');
 
@@ -286,18 +292,18 @@ export const init = () => {
                 return { id: id, parent: parent };
             }).get();
 
-            var parents = $.map(items, function (item) {
+            var parents = $.map(items, function(item) {
                 return item.id;
             });
 
-            $.grep(items, function (item) {
+            $.grep(items, function(item) {
                 if ($.inArray(item.parent, parents) === -1) {
                     data['category'].push(item.id);
                 }
             });
         });
 
-        let courses = $('#assignTemplateModal .category-listing input[id^="checkboxcourse-"]:checked').map(function () {
+        let courses = $('#assignTemplateModal .category-listing input[id^="checkboxcourse-"]:checked').map(function() {
             let id = $(this).attr('id').replace('checkboxcourse-', '');
             let category = $(this).data('parent').replace('#category-listing-content-', '');
 
@@ -305,11 +311,11 @@ export const init = () => {
         }).get();
 
         if ($.isEmptyObject(data['category'])) {
-            $.each(courses, function (index, course) {
+            $.each(courses, function(index, course) {
                 data['course'].push(course.id);
             });
         } else {
-            $.grep(courses, function (course) {
+            $.grep(courses, function(course) {
                 if ($.inArray(course.category, allCategories) === -1) {
                     data['course'].push(course.id);
                 }
@@ -326,10 +332,10 @@ export const init = () => {
                 forced: forced,
                 action: ACTION[1]
             },
-            success: function () {
+            success: function() {
                 window.location.reload();
             },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
             },
@@ -340,26 +346,26 @@ export const init = () => {
 
     /**
      * Reset default checkboxes.
-     * @param {string} selector 
+     * @param {string} selector
      */
     const resetDefaultCheckboxes = (selector) => {
         document.querySelectorAll(selector).forEach(checkbox => {
             checkbox.checked = false;
             checkbox.disabled = false;
         });
-    }
+    };
 
     /**
      * Resets all Select Courses links to their default state.
      *
      * @return {Promise<void>}
      */
-    const resetDefaultSelectCourses = async () => {
+    const resetDefaultSelectCourses = async() => {
         const selectItems = document.querySelectorAll(selectors.selectAllId);
 
-        Promise.all(Array.from(selectItems).map(async (selectItem) => {
+        Promise.all(Array.from(selectItems).map(async(selectItem) => {
             selectItem.setAttribute('data-forceselected', 'false');
             selectItem.textContent = await getString('assignselectcourses', 'local_notificationsagent');
         }));
-    }
-}
+    };
+};

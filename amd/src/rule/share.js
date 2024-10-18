@@ -23,7 +23,6 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -36,10 +35,10 @@ import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {updateRuleShare} from 'local_notificationsagent/rule/repository';
-import ajax from 'core/ajax';
+
 /**
  * Types of rule sharing.
- * 
+ *
  * @type {{SHARING_TYPE: boolean}}
  */
 const SHARING_TYPE = {
@@ -62,26 +61,26 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     let shareItems = document.querySelectorAll(selectors.shareRuleId);
 
     shareItems.forEach((shareItem) => {
-        shareItem.addEventListener('click', async function(e) {
+        shareItem.addEventListener('click', async function() {
             await showModal(shareItem);
         });
-    });   
+    });
 };
 
 /**
- * 
+ *
  * Shows the share modal for a given rule.
- * 
+ *
  * @param {HTMLElement} shareItem
  * @returns {Promise<void>}
  */
-const showModal = async (shareItem) => {
+const showModal = async(shareItem) => {
     let ruleObj = {};
-    
+
     ruleObj.id = shareItem.dataset.ruleid;
     ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
     ruleObj.shared = shareItem.dataset.shared == SHARING_TYPE.SHARED ? SHARING_TYPE.SHARED : SHARING_TYPE.UNSHARED;
@@ -91,7 +90,7 @@ const showModal = async (shareItem) => {
     } else {
         ruleObj.name = await getString('sharetitle', 'local_notificationsagent', ruleObj);
     }
-    
+
     ModalFactory.create({
         type: ModalFactory.types.SAVE_CANCEL,
         title: ruleObj.name,
@@ -100,7 +99,9 @@ const showModal = async (shareItem) => {
         }),
     }).then(function(modal) {
         let isShared = !ruleObj.shared ? SHARING_TYPE.UNSHARED : SHARING_TYPE.SHARED;
-        let shareBtnText = isShared ? getString('editrule_unsharerule', 'local_notificationsagent') : getString('editrule_sharerule', 'local_notificationsagent');
+        let shareBtnText = isShared ?
+            getString('editrule_unsharerule', 'local_notificationsagent') :
+            getString('editrule_sharerule', 'local_notificationsagent');
 
         modal.setSaveButtonText(shareBtnText);
 
@@ -123,14 +124,14 @@ const showModal = async (shareItem) => {
 
 /**
  * Changes the sharing status for a given rule.
- * 
+ *
  * @param {integer} id Rule id.
  * @param {boolean} shared Rule shared type.
  * @returns {Promise<void>}
  */
 const setRuleShare = async(id, shared) => {
     try {
-        response = await updateRuleShare(id, shared);
+        let response = await updateRuleShare(id, shared);
 
         if ($.isEmptyObject(response['warnings'])) {
             let shareItem = document.querySelector('a#share-rule-' + id);

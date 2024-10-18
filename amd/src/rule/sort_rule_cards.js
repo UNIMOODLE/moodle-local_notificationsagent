@@ -21,13 +21,8 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version details
- *
- * @package    local_notificationsagent
- * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
- * @author     ISYC <soporte@isyc.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import {saveOrderSession} from 'local_notificationsagent/rule/repository';
@@ -49,16 +44,16 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     await getOrderSession();
     saveOrderSessionId();
 };
 
 
 /**
- * 
+ *
  * Save key rule ordenation.
- * 
+ *
  */
 const saveOrderSessionId = async() => {
     let buttonapplysort = document.getElementById(selectors.sortButtonId);
@@ -72,7 +67,7 @@ const saveOrderSessionId = async() => {
     buttonapplysort.addEventListener('click', async() => {
         let orderid = document.getElementById(selectors.selectOptionId).value;
         let sessionname = 'orderid';
-        response = await saveOrderSession(sessionname, orderid, courseid);
+        await saveOrderSession(sessionname, orderid, courseid);
         location.reload();
     });
 
@@ -80,9 +75,9 @@ const saveOrderSessionId = async() => {
 
 
 /**
- * 
+ *
  * Save key rule ordenation.
- * 
+ *
  */
 const getOrderSession = async() => {
         let orderid = -1;
@@ -92,7 +87,7 @@ const getOrderSession = async() => {
         if (urlparams.has('courseid')) {
             courseid = urlparams.get('courseid');
         }
-        response = await saveOrderSession(sessionname, orderid, courseid);
+        let response = await saveOrderSession(sessionname, orderid, courseid);
         if (response.orderid != -1) {
             let select = document.getElementById('orderrulesid');
                 let array = [];
@@ -105,7 +100,4 @@ const getOrderSession = async() => {
                     select.value = array[0];
                 }
         }
-
 };
-
-

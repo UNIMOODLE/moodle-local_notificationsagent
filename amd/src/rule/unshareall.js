@@ -23,7 +23,6 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -51,30 +50,30 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     let ununshareAllItems = document.querySelectorAll(selectors.unshareAllRuleId);
 
     ununshareAllItems.forEach((unshareAllItem) => {
-        unshareAllItem.addEventListener('click', async function(e) {
+        unshareAllItem.addEventListener('click', async function() {
             await showModal(unshareAllItem);
         });
-    });   
+    });
 };
 
 /**
- * 
+ *
  * Shows the unshare all modal for a given rule.
- * 
+ *
  * @param {HTMLElement} unshareAllItem
  * @returns {Promise<void>}
  */
-const showModal = async (unshareAllItem) => {
+const showModal = async(unshareAllItem) => {
     let ruleObj = {};
-    
+
     ruleObj.id = unshareAllItem.dataset.ruleid;
     ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
     ruleObj.name = await getString('unsharealltitle', 'local_notificationsagent', ruleObj);
-   
+
     ModalFactory.create({
         type: ModalFactory.types.SAVE_CANCEL,
         title: ruleObj.name,
@@ -103,22 +102,22 @@ const showModal = async (unshareAllItem) => {
 
 /**
  * Rejects the sharing for a given rule.
- * 
+ *
  * @param {integer} id Rule id.
  * @returns {Promise<void>}
  */
 const setUnshareAllRule = async(id) => {
     try {
-        response = await unshareAllRule(id);
+       let response = await unshareAllRule(id);
 
         if ($.isEmptyObject(response['warnings'])) {
             getString('sharereject', 'local_notificationsagent').then(ruleUnshared => {
                 document.querySelector('#card-' + id).remove();
-               
+
                 Notification.addNotification({
                     message: ruleUnshared,
                     type: 'info'
-                }); 
+                });
             });
         } else {
             Notification.addNotification({

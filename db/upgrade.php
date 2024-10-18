@@ -62,12 +62,6 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // Notificationsagent savepoint reached.
-        upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
-    }
-
-    if ($oldversion < 2023112100) {
-        // Define field cmid to be added to notificationsagent_condition.
         $table = new xmldb_table('notificationsagent_condition');
         $field = new xmldb_field('cmid', XMLDB_TYPE_INTEGER, '11', null, null, null, null, 'parameters');
 
@@ -85,6 +79,7 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
             }
         }
         $recordset->close();
+
         // Notificationsagent savepoint reached.
         upgrade_plugin_savepoint(true, 2023112100, 'local', 'notificationsagent');
     }

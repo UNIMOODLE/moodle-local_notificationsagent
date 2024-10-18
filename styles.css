@@ -1,4 +1,4 @@
-body.path-local-notificationsagent h5 i.icon{
+body.path-local-notificationsagent h5 i.icon {
     font-size: 1.2rem;
     line-height: initial;
 }
@@ -7,91 +7,91 @@ body.path-local-notificationsagent #id_remove_exception_button,
 body.path-local-notificationsagent #id_remove_action_button,
 body.path-local-notificationsagent #fitem_id_remove_condition_button,
 body.path-local-notificationsagent #fitem_id_remove_exception_button,
-body.path-local-notificationsagent #fitem_id_remove_action_button{
+body.path-local-notificationsagent #fitem_id_remove_action_button {
     display: none;
 }
 
-body.path-local-notificationsagent h5 > i.icon:first-child{
+body.path-local-notificationsagent h5 > i.icon:first-child {
     margin-left: .5rem;
 }
 
-body.path-local-notificationsagent .notificationvars{
+body.path-local-notificationsagent .notificationvars {
     font-size: 15px;
     margin-top: 0.5rem;
     font-style: italic;
 }
 
-body.path-local-notificationsagent .notificationvars > a{
+body.path-local-notificationsagent .notificationvars > a {
     text-decoration: underline;
 }
 
-body.path-local-notificationsagent .notificationvars > a:not(:last-child){
+body.path-local-notificationsagent .notificationvars > a:not(:last-child) {
     margin-right: .5rem;
 }
 
 body.path-local-notificationsagent .mform .form-group[id^="fgroup_id_new"][id$="_group"] {
-    border-top: 1px solid #dee2e6!important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 1.5rem !important;
-    padding-top: 1rem !important;
+    border-top: 1px solid #dee2e6;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
 }
 
-body.path-local-notificationsagent .mform .form-inline .form-group .custom-select{
+body.path-local-notificationsagent .mform .form-inline .form-group .custom-select {
     width: 100%;
 }
-body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
+body.path-local-notificationsagent [role="main"] > .d-flex > div.card {
     flex: 0 0 100%;
     margin-bottom: 24px;
 }
 
-@media (min-width: 1320px){
-    body.path-local-notificationsagent [role="main"] > .d-flex > div.card{
+@media (min-width: 1320px) {
+    body.path-local-notificationsagent [role="main"] > .d-flex > div.card {
         flex: 0 0 32.222222221%;
         margin-left: 1.666666665%;
     }
-    body.path-local-notificationsagent [role="main"] > .d-flex > div.card:nth-child(3n+1){
+    body.path-local-notificationsagent [role="main"] > .d-flex > div.card:nth-child(3n+1) {
         margin-left: 0;
     }
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"]{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] {
     height: 500px;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"].card-template,
-body.path-local-notificationsagent .d-flex>.card[id^="card-"].card-required{
-    background-color: #F3F3F3;
+body.path-local-notificationsagent .d-flex > .card[id^="card-"].card-template,
+body.path-local-notificationsagent .d-flex > .card[id^="card-"].card-required {
+    background-color: #f3f3f3;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .name{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .name {
     font-weight: 600;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .createby{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .createby {
     font-size: 14px;
     color: gray;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .createby > i.fa-user{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .createby > i.fa-user {
     line-height: 13px;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .card-body{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .card-body {
     overflow-y: auto;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .card-content{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .card-content {
     flex: 1;
 }
 
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .conditions-content > span,
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .exceptions-content > span,
-body.path-local-notificationsagent .d-flex>.card[id^="card-"] .actions-content > span{
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .conditions-content > span,
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .exceptions-content > span,
+body.path-local-notificationsagent .d-flex > .card[id^="card-"] .actions-content > span {
     font-size: 18px;
 }
 
-body.path-local-notificationsagent .badge{
+body.path-local-notificationsagent .badge {
     font-size: 12px;
     padding: 0.5rem 1rem;
     background-color: #f3f3f3;
@@ -99,134 +99,134 @@ body.path-local-notificationsagent .badge{
     text-transform: capitalize;
 }
 
-body.path-local-notificationsagent .badge.badge-template{
-    background-color: #FFEFBD;
-    color: #8A600D;
+body.path-local-notificationsagent .badge.badge-template {
+    background-color: #ffefdb;
+    color: #8a600d;
 }
 
-body.path-local-notificationsagent .badge.badge-rule{
-    background-color: #ECF3FD;
-    color: #117CDC;
+body.path-local-notificationsagent .badge.badge-rule {
+    background-color: #ecf3fd;
+    color: #117cdc;
 }
 
-body.path-local-notificationsagent .badge.badge-rule.shared{
+body.path-local-notificationsagent .badge.badge-rule.shared {
     background-color: #d8dcfd;
     color: #0009e4;
 }
 
 body.path-local-notificationsagent .badge.badge-status,
-body.path-local-notificationsagent .badge.badge-shared{
+body.path-local-notificationsagent .badge.badge-shared {
     display: flex;
     align-items: center;
 }
 
-body.path-local-notificationsagent .badge.badge-status > i{
+body.path-local-notificationsagent .badge.badge-status > i {
     font-size: 8px;
 }
 
-body.path-local-notificationsagent .badge.badge-shared > i{
+body.path-local-notificationsagent .badge.badge-shared > i {
     font-size: 11px;
 }
 
-body.path-local-notificationsagent .badge.badge-status.badge-active{
+body.path-local-notificationsagent .badge.badge-status.badge-active {
     background-color: #d5ffbc;
     color: #089400;
 }
 
-body.path-local-notificationsagent .badge.badge-status.badge-paused{
+body.path-local-notificationsagent .badge.badge-status.badge-paused {
     background-color: #ffff93;
     color: #7d7d01;
 }
 
-body.path-local-notificationsagent .badge.badge-status.badge-broken{
+body.path-local-notificationsagent .badge.badge-status.badge-broken {
     background-color: #fff1f0;
     color: #d72112;
 }
 
-body.path-local-notificationsagent .badge.badge-status.badge-required{
+body.path-local-notificationsagent .badge.badge-status.badge-required {
     background-color: #f4e4ff;
     color: #a928ff;
 }
 
-body.path-local-notificationsagent .badge.badge-shared{
+body.path-local-notificationsagent .badge.badge-shared {
     background-color: #d8dcfd;
     color: #0009e4;
     margin-right: 0.5rem;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .modal-dialog{
+body.path-local-notificationsagent #assignTemplateModal .modal-dialog {
     max-width: 800px;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .course-category-listing{
+body.path-local-notificationsagent #assignTemplateModal .course-category-listing {
     cursor: default;
     font-size: 14px;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .header-listing{
-    border: 1px solid #CED4DA;
+body.path-local-notificationsagent #assignTemplateModal .header-listing {
+    border: 1px solid #ced4da;
     border-radius: 8px 8px 0 0;
-    background-color: #F3F3F3;
-    color: #92989D;
+    background-color: #f3f3f3;
+    color: #92989d;
     font-weight: 700;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .header-listing > div{
+body.path-local-notificationsagent #assignTemplateModal .header-listing > div {
     padding: 0.75rem 1.25rem;
     border: 1px solid transparent;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .category-listing{
+body.path-local-notificationsagent #assignTemplateModal .category-listing {
     overflow-y: auto;
     max-height: 50vh;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .list-group-item{
+body.path-local-notificationsagent #assignTemplateModal .list-group-item {
     padding: 0;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .list-group-item > div{
+body.path-local-notificationsagent #assignTemplateModal .list-group-item > div {
     padding: 0.75rem 1.25rem;
     align-items: center;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed{
-    background-color: #ffffff;
+body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed {
+    background-color: #fff;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed:hover{
+body.path-local-notificationsagent #assignTemplateModal .listitem-category.collapsed:hover {
     background-color: #f8f9fa;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .listitem-category{
-    background-color: #F3F3F3;
+body.path-local-notificationsagent #assignTemplateModal .listitem-category {
+    background-color: #f3f3f3;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item{
+body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item {
     border-right: 0;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item:last-child{
+body.path-local-notificationsagent #assignTemplateModal .listitem-category .list-group-item:last-child {
     margin-bottom: 1rem;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label{
+body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label {
     cursor: pointer;
 }
 
-body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label::before{
+body.path-local-notificationsagent #assignTemplateModal .custom-checkbox .custom-control-label::before {
     border-radius: 0.25rem;
 }
 
-body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"]{
+body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"] {
     cursor: pointer;
 }
 
-body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"][aria-expanded="true"] i.fa-angle-down:before{
+body.path-local-notificationsagent #assignTemplateModal [data-toggle="collapse"][aria-expanded="true"] i.fa-angle-down:before {
     content: "\f106";
 }
 
-body.path-local-notificationsagent #assignTemplateModal [id^="selected-info-"]{
+body.path-local-notificationsagent #assignTemplateModal [id^="selected-info-"] {
     color: #fff;
     margin-left: 1rem;
     background-color: #28377c;
@@ -235,32 +235,32 @@ body.path-local-notificationsagent #assignTemplateModal [id^="selected-info-"]{
     line-height: 12px;
 }
 
-body.path-local-notificationsagent #fitem_id_availabilityconditionsjson{
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson {
     display: none;
 }
-body.path-local-notificationsagent #fitem_id_availabilityconditionsjson[aria-hidden=false]{
-    display: flex !important;
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson[aria-hidden=false] {
+    display: flex;
 }
 
 body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-header,
 body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-eye,
-body.path-local-notificationsagent #fitem_id_availabilityconditionsjson #id_availabilityconditionsjson[aria-hidden=true]{
-    display: none !important;
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson #id_availabilityconditionsjson[aria-hidden=true] {
+    display: none;
 }
 
-body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner{
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner {
     border: 0;
     padding: 0;
     margin: 0;
 }
 
-body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner .availability-plugincontrols{
+body.path-local-notificationsagent #fitem_id_availabilityconditionsjson .availability-inner .availability-plugincontrols {
     margin-left: 0;
 }
 
 body.path-local-notificationsagent .hide-div {
-    display:none !important;
+    display: none;
 }
 body.path-local-notificationsagent .show-div {
-    display:block !important;
+    display: block;
 }

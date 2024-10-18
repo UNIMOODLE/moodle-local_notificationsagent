@@ -23,7 +23,6 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -39,7 +38,7 @@ import {updateRuleStatus} from 'local_notificationsagent/rule/repository';
 
 /**
  * Types of rule states.
- * 
+ *
  * @type {{STATUS_TYPE: boolean}}
  */
 const STATUS_TYPE = {
@@ -62,26 +61,26 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     let updateStatusItems = document.querySelectorAll(selectors.updateStatusRuleId);
 
     updateStatusItems.forEach((updateStatusItem) => {
-        updateStatusItem.addEventListener('click', async function(e) {
+        updateStatusItem.addEventListener('click', async function() {
             await showModal(updateStatusItem);
         });
-    });   
+    });
 };
 
 /**
- * 
+ *
  * Shows the update status modal for a given rule.
- * 
+ *
  * @param {HTMLElement} updateStatusItem
  * @returns {Promise<void>}
  */
-const showModal = async (updateStatusItem) => {
+const showModal = async(updateStatusItem) => {
     let ruleObj = {};
-    
+
     ruleObj.id = updateStatusItem.dataset.ruleid;
     ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
     ruleObj.status = updateStatusItem.dataset.status == STATUS_TYPE.RESUMED ? STATUS_TYPE.RESUMED : STATUS_TYPE.PAUSED;
@@ -91,7 +90,7 @@ const showModal = async (updateStatusItem) => {
     } else {
         ruleObj.name = await getString('status_activatetitle', 'local_notificationsagent', ruleObj);
     }
-    
+
     ModalFactory.create({
         type: ModalFactory.types.SAVE_CANCEL,
         title: ruleObj.name,
@@ -100,7 +99,8 @@ const showModal = async (updateStatusItem) => {
         }),
     }).then(function(modal) {
         let isPaused = !ruleObj.status ? STATUS_TYPE.PAUSED : STATUS_TYPE.RESUMED;
-        let updateStatusBtnText = isPaused ? getString('statuspause', 'local_notificationsagent') : getString('statusactivate', 'local_notificationsagent');
+        let updateStatusBtnText = isPaused ?
+            getString('statuspause', 'local_notificationsagent') : getString('statusactivate', 'local_notificationsagent');
 
         modal.setSaveButtonText(updateStatusBtnText);
 
@@ -123,14 +123,14 @@ const showModal = async (updateStatusItem) => {
 
 /**
  * Changes the status for a given rule.
- * 
+ *
  * @param {integer} id Rule id.
  * @param {boolean} status Rule status type.
  * @returns {Promise<void>}
  */
 const setRuleStatus = async(id, status) => {
     try {
-        response = await updateRuleStatus(id, status);
+        let response = await updateRuleStatus(id, status);
 
         if ($.isEmptyObject(response['warnings'])) {
             let updateStatusItem = document.querySelector('a#status-rule-' + id);
@@ -138,8 +138,8 @@ const setRuleStatus = async(id, status) => {
             let updateStatusItemText = '';
             let updateStatusItemMessage = '';
 
-            cardBadge = document.querySelector('#card-' + id + ' .badge-status');
-            
+            let cardBadge = document.querySelector('#card-' + id + ' .badge-status');
+
             if (!status) {
                 updateStatusItemText = await getString('statuspause', 'local_notificationsagent');
                 updateStatusItem.setAttribute(selectors.updateStatusRuleDataState, STATUS_TYPE.RESUMED);

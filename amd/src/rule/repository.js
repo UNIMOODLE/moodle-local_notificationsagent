@@ -128,6 +128,7 @@ const unshareAllRule = (ruleid) => {
  *
  * @param {String} sessionname The session name.
  * @param {Number} orderid The order ID.
+ * @param {Number} courseid The course ID
  * @returns {object} jQuery promise
  */
 const saveOrderSession = (sessionname, orderid, courseid) => {
@@ -143,7 +144,7 @@ const saveOrderSession = (sessionname, orderid, courseid) => {
 };
 
 export default {
-    updateRuleStatus, deleteRule, updateRuleShare, 
-    shareAllRule, unshareAllRule, 
+    updateRuleStatus, deleteRule, updateRuleShare,
+    shareAllRule, unshareAllRule,
     checkRuleContext, saveOrderSession
-}
+};

@@ -28,10 +28,10 @@
  */
 export const init = (idButton, idSelect) => {
     let button = document.querySelector('[id*="' + idButton + '"]');
-    button.addEventListener('click', function (ev) {
+    button.addEventListener('click', function(ev) {
         let select = document.querySelector('[id*="' + idSelect + '"]');
 
-        // if select option is AC
+        // If select option is AC
         let selectDataset = select.options[select.selectedIndex].dataset;
         if (selectDataset.type) {
             ev.preventDefault();
@@ -40,7 +40,7 @@ export const init = (idButton, idSelect) => {
             return;
         }
     });
-}
+};
 
 /**
  * Remove initialisation.
@@ -50,11 +50,11 @@ export const init = (idButton, idSelect) => {
  */
 export const initRemove = (removeSpan, submitRemove) => {
     // Event to remove icon click
-    document.querySelectorAll('.' + removeSpan).forEach(function (link) {
-        link.addEventListener('click', function (e) {
+    document.querySelectorAll('.' + removeSpan).forEach(function(link) {
+        link.addEventListener('click', function(e) {
             let selector = document.querySelector('input[name="' + submitRemove + '"]');
             selector.value = e.target.id;
             selector.click();
         });
     });
-}
+};

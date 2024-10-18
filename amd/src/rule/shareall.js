@@ -23,7 +23,6 @@
 /**
  * Version details
  *
- * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
@@ -51,30 +50,30 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     let shareAllItems = document.querySelectorAll(selectors.shareAllRuleId);
 
     shareAllItems.forEach((shareAllItem) => {
-        shareAllItem.addEventListener('click', async function(e) {
+        shareAllItem.addEventListener('click', async function() {
             await showModal(shareAllItem);
         });
-    });   
+    });
 };
 
 /**
- * 
+ *
  * Shows the share all modal for a given rule.
- * 
+ *
  * @param {HTMLElement} shareAllItem
  * @returns {Promise<void>}
  */
-const showModal = async (shareAllItem) => {
+const showModal = async(shareAllItem) => {
     let ruleObj = {};
-    
+
     ruleObj.id = shareAllItem.dataset.ruleid;
     ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
     ruleObj.name = await getString('sharealltitle', 'local_notificationsagent', ruleObj);
-   
+
     ModalFactory.create({
         type: ModalFactory.types.SAVE_CANCEL,
         title: ruleObj.name,
@@ -103,13 +102,13 @@ const showModal = async (shareAllItem) => {
 
 /**
  * Approves the sharing for a given rule.
- * 
+ *
  * @param {integer} id Rule id.
  * @returns {Promise<void>}
  */
 const setShareAllRule = async(id) => {
     try {
-        response = await shareAllRule(id);
+        let response = await shareAllRule(id);
 
         if ($.isEmptyObject(response['warnings'])) {
             window.location.reload();

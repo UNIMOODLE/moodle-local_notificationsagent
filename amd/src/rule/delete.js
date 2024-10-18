@@ -40,26 +40,26 @@ const selectors = {
  *
  * @method init
  */
-export const init = async () => {
+export const init = async() => {
     let deleteItems = document.querySelectorAll(selectors.deleteRuleId);
 
     deleteItems.forEach((deleteItem) => {
-        deleteItem.addEventListener('click', async function(e) {
+        deleteItem.addEventListener('click', async function() {
             await showModal(deleteItem);
         });
-    });   
+    });
 };
 
 /**
- * 
+ *
  * Shows the delete modal for a given rule.
- * 
+ *
  * @param {HTMLElement} deleteItem
  * @returns {Promise<void>}
  */
-const showModal = async (deleteItem) => {
+const showModal = async(deleteItem) => {
     let ruleObj = {};
-    
+
     ruleObj.id = deleteItem.dataset.ruleid;
     ruleObj.type = deleteItem.dataset.type;
     ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
@@ -88,7 +88,7 @@ const showModal = async (deleteItem) => {
             });
 
             modal.show();
-    
+
             return true;
         }).catch(Notification.exception);
     });
@@ -96,7 +96,7 @@ const showModal = async (deleteItem) => {
 
 /**
  * Checks if the rule has any other context before deleting
- * 
+ *
  * @param {HTMLElement} deleteItem Card rule element.
  * @returns {boolean} Has it context?
  */
@@ -105,8 +105,8 @@ const hasRuleContext = async(deleteItem) => {
     let hasContext = false;
 
     try {
-        response = await checkRuleContext(id);
-        
+        let response = await checkRuleContext(id);
+
         if ($.isEmptyObject(response['warnings'])) {
             hasContext = response['hascontext'];
         } else {
@@ -124,22 +124,22 @@ const hasRuleContext = async(deleteItem) => {
 
 /**
  * Deletes a given rule.
- * 
+ *
  * @param {Integer} id Rule id.
  * @returns {Promise<void>}
  */
 const setDeleteRule = async(id) => {
     try {
-        response = await deleteRule(id);
-        
+        let response = await deleteRule(id);
+
         if ($.isEmptyObject(response['warnings'])) {
             getString('deleteaccept', 'local_notificationsagent').then(ruleDeleted => {
                 document.querySelector('#card-' + id).remove();
-               
+
                 Notification.addNotification({
                     message: ruleDeleted,
                     type: 'info'
-                }); 
+                });
             });
         } else {
             Notification.addNotification({
