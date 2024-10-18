@@ -216,13 +216,11 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     }
 
     /**
-     * Executed after course restore is complete.
-     *
-     * This method is only executed if course configuration was overridden.
+     * Update the necessary ids and json parameters for each subplugin.
      *
      * @return void
      */
-    protected function after_restore_course() {
+    protected function update_subplugins() {
         global $DB;
 
         $rules = $DB->get_records_sql('
@@ -232,8 +230,8 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
                AND nctx.contextid = :context
              WHERE nctx.objectid = :course
         ', [
-                'context' => CONTEXT_COURSE,
-                'course' => $this->task->get_courseid(),
+            'context' => CONTEXT_COURSE,
+            'course' => $this->task->get_courseid(),
         ]);
 
         foreach ($rules as $rule) {
@@ -251,6 +249,66 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
                     $this->task->get_logger()
                 );
             }
+        }
+    }
+
+    /**
+     * Delete rules that are not restored from backup if TARGET_CURRENT_DELETING or TARGET_EXISTING_DELETING is marked.
+     *
+     * @return void
+     */
+    protected function delete_rules() {
+        global $DB;
+
+        $records = $DB->get_recordset(
+            'backup_ids_temp',
+            [
+                'backupid' => $this->task->get_restoreid(),
+                'itemname' => 'notificationsagent_rule',
+            ],
+            'newitemid'
+        );
+
+        $newrules = [];
+        foreach ($records as $record) {
+            $newrules[] = $record->newitemid;
+        }
+        $records->close();
+
+        [$sqlnotin, $params] = $DB->get_in_or_equal(array_values($newrules), SQL_PARAMS_NAMED, 'param', false);
+        $sql = "SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nr.deleted = 0
+                   AND nctx.contextid = :coursecontextid
+                   AND nctx.objectid = :courseid
+                 WHERE nr.id {$sqlnotin}";
+        $params = [
+            'coursecontextid' => CONTEXT_COURSE,
+            'courseid' => $this->task->get_courseid(),
+        ] + $params;
+
+        $rules = $DB->get_recordset_sql($sql, $params);
+        foreach ($rules as $rule) {
+            $instance = new \local_notificationsagent\rule($rule->id);
+            $instance->delete();
+        }
+        $rules->close();
+    }
+
+    /**
+     * Executed after course restore is complete.
+     *
+     * This method is only executed if course configuration was overridden.
+     *
+     * @return void
+     */
+    public function after_restore_course() {
+        $this->update_subplugins();
+
+        if ($this->task->get_target() == backup::TARGET_CURRENT_DELETING
+            || $this->task->get_target() == backup::TARGET_EXISTING_DELETING) {
+            $this->delete_rules();
         }
     }
 }
