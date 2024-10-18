@@ -1,4 +1,4 @@
-@managerules_admin @notificationsagent @javascript
+@managerules_admin @javascript @local_notificationsagent @local
 Feature: Testing rules management for admin in notifications agent plugin
   In order to test the rule management
   As an admin

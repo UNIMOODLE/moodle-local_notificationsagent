@@ -1,4 +1,4 @@
-@managetemplates @notificationsagent @javascript
+@managetemplates  @javascript @local_notificationsagent @local
 Feature: Testing templates management in notifications agent plugin
   In order to test the template management
   As an admin

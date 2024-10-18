@@ -1,4 +1,4 @@
-@managerules_teacher @notificationsagent @javascript
+@managerules_teacher @javascript @local_notificationsagent @local
 Feature: Testing rules management for teachers in notifications agent plugin
   In order to test the rule management in a course
   As a teacher
