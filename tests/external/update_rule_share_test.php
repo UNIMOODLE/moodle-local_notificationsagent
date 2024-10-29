@@ -55,20 +55,12 @@ class update_rule_share_test extends \advanced_testcase {
     /**
      * @var \stdClass
      */
-    /**
-     * @var \stdClass
-     */
     private static $user;
-
     /**
      * @var \stdClass
      */
     private static $course;
 
-    /**
-     * @var \stdClass
-     */
-    private static $cmteste;
     /**
      *
      */

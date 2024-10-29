@@ -55,9 +55,6 @@ class unshare_rule_all_test extends \advanced_testcase {
     /**
      * @var \stdClass
      */
-    /**
-     * @var \stdClass
-     */
     private static $user;
 
     /**
@@ -65,10 +62,6 @@ class unshare_rule_all_test extends \advanced_testcase {
      */
     private static $course;
 
-    /**
-     * @var \stdClass
-     */
-    private static $cmteste;
     /**
      *
      */

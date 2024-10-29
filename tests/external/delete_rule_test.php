@@ -66,55 +66,35 @@ class delete_rule_test extends \advanced_testcase {
     private static $course;
 
     /**
-     * @var \stdClass
-     */
-    private static $cmteste;
-    /**
-     *
-     */
-    /**
      * Date start for the course
      */
     public const COURSE_DATESTART = 1704099600; // 01/01/2024 10:00:00.
-    /**
-     *
-     */
+
     /**
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
-    /**
-     *
-     */
+
     /**
      * Activity date start
      */
     public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
-    /**
-     *
-     */
+
     /**
      * Activity date end
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
-    /**
-     *
-     */
+
     /**
      * User first access to a course
      */
     public const USER_FIRSTACCESS = 1704099600; // 30/01/2024 10:00:00,
-    /**
-     *
-     */
+
     /**
      * User last access to a course
      */
     public const USER_LASTACCESS = 1704099600; // 01/01/2024 10:00:00.
-    /**
-     *
-     */
-    public const CMID = 246000;
+
 
     /**
      * Settin up test context

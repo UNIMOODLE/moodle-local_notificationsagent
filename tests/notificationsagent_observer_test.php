@@ -46,10 +46,7 @@ use notificationscondition_sessionstart\sessionstart;
  * @group notificationsagent
  */
 class notificationsagent_observer_test extends \advanced_testcase {
-    /**
-     * @var \local_notificationsagent\rule
-     */
-    private static $rule;
+
     /**
      * @var \stdClass
      */
@@ -58,10 +55,6 @@ class notificationsagent_observer_test extends \advanced_testcase {
      * @var \stdClass
      */
     private static $course;
-    /**
-     * @var \stdClass
-     */
-    private static $cmtestnt;
     /**
      * Date start for the course
      */
