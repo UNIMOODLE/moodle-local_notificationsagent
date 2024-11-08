@@ -55,7 +55,7 @@ class notificationscondition_itemgraded_observer {
         }
 
         $gradeitem = \grade_item::fetch(['id' => $event->other['itemid'], 'courseid' => $courseid]);
-        if($gradeitem->itemtype === 'course' || !isset($gradeitem->itemmodule) || !isset($gradeitem->iteminstance)){
+        if ($gradeitem->itemtype === 'course' || !isset($gradeitem->itemmodule) || !isset($gradeitem->iteminstance)) {
             return;
         }
         $cm = get_coursemodule_from_instance(
