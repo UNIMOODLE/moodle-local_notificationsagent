@@ -342,3 +342,23 @@ $string['evaluaterule'] = 'Evaluate rule';
 $string['evaluaterule_help'] =
     'Rule is evaluated as follows:
      ([Condition 1] **AND** [Condition 2]  **AND** ... ) **AND NOT** ([Exception 1] **OR** [Exception 2] ...) -> [Action 1]->[Action 2]';
+// Placeholders.
+// 'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
+//'Course_FullName', 'Course_Url', 'Course_Category_Name', 'Teacher_FirstName', 'Teacher_LastName',
+//'Teacher_Email','Teacher_Username', 'Teacher_Address', 'Current_time', self::SEPARATOR, 'Follow_Link',
+$string['placeholder_User_FirstName'] = 'User first name';
+$string['placeholder_User_LastName'] = 'User last name';
+$string['placeholder_User_Email'] = 'User email';
+$string['placeholder_User_Username'] = 'User username';
+$string['placeholder_User_Address'] = 'User address';
+$string['placeholder_Course_FullName'] = 'Course full name';
+$string['placeholder_Course_Url'] = 'Course url';
+$string['placeholder_Course_Category_Name'] = 'Course category name';
+$string['placeholder_Teacher_FirstName'] = 'Teacher first name';
+$string['placeholder_Teacher_LastName'] = 'Teacher last name';
+$string['placeholder_Teacher_Email'] = 'Teacher email';
+$string['placeholder_Teacher_Username'] = 'Teacher username';
+$string['placeholder_Teacher_Address'] = 'Teacher address';
+$string['placeholder_Current_time'] = 'Current time';
+$string['placeholder_Follow_Link'] = 'Follow link';
+$string['placeholder_Separator'] = 'Message separator';

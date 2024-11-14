@@ -104,6 +104,16 @@ body.path-local-notificationsagent .badge.badge-template {
     color: #8a600d;
 }
 
+body.path-local-notificationsagent .badge.badge-placeholder {
+    background-color: #a3b7d2;
+    font-size: 10px;
+    font-weight: normal;
+    border-color: #325679;
+    border: none;
+    padding: 6px;
+    text-transform: none;
+}
+
 body.path-local-notificationsagent .badge.badge-rule {
     background-color: #ecf3fd;
     color: #117cdc;

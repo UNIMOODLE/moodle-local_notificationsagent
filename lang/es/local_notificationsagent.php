@@ -342,3 +342,23 @@ $string['subplugintype_notificationsaction_plural'] = 'Plugins de acción';
 $string['evaluaterule'] = 'Evaluar regla';
 $string['evaluaterule_help'] =
     'La regla se evalúa como sigue: ([Condtion 1] **AND** [Condition 2] **AND** ...) **AND NOT** ([Exception 1] OR [Exception 2] ...) -> [Action 1]->[Action 2]';
+// Placeholders.
+// 'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
+//'Course_FullName', 'Course_Url', 'Course_Category_Name', 'Teacher_FirstName', 'Teacher_LastName',
+//'Teacher_Email','Teacher_Username', 'Teacher_Address', 'Current_time', self::SEPARATOR, 'Follow_Link',
+$string['placeholder_User_FirstName'] = 'Nombre del usuario';
+$string['placeholder_User_LastName'] = 'Apellidos del usuario';
+$string['placeholder_User_Email'] = 'Email del usuario';
+$string['placeholder_User_Username'] = 'Identificador del usuario';
+$string['placeholder_User_Address'] = 'Dirección del usuario';
+$string['placeholder_Course_FullName'] = 'Nombre del curso';
+$string['placeholder_Course_Url'] = 'Url del curso';
+$string['placeholder_Course_Category_Name'] = 'Categoría del curso';
+$string['placeholder_Teacher_FirstName'] = 'Nombre del profesor';
+$string['placeholder_Teacher_LastName'] = 'Apellidos del profesor';
+$string['placeholder_Teacher_Email'] = 'Email del profesor';
+$string['placeholder_Teacher_Username'] = 'Identificador del profesor';
+$string['placeholder_Teacher_Address'] = 'Dirección del profesor';
+$string['placeholder_Current_time'] = 'Hora actual';
+$string['placeholder_Separator'] = 'Separador de mensaje';
+$string['placeholder_Follow_Link'] = 'Enlace de seguimiento';

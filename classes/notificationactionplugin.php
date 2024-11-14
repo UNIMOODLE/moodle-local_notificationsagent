@@ -119,23 +119,32 @@ abstract class notificationactionplugin extends notificationplugin {
             ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
         );
         foreach (rule::get_placeholders($showuserplaceholders) as $option) {
-            $clipboardtarget = "#notificationvars_" . $id . "_" . $type . "_" . $option;
-            $placeholders .= \html_writer::start_tag(
-                'a',
+            $clipboardtargetid = "notificationvars_" . $id . "_" . $type . "_" . $option;
+            $placeholdercodeelement = \html_writer::tag('span', 
+            '{' . $option . '}',
+                 [
+                    'id' => $clipboardtargetid,
+                    'style' => 'display: none;'
+                ]);
+            $placeholdername = get_string(
+                $option == rule::SEPARATOR ? 'placeholder_Separator' : 'placeholder_' . $option,
+                'local_notificationsagent');
+            $placeholders .= \html_writer::tag(
+                'button',
+                $placeholdername . $placeholdercodeelement,
                 [
-                            "href" => "#", "id" => "notificationvars_" . $id . "_" . $type . "_" . $option, "data-text" => $option,
-                            "data-action" => "copytoclipboard", "data-clipboard-target" => $clipboardtarget,
+                            "id" => $clipboardtargetid . 'button',
+                            "class" => "badge  badge-placeholder",
+                            "data-action" => "copytoclipboard",
+                            "data-clipboard-target" => '#' . $clipboardtargetid,
                     ]
             );
-            $placeholders .= \html_writer::start_tag('span');
-            $placeholders .= "{" . $option . "}";
-            $placeholders .= \html_writer::end_tag('span');
-            $placeholders .= \html_writer::end_tag('a');
+
         }
         $placeholders .= \html_writer::end_tag('div');
         $placeholders .= \html_writer::end_tag('div');
         $placeholders .= \html_writer::end_tag('div');
-
+     
         $group = $mform->createElement('html', $placeholders);
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
