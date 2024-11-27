@@ -314,6 +314,9 @@ $string['actions'] = 'Acciones';
 
 // Caché.
 $string['cachedef_launched'] = 'Lista de usuarios cuya periodicidad ha comenzado.';
+$string['cachedef_course'] = 'Datos de curso.';
+$string['cachedef_condition'] = 'Lista de condiciones.';
+$string['cachedef_action'] = 'Lista de acciones.';
 
 // Privacy.
 

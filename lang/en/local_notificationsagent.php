@@ -314,6 +314,9 @@ $string['actions'] = 'Actions';
 
 // Cache.
 $string['cachedef_launched'] = 'List of users which periodicity has started.';
+$string['cachedef_course'] = 'Course data.';
+$string['cachedef_condition'] = 'List of conditions.';
+$string['cachedef_action'] = 'List of actions.';
 
 // Privacy.
 $string['privacy:metadata:userid'] = 'The user id linked to this table.';
