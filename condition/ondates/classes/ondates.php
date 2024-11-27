@@ -99,7 +99,6 @@ class ondates extends notificationconditionplugin {
      * @return false|int|mixed|null
      */
     public function estimate_next_time(evaluationcontext $context) {
-        global $CFG;
         $timeaccess = $context->get_timeaccess();
         $params = $context->get_params();
         $data = json_decode($params, true);

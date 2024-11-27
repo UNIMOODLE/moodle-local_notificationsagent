@@ -52,10 +52,6 @@ class activitycompleted_observer_test extends \advanced_testcase {
      */
     private static $rule;
     /**
-     * @var activitycompleted
-     */
-    private static $subplugin;
-    /**
      * @var \stdClass
      */
     private static $course;
@@ -71,10 +67,6 @@ class activitycompleted_observer_test extends \advanced_testcase {
      * @var evaluationcontext
      */
     private static $context;
-    /**
-     * @var bool|\context|\context_course
-     */
-    private static $coursecontext;
     /**
      * @var array|string[]
      */

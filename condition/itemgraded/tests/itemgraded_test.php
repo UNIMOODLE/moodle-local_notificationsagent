@@ -417,7 +417,7 @@ class itemgraded_test extends \advanced_testcase {
                 'layout' => '1,0',
         ]);
 
-        $cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
+        //$cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
 
         self::$subplugin->get_ui($mform, $courseid, $subtype);
 

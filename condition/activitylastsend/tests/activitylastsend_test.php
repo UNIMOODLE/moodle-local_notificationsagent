@@ -223,7 +223,6 @@ class activitylastsend_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
-        global $DB;
         \uopz_set_return('time', 1704099600);
         // Test estimate next time.
         self::$context->set_timeaccess($timeaccess);

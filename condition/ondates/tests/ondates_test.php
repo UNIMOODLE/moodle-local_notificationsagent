@@ -315,7 +315,6 @@ class ondates_test extends \advanced_testcase {
      * @covers \notificationscondition_ondates\ondates::convert_parameters
      */
     public function test_convertparameters() {
-        $id = 0;
         $starddate = 1701622222;
         $enddate = 1714894444;
         $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');

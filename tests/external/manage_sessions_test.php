@@ -129,7 +129,6 @@ class manage_sessions_test extends \advanced_testcase {
      * @return void
      */
     public function test_execute($user, $useinstance, $orderid, $expected) {
-        global $DB;
         $coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser($user === 0 ? self::$user->id : 2);

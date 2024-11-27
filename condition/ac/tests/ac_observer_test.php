@@ -53,37 +53,14 @@ class ac_observer_test extends \advanced_testcase {
      */
     private static $rule;
     /**
-     * @var ac
-     */
-    private static $subplugin;
-    /**
      * @var \stdClass
      */
     private static $course;
-    /**
-     * @var string
-     */
-    private static $subtype;
+
     /**
      * @var \stdClass
      */
     private static $user;
-    /**
-     * @var evaluationcontext
-     */
-    private static $context;
-    /**
-     * @var bool|\context|\context_course
-     */
-    private static $coursecontext;
-    /**
-     * @var array|string[]
-     */
-    private static $elements;
-    /**
-     * @var string
-     */
-    private static $role;
     /**
      * @var \stdClass
      */

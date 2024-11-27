@@ -236,7 +236,7 @@ class courseend_test extends \advanced_testcase {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
-        $params = json_decode(self::$context->get_params(), true);
+
 
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);

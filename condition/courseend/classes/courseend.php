@@ -93,8 +93,6 @@ class courseend extends notificationconditionplugin {
      * @param evaluationcontext $context |null collection of variables to evaluate the condition.
      */
     public function estimate_next_time(evaluationcontext $context) {
-        global $DB, $COURSE;
-
         $timeend = null;
         $params = json_decode($context->get_params());
         $time = $params->{self::UI_TIME};

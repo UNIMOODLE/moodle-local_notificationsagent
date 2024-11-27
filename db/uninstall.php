@@ -36,7 +36,5 @@
  * Custom uninstallation procedure.
  */
 function xmldb_local_notificationsagent_uninstall() {
-    global $DB;
-
     return true;
 }

@@ -78,12 +78,8 @@ class itemgraded extends notificationconditionplugin {
      * @return bool true if the condition is true, false otherwise.
      */
     public function evaluate(evaluationcontext $context): bool {
-        global $DB;
-
         $meetcondition = false;
         $gradeisachieved = false;
-        $pluginname = $this->get_subtype();
-        $conditionid = $this->get_id();
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
         $params = json_decode($context->get_params());

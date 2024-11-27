@@ -251,7 +251,7 @@ class activitynewcontent_test extends \advanced_testcase {
     public function test_processmarkups() {
         $modcomponent = 'mod_quiz';
         $quizgenerator = self::getDataGenerator()->get_plugin_generator($modcomponent);
-        $cmgen = $quizgenerator->create_instance([
+        $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
         ]);
         $params[self::$subplugin::MODNAME] = $modcomponent;
