@@ -61,7 +61,7 @@ class addusergroup extends notificationactionplugin {
         $this->get_ui_title($mform, $type);
 
         // Groups.
-        $groups = groups_get_all_groups($courseid, null, null, 'id, name');
+        $groups = groups_get_all_groups($courseid, null, null, 'g.id, g.name');
         $listgroups = [];
 
         foreach ($groups as $item) {

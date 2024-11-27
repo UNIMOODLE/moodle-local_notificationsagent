@@ -149,7 +149,7 @@ class usergroupadd extends notificationconditionplugin {
     public function get_ui($mform, $courseid, $type) {
         $this->get_ui_title($mform, $type);
 
-        $groups = groups_get_all_groups($courseid, null, null, 'id, name');
+        $groups = groups_get_all_groups($courseid, null, null, 'g.id, g.name');
         $listgroups = [];
 
         if ($this->rule->template == rule::TEMPLATE_TYPE) {
