@@ -411,13 +411,11 @@ class itemgraded_test extends \advanced_testcase {
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         // Generate quiz.
-        $quiz = $quizgenerator->create_instance(['course' => self::$coursetest->id,
+        $quizgenerator->create_instance(['course' => self::$coursetest->id,
                 'grade' => 100.0,
                 'sumgrades' => 10,
                 'layout' => '1,0',
         ]);
-
-        //$cm = get_coursemodule_from_instance('quiz', $quiz->id, self::$coursetest->id);
 
         self::$subplugin->get_ui($mform, $courseid, $subtype);
 
