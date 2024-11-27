@@ -44,12 +44,16 @@ use local_notificationsagent\rule;
 
 $courseid = required_param('courseid', PARAM_INT);
 $context = context_course::instance($courseid);
+$capability =  'local/notificationsagent:importrule';
 $pluginname = '';
 $timer = 0;
 
 if (!$courseid) {
     require_login();
     throw new \moodle_exception('needcourseid');
+}
+if (!has_capability($capability, $context)) {
+    require_capability($capability, $context);
 }
 
 if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO_FILE) {
@@ -131,4 +135,4 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
     }
 }
 
-header('Location: index.php?courseid=' . $courseid);
+//header('Location: index.php?courseid=' . $courseid);
