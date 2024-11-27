@@ -37,9 +37,9 @@ require_once("../../config.php");
 global $DB;
 require_login();
 $ruleid = required_param('ruleid', PARAM_INT);
-$courseid= required_param('courseid', PARAM_INT);
-$capability =  'local/notificationsagent:exportrule';
-$context =  \context_course::instance($courseid);
+$courseid = required_param('courseid', PARAM_INT);
+$capability = 'local/notificationsagent:exportrule';
+$context = \context_course::instance($courseid);
 $json = [];
 
 if (!has_capability($capability, $context)) {

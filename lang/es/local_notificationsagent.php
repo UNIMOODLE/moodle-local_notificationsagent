@@ -346,9 +346,6 @@ $string['evaluaterule'] = 'Evaluar regla';
 $string['evaluaterule_help'] =
     'La regla se evalúa como sigue: ([Condtion 1] **AND** [Condition 2] **AND** ...) **AND NOT** ([Exception 1] OR [Exception 2] ...) -> [Action 1]->[Action 2]';
 // Placeholders.
-// 'User_FirstName', 'User_LastName', 'User_Email', 'User_Username', 'User_Address',
-//'Course_FullName', 'Course_Url', 'Course_Category_Name', 'Teacher_FirstName', 'Teacher_LastName',
-//'Teacher_Email','Teacher_Username', 'Teacher_Address', 'Current_time', self::SEPARATOR, 'Follow_Link',
 $string['placeholder_User_FirstName'] = 'Nombre del usuario';
 $string['placeholder_User_LastName'] = 'Apellidos del usuario';
 $string['placeholder_User_Email'] = 'Email del usuario';

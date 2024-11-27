@@ -120,11 +120,11 @@ abstract class notificationactionplugin extends notificationplugin {
         );
         foreach (rule::get_placeholders($showuserplaceholders) as $option) {
             $clipboardtargetid = "notificationvars_" . $id . "_" . $type . "_" . $option;
-            $placeholdercodeelement = \html_writer::tag('span', 
+            $placeholdercodeelement = \html_writer::tag('span',
             '{' . $option . '}',
                  [
                     'id' => $clipboardtargetid,
-                    'style' => 'display: none;'
+                    'style' => 'display: none;',
                 ]);
             $placeholdername = get_string(
                 $option == rule::SEPARATOR ? 'placeholder_Separator' : 'placeholder_' . $option,
@@ -144,7 +144,7 @@ abstract class notificationactionplugin extends notificationplugin {
         $placeholders .= \html_writer::end_tag('div');
         $placeholders .= \html_writer::end_tag('div');
         $placeholders .= \html_writer::end_tag('div');
-     
+
         $group = $mform->createElement('html', $placeholders);
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
