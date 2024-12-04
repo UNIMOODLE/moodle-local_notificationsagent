@@ -35,7 +35,6 @@
 namespace local_notificationsagent\privacy;
 
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
@@ -95,6 +94,44 @@ class provider_test extends \advanced_testcase {
 
         $result = $DB->insert_record('notificationsagent_report', $report);
         $this->assertIsInt($result);
+
+        $rule = new \stdClass();
+        $rule->ruleid = 1;
+        $rule->createdby = self::$user->id;
+        $rule->createdat = time();
+        $result = $ruleid = $DB->insert_record('notificationsagent_rule', $rule);
+        $this->assertIsInt($result);
+
+        $launched = new \stdClass();
+        $launched->ruleid = $ruleid;
+        $launched->courseid = self::$course->id;
+        $launched->userid = self::$user->id;
+        $launched->timesfired = 3;
+        $launched->timecreated = time();
+        $launched->timemodified = time();
+        $result = $DB->insert_record('notificationsagent_launched', $launched);
+        $this->assertIsInt($result);
+
+        $cache = new \stdClass();
+        $cache->userid = self::$user->id;
+        $result = $DB->insert_record('notificationsagent_cache', $cache);
+        $this->assertIsInt($result);
+
+        $triggers = new \stdClass();
+        $triggers->userid = self::$user->id;
+        $triggers->ruleid = $ruleid;
+        $triggers->conditionid = 2;
+        $triggers->courseid = self::$course->id;
+        $result = $DB->insert_record('notificationsagent_triggers', $triggers);
+        $this->assertIsInt($result);
+
+        $context = new \stdClass();
+        $context->ruleid = $ruleid;
+        $context->contextid = CONTEXT_COURSE;
+        $context->objectid = self::$course->id;
+        $result = $DB->insert_record('notificationsagent_context', $context);
+        $this->assertIsInt($result);
+
     }
 
     /**
@@ -151,16 +188,39 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::delete_user_report
      * @return void
      */
-    public function test_delete_data_for_all_users_in_contextt() {
+    public function test_delete_data_for_all_users_in_context() {
         global $DB;
         $report = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $launched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $triggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        $params = ['objectid' => self::$course->id, 'contextid' => CONTEXT_COURSE];
+        $contexts = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+
+        foreach ($contexts as $context) {
+            $getrule = $DB->get_records('notificationsagent_rule', ['id' => $context->ruleid, 'createdby' => self::$user->id]);
+            $this->assertNotEmpty($getrule);
+        }
+
         $this->assertNotEmpty($report);
+        $this->assertNotEmpty($launched);
+        $this->assertNotEmpty($triggers);
         $context = \context_course::instance(self::$course->id);
         provider::delete_data_for_all_users_in_context($context);
 
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $deletelaunched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $deletetriggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        $rulestodelete = $DB->get_records('notificationsagent_context' , $params, '', 'id');
+
+        foreach ($rulestodelete as $ruletodelete) {
+            $deleterule = $DB->get_records('notificationsagent_rule', ['id' => $ruletodelete->id]);
+            $this->assertEmpty($deleterule);
+        }
 
         $this->assertEmpty($deletereport);
+        $this->assertEmpty($deletelaunched);
+        $this->assertEmpty($deletetriggers);
+
     }
 
     /**
@@ -175,14 +235,33 @@ class provider_test extends \advanced_testcase {
         $emptyapprvlist = new approved_contextlist(self::$user, 'mod_quiz', [$contextlist->get_contexts()[0]->id]);
         provider::delete_data_for_user($emptyapprvlist);
         $report = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
-        $this->assertNotEmpty($report);
+        $launched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $triggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        $params = ['objectid' => self::$course->id, 'contextid' => CONTEXT_COURSE];
+        $contexts = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+        foreach ($contexts as $context) {
+            $getrule = $DB->get_records('notificationsagent_rule', ['id' => $context->ruleid, 'createdby' => self::$user->id]);
+            $this->assertNotEmpty($getrule);
+        }
 
+        $this->assertNotEmpty($report);
+        $this->assertNotEmpty($report);
+        $this->assertNotEmpty($launched);
+        $this->assertNotEmpty($triggers);
         $this->assertNotEmpty($contextlist);
         $apprvlist = new approved_contextlist(self::$user, self::COMPONENT, [$contextlist->get_contexts()[0]->id]);
         $this->assertNotEmpty($apprvlist);
         provider::delete_data_for_user($apprvlist);
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $deletedlaunched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $deletedtriggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        foreach ($contexts as $context) {
+            $deletedrule = $DB->get_records('notificationsagent_rule', ['id' => $context->ruleid, 'createdby' => self::$user->id]);
+            $this->assertEmpty($deletedrule);
+        }
         $this->assertEmpty($deletereport);
+        $this->assertEmpty($deletedtriggers);
+        $this->assertEmpty($deletedlaunched);
     }
 
     /**
@@ -195,10 +274,33 @@ class provider_test extends \advanced_testcase {
         global $DB;
         $context = \context_course::instance(self::$course->id);
         $apprvlist = new approved_userlist($context, self::COMPONENT, [self::$user->id]);
-        $this->assertNotEmpty($apprvlist);
+        $report = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $launched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $triggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        $params = ['objectid' => self::$course->id, 'contextid' => CONTEXT_COURSE];
+        $contexts = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+        foreach ($contexts as $context) {
+            $getrule = $DB->get_records('notificationsagent_rule', ['id' => $context->ruleid, 'createdby' => self::$user->id]);
+            $this->assertNotEmpty($getrule);
+        }
+
+        $this->assertNotEmpty($report);
+        $this->assertNotEmpty($report);
+        $this->assertNotEmpty($launched);
+        $this->assertNotEmpty($triggers);
+
         provider::delete_data_for_users($apprvlist);
         $deletereport = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
+        $deletedlaunched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
+        $deletedtriggers = $DB->get_records('notificationsagent_triggers', ['userid' => self::$user->id]);
+        $contexts = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+        foreach ($contexts as $context) {
+            $deletedrule = $DB->get_records('notificationsagent_rule', ['id' => $context->ruleid, 'createdby' => self::$user->id]);
+            $this->assertEmpty($deletedrule);
+        }
         $this->assertEmpty($deletereport);
+        $this->assertEmpty($deletedtriggers);
+        $this->assertEmpty($deletedlaunched);
     }
 
     /**
@@ -215,16 +317,19 @@ class provider_test extends \advanced_testcase {
 
         provider::export_user_data($apprvlist);
 
-        foreach ($contextlist as $context) {
-            $data = writer::with_context($context)->get_data(
-                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')]
-            );
-            $this->assertNotEmpty($data);
-            foreach ($data as $datoreport) {
-                $this->assertEquals(1, $datoreport['ruleid']);
-                $this->assertEquals(self::$user->id, $datoreport['userid']);
-                $this->assertEquals(self::$course->id, $datoreport['courseid']);
-                $this->assertEquals(self::CMID, $datoreport['actionid']);
+        $tables = [
+            'notificationsagent_rule',
+            'notificationsagent_launched' ,
+            'notificationsagent_cache' ,
+            'notificationsagent_triggers' ,
+            'notificationsagent_report' ,
+        ];
+        foreach ($tables as $table) {
+            foreach ($contextlist as $context) {
+                $data = writer::with_context($context)->get_data(
+                    [$table]
+                );
+                $this->assertNotEmpty($data);
             }
         }
 

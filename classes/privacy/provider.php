@@ -56,18 +56,57 @@ class provider implements
      * @return collection Collection object
      */
     public static function get_metadata(collection $collection): collection {
-        $reportdata = [
-            'userid' => 'privacy:metadata:userid',
-            'courseid' => 'privacy:metadata:courseid',
-            'ruleid' => 'privacy:metadata:ruleid',
-            'actionid' => 'privacy:metadata:actionid',
-            'actiondetail' => 'privacy:metadata:actiondetail',
-            'timestamp' => 'privacy:metadata:timestamp',
-        ];
+
+        $collection->add_database_table(
+            'notificationsagent_rule',
+            [
+                'createdby' => 'privacy:metadata:createdby',
+                'createdat' => 'privacy:metadata:createdat',
+            ],
+            'privacy:metadata:notificationsagentrule'
+        );
+
+        $collection->add_database_table(
+            'notificationsagent_launched',
+            [
+                'userid' => 'privacy:metadata:notificationsagent_launched:userid',
+                'timesfired' => 'privacy:metadata:notificationsagent_launched:timesfired',
+                'timecreated' => 'privacy:metadata:notificationsagent_launched:timecreated',
+                'timemodified' => 'privacy:metadata:notificationsagent_launched:timemodified',
+            ],
+            'privacy:metadata:notificationsagent_launched'
+        );
+
+        $collection->add_database_table(
+            'notificationsagent_cache',
+            [
+                'userid' => 'privacy:metadata:notificationsagent_cache:userid',
+                'startdate' => 'privacy:metadata:notificationsagent_cache:startdate',
+                'cache' => 'privacy:metadata:notificationsagent_cache:cache',
+            ],
+            'privacy:metadata:notificationsagent_cache'
+        );
+
+        $collection->add_database_table(
+            'notificationsagent_triggers',
+            [
+                'userid' => 'privacy:metadata:notificationsagent_triggers:userid',
+                'startdate' => 'privacy:metadata:notificationsagent_triggers:startdate',
+                'ruleoff' => 'privacy:metadata:notificationsagent_triggers:ruleoff',
+            ],
+            'privacy:metadata:notificationsagent_triggers'
+        );
 
         $collection->add_database_table(
             'notificationsagent_report',
-            $reportdata,
+            [
+                'userid' => 'privacy:metadata:userid',
+                'courseid' => 'privacy:metadata:courseid',
+                'ruleid' => 'privacy:metadata:ruleid',
+                'actionid' => 'privacy:metadata:actionid',
+                'actiondetail' => 'privacy:metadata:actiondetail',
+                'timestamp' => 'privacy:metadata:timestamp',
+            ],
             'privacy:metadata:notificationsagentreport'
         );
 
@@ -82,14 +121,23 @@ class provider implements
      * @return  contextlist   $contextlist  The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
+        $contextlist = new contextlist();
+        $params = ['userid' => $userid];
+        $sql = "SELECT ctx.id
+                  FROM {notificationsagent_rule} nar
+                  JOIN {context} ctx ON ctx.instanceid = nar.id
+                 WHERE nar.createdby = :userid";
+
+        $contextlist->add_from_sql($sql, $params);
+
         $params = ['userid' => $userid, 'contextcourse' => CONTEXT_COURSE];
         $sql = "SELECT ctx.id
                        FROM {context} ctx
                        JOIN {notificationsagent_report} nar ON nar.courseid = ctx.instanceid AND nar.userid = :userid
                    WHERE ctx.contextlevel = :contextcourse";
 
-        $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
+
         return $contextlist;
     }
 
@@ -108,29 +156,22 @@ class provider implements
                 return $context;
             }
         });
+        $userid = $contextlist->get_user()->id;
+        $tables = [
+            'notificationsagent_rule' => ['createdby' => $userid],
+            'notificationsagent_launched' => ['userid' => $userid],
+            'notificationsagent_cache' => ['userid' => $userid],
+            'notificationsagent_triggers' => ['userid' => $userid],
+            'notificationsagent_report' => ['userid' => $userid],
+        ];
 
-        foreach ($contexts as $context) {
-            $userid = $contextlist->get_user()->id;
-            $exportdata = [];
-
-            $records = $DB->get_records('notificationsagent_report', ['userid' => $userid]);
+        foreach ($tables as $table => $conditions) {
+            $records = $DB->get_records($table, $conditions);
             foreach ($records as $record) {
-                // Export only the data that does not expose internal information.
-                $data = [];
-                $data['ruleid'] = $record->ruleid;
-                $data['userid'] = $record->userid;
-                $data['courseid'] = $record->courseid;
-                $data['actionid'] = $record->actionid;
-                $data['actiondetail'] = $record->actiondetail;
-                $data['timestamp'] = $record->timestamp;
-
-                $exportdata[] = $data;
+                foreach ($contexts as $context) {
+                    request\writer::with_context($context)->export_data( [$table], $record);
+                }
             }
-
-            request\writer::with_context($context)->export_data(
-                [get_string('privacy:metadata:localnotificationsagentreport', 'local_notificationsagent')],
-                (object) $exportdata
-            );
         }
     }
 
@@ -196,6 +237,15 @@ class provider implements
                 $select = "courseid = :courseid AND userid {$usersql}";
                 $params = ['courseid' => $context->instanceid] + $userparams;
                 $DB->delete_records_select('notificationsagent_report', $select, $params);
+                $DB->delete_records_select('notificationsagent_launched', $select, $params);
+                $DB->delete_records_select('notificationsagent_triggers', $select, $params);
+                $params = ['objectid' => $context->instanceid, 'contextid' => $context->contextlevel];
+                $rulestodelete = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+                foreach ($rulestodelete as $ruletodelete) {
+                    foreach ($userids as $userid) {
+                        $DB->delete_records('notificationsagent_rule', ['id' => $ruletodelete->ruleid, 'createdby' => $userid]);
+                    }
+                }
             }
         }
     }
@@ -211,5 +261,19 @@ class provider implements
         global $DB;
         $params = (isset($userid)) ? ['courseid' => $courseid, 'userid' => $userid] : ['courseid' => $courseid];
         $DB->delete_records('notificationsagent_report', $params);
+        $DB->delete_records('notificationsagent_launched', $params);
+        $DB->delete_records('notificationsagent_triggers', $params);
+
+            $params = ['objectid' => $courseid, 'contextid' => CONTEXT_COURSE];
+            $rulestodelete = $DB->get_records('notificationsagent_context' , $params, '', 'ruleid');
+        foreach ($rulestodelete as $ruletodelete) {
+            if (!isset($userid)) {
+                $DB->delete_records('notificationsagent_rule', ['id' => $ruletodelete->ruleid]);
+            } else {
+                $DB->delete_records('notificationsagent_rule', ['id' => $ruletodelete->ruleid, 'createdby' => $userid]);
+            }
+        }
     }
+
+
 }

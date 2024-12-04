@@ -325,8 +325,31 @@ $string['privacy:metadata:actionid'] = 'An id for an action';
 $string['privacy:metadata:ruleid'] = 'An id for a rule';
 $string['privacy:metadata:actiondetail'] = 'Detail of the action sent to the user.';
 $string['privacy:metadata:notificationsagentreport'] = 'Records messages sent to users which might content some user data.';
+$string['privacy:metadata:notificationsagentrule'] = 'Stores rules that contains some user data .';
 $string['privacy:metadata:timestamp'] = 'Timestamp of the sent action.';
 $string['privacy:metadata:localnotificationsagentreport'] = 'Notifications agent report.';
+$string['privacy:metadata:createdby'] = 'The user id linked to the rule.';
+$string['privacy:metadata:createdat'] = 'Time that the rule was created.';
+
+$string['privacy:metadata:notificationsagent_rule'] = 'Stores rules created by users.';
+$string['privacy:metadata:notificationsagent_rule:createdby'] = 'The ID of the user who created the rule.';
+$string['privacy:metadata:notificationsagent_rule:createdat'] = 'The timestamp when the rule was created.';
+
+$string['privacy:metadata:notificationsagent_launched'] = 'Stores information about notifications launched for users.';
+$string['privacy:metadata:notificationsagent_launched:userid'] = 'The ID of the user related to launched rule.';
+$string['privacy:metadata:notificationsagent_launched:timesfired'] = 'Number of times the rule was triggered.';
+$string['privacy:metadata:notificationsagent_launched:timecreated'] = 'The timestamp when the record was created.';
+$string['privacy:metadata:notificationsagent_launched:timemodified'] = 'The timestamp when the record was last modified.';
+
+$string['privacy:metadata:notificationsagent_cache'] = 'Stores cache data for users.';
+$string['privacy:metadata:notificationsagent_cache:userid'] = 'The ID of the user associated with the cache.';
+$string['privacy:metadata:notificationsagent_cache:startdate'] = 'The start date of the cache.';
+$string['privacy:metadata:notificationsagent_cache:cache'] = 'The cached data.';
+
+$string['privacy:metadata:notificationsagent_triggers'] = 'Stores triggers associated with users.';
+$string['privacy:metadata:notificationsagent_triggers:userid'] = 'The ID of the user associated with the trigger.';
+$string['privacy:metadata:notificationsagent_triggers:startdate'] = 'The start date of the trigger.';
+$string['privacy:metadata:notificationsagent_triggers:ruleoff'] = 'The rule associated with the trigger.';
 
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Broken rules notifications';
@@ -362,3 +385,10 @@ $string['placeholder_Teacher_Address'] = 'Teacher address';
 $string['placeholder_Current_time'] = 'Current time';
 $string['placeholder_Follow_Link'] = 'Follow link';
 $string['placeholder_Separator'] = 'Message separator';
+
+// Import
+$string['import_desc'] = 'Select a JSON file to import the rules';
+$string['import_choose'] = 'JSON file';
+$string['import_title'] = 'Import rules';
+$string['import_apply'] = 'Import and apply';
+$string['import_success'] = 'Rules imported correctly';
