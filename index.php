@@ -55,6 +55,7 @@ if (is_siteadmin() || !empty($PAGE->settingsnav)) {
 require_login();
 
 $courseidparam = optional_param('courseid', 0, PARAM_INT);
+$statusmsg = optional_param('statusmsg', '', PARAM_ALPHANUMEXT);
 
 if ($courseidparam) {
     $course = $DB->get_record('course', ['id' => $courseidparam], '*', MUST_EXIST);
@@ -111,9 +112,14 @@ $PAGE->requires->js_call_amd('local_notificationsagent/rule/share', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/shareall', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/unshareall', 'init');
 $PAGE->requires->js_call_amd('local_notificationsagent/rule/sort_rule_cards', 'init');
+$PAGE->requires->js_call_amd('local_notificationsagent/rule/import', 'init');
 $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
+
+if ($statusmsg !== '') {
+    \core\notification::success(get_string($statusmsg, 'local_notificationsagent'));
+}
 
 $renderer = $PAGE->get_renderer('core');
 $templatecontext = [
@@ -265,6 +271,7 @@ foreach ($rules as $rule) {
     ];
 }
 
+$templatecontext['courseid'] = $courseid;
 $templatecontext['rulecontent'] = $rulecontent;
 $templatecontext['capabilities'] = [
         'import' => has_capability('local/notificationsagent:importrule', $context),

@@ -50,7 +50,7 @@
 
 <div class="d-flex mb-4">
     {{#capabilities.import}}
-        <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
+        <button type="button" class="btn btn-outline-primary importtemplate d-block mr-3" data-courseid={{{ courseid }}} data-toggle="modal" data-target="#importTemplateModal">{{#str}}import, local_notificationsagent{{/str}}</button>
     {{/capabilities.import}}
     {{#capabilities.create}}
         {{^ iscontextsite}}
@@ -297,28 +297,4 @@
     </div>
 </div>
 
-<div class="modal fade" id="importTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form enctype="multipart/form-data" action="{{{importruleurl}}}" method="POST">
-                <div class="modal-header">
-                    <h3 class="modal-title font-weight-bold">{{#str}}import, local_notificationsagent{{/str}}<span></span></h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- MAX_FILE_SIZE must precede the file input field -->
-                    <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                    <input type="hidden" name="courseid" value="{{courseid}}" />
-                    <!-- Name of input element determines name in $_FILES array -->
-                    <input name="userfile" type="file" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light mb-1 mr-4" data-dismiss="modal">{{#str}}assigncancel, local_notificationsagent{{/str}}</button>
-                    <button type="submit" id="importfileTemplateModal" class="btn btn-primary importtemplate mb-1">{{#str}}import, local_notificationsagent{{/str}}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+

@@ -36,12 +36,6 @@ require_once("../../config.php");
 require_once('renderer.php');
 global $CFG, $DB;
 
-use local_notificationsagent\evaluationcontext;
-use local_notificationsagent\notificationsagent;
-use local_notificationsagent\notificationconditionplugin;
-use local_notificationsagent\notificationplugin;
-use local_notificationsagent\rule;
-
 $courseid = required_param('courseid', PARAM_INT);
 $context = context_course::instance($courseid);
 $capability = 'local/notificationsagent:importrule';
@@ -63,18 +57,20 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
     // Read json file.
     $data = file_get_contents($_FILES['userfile']['tmp_name']);
     $data = json_decode($data, true);
-
     // Check if file uploaded is a JSON.
-    if (!$data) {
+    if ( json_last_error() !== JSON_ERROR_NONE || mime_content_type(($_FILES['userfile']['tmp_name']) ) !== 'application/json') {
         $message = get_string('no_json_file', 'local_notificationsagent');
-        echo \core\notification::error($message);
+        echo \core\notification::error($message. ": " . json_last_error_msg());
     } else {
+        $transaction = $DB->start_delegated_transaction();
         $sqlrule = new \stdClass();
-        $sqlrule->name = $data['rule']['name'];
-        $sqlrule->description = $data['rule']['description'];
+        $sqlrule->name = s($data['rule']['name']);
+        $sqlrule->description = s($data['rule']['description']);
         $sqlrule->createdby = $data['rule']['createdby'];
         $sqlrule->createdat = $data['rule']['createdat'];
         $sqlrule->template = $data['rule']['template'];
+        $sqlrule->timesfired = $data['rule']['timesfired'];
+        $sqlrule->runtime = $data['rule']['runtime'];
 
         if ($idrule = $DB->insert_record('notificationsagent_rule', $sqlrule)) {
             $sqlcontext = new \stdClass();
@@ -86,52 +82,24 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
         }
 
         if ($data['actions']) {
-            $sqlactions = new \stdClass();
-            $countactions = count($data['actions']);
-
-            for ($i = 0; $i < $countactions; $i++) {
-                foreach ($data['actions'][array_key_first($data['actions']) + $i] as $key => $value) {
-                    if ($key == 'ruleid') {
-                        $sqlactions->ruleid = $idrule;
-                    } else {
-                        $sqlactions->$key = $value;
-                    }
-                }
-
-                $idactions = $DB->insert_record('notificationsagent_action', $sqlactions);
+            $sqlactions = [];
+            foreach ($data['actions'] as $key => $value) {
+                $value['ruleid'] = $idrule;
+                $sqlactions[$key] = $value;
             }
+            $DB->insert_records('notificationsagent_action', $sqlactions);
+
         }
 
         if ($data['conditions']) {
-            $students = notificationsagent::get_usersbycourse($context);
-
-            $sqlconditions = new \stdClass();
-            $countconditions = count($data['conditions']);
-
-            for ($i = 0; $i < $countconditions; $i++) {
-                foreach ($data['conditions'][array_key_first($data['conditions']) + $i] as $key => $value) {
-                    if ($key == 'ruleid') {
-                        $sqlconditions->ruleid = $idrule;
-                    } else if ($key == 'pluginname') {
-                        $pluginname = $value;
-                        $sqlconditions->$key = $value;
-                    } else {
-                        $sqlconditions->$key = $value;
-                    }
-                }
-
-                // Todo refactor. Save triggers.
-                $conditionid = $DB->insert_record('notificationsagent_condition', $sqlconditions);
+            $sqlconditions = [];
+            foreach ($data['conditions'] as $key => $value) {
+                    $value['ruleid'] = $idrule;
+                    $sqlconditions[$key] = $value;
             }
+                $DB->insert_records('notificationsagent_condition', $sqlconditions);
         }
-
-        if ($idcontext && $idrule && (!is_null($idactions) && !is_null($conditionid))) {
-            $message = get_string('import_success', 'local_notificationsagent');
-            echo \core\notification::success($message);
-        } else {
-            $message = get_string('import_error', 'local_notificationsagent');
-            echo \core\notification::error($message);
-        }
+        $transaction->allow_commit();
     }
 }
 
