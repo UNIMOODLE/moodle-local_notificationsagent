@@ -38,4 +38,7 @@ $string['subtype'] = 'sessionstart';
 $string['modname'] = 'sessionstart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 
-$string['privacy:metadata'] = 'The sessionstart plugin does not store any personal data.';
+$string['privacy:metadata:notificationsagent_crseview'] = 'The plugin stores information related to user access to courses.';
+$string['privacy:metadata:userid'] = 'The ID of the user related to this data.';
+$string['privacy:metadata:courseid'] = 'The ID of the course to which this data refers.';
+$string['privacy:metadata:firstaccess'] = 'The first time the user accessed the course.';

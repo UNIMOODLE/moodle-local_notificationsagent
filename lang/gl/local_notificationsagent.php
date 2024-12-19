@@ -129,40 +129,11 @@ $string['editrule_orderby'] = 'Ordenar por';
 // Condition.
 $string['editrule_generalconditions'] = 'Condicións xerais';
 $string['editrule_newcondition'] = 'Nova condición:';
-$string['editrule_condition_title_tocloseactivity'] = 'Queda menos de [TTTT] para que se peche a actividade [AAAA]';
-$string['editrule_condition_title_usercompleteactivity'] = 'O usuario completou a actividade [AAAA]';
-$string['editrule_condition_title_activeactivity'] = 'A actividade [AAAA] está dispoñible';
-$string['editrule_condition_title_betweendates'] = 'Estamos entre a data [FFFF-1] e [FFFF-2]';
-$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Completa todas as actividades para acceder a este foro [FFFF]';
-$string['editrule_condition_title_forumnotanswer']
-    = 'Unha conversa aberta polo usuario no foro [FFFF] sen responder durante máis de [TTTT] tempo';
-
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
-$string['editrule_condition_element_activity'] = 'Actividade {$a->typeelement}:';
-
 $string['editrule_condition_error'] = 'Debes engadir polo menos unha condición';
 
 // Accións.
 $string['editrule_newaction'] = 'Nova acción:';
-$string['editrule_action_title_individualnotification'] = 'Enviar notificación individual con título [TTTT] e mensaxe [BBBB]';
-$string['editrule_action_title_notificationtouser']
-    = 'Enviar notificación a un usuario específico [UUUU] con título [TTTT] e mensaxe [BBBB]';
-$string['editrule_action_title_postgeneralforum']
-    = 'Publicar unha publicación xeral no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
-$string['editrule_action_title_postprivateforum']
-    = 'Publicar unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
-$string['editrule_action_title_addusertogroup'] = 'Engadir usuario ao grupo [GGGG]';
-$string['editrule_action_title_removeuserfromgroup'] = 'Eliminar un usuario dun grupo [GGGG]';
-$string['editrule_action_title_bootstrapnotification'] = 'Notificación de arranque';
-
-$string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}:';
-$string['editrule_action_element_user'] = 'Usuario {$a->typeelement}:';
-$string['editrule_action_element_forum'] = 'Foro {$a->typeelement}:';
-$string['editrule_action_element_group'] = 'Grupo {$a->typeelement}';
-
 $string['subplugintype_notificationsagentaction'] = 'Acción de subplugins';
-
 $string['editrule_action_error'] = 'Debes engadir polo menos unha acción';
 
 // Rule.

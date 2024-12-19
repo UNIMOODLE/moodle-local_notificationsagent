@@ -33,7 +33,6 @@
  */
 
 require_once("../../config.php");
-require_once('renderer.php');
 global $CFG, $DB;
 
 $courseid = required_param('courseid', PARAM_INT);

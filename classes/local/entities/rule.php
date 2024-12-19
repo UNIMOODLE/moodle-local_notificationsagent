@@ -356,6 +356,7 @@ class rule extends base {
                         foreach ($users as $user) {
                             $options[$user->id] = $user->name;
                         }
+                        $users->close();
                     } else if (
                             has_capability(
                                 'local/notificationsagent:viewcourserule',
@@ -374,6 +375,7 @@ class rule extends base {
                         foreach ($users as $user) {
                             $options[$user->id] = $user->name;
                         }
+                        $users->close();
                     } else if (
                             has_capability(
                                 'local/notificationsagent:manageownrule',

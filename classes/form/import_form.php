@@ -30,13 +30,14 @@ use context;
 use moodle_exception;
 use moodle_url;
 use core_form\dynamic_form;
+use local_notificationsagent\rule;
 
 /**
  * Import modal form
  */
 class import_form extends dynamic_form {
 
-        /**
+    /**
      * Process the form submission
      *
      * @return array
@@ -52,58 +53,49 @@ class import_form extends dynamic_form {
         $filepath = $this->save_temp_file('importfile');
         $file = file_get_contents($filepath);
         $data = json_decode($file, true);
-        
+
         array_walk_recursive($data, function(&$value) {
-            $value = format_text($value, FORMAT_HTML);
+            $value = html_entity_decode(format_text($value, FORMAT_HTML));
         });
 
-        $transaction = $DB->start_delegated_transaction();
-        $sqlrule = new \stdClass();
-        $sqlrule->name = s($data['rule']['name']);
-        $sqlrule->description = s($data['rule']['description']);
-        $sqlrule->createdby = $data['rule']['createdby'];
-        $sqlrule->createdat = $data['rule']['createdat'];
-        $sqlrule->template = $data['rule']['template'];
-        $sqlrule->timesfired = $data['rule']['timesfired'];
-        $sqlrule->runtime = $data['rule']['runtime'];
+        $data = $this->array_to_object($data, 0);
 
-        if ($idrule = $DB->insert_record('notificationsagent_rule', $sqlrule)) {
-            $sqlcontext = new \stdClass();
-            $sqlcontext->ruleid = $idrule;
-            $sqlcontext->contextid = CONTEXT_COURSE;
-            $sqlcontext->objectid = $courseid;
-
-            $idcontext = $DB->insert_record('notificationsagent_context', $sqlcontext);
-        }
-
-        if ($data['actions']) {
-            $sqlactions = [];
-            foreach ($data['actions'] as $key => $value) {
-                $value['ruleid'] = $idrule;
-                $sqlactions[$key] = $value;
-            }
-            $DB->insert_records('notificationsagent_action', $sqlactions);
-
-        }
-
-        if ($data['conditions']) {
-            $sqlconditions = [];
-            foreach ($data['conditions'] as $key => $value) {
-                    $value['ruleid'] = $idrule;
-                    $sqlconditions[$key] = $value;
-            }
-            $DB->insert_records('notificationsagent_condition', $sqlconditions);
-        }
-        $transaction->allow_commit();
+        $data->courseid = $courseid;
+        $rule = new rule();
+        $rule->save_form($data);
 
         $returnurl = new moodle_url('/local/notificationsagent/index.php', [
             'courseid' => $courseid,
-            'statusmsg' => 'import_success'
+            'statusmsg' => 'import_success',
         ]);
         return [
             'result' => true,
             'url' => $returnurl->out(false),
         ];
+    }
+
+    /**
+     * Array to obj function
+     * @param $array
+     * @param $recursive
+     * @param $countrecursive
+     * @return \stdClass
+     */
+    public function array_to_object($array, $recursive = true, &$countrecursive = 0) {
+        $obj = new \stdClass();
+
+        foreach ($array as $k => $v) {
+            if (strlen($k)) {
+                if (is_array($v) && (($recursive === true) || ($countrecursive < $recursive))) {
+                    $countrecursive++;
+                    $obj->{$k} = $this->array_to_object($v, $countrecursive);
+                } else {
+                    $obj->{$k} = $v;
+                }
+            }
+        }
+
+        return $obj;
     }
 
     /**

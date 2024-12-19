@@ -148,38 +148,11 @@ $string['editrule_orderby'] = 'Order by';
 // Condition.
 $string['editrule_generalconditions'] = 'General conditions';
 $string['editrule_newcondition'] = 'New condition:';
-$string['editrule_condition_title_tocloseactivity'] = 'There is less than [TTTT] left for the closing of the activity [AAAA]';
-$string['editrule_condition_title_usercompleteactivity'] = 'User has completed the activity [AAAA]';
-$string['editrule_condition_title_activeactivity'] = 'Activity [AAAA] is available';
-$string['editrule_condition_title_betweendates'] = 'We are between the date [FFFF-1] and [FFFF-2]';
-$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Complete all activities to access this forum [FFFF]';
-$string['editrule_condition_title_forumnotanswer']
-    = 'A thread opened by the user in the forum [FFFF] without replying for more than [TTTT] time';
-
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['editrule_condition_element_activity'] = 'Activity {$a->typeelement}:';
-
 $string['editrule_condition_error'] = 'You must add at least one condition';
 
 // Actions.
 $string['editrule_newaction'] = 'New action:';
-$string['editrule_action_title_individualnotification'] = 'Send individual notification with title [TTTT] and message [BBBB]';
-$string['editrule_action_title_notificationtouser']
-    = 'Send notification to a specific user [UUUU] with title [TTTT] and message [BBBB]';
-$string['editrule_action_title_postgeneralforum'] = 'Post a general forum post [FFFF] with title [TTTT] and message [BBBB]';
-$string['editrule_action_title_postprivateforum'] = 'Post a private forum post [FFFF] with title [TTTT] and message [BBBB]';
-$string['editrule_action_title_addusertogroup'] = 'Add a user to group [GGGG]';
-$string['editrule_action_title_removeuserfromgroup'] = 'Remove a user from a group [GGGG]';
-$string['editrule_action_title_bootstrapnotification'] = 'Bootstrap Notification';
-
-$string['editrule_action_element_title'] = 'Title {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Message {$a->typeelement}';
-$string['editrule_action_element_user'] = 'User {$a->typeelement}';
-$string['editrule_action_element_forum'] = 'Forum {$a->typeelement}';
-$string['editrule_action_element_group'] = 'Group {$a->typeelement}';
-
 $string['subplugintype_notificationsagentaction'] = 'Action subplugins';
-
 $string['editrule_action_error'] = 'You must add at least one action';
 
 // Rule.
@@ -386,7 +359,7 @@ $string['placeholder_Current_time'] = 'Current time';
 $string['placeholder_Follow_Link'] = 'Follow link';
 $string['placeholder_Separator'] = 'Message separator';
 
-// Import
+// Import.
 $string['import_desc'] = 'Select a JSON file to import the rules';
 $string['import_choose'] = 'JSON file';
 $string['import_title'] = 'Import rules';

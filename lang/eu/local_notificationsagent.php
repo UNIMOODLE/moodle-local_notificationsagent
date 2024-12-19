@@ -131,41 +131,11 @@ $string['editrule_orderby'] = 'Ordenatu';
 // Condition.
 $string['editrule_generalconditions'] = 'Baldintza orokorrak';
 $string['editrule_newcondition'] = 'Baldintza berria:';
-$string['editrule_condition_title_tocloseactivity'] = '[TTTT] baino gutxiago falta da [AAAA] jarduera ixteko';
-$string['editrule_condition_title_usercompleteactivity'] = 'Erabiltzaileak jarduera burutu du [AAAA]';
-$string['editrule_condition_title_activeactivity'] = '[AAAA] jarduera eskuragarri dago';
-$string['editrule_condition_title_betweendates'] = '[FFFF-1] eta [FFFF-2] dataren artean gaude';
-$string['editrule_condition_title_accessforumactivitiescomplete'] = 'Osatu jarduera guztiak foro honetara sartzeko [FFFF]';
-$string['editrule_condition_title_forumnotanswer']
-    = 'Erabiltzaileak [FFFF] foroan irekitako haria [TTTT] denbora baino gehiago erantzun gabe';
-
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_element_activity'] = '{$a->typeelement} jarduera:';
-
 $string['editrule_condition_error'] = 'Gutxienez baldintza bat gehitu behar duzu';
 
 // Ekintzak.
 $string['editrule_newaction'] = 'Ekintza berria:';
-$string['editrule_action_title_individualnotification']
-    = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_notificationtouser']
-    = 'Bidali jakinarazpena erabiltzaile jakin bati [UUUU] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_postgeneralforum']
-    = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_postprivateforum']
-    = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title_addusertogroup'] = 'Gehitu erabiltzailea [GGGG] taldean';
-$string['editrule_action_title_removeuserfromgroup'] = 'Kendu erabiltzaile bat [GGGG] talde batetik';
-$string['editrule_action_title_bootstrapnotification'] = 'Bootstrap jakinarazpena';
-
-$string['editrule_action_element_title'] = '{$a->typeelement} izenburua:';
-$string['editrule_action_element_message'] = '{$a->typeelement} mezua:';
-$string['editrule_action_element_user'] = '{$a->typeelement} erabiltzailea:';
-$string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}:';
-$string['editrule_action_element_group'] = '{$a->typeelement} taldea';
-
 $string['subplugintype_notificationsagentaction'] = 'Azpipluginen ekintza';
-
 $string['editrule_action_error'] = 'Gutxienez ekintza bat gehitu behar duzu';
 
 // Rule.

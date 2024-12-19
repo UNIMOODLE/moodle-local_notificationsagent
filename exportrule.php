@@ -32,6 +32,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\rule;
+
 require_once("../../config.php");
 
 global $DB;
@@ -46,12 +48,9 @@ if (!has_capability($capability, $context)) {
     require_capability($capability, $context);
 }
 $ruleparams = ['id' => $ruleid];
-
-$json["rule"] = $DB->get_record('notificationsagent_rule', $ruleparams);
-$json["actions"] = $DB->get_records('notificationsagent_action', ['ruleid' => $ruleid]);
-$json["conditions"] = $DB->get_records('notificationsagent_condition', ['ruleid' => $ruleid]);
-
-$rs = json_encode($json);
+$rule = new rule($ruleid);
+$dataexport = $rule->load_dataexport();
+$rs = json_encode($dataexport);
 
 header('Content-disposition: attachment; filename=rule_' . $ruleid . '_export.json');
 header('Content-type: application/json');

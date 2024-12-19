@@ -200,7 +200,7 @@ class rule {
         $this->set_id($rule->id);
 
         // Set all properties if ruleaction is not RULE_CLONE.
-        if (in_array($this->ruleaction, [self::RULE_ADD, self::RULE_EDIT, self::RULE_ONLY])) {
+        if (in_array($this->ruleaction, [self::RULE_ADD, self::RULE_EDIT, self::RULE_ONLY, self::RULE_CLONE])) {
             // Set the properties of the rule object.
             $this->set_name($rule->name);
             $this->set_description($rule->description);
@@ -464,6 +464,57 @@ class rule {
             $jsonactions[$action->get_id()] = ["pluginname" => $action->get_subtype(), "action" => $ruleaction];
         }
         $this->dataform = array_merge($this->dataform, [editrule_form::FORM_JSON_ACTION => json_encode($jsonactions)]);
+    }
+
+    /**
+     * load array data for export
+     */
+    public function load_dataexport(): array {
+        $data = [];
+        $data["title"] = $this->get_name();
+        $data["description"] = $this->get_description();
+        $data["type"] = $this->get_template();
+        $data["timesfired"] = $this->get_timesfired();
+        $runtime = $this->get_runtime_format();
+        $data["runtime_group"]["runtime_days"] = $runtime["days"];
+        $data["runtime_group"]["runtime_hours"] = $runtime["hours"];
+        $data["runtime_group"]["runtime_minutes"] = $runtime["minutes"];
+
+        if ($this->get_ac()) {
+            $data = [...$data, ...$this->get_ac()->load_dataform()];
+        }
+
+        $jsoncondition = [];
+        foreach ($this->get_conditions() as $condition) {
+            $data = [...$data, ...$condition->load_dataform()];
+            $jsoncondition[$condition->get_id()] = [
+                "pluginname" => $condition->get_subtype(),
+                "action" => editrule_form::FORM_JSON_ACTION_INSERT,
+            ];
+        }
+        $data[editrule_form::FORM_JSON_CONDITION] = json_encode($jsoncondition);
+
+        $jsonexception = [];
+        foreach ($this->get_exceptions() as $exception) {
+            $data = array_merge($data, $exception->load_dataform());
+            $jsonexception[$exception->get_id()] = [
+                "pluginname" => $exception->get_subtype(),
+                "action" => editrule_form::FORM_JSON_ACTION_INSERT,
+            ];
+        }
+        $data[editrule_form::FORM_JSON_EXCEPTION] = json_encode($jsonexception);
+
+        $jsonactions = [];
+        foreach ($this->get_actions() as $action) {
+            $data = array_merge($data, $action->load_dataform());
+            $jsonactions[$action->get_id()] = [
+                "pluginname" => $action->get_subtype(),
+                "action" => editrule_form::FORM_JSON_ACTION_INSERT,
+            ];
+        }
+        $data[editrule_form::FORM_JSON_ACTION] = json_encode($jsonactions);
+
+        return $data;
     }
 
     /**
