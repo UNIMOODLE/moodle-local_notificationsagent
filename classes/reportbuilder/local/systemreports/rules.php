@@ -37,7 +37,6 @@ namespace local_notificationsagent\reportbuilder\local\systemreports;
 use core_reportbuilder\system_report;
 use local_notificationsagent\local\entities\rule;
 use core_reportbuilder\local\entities\course;
-use core_reportbuilder\local\entities\user;
 
 /**
  * System report class for listing notification rules.
@@ -48,15 +47,11 @@ class rules extends system_report {
      */
     protected function initialise(): void {
         $ruleentity = new rule();
+        
         $narralias = $ruleentity->get_table_alias('notificationsagent_report');
         $this->set_main_table('notificationsagent_report', $narralias);
         $this->add_entity($ruleentity);
-
-        $userentity = new user();
-        $useralias = $userentity->get_table_alias('user');
-        $userjoin = "JOIN {user} {$useralias} ON {$useralias}.id = {$narralias}.userid";
-        $this->add_entity($userentity->add_join($userjoin));
-
+        
         $coursentity = new course();
         $coursealias = $coursentity->get_table_alias('course');
         $coursejoin = "JOIN {course} {$coursealias} ON {$coursealias}.id = {$narralias}.courseid";
@@ -86,7 +81,7 @@ class rules extends system_report {
         $this->add_columns_from_entities(
             [
                         'rule:rulename',
-                        'user:fullnamewithlink',
+                        'rule:fullnamewithlink',
                         'course:coursefullnamewithlink',
                         'rule:actionname',
                         'rule:actiondetail',
@@ -108,7 +103,7 @@ class rules extends system_report {
     protected function add_filters(): void {
         $filters = [
                 'rule:rulename',
-                'rule:courseselector',
+                'course:courseselector',
                 'rule:userfullname',
                 'rule:actiondetail',
                 'rule:timestamp',

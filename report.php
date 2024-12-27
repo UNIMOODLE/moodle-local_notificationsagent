@@ -53,8 +53,8 @@ if ($courseid) {
     $PAGE->set_course($course);
     $context = context_course::instance($course->id);
     $coursefilter = get_course($courseid)->id;
-    $filters['rule:courseselector_operator'] = number::EQUAL_TO;
-    $filters['rule:courseselector_values'] = $course->id;
+    $filters['course:courseselector_operator'] = number::EQUAL_TO;
+    $filters['course:courseselector_values'] = $course->id;
 } else {
     $context = context_system::instance();
 }
@@ -125,7 +125,6 @@ $output = $PAGE->get_renderer('local_notificationsagent');
 echo $OUTPUT->header();
 
 $report = system_report_factory::create(systemreports\rules::class, $context);
-
 $report->set_filter_values($filters);
 echo $report->output();
 echo $output->footer();

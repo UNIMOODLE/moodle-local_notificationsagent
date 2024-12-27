@@ -747,7 +747,6 @@ class notificationsagent_test extends \advanced_testcase {
                 'scorm' => [true, 'scorm'],
                 'workshop' => [true, 'workshop'],
                 'no datestart' => [true, 'workshop'],
-                'chattime' => [true, 'chat'],
                 'no supported cm' => [false, 'book'],
         ];
     }

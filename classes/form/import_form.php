@@ -55,7 +55,7 @@ class import_form extends dynamic_form {
         $data = json_decode($file, true);
 
         array_walk_recursive($data, function(&$value) {
-            $value = html_entity_decode(format_text($value, FORMAT_HTML), ENT_QUOTES);
+            $value = html_entity_decode(format_text($value, FORMAT_HTML));
         });
 
         $data = $this->array_to_object($data, 0);

@@ -43,6 +43,8 @@ use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\helpers\format;
 use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\report\filter;
+use core_reportbuilder\local\entities\course;
+use core_reportbuilder\local\entities\user;
 use lang_string;
 
 /**
@@ -57,13 +59,12 @@ class rule extends base {
      *
      * @return string[] Array of $tablename => $alias
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-                'user' => 'u',
-                'course' => 'c',
-                'notificationsagent_rule' => 'narru',
-                'notificationsagent_action' => 'nara',
-                'notificationsagent_report' => 'narr',
+                'user' ,
+                'notificationsagent_rule',
+                'notificationsagent_action',
+                'notificationsagent_report',
         ];
     }
 
@@ -111,10 +112,11 @@ class rule extends base {
         $columns = [];
 
         $reportalias = $this->get_table_alias('notificationsagent_report');
-
+        $useralias = $this->get_table_alias('user');
         $ruleealias = $this->get_table_alias('notificationsagent_rule');
         $actionealias = $this->get_table_alias('notificationsagent_action');
 
+        $userjoin = $this->userjoin();
         $rulejoin = $this->rulejoin();
         $actionjoin = $this->actionjoin();
 
@@ -123,10 +125,34 @@ class rule extends base {
             new lang_string('fullrule', 'local_notificationsagent'),
             $this->get_entity_name()
         ))
-                ->add_join($rulejoin)
-                ->set_type(column::TYPE_TEXT)
-                ->set_is_sortable(true)
-                ->add_field("{$ruleealias}.name");
+            ->add_join($rulejoin)
+            ->set_type(column::TYPE_TEXT)
+            ->set_is_sortable(true)
+            ->add_field("{$ruleealias}.name");
+
+        $fullnameselect = user::get_name_fields_select($useralias);
+        $fullnamesort = explode(', ', $fullnameselect);
+        $fullnamefield = 'fullnamewithlink';
+        $fullnamelang = new lang_string('userfullnamewithlink', 'core_reportbuilder');
+        $columns[] = (new column(
+            $fullnamefield,
+            $fullnamelang,
+            $this->get_entity_name()
+        ))
+            ->add_join($userjoin)
+            ->set_type(column::TYPE_TEXT)
+            ->set_is_sortable(true)
+            ->add_fields("{$useralias}.id,{$useralias}.firstname,{$useralias}.lastname")
+            ->add_field("{$useralias}.id")
+            ->add_callback(static function(?string $value, \stdClass $row) use ($fullnamefield): string {
+                global $OUTPUT;
+
+                if ($value === null) {
+                    return '';
+                }
+
+                return \html_writer::link(new \moodle_url('/user/profile.php', ['id' => $row->id]), $row->firstname.' '.$row->lastname);
+            });
 
         $columns[] = (new column(
             'actionname',
@@ -183,22 +209,19 @@ class rule extends base {
      * @return array
      */
     protected function get_all_filters(): array {
-        global $USER, $COURSE;
-        $narralias = $this->get_table_alias('notificationsagent_report');
-        $narrualias = $this->get_table_alias('notificationsagent_rule');
-        $coursealias = $this->get_table_alias('course');
+        global $DB, $USER, $PAGE;
+
+        $coursentity = new course();
+        $coursealias = $coursentity->get_table_alias('course');
         $useralias = $this->get_table_alias('user');
-        $actionealias = $this->get_table_alias('notificationsagent_action');
         $reportalias = $this->get_table_alias('notificationsagent_report');
-        $rulejoin = $this->rulejoin();
-        $coursecontext = \context_course::instance($COURSE->id);
+        $userid = $USER->id;
+
         // Get rules to view as capability function.
-        $viewrules = static function (): array {
-            global $DB, $USER, $COURSE;
-            $userid = $USER->id;
-            $course = $COURSE;
-            $coursecontext = \context_course::instance($course->id);
+        $viewrules = static function () use ($DB, $userid, $PAGE): array {
+            $coursecontext = $PAGE->context;
             $options = [];
+
             // User can see all the rules.
             if (
                     has_capability(
@@ -222,7 +245,7 @@ class rule extends base {
                 $query
                         = 'SELECT DISTINCT {notificationsagent_report}.ruleid
                          FROM {notificationsagent_report}
-                      WHERE {notificationsagent_report}.courseid =' . $COURSE->id;
+                      WHERE {notificationsagent_report}.courseid =' . $coursecontext->instanceid;
                 $rulenames = $DB->get_fieldset_sql($query);
                 // User can see rules of its own.
             } else if (
@@ -249,15 +272,17 @@ class rule extends base {
                 }
             }
             core_collator::asort($options);
+
             return $options;
         };
+
         // Rule name filter.
         $filters[] = (new filter(
             autocomplete::class,
             'rulename',
             new lang_string('rulename', 'local_notificationsagent'),
             $this->get_entity_name(),
-            "{$narrualias}.id"
+            "{$reportalias}.ruleid"
         ))
                 ->add_joins($this->get_joins())
                 ->set_options_callback($viewrules);
@@ -267,7 +292,7 @@ class rule extends base {
             'timestamp',
             new lang_string('timestamp', 'local_notificationsagent'),
             $this->get_entity_name(),
-            "{$narralias}.timestamp"
+            "{$reportalias}.timestamp"
         ))
                 ->add_joins($this->get_joins())
                 ->set_limited_operators([
@@ -281,14 +306,14 @@ class rule extends base {
             autocomplete::class,
             'courseselector',
             new lang_string('courses'),
-            $this->get_entity_name(),
+            $coursentity->get_entity_name(),
             "{$coursealias}.id"
         ))
                 ->add_joins($this->get_joins())
-                ->set_options_callback(static function (): array {
-                    global $COURSE, $DB;
+                ->set_options_callback(static function () use ($DB, $PAGE): array {
+                    $coursecontext = $PAGE->context;
                     $options = [];
-                    $coursecontext = \context_course::instance($COURSE->id);
+
                     if (
                             has_capability(
                                 'local/notificationsagent:manageallrule',
@@ -307,7 +332,7 @@ class rule extends base {
                                 $coursecontext
                             )
                     ) {
-                        $query = "SELECT id FROM {course} WHERE id = ($COURSE->id)";
+                        $query = "SELECT id FROM {course} WHERE id = ($coursecontext->instanceid)";
                         $courses = $DB->get_fieldset_sql($query);
                         foreach ($courses as $course) {
                             $options[$course] = get_course($course)->fullname;
@@ -333,13 +358,16 @@ class rule extends base {
             'userfullname',
             new lang_string('users'),
             $this->get_entity_name(),
-            "{$narralias}.userid"
+            "{$useralias}.id"
         ))
                 ->add_joins($this->get_joins())
-                ->set_options_callback(static function (): array {
-                    global $USER, $COURSE, $DB;
+                ->set_limited_operators([
+                        select::EQUAL_TO
+                ])
+                ->set_options_callback(static function () use ($DB, $USER, $PAGE): array {
+                    $coursecontext = $PAGE->context;
                     $options = [];
-                    $coursecontext = \context_course::instance($COURSE->id);
+
                     if (
                             has_capability(
                                 'local/notificationsagent:manageallrule',
@@ -352,7 +380,6 @@ class rule extends base {
                                               JOIN {user} ON {user}.id={notificationsagent_report}.userid";
 
                         $users = $DB->get_recordset_sql($query);
-
                         foreach ($users as $user) {
                             $options[$user->id] = $user->name;
                         }
@@ -389,6 +416,18 @@ class rule extends base {
                 });
 
         return $filters;
+    }
+
+    /**
+     * Rule join.
+     *
+     * @return string
+     */
+    public function userjoin() {
+        $useralias = $this->get_table_alias('user');
+        $rulesreportalias = $this->get_table_alias('notificationsagent_report');
+        return "JOIN {user} {$useralias}
+                    ON {$rulesreportalias}.userid = {$useralias}.id";
     }
 
     /**

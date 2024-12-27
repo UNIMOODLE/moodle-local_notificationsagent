@@ -99,7 +99,7 @@ class autocomplete extends coreautocomplete {
 
         // Let choose any course in course selector for this capability.
         if (
-                $name == 'rule:courseselector'
+                $name == 'course:courseselector'
                 && has_capability(
                     'local/notificationsagent:manageallrule',
                     $context
