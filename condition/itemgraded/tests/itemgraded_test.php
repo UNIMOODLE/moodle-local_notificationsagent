@@ -41,7 +41,9 @@ use local_notificationsagent\helper\test\mock_base_logger;
 use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
-
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/condition/itemgraded/compatibility.php');
 /**
  * Class for testing the itemgraded.
  *

@@ -35,21 +35,30 @@
 
 namespace local_notificationsagent\external;
 
+use external_api;
+use external_function_parameters;
+use external_value;
+use external_warnings;
+use external_single_structure;
 use local_notificationsagent\rule;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
 
 /**
  * Rule external API for approving the rule's sharing.
  *
  */
-class share_rule_all extends \external_api {
+class share_rule_all extends external_api {
     /**
      * Define parameters for external function.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-                'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+                'ruleid' => new external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
         ]);
     }
 
@@ -129,10 +138,10 @@ class share_rule_all extends \external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure(
             [
-                        'warnings' => new \external_warnings(),
+                        'warnings' => new external_warnings(),
                 ]
         );
     }

@@ -38,9 +38,6 @@ use local_notificationsagent\rule;
 use notificationscondition_activityend\task\activityend_crontask;
 use notificationscondition_activitylastsend\activitylastsend;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-
 /**
  * Class for testing the activitylastsend_crontask task.
  *

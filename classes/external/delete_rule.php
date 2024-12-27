@@ -35,7 +35,16 @@
 
 namespace local_notificationsagent\external;
 
+use external_api;
+use external_function_parameters;
+use external_value;
+use external_warnings;
+use external_single_structure;
 use local_notificationsagent\rule;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
 
 /**
  * Rule external API for deleting a rule.
@@ -44,15 +53,15 @@ use local_notificationsagent\rule;
  * @copyright  2023 ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class delete_rule extends \external_api {
+class delete_rule extends external_api {
     /**
      * Define parameters for external function.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-                'ruleid' => new \external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+                'ruleid' => new external_value(PARAM_INT, 'The rule ID', VALUE_REQUIRED),
         ]);
     }
 
@@ -116,12 +125,12 @@ class delete_rule extends \external_api {
     /**
      * Describes the data returned from the external function.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function execute_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure(
             [
-                        'warnings' => new \external_warnings(),
+                        'warnings' => new external_warnings(),
                 ]
         );
     }

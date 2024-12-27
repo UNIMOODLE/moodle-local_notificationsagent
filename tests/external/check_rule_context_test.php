@@ -36,16 +36,14 @@ namespace local_notificationsagent\external;
 
 use local_notificationsagent\rule;
 use external_api;
-use local_notificationsagent\external\check_rule_context;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once("{$CFG->libdir}/externallib.php");
 
 /**
  * Testing external share  rule
  *
  * @group notificationsagent
+ * @runTestsInSeparateProcesses
+ *
  */
 class check_rule_context_test extends \advanced_testcase {
     /**
@@ -101,7 +99,7 @@ class check_rule_context_test extends \advanced_testcase {
 
     /**
      * Settin up test context
-     *
+     * @runInSeparateProcess
      * @return void
      */
     final public function setUp(): void {
@@ -125,6 +123,7 @@ class check_rule_context_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\external\check_rule_context::execute_returns
      * @covers       \local_notificationsagent\external\check_rule_context::execute_parameters
      * @dataProvider dataprovider
+     * @runInSeparateProcess
      *
      * @param int $user
      * @param int $useinstance
@@ -133,7 +132,8 @@ class check_rule_context_test extends \advanced_testcase {
      * @return void
      */
     public function test_execute($user, $useinstance, $expected) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
         $coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser($user === 0 ? self::$user->id : 2);

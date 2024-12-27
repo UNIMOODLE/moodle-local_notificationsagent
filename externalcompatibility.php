@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -23,16 +23,24 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version details
+ * Compatibility
  *
- * @package    notificationscondition_activityavailable
+ * @package    local_notificationsagent
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023101804;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationscondition_activityavailable';
+global $CFG;
+// After Moodle 4.2 external classes were moved.
+if ($CFG->version >= 2023042400) {
+    class_alias(\core_external\external_api::class, 'external_api');
+    class_alias(\core_external\restricted_context_exception::class, 'restricted_context_exception');
+    class_alias(\core_external\external_value::class, 'external_value');
+    class_alias(\core_external\external_single_structure::class, 'external_single_structure');
+    class_alias(\core_external\external_function_parameters::class, 'external_function_parameters');
+    class_alias(\core_external\external_warnings::class, 'external_warnings');
+} else {
+    require_once($CFG->dirroot . '/lib/externallib.php');
+}

@@ -43,6 +43,7 @@ use notificationscondition_sessionstart\sessionstart;
 /**
  * Testing notificationsagent class
  *
+ * @runTestsInSeparateProcesses
  * @group notificationsagent
  */
 class notificationsagent_observer_test extends \advanced_testcase {

@@ -38,8 +38,6 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_ondates\ondates;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Ondates test cron task tests

@@ -40,9 +40,6 @@ use local_notificationsagent\rule;
 use notificationscondition_forumnoreply\forumnoreply;
 use notificationscondition_forumnoreply\task\forumnoreply_crontask;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-
 /**
  * Test scheduled task for forumnoreply subplugin
  *

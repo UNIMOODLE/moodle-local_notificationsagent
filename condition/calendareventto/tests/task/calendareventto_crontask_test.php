@@ -38,9 +38,6 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_calendareventto\calendareventto;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-
 /**
  * Test for the calendareventto crontask condition plugin.
  *

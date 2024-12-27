@@ -35,23 +35,32 @@
 
 namespace local_notificationsagent\external;
 
+use external_api;
+use external_function_parameters;
+use external_value;
+use external_warnings;
+use external_single_structure;
 use local_notificationsagent\rule;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
 
 /**
  * Rule external API for save sessions.
  *
  */
-class manage_sessions extends \external_api {
+class manage_sessions extends external_api {
     /**
      * Define parameters for external function.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-                'sessionname' => new \external_value(PARAM_TEXT, 'The session name', VALUE_REQUIRED),
-                'orderid' => new \external_value(PARAM_INT, 'Option order', VALUE_REQUIRED),
-                'courseid' => new \external_value(PARAM_INT, 'Course id', VALUE_REQUIRED),
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+                'sessionname' => new external_value(PARAM_TEXT, 'The session name', VALUE_REQUIRED),
+                'orderid' => new external_value(PARAM_INT, 'Option order', VALUE_REQUIRED),
+                'courseid' => new external_value(PARAM_INT, 'Course id', VALUE_REQUIRED),
         ]);
     }
 
@@ -97,10 +106,10 @@ class manage_sessions extends \external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure(
             [
-                        'orderid' => new \external_value(PARAM_INT, 'Order id value', VALUE_REQUIRED),
+                        'orderid' => new external_value(PARAM_INT, 'Order id value', VALUE_REQUIRED),
                 ]
         );
     }

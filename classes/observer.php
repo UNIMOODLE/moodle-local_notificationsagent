@@ -32,10 +32,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/lib/externallib.php');
-
 use core\event\config_log_created;
 use core\event\course_deleted;
 use core\event\course_module_deleted;

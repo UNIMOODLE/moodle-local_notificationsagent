@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 // Project implemented by the "Recovery, Transformation and Resilience Plan.
-// Funded by the European Union - Next GenerationEU\".
+// Funded by the European Union - Next GenerationEU".
 //
 // Produced by the UNIMOODLE University Group: Universities of
 // Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
@@ -23,16 +23,18 @@
 // Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
 
 /**
- * Version details
+ * Compatibility
  *
- * @package    notificationscondition_activityavailable
+ * @package    notificationscondition_itemgraded
  * @copyright  2023 Proyecto UNIMOODLE
  * @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
  * @author     ISYC <soporte@isyc.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-$plugin->version = 2023101804;
-$plugin->requires = 2020061500;
-$plugin->component = 'notificationscondition_activityavailable';
+global $CFG;
+
+if ($CFG->version >= 2023042400) {
+    class_alias(\mod_quiz\quiz_settings::class, 'quiz');
+    class_alias(\mod_quiz\quiz_attempt::class, 'quiz_attempt');
+}

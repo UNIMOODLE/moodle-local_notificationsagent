@@ -39,9 +39,6 @@ use notificationscondition_activityavailable\task\activityavailable_crontask;
 use local_notificationsagent\notificationsagent;
 use notificationscondition_activityend\activityend;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-
 /**
  * Test for activityend_crontask
  *

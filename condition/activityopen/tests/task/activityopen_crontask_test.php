@@ -38,9 +38,6 @@ use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_activityopen\activityopen;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
-
 /**
  * Class for testing the activityopen_crontask task.
  *

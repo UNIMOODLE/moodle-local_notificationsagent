@@ -38,14 +38,11 @@ use local_notificationsagent\rule;
 use external_api;
 use local_notificationsagent\external\update_rule_share;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once("{$CFG->libdir}/externallib.php");
-
 /**
  * Testing external update rule share
  *
  * @group notificationsagent
+ * @runTestsInSeparateProcesses
  */
 class update_rule_share_test extends \advanced_testcase {
     /**
@@ -143,7 +140,8 @@ class update_rule_share_test extends \advanced_testcase {
      * @return void
      */
     public function test_execute($user, $useinstance, $expected, $status) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
         $coursecontext = \context_course::instance(self::$course->id);
         self::$user = self::getDataGenerator()->create_and_enrol($coursecontext, 'manager');
         self::setUser($user === 0 ? self::$user->id : 2);

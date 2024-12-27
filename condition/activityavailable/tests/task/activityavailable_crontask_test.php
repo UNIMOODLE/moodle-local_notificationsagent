@@ -38,8 +38,6 @@ use local_notificationsagent\rule;
 use local_notificationsagent\task\notificationsagent_trigger_cron;
 use notificationscondition_activityavailable\activityavailable;
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/../../../../../../lib/cronlib.php');
 
 /**
  * Class for testing the activityavailable_crontask task.
