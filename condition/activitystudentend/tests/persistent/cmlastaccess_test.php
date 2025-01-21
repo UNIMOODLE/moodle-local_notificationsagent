@@ -48,7 +48,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class cmlastaccess_test extends \advanced_testcase {
+final class cmlastaccess_test extends \advanced_testcase {
     /**
      * Test define properties.
      *
@@ -56,7 +56,7 @@ class cmlastaccess_test extends \advanced_testcase {
      *
 
      */
-    public function test_define_properties() {
+    public function test_define_properties(): void {
         // Test persistant.
         $this->assertTrue(cmlastaccess::has_property('userid'));
         $this->assertTrue(cmlastaccess::has_property('courseid'));

@@ -43,7 +43,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class calendareventto_observer_test extends \advanced_testcase {
+final class calendareventto_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -89,7 +89,7 @@ class calendareventto_observer_test extends \advanced_testcase {
      */
     public const DURATION = 30 * 86400;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -126,7 +126,7 @@ class calendareventto_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_calendar_updated($time, $user) {
+    public function test_calendar_updated($time, $user): void {
         global $DB, $USER;
         \uopz_set_return('time', self::COURSE_DATESTART);
         $dataform = new \StdClass();
@@ -196,7 +196,7 @@ class calendareventto_observer_test extends \advanced_testcase {
      * @covers       \notificationscondition_calendareventto_observer::calendar_event_deleted
      */
 
-    public function test_calendar_event_deleted() {
+    public function test_calendar_event_deleted(): void {
         global $DB;
         \uopz_set_return('time', self::COURSE_DATESTART);
 

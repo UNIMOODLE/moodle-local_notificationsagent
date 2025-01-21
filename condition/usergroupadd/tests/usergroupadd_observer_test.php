@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class usergroupadd_observer_test extends \advanced_testcase {
+final class usergroupadd_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -131,7 +131,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
      * @covers       \notificationscondition_usergroupadd_observer::group_member_added
      * @dataProvider dataprovider
      */
-    public function test_execute($role) {
+    public function test_execute($role): void {
         global $DB, $USER;
         $pluginname = usergroupadd::NAME;
 
@@ -202,7 +202,7 @@ class usergroupadd_observer_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_usergroupadd_observer::group_deleted
      */
-    public function test_group_deleted() {
+    public function test_group_deleted(): void {
         global $DB;
         $pluginname = usergroupadd::NAME;
 

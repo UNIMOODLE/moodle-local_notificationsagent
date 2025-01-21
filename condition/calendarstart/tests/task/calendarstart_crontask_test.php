@@ -43,7 +43,7 @@ use notificationscondition_calendarstart\calendarstart;
  *
  * @group notificationsagent
  */
-class calendarstart_crontask_test extends \advanced_testcase {
+final class calendarstart_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -92,7 +92,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
     /**
      * Set up the test environment before each test case.
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -128,7 +128,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($date, $radio, $user) {
+    public function test_execute($date, $radio, $user): void {
         global $DB, $USER;
         $pluginname = calendarstart::NAME;
         \uopz_set_return('time', self::CM_DATESTART);
@@ -214,7 +214,7 @@ class calendarstart_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_calendarstart\task\calendarstart_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(calendarstart_crontask::class);
 
         $this->assertIsString($task->get_name());

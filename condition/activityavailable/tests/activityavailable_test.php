@@ -46,7 +46,7 @@ use local_notificationsagent\form\editrule_form;
  *
  * @group notificationsagent
  */
-class activityavailable_test extends \advanced_testcase {
+final class activityavailable_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -130,7 +130,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate(string $conditionjson, int $visible, bool $expected) {
+    public function test_evaluate(string $conditionjson, int $visible, bool $expected): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',
@@ -173,7 +173,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -182,7 +182,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -191,7 +191,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -200,7 +200,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -220,7 +220,7 @@ class activityavailable_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_estimatenexttime($conditionjson, $complementary, $expected) {
+    public function test_estimatenexttime($conditionjson, $complementary, $expected): void {
         \uopz_set_return('time', 1704099600);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestent = $quizgen->create_instance([
@@ -270,7 +270,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -282,7 +282,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -297,7 +297,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activityavailable_cmid" => "7",
@@ -313,7 +313,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -333,7 +333,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityavailable\activityavailable::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -361,7 +361,7 @@ class activityavailable_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activityavailable\activityavailable::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

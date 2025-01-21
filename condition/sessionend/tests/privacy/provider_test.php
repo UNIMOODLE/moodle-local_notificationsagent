@@ -39,13 +39,13 @@ namespace notificationscondition_sessionend\privacy;
  *
  * @group notificationsagent
  */
-class provider_test extends \advanced_testcase {
+final class provider_test extends \advanced_testcase {
     /**
      * Test  get reason
      *
      * @covers \notificationscondition_sessionend\privacy\provider::get_reason
      */
-    public function test_get_reason() {
+    public function test_get_reason(): void {
         $this->assertSame('privacy:metadata', provider::get_reason());
     }
 }

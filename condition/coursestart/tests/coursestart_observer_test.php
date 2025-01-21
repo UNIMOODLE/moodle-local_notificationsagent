@@ -42,7 +42,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class coursestart_observer_test extends \advanced_testcase {
+final class coursestart_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -81,7 +81,7 @@ class coursestart_observer_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -106,7 +106,7 @@ class coursestart_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_course_updated($time, $user) {
+    public function test_course_updated($time, $user): void {
         global $DB, $USER;
 
         $dataform = new \StdClass();

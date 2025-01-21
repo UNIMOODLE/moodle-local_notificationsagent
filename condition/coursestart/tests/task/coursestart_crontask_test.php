@@ -44,7 +44,7 @@ use notificationscondition_coursestart\coursestart;
  * @covers \notificationscondition_coursestart\task\coursestart_crontask
  * @group  notificationsagent
  */
-class coursestart_crontask_test extends \advanced_testcase {
+final class coursestart_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class coursestart_crontask_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -106,7 +106,7 @@ class coursestart_crontask_test extends \advanced_testcase {
      * @dataProvider dataprovider
      * @covers       \notificationscondition_coursestart\task\coursestart_crontask::execute
      */
-    public function test_execute($date, $user) {
+    public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = coursestart::NAME;
 
@@ -170,7 +170,7 @@ class coursestart_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_coursestart\task\coursestart_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(coursestart_crontask::class);
 
         $this->assertIsString($task->get_name());

@@ -47,7 +47,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class ac_test extends \advanced_testcase {
+final class ac_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -130,7 +130,7 @@ class ac_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate(string $conditionjson, bool $expected) {
+    public function test_evaluate(string $conditionjson, bool $expected): void {
         self::$context->set_params($conditionjson);
 
         // Test evaluate.
@@ -161,7 +161,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -170,7 +170,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -179,7 +179,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -188,7 +188,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertFalse(self::$subplugin->check_capability(self::$coursecontext));
     }
 
@@ -204,7 +204,7 @@ class ac_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_estimatenexttime($conditionjson, $expected) {
+    public function test_estimatenexttime($conditionjson, $expected): void {
         \uopz_set_return('time', 1704099600);
 
         self::$context->set_params($conditionjson);
@@ -241,7 +241,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         $this->assertIsString(self::$subplugin->get_title());
     }
@@ -251,7 +251,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -266,7 +266,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $json =
                 '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
                 {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
@@ -284,7 +284,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $expected = 'Your First name is Fernando';
         $json =
                 '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
@@ -300,7 +300,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -325,7 +325,7 @@ class ac_test extends \advanced_testcase {
      * @return void
      * @covers \notificationscondition_ac\ac::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
@@ -338,7 +338,7 @@ class ac_test extends \advanced_testcase {
      * @dataProvider datavalidation
      * @covers       \notificationscondition_ac\ac::validation
      */
-    public function test_validation($params, $expected) {
+    public function test_validation($params, $expected): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',
@@ -373,7 +373,7 @@ class ac_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_ac\ac::load_dataform
      */
-    public function test_loaddataform() {
+    public function test_loaddataform(): void {
         $json =
                 '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
                 {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';

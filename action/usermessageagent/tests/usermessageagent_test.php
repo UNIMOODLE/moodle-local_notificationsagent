@@ -48,7 +48,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class usermessageagent_test extends \advanced_testcase {
+final class usermessageagent_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -143,7 +143,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_execute_action($param, $user) {
+    public function test_execute_action($param, $user): void {
         $auxarray = json_decode($param, true);
         $auxarray['user'] = self::$user->id;
         $param = json_encode($auxarray);
@@ -188,7 +188,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -197,7 +197,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -206,7 +206,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -215,7 +215,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -227,7 +227,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_usermessageagent_title" => "Test title", $id . "_usermessageagent_message" => ['text' => "Message body"],
@@ -244,7 +244,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -256,7 +256,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -271,7 +271,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -306,7 +306,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @param string $param JSON encoded parameters.
      */
-    public function test_getparametersplaceholders($param) {
+    public function test_getparametersplaceholders($param): void {
         $auxarray = json_decode($param, true);
         // Add cmid.
         $auxarray[self::$subplugin::UI_USER] = self::$user->id;
@@ -339,7 +339,7 @@ class usermessageagent_test extends \advanced_testcase {
      * @covers \notificationsaction_usermessageagent\usermessageagent::process_markups
      *
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $uititle = 'test title';
         $uimessage = 'test message';
 
@@ -366,7 +366,7 @@ class usermessageagent_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_usermessageagent\usermessageagent::is_send_once
      */
-    public function test_issendonce() {
+    public function test_issendonce(): void {
         $this->assertTrue(self::$subplugin->is_send_once(self::$user->id));
     }
 
@@ -376,7 +376,7 @@ class usermessageagent_test extends \advanced_testcase {
      * @return void
      * @covers \notificationsaction_usermessageagent\usermessageagent::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }

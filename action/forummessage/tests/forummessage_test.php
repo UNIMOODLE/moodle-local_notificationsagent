@@ -48,7 +48,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class forummessage_test extends \advanced_testcase {
+final class forummessage_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -128,7 +128,7 @@ class forummessage_test extends \advanced_testcase {
      * @return void
      * @covers       \notificationsaction_forummessage\forummessage::execute_action
      */
-    public function test_execute_action($param) {
+    public function test_execute_action($param): void {
         global $DB;
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestaf = $cmgenerator->create_instance([
@@ -167,7 +167,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -176,7 +176,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -185,7 +185,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -194,7 +194,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -206,7 +206,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -218,7 +218,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
             $id . "_forummessage_title" => "Test title", $id . "_forummessage_message" => ['text' => "Message body"],
@@ -235,7 +235,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -267,7 +267,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::is_send_once
      */
-    public function test_is_send_once() {
+    public function test_is_send_once(): void {
         $this->assertTrue(self::$subplugin->is_send_once(self::$user->id));
     }
 
@@ -276,7 +276,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_forummessage\forummessage::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $uititle = 'test title';
         $uimessage = 'test message';
 
@@ -312,7 +312,7 @@ class forummessage_test extends \advanced_testcase {
      * @covers       \notificationsaction_forummessage\forummessage::get_parameters_placeholders
      * @dataProvider dataprovidergetparametersplaceholders
      */
-    public function test_getparametersplaceholders($param) {
+    public function test_getparametersplaceholders($param): void {
         $cmgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmtestaf = $cmgenerator->create_instance([
             'course' => self::$coursetest->id,
@@ -350,7 +350,7 @@ class forummessage_test extends \advanced_testcase {
      * @covers \notificationsaction_forummessage\forummessage::show_user_placeholders
      * @return void
      */
-    public function test_showuserplaceholders() {
+    public function test_showuserplaceholders(): void {
         $this->assertFalse(self::$subplugin->show_user_placeholders());
     }
 
@@ -359,7 +359,7 @@ class forummessage_test extends \advanced_testcase {
      *
      * @covers       \notificationsaction_forummessage\forummessage::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $quizgenerator->create_instance([
             'course' => self::$coursetest->id,

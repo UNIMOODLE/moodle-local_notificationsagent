@@ -45,7 +45,7 @@ use core_privacy\local\request\userlist;
  *
  * @group notificationsagent
  */
-class provider_test extends \advanced_testcase {
+final class provider_test extends \advanced_testcase {
 
     /**
      * @var \stdClass
@@ -76,7 +76,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::get_metadata
      * @return void
      */
-    public function test_get_metadata() {
+    public function test_get_metadata(): void {
         $collection = new collection('notificationsaction_bootstrapnotifications');
         $result = provider::get_metadata($collection);
         $this->assertNotEmpty($collection);
@@ -89,7 +89,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::get_contexts_for_userid
      * @return void
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
 
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $contexts = $contextlist->get_contextids();
@@ -101,7 +101,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::export_user_data
      * @return void
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
 
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $approvedcontextlist = new approved_contextlist(self::$user, 'notificationsaction_bootstrapnotifications',
@@ -128,7 +128,7 @@ class provider_test extends \advanced_testcase {
      * @return void
      *
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
         $datapre = $DB->get_record('notificationsagent_bootstrap', ['courseid' => self::$course->id]);
         $this->assertNotEmpty($datapre);
@@ -143,7 +143,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::delete_data_for_user
      * @return void
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void {
         global $DB;
         $user2 = self::getDataGenerator()->create_user();
         $bootstrap = new bootstrapmessages();
@@ -172,7 +172,7 @@ class provider_test extends \advanced_testcase {
      * @return void
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::get_users_in_context
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
 
         $user2 = self::getDataGenerator()->create_user();
         $bootstrap = new bootstrapmessages();
@@ -197,7 +197,7 @@ class provider_test extends \advanced_testcase {
      * @return void
      * @covers \notificationsaction_bootstrapnotifications\privacy\provider::delete_data_for_users
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void {
         global $DB;
 
         $user2 = self::getDataGenerator()->create_user();

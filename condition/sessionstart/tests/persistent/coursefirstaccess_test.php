@@ -41,14 +41,14 @@ use notificationscondition_activitystudentend\persistent\cmlastaccess;
  *
  * @group notificationsagent
  */
-class coursefirstaccess_test extends \advanced_testcase {
+final class coursefirstaccess_test extends \advanced_testcase {
     /**
      * Test define properties.
      *
      * @covers \notificationscondition_sessionstart\persistent\coursefirstaccess::define_properties
      *
      */
-    public function test_define_properties() {
+    public function test_define_properties(): void {
         // Test persistant.
         $this->assertTrue(cmlastaccess::has_property('userid'));
         $this->assertTrue(cmlastaccess::has_property('courseid'));

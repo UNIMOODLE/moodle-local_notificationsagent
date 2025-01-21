@@ -47,7 +47,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class bootstrapmessages_test extends \advanced_testcase {
+final class bootstrapmessages_test extends \advanced_testcase {
     /**
      * Test define properties.
      *
@@ -55,7 +55,7 @@ class bootstrapmessages_test extends \advanced_testcase {
      *
 
      */
-    public function test_define_properties() {
+    public function test_define_properties(): void {
         // Test persistant.
         $this->assertTrue(bootstrapmessages::has_property('userid'));
         $this->assertTrue(bootstrapmessages::has_property('courseid'));

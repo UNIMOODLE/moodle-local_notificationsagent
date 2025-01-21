@@ -46,7 +46,7 @@ use notificationscondition_activitysinceend\activitysinceend;
  *
  * @group notificationsagent
  */
-class activitysinceend_test extends \advanced_testcase {
+final class activitysinceend_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -158,7 +158,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected): void {
         global $DB;
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
@@ -214,7 +214,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -223,7 +223,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -232,7 +232,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -241,7 +241,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -259,7 +259,7 @@ class activitysinceend_test extends \advanced_testcase {
      * @covers       \notificationscondition_activitysinceend\activitysinceend::estimate_next_time
      * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
+    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion): void {
         global $DB;
         \uopz_set_return('time', 1704099600);
         // Test estimate next time.
@@ -316,7 +316,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -328,7 +328,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -343,7 +343,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activitysinceend_days" => "1",
@@ -362,7 +362,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -387,7 +387,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -427,7 +427,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -472,7 +472,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_timecompletion
      */
-    public function test_get_timecompletion() {
+    public function test_get_timecompletion(): void {
         \uopz_set_return('time', time());
         $modinstance = self::getDataGenerator()->create_module('quiz', [
                 'course' => self::$coursetest,
@@ -495,7 +495,7 @@ class activitysinceend_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activitysinceend\activitysinceend::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

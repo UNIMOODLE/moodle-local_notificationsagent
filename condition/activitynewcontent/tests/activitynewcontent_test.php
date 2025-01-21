@@ -46,7 +46,7 @@ use notificationscondition_activitynewcontent\activitynewcontent;
  *
  * @group notificationsagent
  */
-class activitynewcontent_test extends \advanced_testcase {
+final class activitynewcontent_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -125,7 +125,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $usecache, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $expected): void {
         self::$context->set_timeaccess($timeaccess);
         self::$subplugin->set_id(self::CONDITIONID);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
@@ -172,7 +172,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -181,7 +181,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -190,7 +190,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -199,7 +199,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -211,7 +211,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::estimate_next_time
      */
-    public function test_estimatenexttime() {
+    public function test_estimatenexttime(): void {
         // Test estimate next time.
         $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
     }
@@ -221,7 +221,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -233,7 +233,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -248,7 +248,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $modcomponent = 'mod_quiz';
         $quizgenerator = self::getDataGenerator()->get_plugin_generator($modcomponent);
         $quizgenerator->create_instance([
@@ -268,7 +268,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -296,7 +296,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitynewcontent\activitynewcontent::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activitynewcontent_modname" => "quiz",
@@ -312,7 +312,7 @@ class activitynewcontent_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activitynewcontent\activitynewcontent::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

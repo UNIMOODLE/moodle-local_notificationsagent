@@ -44,7 +44,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class notificationsagent_engine_test extends \advanced_testcase {
+final class notificationsagent_engine_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -99,7 +99,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -146,7 +146,7 @@ class notificationsagent_engine_test extends \advanced_testcase {
         array $actiondata,
         bool $genericuser,
         bool $expected
-    ) {
+    ): void {
         global $DB, $USER;
         $conditions = [];
         $exceptions = [];

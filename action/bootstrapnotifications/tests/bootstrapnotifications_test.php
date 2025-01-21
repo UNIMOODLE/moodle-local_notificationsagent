@@ -47,7 +47,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class bootstrapnotifications_test extends \advanced_testcase {
+final class bootstrapnotifications_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -131,7 +131,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_execute_action($param) {
+    public function test_execute_action($param): void {
         global $USER;
         self::$context->set_params($param);
         self::$context->set_rule(self::$rule);
@@ -169,7 +169,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -178,7 +178,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -187,7 +187,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -196,7 +196,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -208,7 +208,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -220,7 +220,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [$id . "_bootstrapnotifications_message" => "Message body"];
         $expected = '{"message":"Message body"}';
@@ -234,7 +234,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -262,7 +262,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $uimessage = 'test message';
         $expected = str_replace(
             self::$subplugin->get_elements(),
@@ -283,7 +283,7 @@ class bootstrapnotifications_test extends \advanced_testcase {
      * @return void
      * @covers \notificationsaction_bootstrapnotifications\bootstrapnotifications::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }

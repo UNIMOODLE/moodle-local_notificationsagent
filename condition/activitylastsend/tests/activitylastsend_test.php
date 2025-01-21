@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class activitylastsend_test extends \advanced_testcase {
+final class activitylastsend_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -140,7 +140,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $param, $expected) {
+    public function test_evaluate($timeaccess, $param, $expected): void {
         global $DB;
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
@@ -177,7 +177,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -186,7 +186,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -195,7 +195,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -204,7 +204,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -222,7 +222,7 @@ class activitylastsend_test extends \advanced_testcase {
      * @covers       \notificationscondition_activitylastsend\activitylastsend::estimate_next_time
      * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion) {
+    public function test_estimatenexttime($timeaccess, $param, $complementary, $completion): void {
         \uopz_set_return('time', 1704099600);
         // Test estimate next time.
         self::$context->set_timeaccess($timeaccess);
@@ -292,7 +292,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -304,7 +304,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activitylastsend_days" => "1",
@@ -323,7 +323,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -348,7 +348,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -388,7 +388,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitylastsend\activitylastsend::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -440,7 +440,7 @@ class activitylastsend_test extends \advanced_testcase {
      * @covers       \notificationscondition_activitylastsend\activitylastsend::get_cmidfiles
      * @dataProvider dataprovidercmifiles
      */
-    public function test_get_cmidfiles($fileuploadtime, $crontimestarted) {
+    public function test_get_cmidfiles($fileuploadtime, $crontimestarted): void {
         $assgigngenerator = self::getDataGenerator()->get_plugin_generator('mod_assign');
         $assigncm = $assgigngenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -496,7 +496,7 @@ class activitylastsend_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activitylastsend\activitylastsend::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

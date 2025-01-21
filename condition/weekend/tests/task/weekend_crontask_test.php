@@ -44,7 +44,7 @@ use notificationscondition_weekend\weekend;
  *
  * @group notificationsagent
  */
-class weekend_crontask_test extends \advanced_testcase {
+final class weekend_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class weekend_crontask_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -106,7 +106,7 @@ class weekend_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($date, $user) {
+    public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = weekend::NAME;
         \uopz_set_return('time', $date);
@@ -171,7 +171,7 @@ class weekend_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_weekend\task\weekend_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(weekend_crontask::class);
 
         $this->assertIsString($task->get_name());

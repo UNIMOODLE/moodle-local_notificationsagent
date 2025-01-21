@@ -43,7 +43,7 @@ use notificationscondition_activitystudentend\activitystudentend;
  *
  * @group notificationsagent
  */
-class activitystudentend_observer_test extends \advanced_testcase {
+final class activitystudentend_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class activitystudentend_observer_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -107,7 +107,7 @@ class activitystudentend_observer_test extends \advanced_testcase {
      *
      */
 
-    public function test_course_module_viewed() {
+    public function test_course_module_viewed(): void {
         global $DB, $USER;
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');

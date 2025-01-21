@@ -43,7 +43,7 @@ use notificationsaction_removeusergroup\removeusergroup;
  *
  * @group notificationsagent
  */
-class removeusergroup_observer_test extends \advanced_testcase {
+final class removeusergroup_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -123,7 +123,7 @@ class removeusergroup_observer_test extends \advanced_testcase {
      *
      * @covers       \notificationsaction_removeusergroup_observer::group_deleted
      */
-    public function test_group_deleted() {
+    public function test_group_deleted(): void {
         global $DB;
         $pluginname = removeusergroup::NAME;
         // Admin.

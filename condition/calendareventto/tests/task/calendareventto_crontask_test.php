@@ -43,7 +43,7 @@ use notificationscondition_calendareventto\calendareventto;
  *
  * @group notificationsagent
  */
-class calendareventto_crontask_test extends \advanced_testcase {
+final class calendareventto_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -89,7 +89,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      */
     public const DURATION = 30 * 86400;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -123,7 +123,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($date, $user) {
+    public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = calendareventto::NAME;
 
@@ -182,7 +182,7 @@ class calendareventto_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_calendareventto\task\calendareventto_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(calendareventto_crontask::class);
 
         $this->assertIsString($task->get_name());

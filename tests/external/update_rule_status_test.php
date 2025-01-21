@@ -43,7 +43,7 @@ use external_api;
  * @group notificationsagent
  * @runTestsInSeparateProcesses
  */
-class update_rule_status_test extends \advanced_testcase {
+final class update_rule_status_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -93,7 +93,7 @@ class update_rule_status_test extends \advanced_testcase {
      *
      * @return void
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -122,7 +122,7 @@ class update_rule_status_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_execute($user, $useinstance, $expected, $status) {
+    public function test_execute($user, $useinstance, $expected, $status): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
         $coursecontext = \context_course::instance(self::$course->id);

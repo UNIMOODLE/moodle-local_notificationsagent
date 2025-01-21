@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class weekdays_test extends \advanced_testcase {
+final class weekdays_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -122,7 +122,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $params, $expected) {
+    public function test_evaluate($timeaccess, $params, $expected): void {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_params($params);
 
@@ -151,7 +151,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -160,7 +160,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -169,7 +169,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -178,7 +178,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -199,7 +199,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_estimatenexttime($timeaccess, $expected, $param, $complementary) {
+    public function test_estimatenexttime($timeaccess, $expected, $param, $complementary): void {
         \uopz_set_return('time', $timeaccess);
         date_default_timezone_set('Europe/Madrid');
         self::$context->set_complementary($complementary);
@@ -231,7 +231,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         // Test estimate next time.
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
@@ -241,7 +241,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -253,7 +253,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -269,7 +269,7 @@ class weekdays_test extends \advanced_testcase {
      * @covers \notificationscondition_weekdays\weekdays::convert_parameters
      * @covers \notificationscondition_weekdays\weekdays::get_weekdays_list
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $expected = '{"weekdays":[0,2,4]}';
         $calendar = \core_calendar\type_factory::get_calendar_instance();
         $weekdays = $calendar->get_weekdays();
@@ -299,7 +299,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $params = '{"weekdays":[0, 1]}';
         $paramsencoded = json_decode($params);
         self::$subplugin->set_parameters($params);
@@ -322,7 +322,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -368,7 +368,7 @@ class weekdays_test extends \advanced_testcase {
      * @dataProvider datavalidation
      * @covers       \notificationscondition_weekdays\weekdays::validation
      */
-    public function test_validation($params, $expected) {
+    public function test_validation($params, $expected): void {
         self::$subplugin->set_parameters($params);
         $this->assertSame($expected, self::$subplugin->validation(self::$coursetest->id));
     }
@@ -390,7 +390,7 @@ class weekdays_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_weekdays\weekdays::load_dataform
      */
-    public function test_loaddataform() {
+    public function test_loaddataform(): void {
         $params = '{"weekdays":[4]}';
         self::$subplugin->set_parameters($params);
         $this->assertIsArray(self::$subplugin->load_dataform());
@@ -402,7 +402,7 @@ class weekdays_test extends \advanced_testcase {
      * @return void
      * @covers \notificationscondition_weekdays\weekdays::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }

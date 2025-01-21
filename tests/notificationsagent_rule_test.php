@@ -41,7 +41,7 @@ use local_notificationsagent\helper\helper;
  *
  * @group notificationsagent
  */
-class notificationsagent_rule_test extends \advanced_testcase {
+final class notificationsagent_rule_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -87,7 +87,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      */
     public const CMID = 246000;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -127,7 +127,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    public function test_evaluate(int $date, array $conditiondata, array $exceptiondata, bool $expected) {
+    public function test_evaluate(int $date, array $conditiondata, array $exceptiondata, bool $expected): void {
         global $DB, $USER;
 
         $dataform = new \StdClass();
@@ -278,7 +278,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    public function test_create() {
+    public function test_create(): void {
         global $DB, $USER;
         $USER->id = self::$user->id;
         // Simulate data from form.
@@ -356,7 +356,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @dataProvider updateprovider
      *
      */
-    public function test_update($timesfired, $expected) {
+    public function test_update($timesfired, $expected): void {
         self::setUser(self::$user->id);
         // Simulate data from form.
         $dataform = new \StdClass();
@@ -413,7 +413,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers \local_notificationsagent\rule::delete_triggers
      * @return void
      */
-    public function test_delete() {
+    public function test_delete(): void {
         global $DB, $USER;
         $USER->id = self::$user->id;
         // Simulate data from form.
@@ -545,7 +545,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    public function test_get_rules($role, $shared, $siteid) {
+    public function test_get_rules($role, $shared, $siteid): void {
         global $USER, $DB;
         if (empty($role)) {
             self::setAdminUser();
@@ -631,7 +631,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_clone() {
+    public function test_clone(): void {
         global $DB, $USER;
         $USER->id = self::$user->id;
         // Simulate data from form.
@@ -698,7 +698,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::build_category_array
      * @covers       \local_notificationsagent\helper\helper::build_output_categories
      */
-    public function test_build_output_categories() {
+    public function test_build_output_categories(): void {
         self::setUser(self::$user->id);
         // Simulate data from form.
 
@@ -723,7 +723,7 @@ class notificationsagent_rule_test extends \advanced_testcase {
      * @return void
      * @covers \local_notificationsagent\helper\helper::count_category_courses
      */
-    public function test_count_category_courses() {
+    public function test_count_category_courses(): void {
         $category = \core_course_category::get(self::$course->category);
         $cat = helper::count_category_courses($category);
         $this->assertEquals(1, $cat);

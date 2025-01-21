@@ -47,7 +47,7 @@ use notificationsaction_removeusergroup\removeusergroup;
  *
  * @group notificationsagent
  */
-class removeusergroup_test extends \advanced_testcase {
+final class removeusergroup_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -136,7 +136,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::execute_action
      */
-    public function test_execute_action() {
+    public function test_execute_action(): void {
         $auxarray['user'] = self::$user->id;
         $auxarray['cmid'] = self::$group->id;
         $param = json_encode($auxarray);
@@ -153,7 +153,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -162,7 +162,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -171,7 +171,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -180,7 +180,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -192,7 +192,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = ["type" => "5", $id . "_removeusergroup_cmid" => "3"];
         $expected = '{"cmid":"3"}';
@@ -207,7 +207,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -219,7 +219,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -236,7 +236,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @dataProvider dataprovidergetui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -272,7 +272,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers \notificationsaction_removeusergroup\removeusergroup::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $expected = str_replace(self::$subplugin->get_elements(), [self::$group->name], self::$subplugin->get_title());
         $params[self::$subplugin::UI_ACTIVITY] = self::$group->id;
         $params = json_encode($params);
@@ -287,7 +287,7 @@ class removeusergroup_test extends \advanced_testcase {
      *
      * @covers       \notificationsaction_removeusergroup\removeusergroup::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $objparameters = new \stdClass();
         $objparameters->cmid = self::$group->id;
 

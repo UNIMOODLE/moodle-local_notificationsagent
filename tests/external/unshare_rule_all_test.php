@@ -45,7 +45,7 @@ use local_notificationsagent\external\unshare_rule_all;
  * @group notificationsagent
  * @runTestsInSeparateProcesses
  */
-class unshare_rule_all_test extends \advanced_testcase {
+final class unshare_rule_all_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -112,7 +112,7 @@ class unshare_rule_all_test extends \advanced_testcase {
      *
      * @return void
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -140,7 +140,7 @@ class unshare_rule_all_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_execute($user, $useinstance, $expected) {
+    public function test_execute($user, $useinstance, $expected): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/local/notificationsagent/externalcompatibility.php');
         $coursecontext = \context_course::instance(self::$course->id);

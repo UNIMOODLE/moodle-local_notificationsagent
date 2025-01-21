@@ -44,7 +44,7 @@ use notificationscondition_activityavailable\activityavailable;
  *
  * @group notificationsagent
  */
-class activityavailable_crontask_test extends \advanced_testcase {
+final class activityavailable_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -104,7 +104,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      *
      */
-    public function test_execute() {
+    public function test_execute(): void {
         global $DB, $USER;
         $pluginname = activityavailable::NAME;
 
@@ -161,7 +161,7 @@ class activityavailable_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_activityavailable\task\activityavailable_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(activityavailable_crontask::class);
 
         $this->assertIsString($task->get_name());

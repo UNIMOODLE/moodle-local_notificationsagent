@@ -45,7 +45,7 @@ use notificationscondition_forumnoreply\task\forumnoreply_crontask;
  *
  * @group notificationsagent
  */
-class forumnoreply_crontask_test extends \advanced_testcase {
+final class forumnoreply_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -83,7 +83,7 @@ class forumnoreply_crontask_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -107,7 +107,7 @@ class forumnoreply_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($date) {
+    public function test_execute($date): void {
         global $DB, $USER;
         $pluginname = forumnoreply::NAME;
 
@@ -188,7 +188,7 @@ class forumnoreply_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_forumnoreply\task\forumnoreply_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(forumnoreply_crontask::class);
 
         $this->assertIsString($task->get_name());

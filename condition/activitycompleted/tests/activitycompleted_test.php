@@ -46,7 +46,7 @@ use local_notificationsagent\form\editrule_form;
  *
  * @group notificationsagent
  */
-class activitycompleted_test extends \advanced_testcase {
+final class activitycompleted_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -130,7 +130,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate(string $conditionjson, int $completed, bool $expected) {
+    public function test_evaluate(string $conditionjson, int $completed, bool $expected): void {
         global $DB;
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
@@ -183,7 +183,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -192,7 +192,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -201,7 +201,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -210,7 +210,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -231,7 +231,7 @@ class activitycompleted_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_estimatenexttime($conditionjson, $complementary, $expected, $completed) {
+    public function test_estimatenexttime($conditionjson, $complementary, $expected, $completed): void {
         global $DB;
         \uopz_set_return('time', 1704099600);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
@@ -290,7 +290,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -302,7 +302,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -317,7 +317,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activitycompleted_cmid" => "7",
@@ -333,7 +333,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -353,7 +353,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activitycompleted\activitycompleted::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -381,7 +381,7 @@ class activitycompleted_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activitycompleted\activitycompleted::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

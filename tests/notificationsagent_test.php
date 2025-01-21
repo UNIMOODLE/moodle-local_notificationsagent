@@ -43,7 +43,7 @@ use notificationscondition_sessionstart\sessionstart;
  *
  * @group notificationsagent
  */
-class notificationsagent_test extends \advanced_testcase {
+final class notificationsagent_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -89,7 +89,7 @@ class notificationsagent_test extends \advanced_testcase {
      */
     public const CMID = 246000;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -134,7 +134,7 @@ class notificationsagent_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_notificationsagent_condition_get_cm_dates($timeopen, $timeclose, $modname, $fieldopen, $fieldclose) {
+    public function test_notificationsagent_condition_get_cm_dates($timeopen, $timeclose, $modname, $fieldopen, $fieldclose): void {
         $this->resetAfterTest();
         $course = self::getDataGenerator()->create_course();
         $manager = self::getDataGenerator()->create_and_enrol($course, 'manager');
@@ -203,7 +203,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @covers \local_notificationsagent\notificationsagent::get_usersbycourse
      * @return void
      */
-    public function test_get_usersbycourse() {
+    public function test_get_usersbycourse(): void {
         $context = \context_course::instance(self::$course->id);
         $noenrolluser = self::getDataGenerator()->create_user();
         $manager = self::getDataGenerator()->create_and_enrol(self::$course, 'manager');
@@ -221,7 +221,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_notificationsagent\notificationsagent::set_timer_cache
      */
-    public function test_set_timer_cache() {
+    public function test_set_timer_cache(): void {
         global $DB;
 
         notificationsagent::set_timer_cache(
@@ -288,7 +288,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_notificationsagent\notificationsagent::set_time_trigger
      */
-    public function test_set_time_trigger() {
+    public function test_set_time_trigger(): void {
         global $DB;
 
         notificationsagent::set_time_trigger(
@@ -358,7 +358,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @covers \local_notificationsagent\notificationsagent::get_conditions_by_course
      * @return void
      */
-    public function test_get_conditions_by_course() {
+    public function test_get_conditions_by_course(): void {
         global $USER, $DB;
         // Rule.
         $dataform = new \StdClass();
@@ -419,7 +419,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_notificationsagent\notificationsagent::get_conditions_by_cm
      */
-    public function test_get_conditions_by_cm() {
+    public function test_get_conditions_by_cm(): void {
         global $DB, $USER;
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -462,7 +462,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_notificationsagent\notificationsagent::get_conditions_by_plugin
      */
-    public function test_get_conditions_by_plugin() {
+    public function test_get_conditions_by_plugin(): void {
         global $DB, $USER;
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -512,7 +512,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @return void
      * @covers \local_notificationsagent\notificationsagent::get_availability_conditions
      */
-    public function test_get_availability_conditions() {
+    public function test_get_availability_conditions(): void {
         global $USER, $DB;
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -560,7 +560,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @return void
      * @covers \local_notificationsagent\notificationsagent::get_course_category_context_byruleid
      */
-    public function test_get_course_category_context_byruleid() {
+    public function test_get_course_category_context_byruleid(): void {
         global $DB, $USER;
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
@@ -596,7 +596,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    public function test_is_ruleoff($ruleoff, $expected) {
+    public function test_is_ruleoff($ruleoff, $expected): void {
         global $DB;
         $ruleid = self::$rule->get_id();
         $courseid = self::$course->id;
@@ -651,7 +651,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @dataProvider datatriggers
      * @covers       \local_notificationsagent\notificationsagent::get_triggersbytimeinterval
      */
-    public function test_get_triggersbytimeinterval($date, $timestarted, $tasklastrunttime, $emptyresult) {
+    public function test_get_triggersbytimeinterval($date, $timestarted, $tasklastrunttime, $emptyresult): void {
         global $USER, $DB;
         // Rule.
         $dataform = new \StdClass();
@@ -711,7 +711,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\notificationsagent::supported_cm
      * @dataProvider datasupported
      */
-    public function test_supportedcm($expected, string $modname) {
+    public function test_supportedcm($expected, string $modname): void {
         $this->resetAfterTest();
         $course = self::getDataGenerator()->create_course();
         $manager = self::getDataGenerator()->create_and_enrol($course, 'manager');
@@ -757,7 +757,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @return void
      * @covers \local_notificationsagent\notificationsagent::bulk_delete_conditions_by_userid
      */
-    public function test_bulk_delete_conditions_by_userid() {
+    public function test_bulk_delete_conditions_by_userid(): void {
         global $DB;
         $objdbtrigger = new \stdClass();
         $objdbtrigger->ruleid = self::$rule->get_id();
@@ -797,7 +797,7 @@ class notificationsagent_test extends \advanced_testcase {
      * @dataProvider dataexpresion
      * @return void
      */
-    public function test_evaluate_expression($operator, $a, $b, $expected) {
+    public function test_evaluate_expression($operator, $a, $b, $expected): void {
         $result = notificationsagent::evaluate_expression($operator, $a, $b);
         $this->assertSame($expected, $result);
     }

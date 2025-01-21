@@ -47,7 +47,7 @@ use notificationsaction_bootstrapnotifications\bootstrapnotifications;
  *
  * @group notificationsagent
  */
-class bootstrapnotifications_observer_test extends \advanced_testcase {
+final class bootstrapnotifications_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -131,7 +131,7 @@ class bootstrapnotifications_observer_test extends \advanced_testcase {
      * @covers       \notificationsaction_bootstrapnotifications\bootstrapmessages::get_records
      *
      */
-    public function test_course_viewed($message, $course) {
+    public function test_course_viewed($message, $course): void {
         global $SESSION;
 
         $courseid = $course == SITEID ? SITEID : self::$coursetest->id;

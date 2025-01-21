@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class usergroupadd_test extends \advanced_testcase {
+final class usergroupadd_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -133,7 +133,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $usecache, $complementary, $addingroup, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $complementary, $addingroup, $expected): void {
         global $DB;
         self::setUser(self::$user->id);
         if ($addingroup) {
@@ -181,7 +181,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -190,7 +190,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -199,7 +199,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -208,7 +208,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -228,7 +228,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_estimatenexttime($timeaccess, $expected, $complementary, $addingroup) {
+    public function test_estimatenexttime($timeaccess, $expected, $complementary, $addingroup): void {
         \uopz_set_return('time', $timeaccess);
         // Saturday, Sunday configuration.
         self::$context->set_complementary($complementary);
@@ -269,7 +269,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         // Test estimate next time.
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
@@ -279,7 +279,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -291,7 +291,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -306,7 +306,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [$id . "_" . self::$subplugin::NAME . "_cmid" => "5"];
         $expected = '{"cmid":5}';
@@ -320,7 +320,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $expected = str_replace(self::$subplugin->get_elements(), [self::$group->name], self::$subplugin->get_title());
         $params[self::$subplugin::UI_ACTIVITY] = self::$group->id;
         $params = json_encode($params);
@@ -335,7 +335,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_usergroupadd\usergroupadd::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$course->id;
         $typeaction = "add";
         $customdata = [
@@ -362,7 +362,7 @@ class usergroupadd_test extends \advanced_testcase {
      * @return void
      * @covers \notificationscondition_usergroupadd\usergroupadd::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
@@ -372,7 +372,7 @@ class usergroupadd_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_usergroupadd\usergroupadd::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $objparameters = new \stdClass();
         $objparameters->cmid = self::$group->id;
 

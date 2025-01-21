@@ -46,7 +46,7 @@ use notificationscondition_activityend\activityend;
  *
  * @group notificationsagent
  */
-class activityend_test extends \advanced_testcase {
+final class activityend_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -150,7 +150,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected): void {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
@@ -202,7 +202,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -211,7 +211,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -220,7 +220,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -229,7 +229,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -248,7 +248,7 @@ class activityend_test extends \advanced_testcase {
      * @covers       \notificationscondition_activityend\activityend::estimate_next_time
      * @dataProvider dataprovider
      */
-    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected): void {
         \uopz_set_return('time', $timeaccess);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -281,7 +281,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -293,7 +293,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -308,7 +308,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activityend_days" => "1",
@@ -327,7 +327,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -352,7 +352,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -392,7 +392,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityend\activityend::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -437,7 +437,7 @@ class activityend_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activityend\activityend::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

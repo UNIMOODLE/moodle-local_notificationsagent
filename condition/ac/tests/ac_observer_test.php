@@ -47,7 +47,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class ac_observer_test extends \advanced_testcase {
+final class ac_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -112,7 +112,7 @@ class ac_observer_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_ac_observer::group_deleted
      */
-    public function test_group_deleted() {
+    public function test_group_deleted(): void {
         global $DB;
         $pluginname = ac::NAME;
 
@@ -151,7 +151,7 @@ class ac_observer_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_ac_observer::grouping_deleted
      */
-    public function test_grouping_deleted() {
+    public function test_grouping_deleted(): void {
         global $DB;
         $pluginname = ac::NAME;
 

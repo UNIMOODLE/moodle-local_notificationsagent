@@ -45,7 +45,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class calendarstart_test extends \advanced_testcase {
+final class calendarstart_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -145,7 +145,7 @@ class calendarstart_test extends \advanced_testcase {
      * @covers       \notificationscondition_calendarstart\calendarstart::evaluate
      *
      */
-    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected): void {
         $auxarray = json_decode($param, true);
         $auxarray['cmid'] = self::$caledarevent->id;
         $param = json_encode($auxarray);
@@ -202,7 +202,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -211,7 +211,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -220,7 +220,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -229,7 +229,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -241,7 +241,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
 
@@ -257,7 +257,7 @@ class calendarstart_test extends \advanced_testcase {
      * @covers       \notificationscondition_calendarstart\calendarstart::estimate_next_time
      * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected): void {
         \uopz_set_return('time', $timeaccess);
         $auxarray = json_decode($param, true);
         $auxarray['cmid'] = self::$caledarevent->id;
@@ -374,7 +374,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -386,7 +386,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -401,7 +401,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $time = self::$caledarevent->timestart;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
@@ -421,7 +421,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -468,7 +468,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -517,7 +517,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_calendarstart\calendarstart::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_calendarstart_days" => "1",
@@ -537,7 +537,7 @@ class calendarstart_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_calendarstart\calendarstart::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         self::setUser(2);// Admin.
         $event = self::getDataGenerator()->create_event([
                 'eventtype' => 'course',

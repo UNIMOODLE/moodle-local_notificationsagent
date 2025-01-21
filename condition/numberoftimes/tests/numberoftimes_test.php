@@ -48,7 +48,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  * @covers \notificationscondition_numberoftimes\numberoftimes
  * @group  notificationsagent
  */
-class numberoftimes_test extends \advanced_testcase {
+final class numberoftimes_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -131,7 +131,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $timemodified, $timesfired, $param, $launched, $expected) {
+    public function test_evaluate($timeaccess, $timemodified, $timesfired, $param, $launched, $expected): void {
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
         self::$subplugin->set_id(self::CONDITIONID);
@@ -172,7 +172,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -181,7 +181,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -190,7 +190,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -199,7 +199,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -211,7 +211,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
 
@@ -220,7 +220,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::estimate_next_time
      */
-    public function test_estimatenexttime() {
+    public function test_estimatenexttime(): void {
         // Test estimate next time.
         $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
     }
@@ -230,7 +230,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -242,7 +242,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -257,7 +257,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $ntimes = 1;
         $params[self::$subplugin::N_TIMES] = $ntimes;
         $time = 86400;
@@ -279,7 +279,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_numberoftimes_days" => "1",
@@ -298,7 +298,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -338,7 +338,7 @@ class numberoftimes_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_numberoftimes\numberoftimes::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -384,7 +384,7 @@ class numberoftimes_test extends \advanced_testcase {
      * @return void
      * @covers \notificationscondition_numberoftimes\numberoftimes::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }

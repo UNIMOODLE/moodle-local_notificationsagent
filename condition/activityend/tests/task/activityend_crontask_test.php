@@ -44,7 +44,7 @@ use notificationscondition_activityend\activityend;
  *
  * @group notificationsagent
  */
-class activityend_crontask_test extends \advanced_testcase {
+final class activityend_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class activityend_crontask_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -107,7 +107,7 @@ class activityend_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($date, $user) {
+    public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = activityend::NAME;
 
@@ -175,7 +175,7 @@ class activityend_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_activityend\task\activityend_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(activityend_crontask::class);
 
         $this->assertIsString($task->get_name());

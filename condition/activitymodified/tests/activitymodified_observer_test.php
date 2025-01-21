@@ -42,7 +42,7 @@ use local_notificationsagent\notificationsagent;
  *
  * @group notificationsagent
  */
-class activitymodified_observer_test extends \advanced_testcase {
+final class activitymodified_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -71,7 +71,7 @@ class activitymodified_observer_test extends \advanced_testcase {
     /**
      * Set up the function and perform necessary initialization steps.
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -94,7 +94,7 @@ class activitymodified_observer_test extends \advanced_testcase {
      * @covers       \notificationscondition_activitymodified_observer::course_module_updated
      * @dataProvider dataprovider
      */
-    public function test_execute($role, $fileuploadtime) {
+    public function test_execute($role, $fileuploadtime): void {
         global $DB, $USER;
 
         if (!is_null($fileuploadtime)) {

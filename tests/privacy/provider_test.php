@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class provider_test extends \advanced_testcase {
+final class provider_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -74,7 +74,7 @@ class provider_test extends \advanced_testcase {
      *
      * @return void
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         global $DB;
@@ -140,7 +140,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::get_metadata
      * @return void
      */
-    public function test_get_metadata() {
+    public function test_get_metadata(): void {
         $collection = new collection(self::COMPONENT);
         $result = provider::get_metadata($collection);
         $this->assertNotEmpty($collection);
@@ -154,7 +154,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::get_contexts_for_userid
      * @return void
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
         $context = \context_course::instance(self::$course->id);
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         // Expect one item.
@@ -169,7 +169,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::get_users_in_context
      * @return void
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
         $context = \context_course::instance(self::$course->id);
         $userlist = new userlist($context, self::COMPONENT);
         provider::get_users_in_context($userlist);
@@ -188,7 +188,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::delete_user_report
      * @return void
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
         $report = $DB->get_records('notificationsagent_report', ['courseid' => self::$course->id]);
         $launched = $DB->get_records('notificationsagent_launched', ['userid' => self::$user->id]);
@@ -229,7 +229,7 @@ class provider_test extends \advanced_testcase {
      * @return void
      * @covers \local_notificationsagent\privacy\provider::delete_data_for_user
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void {
         global $DB;
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $emptyapprvlist = new approved_contextlist(self::$user, 'mod_quiz', [$contextlist->get_contexts()[0]->id]);
@@ -270,7 +270,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::delete_data_for_users
      * @return void
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void {
         global $DB;
         $context = \context_course::instance(self::$course->id);
         $apprvlist = new approved_userlist($context, self::COMPONENT, [self::$user->id]);
@@ -309,7 +309,7 @@ class provider_test extends \advanced_testcase {
      * @covers \local_notificationsagent\privacy\provider::export_user_data
      * @return void
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $apprvlist = new approved_contextlist(self::$user, self::COMPONENT, [$contextlist->get_contexts()[0]->id]);
         $this->assertNotEmpty($apprvlist);

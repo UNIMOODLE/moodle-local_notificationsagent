@@ -43,7 +43,7 @@ use notificationscondition_activitynewcontent\activitynewcontent;
  *
  * @group notificationsagent
  */
-class activitynewcontent_observer_test extends \advanced_testcase {
+final class activitynewcontent_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class activitynewcontent_observer_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -108,7 +108,7 @@ class activitynewcontent_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_course_module_created($modname, $user, $expected) {
+    public function test_course_module_created($modname, $user, $expected): void {
         global $DB, $USER;
 
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_' . $modname);

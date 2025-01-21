@@ -43,7 +43,7 @@ use notificationsaction_addusergroup\addusergroup;
  *
  * @group notificationsagent
  */
-class addusergroup_observer_test extends \advanced_testcase {
+final class addusergroup_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -123,7 +123,7 @@ class addusergroup_observer_test extends \advanced_testcase {
      *
      * @covers       \notificationsaction_addusergroup_observer::group_deleted
      */
-    public function test_group_deleted() {
+    public function test_group_deleted(): void {
         global $DB;
         $pluginname = addusergroup::NAME;
         // Admin.

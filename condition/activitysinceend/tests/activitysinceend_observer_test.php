@@ -43,7 +43,7 @@ use notificationscondition_activitysinceend\activitysinceend;
  *
  * @group notificationsagent
  */
-class activitysinceend_observer_test extends \advanced_testcase {
+final class activitysinceend_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -82,7 +82,7 @@ class activitysinceend_observer_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         global $CFG;
         $this->resetAfterTest();
@@ -109,7 +109,7 @@ class activitysinceend_observer_test extends \advanced_testcase {
      *
      */
 
-    public function test_course_module_completion_updated($time, $data) {
+    public function test_course_module_completion_updated($time, $data): void {
         global $DB, $USER;
         \uopz_set_return('time', $time);
         $pluginname = activitysinceend::NAME;

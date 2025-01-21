@@ -42,7 +42,7 @@ use notificationscondition_sessionstart\sessionstart;
  *
  * @group notificationsagent
  */
-class sessionstart_observer_test extends \advanced_testcase {
+final class sessionstart_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -81,7 +81,7 @@ class sessionstart_observer_test extends \advanced_testcase {
      */
     public const USER_LASTACCESS = 1704099600;
 
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -107,7 +107,7 @@ class sessionstart_observer_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
 
-    public function test_course_viewed($time, $firstaccess) {
+    public function test_course_viewed($time, $firstaccess): void {
         global $DB, $USER;
 
         $dataform = new \StdClass();

@@ -46,7 +46,7 @@ use notificationscondition_activityopen\activityopen;
  *
  * @group notificationsagent
  */
-class activityopen_test extends \advanced_testcase {
+final class activityopen_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -152,7 +152,7 @@ class activityopen_test extends \advanced_testcase {
      * @dataProvider dataprovider
      * @throws \coding_exception
      */
-    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $param, $complementary, $expected): void {
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
 
@@ -195,7 +195,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -204,7 +204,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertTrue(self::$subplugin->is_generic());
     }
 
@@ -213,7 +213,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -222,7 +222,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -239,7 +239,7 @@ class activityopen_test extends \advanced_testcase {
      * @covers       \notificationscondition_activityopen\activityopen::estimate_next_time
      * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $param, $complementary) {
+    public function test_estimatenexttime($timeaccess, $param, $complementary): void {
         self::$context->set_complementary($complementary);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
@@ -293,7 +293,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -305,7 +305,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -320,7 +320,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_activityopen_days" => "1",
@@ -339,7 +339,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -364,7 +364,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -404,7 +404,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_activityopen\activityopen::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -449,7 +449,7 @@ class activityopen_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_activityopen\activityopen::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestaa = $quizgenerator->create_instance([
                 'name' => 'Quiz unittest',

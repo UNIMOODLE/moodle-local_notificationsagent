@@ -43,7 +43,7 @@ use notificationscondition_activitylastsend\activitylastsend;
  *
  * @group notificationsagent
  */
-class activitylastsend_crontask_test extends \advanced_testcase {
+final class activitylastsend_crontask_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -72,7 +72,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
     /**
      * Set up the function and perform necessary initialization steps.
      */
-    final public function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $rule = new rule();
@@ -98,7 +98,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
      * @dataProvider dataprovider
      */
-    public function test_execute($fileuploadtime, $crontimestarted) {
+    public function test_execute($fileuploadtime, $crontimestarted): void {
         global $DB, $USER;
 
         $pluginname = activitylastsend::NAME;
@@ -189,7 +189,7 @@ class activitylastsend_crontask_test extends \advanced_testcase {
      * @covers \notificationscondition_activitylastsend\task\activitylastsend_crontask::get_name
      * @return void
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = \core\task\manager::get_scheduled_task(activitylastsend_crontask::class);
 
         $this->assertIsString($task->get_name());

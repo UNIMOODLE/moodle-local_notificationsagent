@@ -45,7 +45,7 @@ use core_privacy\local\request\userlist;
  *
  * @group notificationsagent
  */
-class provider_test extends \advanced_testcase {
+final class provider_test extends \advanced_testcase {
 
     /**
      * @var \stdClass
@@ -75,7 +75,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::get_metadata
      * @return void
      */
-    public function test_get_metadata() {
+    public function test_get_metadata(): void {
         $collection = new collection('notificationscondition_sessionstart');
         $result = provider::get_metadata($collection);
         $this->assertNotEmpty($collection);
@@ -87,7 +87,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::get_contexts_for_userid
      * @return void
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
 
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $contexts = $contextlist->get_contextids();
@@ -99,7 +99,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::export_user_data
      * @return void
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
 
         $contextlist = provider::get_contexts_for_userid(self::$user->id);
         $approvedcontextlist = new approved_contextlist(self::$user, 'notificationscondition_sessionstart',
@@ -123,7 +123,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::delete_data_for_all_users_in_context
      * @return void
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
         $datapre = $DB->get_record('notificationsagent_crseview', ['courseid' => self::$course->id]);
         $this->assertNotEmpty($datapre);
@@ -136,7 +136,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::delete_data_for_user
      * @return void
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void {
         global $DB;
         $user2 = self::getDataGenerator()->create_user();
         $firstaccess = new coursefirstaccess();
@@ -165,7 +165,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::get_users_in_context
      * @return void
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
 
         $user2 = self::getDataGenerator()->create_user();
         $firstaccess = new coursefirstaccess();
@@ -189,7 +189,7 @@ class provider_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\privacy\provider::delete_data_for_users
      * @return void
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void {
         global $DB;
 
         $user2 = self::getDataGenerator()->create_user();

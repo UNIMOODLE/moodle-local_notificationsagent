@@ -46,7 +46,7 @@ use local_notificationsagent\rule;
  *
  * @group notificationsagent
  */
-class activitycompleted_observer_test extends \advanced_testcase {
+final class activitycompleted_observer_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -120,7 +120,7 @@ class activitycompleted_observer_test extends \advanced_testcase {
      *
      */
 
-    public function test_course_module_completion_updated($status) {
+    public function test_course_module_completion_updated($status): void {
         global $DB, $USER;
 
         $pluginname = activitycompleted::NAME;

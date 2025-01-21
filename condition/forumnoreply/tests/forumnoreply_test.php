@@ -46,7 +46,7 @@ use notificationscondition_forumnoreply\forumnoreply;
  *
  * @group notificationsagent
  */
-class forumnoreply_test extends \advanced_testcase {
+final class forumnoreply_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -124,7 +124,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @dataProvider dataprovider
      */
-    public function test_evaluate($timeaccess, $param, $expected, $complementary) {
+    public function test_evaluate($timeaccess, $param, $expected, $complementary): void {
         \uopz_set_return('time', $timeaccess);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
@@ -182,7 +182,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -191,7 +191,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -200,7 +200,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -209,7 +209,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -221,7 +221,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
 
@@ -230,7 +230,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -242,7 +242,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -257,7 +257,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,
@@ -282,7 +282,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -322,7 +322,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -367,7 +367,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_forumnoreply\forumnoreply::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_forumnoreply_days" => "1",
@@ -386,7 +386,7 @@ class forumnoreply_test extends \advanced_testcase {
      *
      * @covers       \notificationscondition_forumnoreply\forumnoreply::validation
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_forum');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$coursetest->id,

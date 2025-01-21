@@ -47,7 +47,7 @@ use local_notificationsagent\helper\test\mock_base_logger;
  *
  * @group notificationsagent
  */
-class sessionend_test extends \advanced_testcase {
+final class sessionend_test extends \advanced_testcase {
     /**
      * @var rule
      */
@@ -137,7 +137,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_evaluate($timeaccess, $usecache, $uselastacces, $param, $complementary, $expected) {
+    public function test_evaluate($timeaccess, $usecache, $uselastacces, $param, $complementary, $expected): void {
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -185,7 +185,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_subtype
      */
-    public function test_getsubtype() {
+    public function test_getsubtype(): void {
         $this->assertSame(self::$subtype, self::$subplugin->get_subtype());
     }
 
@@ -194,7 +194,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::is_generic
      */
-    public function test_isgeneric() {
+    public function test_isgeneric(): void {
         $this->assertFalse(self::$subplugin->is_generic());
     }
 
@@ -203,7 +203,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_elements
      */
-    public function test_getelements() {
+    public function test_getelements(): void {
         $this->assertSame(self::$elements, self::$subplugin->get_elements());
     }
 
@@ -212,7 +212,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::check_capability
      */
-    public function test_checkcapability() {
+    public function test_checkcapability(): void {
         $this->assertSame(
             has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
@@ -230,7 +230,7 @@ class sessionend_test extends \advanced_testcase {
      * @covers       \notificationscondition_sessionend\sessionend::estimate_next_time
      * @dataProvider dataestimate
      */
-    public function test_estimatenexttime($timeaccess, $userlastaccess, $complementary, $params) {
+    public function test_estimatenexttime($timeaccess, $userlastaccess, $complementary, $params): void {
         \uopz_set_return('time', $timeaccess);
         self::$context->set_params($params);
         self::$context->set_userid(self::$user->id);
@@ -273,7 +273,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_cmid
      */
-    public function test_getcmid() {
+    public function test_getcmid(): void {
         $this->assertNull(self::$subplugin->get_cmid(self::$context));
     }
 
@@ -282,7 +282,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_title
      */
-    public function test_gettitle() {
+    public function test_gettitle(): void {
         $this->assertNotNull(self::$subplugin->get_title());
         foreach (self::$elements as $element) {
             $this->assertStringContainsString($element, self::$subplugin->get_title());
@@ -294,7 +294,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_description
      */
-    public function test_getdescription() {
+    public function test_getdescription(): void {
         $this->assertSame(
             self::$subplugin->get_description(),
             [
@@ -309,7 +309,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::process_markups
      */
-    public function test_processmarkups() {
+    public function test_processmarkups(): void {
         $time = 86400;
         $params[self::$subplugin::UI_TIME] = $time;
         $params = json_encode($params);
@@ -329,7 +329,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::get_ui
      */
-    public function test_getui() {
+    public function test_getui(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -367,7 +367,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::set_default
      */
-    public function test_setdefault() {
+    public function test_setdefault(): void {
         $courseid = self::$coursetest->id;
         $typeaction = "add";
         $customdata = [
@@ -412,7 +412,7 @@ class sessionend_test extends \advanced_testcase {
      *
      * @covers \notificationscondition_sessionend\sessionend::convert_parameters
      */
-    public function test_convertparameters() {
+    public function test_convertparameters(): void {
         $id = self::$subplugin->get_id();
         $params = [
                 $id . "_sessionend_days" => "1",
@@ -431,7 +431,7 @@ class sessionend_test extends \advanced_testcase {
      * @return void
      * @covers \notificationscondition_sessionend\sessionend::update_after_restore
      */
-    public function test_update_after_restore() {
+    public function test_update_after_restore(): void {
         $logger = new mock_base_logger(0);
         $this->assertFalse(self::$subplugin->update_after_restore('restoreid', self::$coursecontext->id, $logger));
     }
