@@ -143,8 +143,8 @@ $string['rulesaved'] = 'Regla desada';
 
 // Rule errors.
 $string['editrule_required_error'] = 'Camp requerit';
-$string['editrule_runtime_error'] = 'Si ' . $string['editrule_timesfired'] . ' és > 0, ha d\'indicar un interval';
-$string['editrule_execution_error'] = $string['editrule_timesfired'] . ' entre {$a->minimum} i {$a->maximum}';
+$string['editrule_runtime_error'] = 'Si {$a->timesfired} és > 0, ha d\'indicar un interval';
+$string['editrule_execution_error'] = '{$a->timesfired} entre {$a->minimum} i {$a->maximum}';
 
 // Card content.
 $string['cardif'] = 'Si tot:';

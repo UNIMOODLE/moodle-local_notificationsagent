@@ -144,8 +144,8 @@ $string['rulesaved'] = 'Regla guardada';
 
 // Rule errors.
 $string['editrule_required_error'] = 'Campo requerido';
-$string['editrule_runtime_error'] = 'Si ' . $string['editrule_timesfired'] . ' es > 0, debe indicar un intervalo';
-$string['editrule_execution_error'] = $string['editrule_timesfired'] . ' entre {$a->minimum} y {$a->maximum}';
+$string['editrule_runtime_error'] = 'Si {$a->timesfired} es > 0, debe indicar un intervalo';
+$string['editrule_execution_error'] = '{$a->timesfired} entre {$a->minimum} y {$a->maximum}';
 
 // Card content.
 $string['cardif'] = 'Si todas de:';

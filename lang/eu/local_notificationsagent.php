@@ -144,8 +144,8 @@ $string['rulesaved'] = 'Araua gorde da';
 
 // Rule errors.
 $string['editrule_required_error'] = 'Beharrezko eremua';
-$string['editrule_runtime_error'] = 'Ez ' . $string['editrule_timesfired'] . ' > 0 da, tarte bat adierazi behar du';
-$string['editrule_execution_error'] = $string['editrule_timesfired'] . ' {$a->minimum} eta {$a->maximum} arteko eremua';
+$string['editrule_runtime_error'] = 'Ez {$a->timesfired} > 0 da, tarte bat adierazi behar du';
+$string['editrule_execution_error'] = '{$a->timesfired} {$a->minimum} eta {$a->maximum} arteko eremua';
 
 // Txartelaren edukia.
 $string['cardif'] = 'Guztiak bada:';
