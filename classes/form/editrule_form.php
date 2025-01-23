@@ -516,7 +516,11 @@ class editrule_form extends \moodleform {
             $errors["timesfired"] = get_string(
                 'editrule_execution_error',
                 'local_notificationsagent',
-                ['minimum' => rule::MINIMUM_EXECUTION, 'maximum' => rule::MAXIMUM_EXECUTION]
+                ['timesfired' => get_string(
+                    'editrule_timesfired',
+                    'local_notificationsagent'),
+                    'minimum' => rule::MINIMUM_EXECUTION,
+                    'maximum' => rule::MAXIMUM_EXECUTION]
             );
         }
 
@@ -526,7 +530,10 @@ class editrule_form extends \moodleform {
                 empty($data["runtime_group"]["runtime_days"]) && empty($data["runtime_group"]["runtime_hours"])
                 && empty($data["runtime_group"]["runtime_minutes"])
             ) {
-                $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent');
+                $errors["runtime_group"] = get_string('editrule_runtime_error', 'local_notificationsagent',
+                    ['timesfired' => get_string(
+                    'editrule_timesfired',
+                    'local_notificationsagent')]);
             }
         }
 

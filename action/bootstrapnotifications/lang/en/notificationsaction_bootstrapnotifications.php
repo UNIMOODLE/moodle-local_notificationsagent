@@ -35,13 +35,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Bootstrap notifications';
-$string['messageprovider:bootstrap_notifications'] = 'Add user group Provider';
 $string['bootstrapnotifications_action'] = 'Bootstrap notification with text [TTTT]';
-$string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Text {$a->typeelement}';
+$string['messageprovider:bootstrap_notifications'] = 'Add user group Provider';
+$string['pluginname'] = 'Bootstrap notifications';
 $string['privacy:metadata'] = 'The bootstrapnotifications plugin does not store any personal data.';
 $string['privacy:metadata:notificationsagent_bootstrap'] = 'Stores information about bootstrap notifications';
-$string['privacy:metadata:notificationsagent_bootstrap:userid'] = 'UserID related to notifications.';
 $string['privacy:metadata:notificationsagent_bootstrap:courseid'] = 'CourseID related to notifications.';
 $string['privacy:metadata:notificationsagent_bootstrap:message'] = 'Message content.';
+$string['privacy:metadata:notificationsagent_bootstrap:userid'] = 'UserID related to notifications.';
+$string['subtype'] = 'bootstrapnotifications';

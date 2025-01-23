@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Acción relativa á mensaxe privada do foro';
-$string['privateforummessage_action'] = 'Publica unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
-$string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foro {$a->typeelement}';
-$string['subtype'] = 'privateforummessage';
+$string['editrule_action_element_message'] = 'Mensaxe {$a->typeelement}';
+$string['editrule_action_element_title'] = 'Título {$a->typeelement}:';
+$string['pluginname'] = 'Acción relativa á mensaxe privada do foro';
+$string['privacy:metadata'] = 'O plugin privateforummessage non almacena ningún dato persoal.';
+$string['privateforummessage_action'] = 'Publica unha publicación privada no foro [FFFF] con título [TTTT] e mensaxe [BBBB]';
 $string['privateforummessage_replyerror']
         = 'A publicación non se puido publicar probablemente porque non se executou a condición forumnoreply.';
-$string['privacy:metadata'] = 'O plugin privateforummessage non almacena ningún dato persoal.';
+$string['subtype'] = 'privateforummessage';

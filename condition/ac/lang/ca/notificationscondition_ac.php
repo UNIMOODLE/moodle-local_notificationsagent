@@ -35,9 +35,9 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Availability Condition';
-$string['conditiontext'] = 'Availability Condition';
-$string['subtype'] = 'ac';
-$string['modname'] = 'ac';
 $string['ac_crontask'] = 'Availability condition cron task';
+$string['conditiontext'] = 'Availability Condition';
+$string['modname'] = 'ac';
+$string['pluginname'] = 'Availability Condition';
 $string['privacy:metadata'] = 'El plugin ac no emmagatzema cap dada personal.';
+$string['subtype'] = 'ac';

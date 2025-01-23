@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Se ha modificado la condición de una actividad.';
-$string['conditiontext'] = 'Se ha modificado el contenido de la actividad [AAAA].';
-$string['subtype'] = 'activitymodified';
-$string['modname'] = 'activitymodified';
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'Tarea de finalización de la actividad';
+$string['conditiontext'] = 'Se ha modificado el contenido de la actividad [AAAA].';
+$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['modname'] = 'activitymodified';
+$string['pluginname'] = 'Se ha modificado la condición de una actividad.';
 $string['privacy:metadata'] = 'El plugin de activitymodified no almacena ningún dato personal.';
+$string['subtype'] = 'activitymodified';

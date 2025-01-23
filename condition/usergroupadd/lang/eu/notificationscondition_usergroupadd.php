@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Erabiltzailea talde batean gehitzeko baldintza';
 $string['conditiontext'] = 'Erabiltzailea talde batean gehitu da [GGGG].';
-$string['subtype'] = 'usergroupadd';
-$string['modname'] = 'usergroupadd';
 $string['editrule_action_element_group'] = 'Klusterra {$a->typeelement}';
-$string['usergroupaddtext'] = 'Taldera gehitzen denean ({$a->usergroupadd})';
-$string['usergroupaddtag'] = 'Taldera gehitzen denean';
-
+$string['modname'] = 'usergroupadd';
+$string['pluginname'] = 'Erabiltzailea talde batean gehitzeko baldintza';
 $string['privacy:metadata'] = 'usergroupadd pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'usergroupadd';
+$string['usergroupaddtag'] = 'Taldera gehitzen denean';
+$string['usergroupaddtext'] = 'Taldera gehitzen denean ({$a->usergroupadd})';
+

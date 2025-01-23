@@ -35,14 +35,14 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
-$string['conditiontext'] = '[TTTT] baino gutxiago falta da jardueraren amaiera datarako [AAAA].';
-$string['subtype'] = 'activityend';
-$string['modname'] = 'activityend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
+$string['conditiontext'] = '[TTTT] baino gutxiago falta da jardueraren amaiera datarako [AAAA].';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activityend';
+$string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
+$string['privacy:metadata'] = 'activityend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activityend';
 $string['validation_editrule_form_dateend'] = 'Beharrezkoa da jarduera/ikastaroaren amaiera data gehitzea';
 $string['validation_editrule_form_supported_cm']
         = 'Jarduera mota ez da onartzen. Jarri harremanetan guneko administratzailearekin.';
-$string['privacy:metadata'] = 'activityend pluginak ez du datu pertsonalik gordetzen.';

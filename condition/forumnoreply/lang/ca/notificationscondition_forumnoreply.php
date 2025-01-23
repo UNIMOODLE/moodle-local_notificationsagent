@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició: fil obert pel usuari sense resposta.';
 $string['conditiontext'] = 'Un fil obert pel usuari al fòrum [FFFF] sense cap resposta durant més de [TTTT] temps.';
-$string['subtype'] = 'forumnoreply';
-$string['modname'] = 'forumnoreply';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['forumnoreply_crontask'] = 'forumnoreply cron task';
-
+$string['modname'] = 'forumnoreply';
+$string['pluginname'] = 'Condició: fil obert pel usuari sense resposta.';
 $string['privacy:metadata'] = 'El plugin forumnoreply no emmagatzema cap dada personal.';
+$string['subtype'] = 'forumnoreply';
+

@@ -35,9 +35,9 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Acció relativa a notificacions bootstrap';
-$string['messageprovider:bootstrapnotifications'] = 'Notificacions bootstrap proveïdor';
 $string['bootstrapnotifications_action'] = 'Notificació bootstrap amb text [TTTT]';
-$string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Text {$a->typeelement}';
+$string['messageprovider:bootstrapnotifications'] = 'Notificacions bootstrap proveïdor';
+$string['pluginname'] = 'Acció relativa a notificacions bootstrap';
 $string['privacy:metadata'] = 'El plugin bootstrapnotifications no emmagatzema cap dada personal.';
+$string['subtype'] = 'bootstrapnotifications';

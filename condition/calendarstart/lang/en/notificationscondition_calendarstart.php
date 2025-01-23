@@ -32,13 +32,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition relative date since the calendar event';
-$string['conditiontext'] = 'It has been [TTTT] since the calendar event [CCCC]';
-$string['subtype'] = 'calendarstart';
-$string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'Calendar start cron task';
-$string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
 $string['afterend'] = 'After the end of "event"';
 $string['afterstart'] = 'After the start of "event"';
+$string['calendarstart_crontask'] = 'Calendar start cron task';
+$string['conditiontext'] = 'It has been [TTTT] since the calendar event [CCCC]';
+$string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'calendarstart';
+$string['pluginname'] = 'Condition relative date since the calendar event';
 $string['privacy:metadata'] = 'The calendarstart plugin does not store any personal data.';
+$string['subtype'] = 'calendarstart';

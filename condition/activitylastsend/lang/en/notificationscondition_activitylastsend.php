@@ -35,11 +35,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Condition relative date since the last student content submission in the activity';
-$string['conditiontext'] = 'It has been more than [TTTT] since the last student content submission in the activity [AAAA].';
-$string['subtype'] = 'activitylastsend';
-$string['modname'] = 'activitylastsend';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'Activity lastsend cron task';
+$string['conditiontext'] = 'It has been more than [TTTT] since the last student content submission in the activity [AAAA].';
+$string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'activitylastsend';
+$string['pluginname'] = 'Condition relative date since the last student content submission in the activity';
 $string['privacy:metadata'] = 'The activitylastsend plugin does not store any personal data.';
+$string['subtype'] = 'activitylastsend';

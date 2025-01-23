@@ -32,11 +32,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition relative date to course start';
 $string['conditiontext'] = '[TTTT] has passed since the beginning of the course.';
-$string['subtype'] = 'coursestart';
-$string['modname'] = 'coursestart';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['coursestart_crontask'] = 'Course start cron task';
-
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'coursestart';
+$string['pluginname'] = 'Condition relative date to course start';
 $string['privacy:metadata'] = 'The coursestart plugin does not store any personal data.';
+$string['subtype'] = 'coursestart';
+

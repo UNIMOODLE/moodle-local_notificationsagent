@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintzaren baldintza gutxiago baino gehiagotan zenbaki batzuk baino gutxiago hasi da eta gutxienez denbora bat.';
 $string['conditiontext'] = 'Baldintza gutxiago baino gehiagotan [N] aldiz hasi da eta gutxienez [TTTT] denbora darama.';
-$string['subtype'] = 'numberoftimes';
-$string['modname'] = 'numberoftimes';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'numberoftimes';
 $string['numberoftimes_crontask'] = 'numberoftimes cron task';
-
+$string['pluginname'] = 'Baldintzaren baldintza gutxiago baino gehiagotan zenbaki batzuk baino gutxiago hasi da eta gutxienez denbora bat.';
 $string['privacy:metadata'] = 'numberoftimes pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'numberoftimes';
+

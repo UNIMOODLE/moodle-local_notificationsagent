@@ -47,11 +47,11 @@ class rules extends system_report {
      */
     protected function initialise(): void {
         $ruleentity = new rule();
-        
+
         $narralias = $ruleentity->get_table_alias('notificationsagent_report');
         $this->set_main_table('notificationsagent_report', $narralias);
         $this->add_entity($ruleentity);
-        
+
         $coursentity = new course();
         $coursealias = $coursentity->get_table_alias('course');
         $coursejoin = "JOIN {course} {$coursealias} ON {$coursealias}.id = {$narralias}.courseid";

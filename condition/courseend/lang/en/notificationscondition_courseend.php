@@ -33,11 +33,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition relative date to course end';
 $string['conditiontext'] = 'Less than [TTTT] remains for the course end.';
-$string['subtype'] = 'courseend';
-$string['modname'] = 'courseend';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['courseend_crontask'] = 'Course end cron task';
-$string['validation_editrule_form_dateend'] = 'It is necessary to add an course end date';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'courseend';
+$string['pluginname'] = 'Condition relative date to course end';
 $string['privacy:metadata'] = 'The courseend plugin does not store any personal data.';
+$string['subtype'] = 'courseend';
+$string['validation_editrule_form_dateend'] = 'It is necessary to add an course end date';

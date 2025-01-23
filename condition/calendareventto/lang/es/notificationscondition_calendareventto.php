@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Tiempo restante para el evento del calendario';
-$string['conditiontext'] = 'Queda menos de [TTTT] para el evento del calendario [CCCC]';
-$string['subtype'] = 'calendareventto';
-$string['modname'] = 'calendareventto';
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Tarea de finalización del calendario';
+$string['conditiontext'] = 'Queda menos de [TTTT] para el evento del calendario [CCCC]';
 $string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['modname'] = 'calendareventto';
+$string['pluginname'] = 'Tiempo restante para el evento del calendario';
 $string['privacy:metadata'] = 'El plugin de calendareventto no almacena ningún dato personal.';
+$string['subtype'] = 'calendareventto';

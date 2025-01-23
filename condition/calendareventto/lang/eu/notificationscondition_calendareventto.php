@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Egunerako garaiera gelditzen den denboraren jakinarazpena';
-$string['conditiontext'] = '[TTTT] geratzen da edozein egunerako [CCCC] egunerako ekitaldirako';
-$string['subtype'] = 'calendareventto';
-$string['modname'] = 'calendareventto';
-$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Egunerako amaitzeko krono-lan';
+$string['conditiontext'] = '[TTTT] geratzen da edozein egunerako [CCCC] egunerako ekitaldirako';
 $string['editrule_condition_calendar'] = 'Ekitaldi {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
+$string['modname'] = 'calendareventto';
+$string['pluginname'] = 'Egunerako garaiera gelditzen den denboraren jakinarazpena';
 $string['privacy:metadata'] = 'calendareventto pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'calendareventto';

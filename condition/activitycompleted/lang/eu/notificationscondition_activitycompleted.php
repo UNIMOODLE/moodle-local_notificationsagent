@@ -35,9 +35,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Jarduera bat burutzeari dagokion baldintza.';
 $string['conditiontext'] = 'Erabiltzaileak jarduera burutu du [AAAA].';
-$string['subtype'] = 'activitycompleted';
-$string['modname'] = 'activitycompleted';
 $string['editrule_condition_activity'] = '{$a->typeelement} jarduera:';
+$string['modname'] = 'activitycompleted';
+$string['pluginname'] = 'Jarduera bat burutzeari dagokion baldintza.';
 $string['privacy:metadata'] = 'activitycompleted pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activitycompleted';

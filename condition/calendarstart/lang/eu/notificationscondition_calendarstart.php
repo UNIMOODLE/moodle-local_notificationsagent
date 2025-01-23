@@ -36,13 +36,13 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Eguneratze data txandakako eguna';
-$string['conditiontext'] = 'Izena eman [TTTT] kalendarioko ekitaldiaren ostean [CCCC]';
-$string['subtype'] = 'calendarstart';
-$string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'Kalendari hasiera kron lan';
-$string['editrule_condition_calendar'] = 'Ekitaldia {$a->typeelement}aren ostean:';
 $string['afterend'] = '"Ekitaldi"aren amaieran ondoren';
 $string['afterstart'] = '"Ekitaldi"aren hasieran ondoren';
+$string['calendarstart_crontask'] = 'Kalendari hasiera kron lan';
+$string['conditiontext'] = 'Izena eman [TTTT] kalendarioko ekitaldiaren ostean [CCCC]';
+$string['editrule_condition_calendar'] = 'Ekitaldia {$a->typeelement}aren ostean:';
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
+$string['modname'] = 'calendarstart';
+$string['pluginname'] = 'Eguneratze data txandakako eguna';
 $string['privacy:metadata'] = 'calendarstart pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'calendarstart';

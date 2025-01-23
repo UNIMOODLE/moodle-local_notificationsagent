@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Acció relativa a Forum Message';
-$string['forummessage_action'] = 'Publicar un post general al fòrum [FFFF] amb títol [TTTT] i missatge [BBBB]';
-$string['editrule_action_element_title'] = 'Títol {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Fòrum {$a->typeelement}';
-$string['subtype'] = 'forummessage';
+$string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
+$string['editrule_action_element_title'] = 'Títol {$a->typeelement}:';
+$string['forummessage_action'] = 'Publicar un post general al fòrum [FFFF] amb títol [TTTT] i missatge [BBBB]';
+$string['pluginname'] = 'Acció relativa a Forum Message';
 $string['privacy:metadata'] = 'El plugin forummessage no emmagatzema cap dada personal.';
+$string['subtype'] = 'forummessage';

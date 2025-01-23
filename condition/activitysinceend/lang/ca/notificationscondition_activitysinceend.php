@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició: data relativa des de la fi de l\'activitat';
 $string['conditiontext'] = 'Han passat [TTTT] des de l\'assoliment de la fita de l\'activitat [AAAA].';
-$string['subtype'] = 'activitysinceend';
-$string['modname'] = 'activitysinceend';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['modname'] = 'activitysinceend';
+$string['pluginname'] = 'Condició: data relativa des de la fi de l\'activitat';
 $string['privacy:metadata'] = 'El plugin activitysinceend no emmagatzema cap dada personal.';
+$string['subtype'] = 'activitysinceend';

@@ -35,14 +35,14 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
 $string['conditiontext'] = 'Asteburua da';
-$string['subtype'] = 'weekend';
-$string['modname'] = 'weekend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['weekend_crontask'] = 'weekend cron task';
-$string['weekendtext'] = 'Asteburua dad ({$a->weekend})';
-$string['weekendtag'] = 'Asteburu';
-
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'weekend';
+$string['pluginname'] = 'Horri dagokion baldintza';
 $string['privacy:metadata'] = 'weekend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'weekend';
+$string['weekend_crontask'] = 'weekend cron task';
+$string['weekendtag'] = 'Asteburu';
+$string['weekendtext'] = 'Asteburua dad ({$a->weekend})';
+

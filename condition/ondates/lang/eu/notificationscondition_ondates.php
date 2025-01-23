@@ -35,15 +35,15 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Daten arteko egoera erlatiboa';
 $string['conditiontext'] = '[FFFF] eta [FFFF] artean gaude.';
-$string['validation_editrule_form_supported_invalid_date'] = 'Hasiera-datak amaiera-data baino lehenagokoa izan behar du';
-$string['validation_editrule_form_supported_finished_date'] = 'Amaiera-data ezin da izan uneko data baino lehenagokoa';
-$string['subtype'] = 'ondates';
-$string['modname'] = 'ondates';
-$string['editrule_condition_element_startdate'] = 'Hasiera data';
 $string['editrule_condition_element_enddate'] = 'Amaiera data';
+$string['editrule_condition_element_startdate'] = 'Hasiera data';
+$string['modname'] = 'ondates';
 $string['ondates_crontask'] = 'Ondates cron task';
-$string['ondatestext'] = 'Zita artean gaude ({$a->ondates})';
 $string['ondatestag'] = 'Daten artean';
+$string['ondatestext'] = 'Zita artean gaude ({$a->ondates})';
+$string['pluginname'] = 'Daten arteko egoera erlatiboa';
 $string['privacy:metadata'] = 'ondates pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'ondates';
+$string['validation_editrule_form_supported_finished_date'] = 'Amaiera-data ezin da izan uneko data baino lehenagokoa';
+$string['validation_editrule_form_supported_invalid_date'] = 'Hasiera-datak amaiera-data baino lehenagokoa izan behar du';

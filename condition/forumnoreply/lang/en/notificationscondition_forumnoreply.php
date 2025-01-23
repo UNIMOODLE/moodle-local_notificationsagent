@@ -32,12 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition of a thread opened by the user without a response.';
 $string['conditiontext'] = 'An open thread by the user in the [FFFF] forum without any response for more than [TTTT] time.';
-$string['subtype'] = 'forumnoreply';
-$string['modname'] = 'forumnoreply';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['forumnoreply_crontask'] = 'Forumnoreply cron task';
 $string['editrule_condition_forum'] = 'Thread [FFFF]';
-
+$string['forumnoreply_crontask'] = 'Forumnoreply cron task';
+$string['modname'] = 'forumnoreply';
+$string['pluginname'] = 'Condition of a thread opened by the user without a response.';
 $string['privacy:metadata'] = 'The forumnoreply plugin does not store any personal data.';
+$string['subtype'] = 'forumnoreply';
+

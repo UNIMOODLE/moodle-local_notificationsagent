@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: jarduera amaitutakoaren ostean data erlatiboa';
 $string['conditiontext'] = '[AAAA] jardueraren amaieratik [TTTT] pasa da.';
-$string['subtype'] = 'activitysinceend';
-$string['modname'] = 'activitysinceend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activitysinceend';
+$string['pluginname'] = 'Baldintza: jarduera amaitutakoaren ostean data erlatiboa';
 $string['privacy:metadata'] = 'activitysinceend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activitysinceend';

@@ -35,10 +35,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Balorazio-elementu batean puntuazioa lortzearekin lotutako baldintza.';
 $string['conditiontext'] = 'Erabiltzaileak [OOOP] [GGGG] balorazioa lortu du [AAAA] jardueran.';
-$string['subtype'] = 'itemgraded';
-$string['modname'] = 'itemgraded';
-$string['editrule_condition_grade'] = 'Titulazioa {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_grade'] = 'Titulazioa {$a->typeelement}:';
+$string['modname'] = 'itemgraded';
+$string['pluginname'] = 'Balorazio-elementu batean puntuazioa lortzearekin lotutako baldintza.';
 $string['privacy:metadata'] = 'itemgraded pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'itemgraded';

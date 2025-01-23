@@ -151,7 +151,9 @@ class rule extends base {
                     return '';
                 }
 
-                return \html_writer::link(new \moodle_url('/user/profile.php', ['id' => $row->id]), $row->firstname.' '.$row->lastname);
+                return \html_writer::link(new \moodle_url('/user/profile.php',
+                    ['id' => $row->id]),
+                    $row->firstname.' '.$row->lastname);
             });
 
         $columns[] = (new column(
@@ -362,7 +364,7 @@ class rule extends base {
         ))
                 ->add_joins($this->get_joins())
                 ->set_limited_operators([
-                        select::EQUAL_TO
+                        select::EQUAL_TO,
                 ])
                 ->set_options_callback(static function () use ($DB, $USER, $PAGE): array {
                     $coursecontext = $PAGE->context;

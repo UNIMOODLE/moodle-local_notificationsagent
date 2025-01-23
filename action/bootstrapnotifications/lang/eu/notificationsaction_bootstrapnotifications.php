@@ -35,9 +35,9 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Bootstrap jakinarazpenekin lotutako ekintza';
-$string['messageprovider:bootstrapnotifications'] = 'Bootstrap jakinarazpen hornitzailea';
 $string['bootstrapnotifications_action'] = 'Bootstrap jakinarazpena testuarekin [TTTT]';
-$string['subtype'] = 'bootstrapnotifications';
 $string['editrule_action_element_text'] = 'Testua {$a->typeelement}:';
+$string['messageprovider:bootstrapnotifications'] = 'Bootstrap jakinarazpen hornitzailea';
+$string['pluginname'] = 'Bootstrap jakinarazpenekin lotutako ekintza';
 $string['privacy:metadata'] = 'bootstrapnotifications pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'bootstrapnotifications';

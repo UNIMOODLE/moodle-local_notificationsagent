@@ -35,10 +35,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Add user to group';
-$string['messageprovider:add_user_group'] = 'Add user group Provider';
 $string['addusergroup_action'] = 'Add user to group [GGGG]';
-$string['subtype'] = 'addusergroup';
-$string['editrule_action_element_user'] = 'User {$a->typeelement}';
 $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
+$string['editrule_action_element_user'] = 'User {$a->typeelement}';
+$string['messageprovider:add_user_group'] = 'Add user group Provider';
+$string['pluginname'] = 'Add user to group';
 $string['privacy:metadata'] = 'The addusergroup plugin does not store any personal data.';
+$string['subtype'] = 'addusergroup';

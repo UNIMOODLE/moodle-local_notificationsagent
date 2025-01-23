@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: erabiltzaileak erantzunik gabe irekitako gaitza.';
 $string['conditiontext'] = '[TTTT] denbora baino gehiago erabiltzaileak irekitako gaitza erantzunik gabe dago [FFFF] foroan.';
-$string['subtype'] = 'forumnoreply';
-$string['modname'] = 'forumnoreply';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['forumnoreply_crontask'] = 'forumnoreply cron task';
-
+$string['modname'] = 'forumnoreply';
+$string['pluginname'] = 'Baldintza: erabiltzaileak erantzunik gabe irekitako gaitza.';
 $string['privacy:metadata'] = 'forumnoreply pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'forumnoreply';
+

@@ -35,10 +35,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Condition related to the achieving a score in a grade item.';
 $string['conditiontext'] = 'The user achieved a grade [OOOP] [GGGG] in the [AAAA] activity.';
-$string['subtype'] = 'itemgraded';
-$string['modname'] = 'itemgraded';
-$string['editrule_condition_grade'] = 'Grade {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['editrule_condition_grade'] = 'Grade {$a->typeelement}:';
+$string['modname'] = 'itemgraded';
+$string['pluginname'] = 'Condition related to the achieving a score in a grade item.';
 $string['privacy:metadata'] = 'The itemgraded plugin does not store any personal data.';
+$string['subtype'] = 'itemgraded';

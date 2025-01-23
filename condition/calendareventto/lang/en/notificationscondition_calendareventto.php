@@ -32,11 +32,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Remaining time for calendar event';
-$string['conditiontext'] = 'Less than [TTTT] remains for the calendar event [CCCC]';
-$string['subtype'] = 'calendareventto';
-$string['modname'] = 'calendareventto';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['calendareventto_crontask'] = 'Calendar end cron task';
+$string['conditiontext'] = 'Less than [TTTT] remains for the calendar event [CCCC]';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'calendareventto';
+$string['pluginname'] = 'Remaining time for calendar event';
 $string['privacy:metadata'] = 'The calendareventto plugin does not store any personal data.';
+$string['subtype'] = 'calendareventto';

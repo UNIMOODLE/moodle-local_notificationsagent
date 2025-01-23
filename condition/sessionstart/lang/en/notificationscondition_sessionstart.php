@@ -32,13 +32,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition relative date to first access to a course';
 $string['conditiontext'] = '[TTTT] has passed since the user first session in the course.';
-$string['subtype'] = 'sessionstart';
-$string['modname'] = 'sessionstart';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-
-$string['privacy:metadata:notificationsagent_crseview'] = 'The plugin stores information related to user access to courses.';
-$string['privacy:metadata:userid'] = 'The ID of the user related to this data.';
+$string['modname'] = 'sessionstart';
+$string['pluginname'] = 'Condition relative date to first access to a course';
 $string['privacy:metadata:courseid'] = 'The ID of the course to which this data refers.';
 $string['privacy:metadata:firstaccess'] = 'The first time the user accessed the course.';
+$string['privacy:metadata:notificationsagent_crseview'] = 'The plugin stores information related to user access to courses.';
+$string['privacy:metadata:userid'] = 'The ID of the user related to this data.';
+$string['subtype'] = 'sessionstart';
+

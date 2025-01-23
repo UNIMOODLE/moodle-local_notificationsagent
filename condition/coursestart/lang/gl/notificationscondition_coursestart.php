@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa á data de inicio do curso';
 $string['conditiontext'] = 'Pasaron [TTTT] dende o comezo do curso.';
-$string['subtype'] = 'coursestart';
-$string['modname'] = 'coursestart';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['coursestart_crontask'] = 'Tarefa cron de inicio de curso';
-
+$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['modname'] = 'coursestart';
+$string['pluginname'] = 'Condición relativa á data de inicio do curso';
 $string['privacy:metadata'] = 'O plugin coursestart non almacena ningún dato persoal.';
+$string['subtype'] = 'coursestart';
+

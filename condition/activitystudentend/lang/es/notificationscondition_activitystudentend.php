@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición de fecha desde la última entrada del estudiante en la actividad';
-$string['conditiontext'] = 'Han pasado [TTTT] desde la última entrada del estudiante en la actividad [AAAA].';
-$string['subtype'] = 'activitystudentend';
-$string['modname'] = 'activitystudentend';
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['activitystudentend_crontask'] = 'Tarea cron para abrir la actividad';
+$string['conditiontext'] = 'Han pasado [TTTT] desde la última entrada del estudiante en la actividad [AAAA].';
+$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['modname'] = 'activitystudentend';
+$string['pluginname'] = 'Condición de fecha desde la última entrada del estudiante en la actividad';
 $string['privacy:metadata'] = 'El plugin de activitystudentend no almacena ningún dato personal.';
+$string['subtype'] = 'activitystudentend';

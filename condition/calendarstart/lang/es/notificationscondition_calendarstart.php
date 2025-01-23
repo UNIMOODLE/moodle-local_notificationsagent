@@ -35,13 +35,13 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición fecha relativa desde el evento del calendario';
-$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el evento de calendario [CCCC]';
-$string['subtype'] = 'calendarstart';
-$string['modname'] = 'calendarstart';
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
-$string['calendarstart_crontask'] = 'Tarea cron de inicio de calendario';
-$string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
 $string['afterend'] = 'Después del fin del "evento"';
 $string['afterstart'] = 'Después del inicio del "evento"';
+$string['calendarstart_crontask'] = 'Tarea cron de inicio de calendario';
+$string['conditiontext'] = 'Ha transcurrido [TTTT] desde el evento de calendario [CCCC]';
+$string['editrule_condition_calendar'] = 'Evento {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['modname'] = 'calendarstart';
+$string['pluginname'] = 'Condición fecha relativa desde el evento del calendario';
 $string['privacy:metadata'] = 'El plugin de calendarstart no almacena ningún dato personal.';
+$string['subtype'] = 'calendarstart';

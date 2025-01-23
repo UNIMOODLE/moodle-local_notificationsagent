@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
 $string['conditiontext'] = 'Kurtsaren amaieraraino [TTTT] falta da.';
-$string['subtype'] = 'courseend';
-$string['modname'] = 'courseend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['courseend_crontask'] = 'courseend cron task';
-$string['validation_editrule_form_dateend'] = 'Ikastaroaren amaiera data gehitu behar duzu';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'courseend';
+$string['pluginname'] = 'Baldintza: jarduera amaitzeko data erlatiboa';
 $string['privacy:metadata'] = 'courseend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'courseend';
+$string['validation_editrule_form_dateend'] = 'Ikastaroaren amaiera data gehitu behar duzu';

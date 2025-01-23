@@ -35,9 +35,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Condition related to the completion of an activity.';
 $string['conditiontext'] = 'The user has completed the activity [AAAA].';
-$string['subtype'] = 'activitycompleted';
-$string['modname'] = 'activitycompleted';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['modname'] = 'activitycompleted';
+$string['pluginname'] = 'Condition related to the completion of an activity.';
 $string['privacy:metadata'] = 'The activitycompleted plugin does not store any personal data.';
+$string['subtype'] = 'activitycompleted';

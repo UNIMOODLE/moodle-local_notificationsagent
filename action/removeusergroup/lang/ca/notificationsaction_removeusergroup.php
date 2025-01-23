@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Acció relativa a eliminar un grup d\'usuaris';
+$string['editrule_action_element_group'] = 'Grup {$a->typeelement}:';
+$string['editrule_action_element_user'] = 'Usuari {$a->typeelement}:';
 $string['messageprovider:removeusergroup'] = 'Eliminar un grup d\'usuaris Proveïdor';
+$string['pluginname'] = 'Acció relativa a eliminar un grup d\'usuaris';
+$string['privacy:metadata'] = 'El plugin removeusergroup no emmagatzema cap dada personal.';
 $string['removeusergroup_action'] = 'Eliminar usuari al grup [GGGG]';
 $string['subtype'] = 'removeusergroup';
-$string['editrule_action_element_user'] = 'Usuari {$a->typeelement}:';
-$string['editrule_action_element_group'] = 'Grup {$a->typeelement}:';
-$string['privacy:metadata'] = 'El plugin removeusergroup no emmagatzema cap dada personal.';

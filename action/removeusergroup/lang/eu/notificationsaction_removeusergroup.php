@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Ekintza Baldintza garrantzitsua kendu erabiltzailea taldetik';
+$string['editrule_action_element_group'] = 'Taldea {$a->typeelement}:';
+$string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}:';
 $string['messageprovider:removeusergroup'] = 'Ezabatu erabiltzaile taldea Hornitzailea';
+$string['pluginname'] = 'Ekintza Baldintza garrantzitsua kendu erabiltzailea taldetik';
+$string['privacy:metadata'] = 'removeusergroup pluginak ez du datu pertsonalik gordetzen.';
 $string['removeusergroup_action'] = 'Ezabatu erabiltzailea [AAAA] taldetik';
 $string['subtype'] = 'removeusergroup';
-$string['editrule_action_element_user'] = 'Erabiltzailea {$a->typeelement}:';
-$string['editrule_action_element_group'] = 'Taldea {$a->typeelement}:';
-$string['privacy:metadata'] = 'removeusergroup pluginak ez du datu pertsonalik gordetzen.';

@@ -2432,7 +2432,7 @@ class rule {
     /**
      * Check permission to access to rule
      *
-     * @param context_system|context_course $context
+     * @param \context_system|context_course $context
      * @param int $courseid
      */
     public function check_permission($context, $courseid) {

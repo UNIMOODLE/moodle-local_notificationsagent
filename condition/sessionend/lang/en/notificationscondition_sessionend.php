@@ -33,11 +33,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition relative date to last access to a course';
 $string['conditiontext'] = '[TTTT] has passed since the user last session in the course.';
-$string['subtype'] = 'sessionend';
-$string['modname'] = 'sessionend';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['sessionend_crontask'] = 'Session end cron task';
-
+$string['modname'] = 'sessionend';
+$string['pluginname'] = 'Condition relative date to last access to a course';
 $string['privacy:metadata'] = 'The sessionend plugin does not store any personal data.';
+$string['sessionend_crontask'] = 'Session end cron task';
+$string['subtype'] = 'sessionend';
+

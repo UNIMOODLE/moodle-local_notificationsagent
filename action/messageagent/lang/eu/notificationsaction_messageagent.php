@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Nire jakinarazpenen laguntzailea';
-$string['messageprovider:individual_message'] = 'Nire jardueraren jakinarazpena.';
-$string['messageagent_action'] = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_title'] = 'Kualifikazioa {$a->typeelement}:';
 $string['editrule_action_message'] = 'Mezua {$a->typeelement}';
-$string['subtype'] = 'messageagent';
+$string['editrule_action_title'] = 'Kualifikazioa {$a->typeelement}:';
+$string['messageagent_action'] = 'Bidali banakako jakinarazpena izenburuarekin [TTTT] eta mezuarekin [BBBB]';
 $string['messageagent_event'] = 'Mezularitzako agentea';
+$string['messageprovider:individual_message'] = 'Nire jardueraren jakinarazpena.';
+$string['pluginname'] = 'Nire jakinarazpenen laguntzailea';
 $string['privacy:metadata'] = 'messageagent pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'messageagent';

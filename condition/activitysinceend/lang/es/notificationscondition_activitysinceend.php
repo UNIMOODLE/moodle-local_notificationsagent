@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición: fecha relativa desde el fin de la actividad';
 $string['conditiontext'] = 'Ha transcurrido [TTTT] desde la marca de finalización de la actividad [AAAA].';
-$string['subtype'] = 'activitysinceend';
-$string['modname'] = 'activitysinceend';
-$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
+$string['modname'] = 'activitysinceend';
+$string['pluginname'] = 'Condición: fecha relativa desde el fin de la actividad';
 $string['privacy:metadata'] = 'El plugin de activitysinceend no almacena ningún dato personal.';
+$string['subtype'] = 'activitysinceend';

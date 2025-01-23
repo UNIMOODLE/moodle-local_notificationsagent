@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Ikastaroan eduki berria dago.';
-$string['conditiontext'] = '[AAAA] motako ikastaroan eduki berria dago.';
-$string['subtype'] = 'activitynewcontent';
-$string['modname'] = 'activitynewcontent';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitynewcontent_crontask'] = 'activitynewcontent cron task';
-
+$string['conditiontext'] = '[AAAA] motako ikastaroan eduki berria dago.';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activitynewcontent';
+$string['pluginname'] = 'Ikastaroan eduki berria dago.';
 $string['privacy:metadata'] = 'activitynewcontent pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activitynewcontent';
+

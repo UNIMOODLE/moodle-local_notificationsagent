@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'A condición da actividade está dispoñible.';
-$string['conditiontext'] = 'A actividade [AAAA] está dispoñible.';
-$string['subtype'] = 'activityavailable';
-$string['modname'] = 'activityavailable';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activityavailable_crontask'] = 'activityavailable cron task';
+$string['conditiontext'] = 'A actividade [AAAA] está dispoñible.';
+$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['modname'] = 'activityavailable';
+$string['pluginname'] = 'A condición da actividade está dispoñible.';
 $string['privacy:metadata'] = 'O plugin activityavailable non almacena ningún dato persoal.';
+$string['subtype'] = 'activityavailable';

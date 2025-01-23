@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a la fecha del primer acceso a un curso';
 $string['conditiontext'] = 'Ha transcurrido [TTTT] desde el primer inicio de sesión en el curso.';
-$string['subtype'] = 'sessionstart';
-$string['modname'] = 'sessionstart';
-$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
-$string['sessionstart_crontask'] = 'sessionstart cron task';
-
+$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
+$string['modname'] = 'sessionstart';
+$string['pluginname'] = 'Condición relativa a la fecha del primer acceso a un curso';
 $string['privacy:metadata'] = 'El plugin de sessionstart no almacena ningún dato personal.';
+$string['sessionstart_crontask'] = 'sessionstart cron task';
+$string['subtype'] = 'sessionstart';
+

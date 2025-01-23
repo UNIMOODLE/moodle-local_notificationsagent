@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Ikasleak jarduera baten azken sarrera datako baldintza';
-$string['conditiontext'] = '[AAAA] jarduera irakaslearen azken sarrera gertatu da [TTTT] luzatu da.';
-$string['subtype'] = 'activitystudentend';
-$string['modname'] = 'activitystudentend';
-$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitystudentend_crontask'] = 'Jarduera irekitzeko krono-lan';
+$string['conditiontext'] = '[AAAA] jarduera irakaslearen azken sarrera gertatu da [TTTT] luzatu da.';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Ordua {$a->typeelement}:';
+$string['modname'] = 'activitystudentend';
+$string['pluginname'] = 'Ikasleak jarduera baten azken sarrera datako baldintza';
 $string['privacy:metadata'] = 'activitystudentend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activitystudentend';

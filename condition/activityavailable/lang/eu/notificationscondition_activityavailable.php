@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = 'Jarduera [AAAA] eskuragarri dago';
-$string['subtype'] = 'activityavailable';
-$string['modname'] = 'activityavailable';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityavailable_crontask'] = 'activityavailable cron task';
+$string['conditiontext'] = 'Jarduera [AAAA] eskuragarri dago';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activityavailable';
+$string['pluginname'] = 'Horri dagokion baldintza';
 $string['privacy:metadata'] = 'activityavailable pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activityavailable';

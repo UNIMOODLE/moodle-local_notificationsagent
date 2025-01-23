@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició de data des de l\'última entrada de l\'estudiant a l\'activitat';
-$string['conditiontext'] = 'Han passat [TTTT] des de l\'última entrada de l\'estudiant a l\'activitat [AAAA].';
-$string['subtype'] = 'activitystudentend';
-$string['modname'] = 'activitystudentend';
-$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activitystudentend_crontask'] = 'Tasca cron per obrir l\'activitat';
+$string['conditiontext'] = 'Han passat [TTTT] des de l\'última entrada de l\'estudiant a l\'activitat [AAAA].';
+$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Hora {$a->typeelement}:';
+$string['modname'] = 'activitystudentend';
+$string['pluginname'] = 'Condició de data des de l\'última entrada de l\'estudiant a l\'activitat';
 $string['privacy:metadata'] = 'El plugin activitystudentend no emmagatzema cap dada personal.';
+$string['subtype'] = 'activitystudentend';

@@ -35,15 +35,15 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa entre dates';
 $string['conditiontext'] = 'Estem entre [FFFF] i [FFFF]';
-$string['validation_editrule_form_supported_invalid_date'] = 'A data de inicio debe ser anterior á data de finalización';
-$string['validation_editrule_form_supported_finished_date'] = 'A data de finalización non pode ser anterior á data actual';
-$string['subtype'] = 'ondates';
-$string['modname'] = 'ondates';
-$string['editrule_condition_element_startdate'] = 'Data d\'inici';
 $string['editrule_condition_element_enddate'] = 'Data de fi';
+$string['editrule_condition_element_startdate'] = 'Data d\'inici';
+$string['modname'] = 'ondates';
 $string['ondates_crontask'] = 'Ondates cron task';
-$string['ondatestext'] = 'Estem entre dates ({$a->ondates})';
 $string['ondatestag'] = 'Entre dates';
+$string['ondatestext'] = 'Estem entre dates ({$a->ondates})';
+$string['pluginname'] = 'Condició relativa entre dates';
 $string['privacy:metadata'] = 'El plugin ondates no emmagatzema cap dada personal.';
+$string['subtype'] = 'ondates';
+$string['validation_editrule_form_supported_finished_date'] = 'A data de finalización non pode ser anterior á data actual';
+$string['validation_editrule_form_supported_invalid_date'] = 'A data de inicio debe ser anterior á data de finalización';

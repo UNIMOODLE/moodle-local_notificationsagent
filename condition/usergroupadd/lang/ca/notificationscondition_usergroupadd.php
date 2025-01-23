@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a afegir usuari a un grup';
 $string['conditiontext'] = 'L\'usuari s\'ha afegit a un grup [GGGG].';
-$string['subtype'] = 'usergroupadd';
-$string['modname'] = 'usergroupadd';
 $string['editrule_action_element_group'] = 'Grup {$a->typeelement}';
-$string['usergroupaddtext'] = 'Quan s\'afegeixi al grup ({$a->usergroupadd})';
-$string['usergroupaddtag'] = 'Quan s\'afegeixi al grup';
+$string['modname'] = 'usergroupadd';
+$string['pluginname'] = 'Condició relativa a afegir usuari a un grup';
 $string['privacy:metadata'] = 'El plugin usergroupadd no emmagatzema cap dada personal.';
+$string['subtype'] = 'usergroupadd';
+$string['usergroupaddtag'] = 'Quan s\'afegeixi al grup';
+$string['usergroupaddtext'] = 'Quan s\'afegeixi al grup ({$a->usergroupadd})';

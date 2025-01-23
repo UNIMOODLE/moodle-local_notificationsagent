@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condition relative to add user to group';
 $string['conditiontext'] = 'The user has been added to a group [GGGG].';
-$string['subtype'] = 'usergroupadd';
-$string['modname'] = 'usergroupadd';
 $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
-$string['usergroupaddtext'] = 'The user has been added to a group ({$a->usergroupadd})';
-$string['usergroupaddtag'] = 'The user has been added to a group';
-
+$string['modname'] = 'usergroupadd';
+$string['pluginname'] = 'Condition relative to add user to group';
 $string['privacy:metadata'] = 'The usergroupadd plugin does not store any personal data.';
+$string['subtype'] = 'usergroupadd';
+$string['usergroupaddtag'] = 'The user has been added to a group';
+$string['usergroupaddtext'] = 'The user has been added to a group ({$a->usergroupadd})';
+

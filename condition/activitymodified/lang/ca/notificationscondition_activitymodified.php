@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició relativa a S\'ha modificat el contingut de l\'activitat';
-$string['conditiontext'] = 'S\'ha modificat el contingut de l\'activitat [AAAA]';
-$string['subtype'] = 'activitymodified';
-$string['modname'] = 'activitymodified';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'activitymodified cron task';
+$string['conditiontext'] = 'S\'ha modificat el contingut de l\'activitat [AAAA]';
+$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['modname'] = 'activitymodified';
+$string['pluginname'] = 'Condició relativa a S\'ha modificat el contingut de l\'activitat';
 $string['privacy:metadata'] = 'El plugin activitymodified no emmagatzema cap dada personal.';
+$string['subtype'] = 'activitymodified';

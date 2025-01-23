@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición: fecha relativa hasta el fin del curso';
 $string['conditiontext'] = 'Quedan menos de [TTTT] para el fin del curso.';
-$string['subtype'] = 'courseend';
-$string['modname'] = 'courseend';
-$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
 $string['courseend_crontask'] = 'courseend cron task';
-$string['validation_editrule_form_dateend'] = 'Es necesario añadir una fecha de fin de curso';
+$string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
+$string['modname'] = 'courseend';
+$string['pluginname'] = 'Condición: fecha relativa hasta el fin del curso';
 $string['privacy:metadata'] = 'El plugin de courseend no almacena ningún dato personal.';
+$string['subtype'] = 'courseend';
+$string['validation_editrule_form_dateend'] = 'Es necesario añadir una fecha de fin de curso';

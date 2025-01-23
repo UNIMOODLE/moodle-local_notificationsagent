@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Horri dagokion baldintza';
-$string['conditiontext'] = '[TTTT] baino gehiago izan da ikasleak [AAAA] jardueran azken edukia bidali zuenetik.';
-$string['subtype'] = 'activitylastsend';
-$string['modname'] = 'activitylastsend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'activitylastsend cron task';
-
+$string['conditiontext'] = '[TTTT] baino gehiago izan da ikasleak [AAAA] jardueran azken edukia bidali zuenetik.';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activitylastsend';
+$string['pluginname'] = 'Horri dagokion baldintza';
 $string['privacy:metadata'] = 'activitylastsend pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activitylastsend';
+

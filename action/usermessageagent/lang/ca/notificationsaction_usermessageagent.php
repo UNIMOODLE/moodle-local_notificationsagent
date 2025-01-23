@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Notificació individual a usuari';
-$string['messageprovider:particular_message'] = 'Proveïdor de missatges particulars';
-$string['usermessageagent_action'] = 'Enviar notificació a un usuari concret [UUUU] amb títol [TTTT] i missatge [BBBB]';
-$string['subtype'] = 'usermessageagent';
+$string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
 $string['editrule_action_element_title'] = 'Titol {$a->typeelement}:';
 $string['editrule_action_element_user'] = 'Usuari {$a->typeelement}';
-$string['editrule_action_element_message'] = 'Missatge {$a->typeelement}';
+$string['messageprovider:particular_message'] = 'Proveïdor de missatges particulars';
+$string['pluginname'] = 'Notificació individual a usuari';
 $string['privacy:metadata'] = 'El plugin usermessageagent no emmagatzema cap dada personal.';
+$string['subtype'] = 'usermessageagent';
+$string['usermessageagent_action'] = 'Enviar notificació a un usuari concret [UUUU] amb títol [TTTT] i missatge [BBBB]';

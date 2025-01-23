@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició: data relativa a l\'últim accés al curs';
 $string['conditiontext'] = 'Han passat [TTTT] des de la darrera sessió de l\'usuari al curs.';
-$string['subtype'] = 'sessionend';
-$string['modname'] = 'sessionend';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
-$string['sessionend_crontask'] = 'sessionend cron task';
-
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['modname'] = 'sessionend';
+$string['pluginname'] = 'Condició: data relativa a l\'últim accés al curs';
 $string['privacy:metadata'] = 'El plugin sessionend no emmagatzema cap dada personal.';
+$string['sessionend_crontask'] = 'sessionend cron task';
+$string['subtype'] = 'sessionend';
+

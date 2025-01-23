@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: azken sarrera-dataren data erlatiboa ikastarora';
 $string['conditiontext'] = 'Azken saioaren ondoren [TTTT] igaro da erabiltzailearen azken sarrera-data ikastarora.';
-$string['subtype'] = 'sessionend';
-$string['modname'] = 'sessionend';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['sessionend_crontask'] = 'sessionend cron task';
-
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'sessionend';
+$string['pluginname'] = 'Baldintza: azken sarrera-dataren data erlatiboa ikastarora';
 $string['privacy:metadata'] = 'sessionend pluginak ez du datu pertsonalik gordetzen.';
+$string['sessionend_crontask'] = 'sessionend cron task';
+$string['subtype'] = 'sessionend';
+

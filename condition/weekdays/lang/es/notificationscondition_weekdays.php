@@ -35,14 +35,14 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a cada día de la semana';
 $string['conditiontext'] = 'Cada día de la semana. [LMXJVSD]';
-$string['subtype'] = 'weekdays';
-$string['modname'] = 'weekdays';
-$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividad {$a->typeelement}:';
-$string['weekdays_crontask'] = 'Weekdays cron task';
-$string['weekdaystext'] = 'Es fin de semana ({$a->weekdays})';
-$string['weekdaystag'] = 'Cada día de la semana';
-$string['weekdaysrequired'] = 'Selecciona al menos un día';
+$string['editrule_condition_element_time'] = 'Tiempo {$a->typeelement}:';
+$string['modname'] = 'weekdays';
+$string['pluginname'] = 'Condición relativa a cada día de la semana';
 $string['privacy:metadata'] = 'El plugin de weekdays no almacena ningún dato personal.';
+$string['subtype'] = 'weekdays';
+$string['weekdays_crontask'] = 'Weekdays cron task';
+$string['weekdaysrequired'] = 'Selecciona al menos un día';
+$string['weekdaystag'] = 'Cada día de la semana';
+$string['weekdaystext'] = 'Es fin de semana ({$a->weekdays})';

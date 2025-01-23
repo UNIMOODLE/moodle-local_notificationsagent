@@ -34,10 +34,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Condition relative date since activity end';
 $string['conditiontext'] = 'It has been [TTTT] since the completion milestone of the activity [AAAA].';
-$string['subtype'] = 'activitysinceend';
-$string['modname'] = 'activitysinceend';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'activitysinceend';
+$string['pluginname'] = 'Condition relative date since activity end';
 $string['privacy:metadata'] = 'The activitysinceend plugin does not store any personal data.';
+$string['subtype'] = 'activitysinceend';

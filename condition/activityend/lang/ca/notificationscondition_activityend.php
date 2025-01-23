@@ -35,13 +35,13 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condició: data relativa a la fi de l\'activitat';
-$string['conditiontext'] = 'Queda menys de [TTTT] per a la data de tancament de l\'activitat [AAAA].';
-$string['subtype'] = 'activityend';
-$string['modname'] = 'activityend';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activityend_crontask'] = 'activityend cron task';
+$string['conditiontext'] = 'Queda menys de [TTTT] per a la data de tancament de l\'activitat [AAAA].';
+$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['modname'] = 'activityend';
+$string['pluginname'] = 'Condició: data relativa a la fi de l\'activitat';
+$string['privacy:metadata'] = 'El plugin activityend no emmagatzema cap dada personal.';
+$string['subtype'] = 'activityend';
 $string['validation_editrule_form_dateend'] = 'Cal afegir una data de finalització d\'activitat/curs';
 $string['validation_editrule_form_supported_cm'] = 'Tipus d\'activitat no suportat. Contacteu amb l\'admistrador del lloc.';
-$string['privacy:metadata'] = 'El plugin activityend no emmagatzema cap dada personal.';

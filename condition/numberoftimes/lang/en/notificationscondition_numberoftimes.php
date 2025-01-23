@@ -32,13 +32,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Condition of the rule has been initiated fewer than a number of times and at least some time ago.';
-$string['conditiontext'] = 'The rule has been initiated fewer than [N] times and at least [TTTT] ago.';
-$string['subtype'] = 'numberoftimes';
-$string['modname'] = 'numberoftimes';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['condition_number_times'] = '{$a->typeelement} Times :';
 $string['condition_number'] = 'Times';
+$string['condition_number_times'] = '{$a->typeelement} Times :';
+$string['conditiontext'] = 'The rule has been initiated fewer than [N] times and at least [TTTT] ago.';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'numberoftimes';
 $string['numberoftimes_crontask'] = 'Numberoftimes cron task';
-
+$string['pluginname'] = 'Condition of the rule has been initiated fewer than a number of times and at least some time ago.';
 $string['privacy:metadata'] = 'The numberoftimes plugin does not store any personal data.';
+$string['subtype'] = 'numberoftimes';
+

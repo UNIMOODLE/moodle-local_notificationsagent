@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición: data relativa ao inicio da actividade';
-$string['conditiontext'] = '[TTTT] transcorreu desde a data de apertura da actividade [AAAA].';
-$string['subtype'] = 'activityopen';
-$string['modname'] = 'activityopen';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
+$string['conditiontext'] = '[TTTT] transcorreu desde a data de apertura da actividade [AAAA].';
+$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['modname'] = 'activityopen';
+$string['pluginname'] = 'Condición: data relativa ao inicio da actividade';
 $string['privacy:metadata'] = 'O plugin activityopen non almacena ningún dato persoal.';
+$string['subtype'] = 'activityopen';

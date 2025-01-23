@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza: jarduera hasierako data erlatiboa';
-$string['conditiontext'] = '[TTTT] jardueraren irekiera datatik [AAAA] igaro da.';
-$string['subtype'] = 'activityopen';
-$string['modname'] = 'activityopen';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
 $string['activityopen_crontask'] = 'activityopen cron task';
+$string['conditiontext'] = '[TTTT] jardueraren irekiera datatik [AAAA] igaro da.';
+$string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'activityopen';
+$string['pluginname'] = 'Baldintza: jarduera hasierako data erlatiboa';
 $string['privacy:metadata'] = 'activityopen pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'activityopen';

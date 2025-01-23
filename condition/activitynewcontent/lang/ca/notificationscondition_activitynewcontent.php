@@ -35,12 +35,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'El curs té nou contingut.';
-$string['conditiontext'] = 'Hi ha nou contingut en el curs de tipus [AAAA].';
-$string['subtype'] = 'activitynewcontent';
-$string['modname'] = 'activitynewcontent';
-$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
 $string['activitynewcontent_crontask'] = 'activitynewcontent cron task';
-
+$string['conditiontext'] = 'Hi ha nou contingut en el curs de tipus [AAAA].';
+$string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Temp {$a->typeelement}:';
+$string['modname'] = 'activitynewcontent';
+$string['pluginname'] = 'El curs té nou contingut.';
 $string['privacy:metadata'] = 'El plugin activitynewcontent no emmagatzema cap dada personal.';
+$string['subtype'] = 'activitynewcontent';
+

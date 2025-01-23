@@ -35,15 +35,15 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condition relative to weekdays';
 $string['conditiontext'] = 'Every weekday [LMXJVSD]';
-$string['subtype'] = 'weekdays';
-$string['modname'] = 'weekdays';
-$string['editrule_required_error'] = 'Required';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
-$string['weekdays_crontask'] = 'Weekdays cron task';
-$string['weekdaystext'] = 'It is weekdays ({$a->weekdays})';
-$string['weekdaystag'] = 'weekdays';
-$string['weekdaysrequired'] = 'Select at least one day';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['editrule_required_error'] = 'Required';
+$string['modname'] = 'weekdays';
+$string['pluginname'] = 'Condition relative to weekdays';
 $string['privacy:metadata'] = 'The weekdays plugin does not store any personal data.';
+$string['subtype'] = 'weekdays';
+$string['weekdays_crontask'] = 'Weekdays cron task';
+$string['weekdaysrequired'] = 'Select at least one day';
+$string['weekdaystag'] = 'weekdays';
+$string['weekdaystext'] = 'It is weekdays ({$a->weekdays})';

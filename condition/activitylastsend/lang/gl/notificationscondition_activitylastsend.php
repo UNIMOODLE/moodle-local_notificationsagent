@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición relativa a';
-$string['conditiontext'] = 'Hai máis de [TTTT] desde o último envío de contidos do alumno na actividade [AAAA].';
-$string['subtype'] = 'activitylastsend';
-$string['modname'] = 'activitylastsend';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
 $string['activitylastsend_crontask'] = 'Activitylastsend cron task';
+$string['conditiontext'] = 'Hai máis de [TTTT] desde o último envío de contidos do alumno na actividade [AAAA].';
+$string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['modname'] = 'activitylastsend';
+$string['pluginname'] = 'Condición relativa a';
 $string['privacy:metadata'] = 'O plugin activitylastsend non almacena ningún dato persoal.';
+$string['subtype'] = 'activitylastsend';

@@ -35,10 +35,10 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Foroko mezuari buruzko ekintza';
-$string['forummessage_action'] = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_element_title'] = 'Kualifikazioa {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}';
-$string['subtype'] = 'forummessage';
+$string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
+$string['editrule_action_element_title'] = 'Kualifikazioa {$a->typeelement}:';
+$string['forummessage_action'] = 'Argitaratu mezu orokor bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['pluginname'] = 'Foroko mezuari buruzko ekintza';
 $string['privacy:metadata'] = 'forummessage pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'forummessage';

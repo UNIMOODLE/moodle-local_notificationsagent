@@ -34,11 +34,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'The condition of an activity has been modified.';
-$string['conditiontext'] = 'The content of activity [AAAA] has been modified. ';
-$string['subtype'] = 'activitymodified';
-$string['modname'] = 'activitymodified';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
-$string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['activitymodified_crontask'] = 'Activitymodified cron task';
+$string['conditiontext'] = 'The content of activity [AAAA] has been modified. ';
+$string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'activitymodified';
+$string['pluginname'] = 'The condition of an activity has been modified.';
 $string['privacy:metadata'] = 'The activitymodified plugin does not store any personal data.';
+$string['subtype'] = 'activitymodified';

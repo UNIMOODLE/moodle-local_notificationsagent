@@ -35,14 +35,14 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condition relative to weekend';
 $string['conditiontext'] = 'It is weekend';
-$string['subtype'] = 'weekend';
-$string['modname'] = 'weekend';
-$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
-$string['weekend_crontask'] = 'Weekend cron task';
-$string['weekendtext'] = 'It is weekend ({$a->weekend})';
-$string['weekendtag'] = 'Weekend';
-
+$string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
+$string['modname'] = 'weekend';
+$string['pluginname'] = 'Condition relative to weekend';
 $string['privacy:metadata'] = 'The weekend plugin does not store any personal data.';
+$string['subtype'] = 'weekend';
+$string['weekend_crontask'] = 'Weekend cron task';
+$string['weekendtag'] = 'Weekend';
+$string['weekendtext'] = 'It is weekend ({$a->weekend})';
+

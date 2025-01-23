@@ -35,11 +35,11 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Foro pribatuko mezuari buruzko ekintza';
-$string['privateforummessage_action'] = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
-$string['editrule_action_element_title'] = 'Kualifikazioa {$a->typeelement}:';
-$string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
 $string['editrule_action_element_forum'] = 'Foroa {$a->typeelement}';
-$string['subtype'] = 'privateforummessage';
-$string['privateforummessage_replyerror'] = 'Mezua ezin izan da argitaratu ziurrenik forumnoreply baldintza ez zelako exekutatu.';
+$string['editrule_action_element_message'] = 'Mezua {$a->typeelement}';
+$string['editrule_action_element_title'] = 'Kualifikazioa {$a->typeelement}:';
+$string['pluginname'] = 'Foro pribatuko mezuari buruzko ekintza';
 $string['privacy:metadata'] = 'privateforummessage pluginak ez du datu pertsonalik gordetzen.';
+$string['privateforummessage_action'] = 'Argitaratu mezu pribatu bat foroan [FFFF] izenburuarekin [TTTT] eta mezuarekin [BBBB]';
+$string['privateforummessage_replyerror'] = 'Mezua ezin izan da argitaratu ziurrenik forumnoreply baldintza ez zelako exekutatu.';
+$string['subtype'] = 'privateforummessage';

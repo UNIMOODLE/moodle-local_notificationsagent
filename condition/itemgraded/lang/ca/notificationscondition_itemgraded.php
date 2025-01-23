@@ -35,10 +35,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Condició relacionada amb lobtenció duna puntuació en un element de qualificació.';
 $string['conditiontext'] = 'L\'usuari ha obtingut la qualificació [OOOP] [GGGG] a l\'activitat [AAAA].';
-$string['subtype'] = 'itemgraded';
-$string['modname'] = 'itemgraded';
-$string['editrule_condition_grade'] = 'Qualificació {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Activitat {$a->typeelement}:';
+$string['editrule_condition_grade'] = 'Qualificació {$a->typeelement}:';
+$string['modname'] = 'itemgraded';
+$string['pluginname'] = 'Condició relacionada amb lobtenció duna puntuació en un element de qualificació.';
 $string['privacy:metadata'] = 'El plugin itemgraded no emmagatzema cap dada personal.';
+$string['subtype'] = 'itemgraded';

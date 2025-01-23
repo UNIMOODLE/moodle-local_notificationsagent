@@ -36,12 +36,12 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Condición da regra foi iniciada menos dun número de veces e polo menos hai algún tempo.';
 $string['conditiontext'] = 'A regra foi iniciada menos de [N] veces e polo menos hai [TTTT].';
-$string['subtype'] = 'numberoftimes';
-$string['modname'] = 'numberoftimes';
-$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Actividade {$a->typeelement}:';
+$string['editrule_condition_element_time'] = 'Tempo {$a->typeelement}:';
+$string['modname'] = 'numberoftimes';
 $string['numberoftimes_crontask'] = 'numberoftimes cron task';
-
+$string['pluginname'] = 'Condición da regra foi iniciada menos dun número de veces e polo menos hai algún tempo.';
 $string['privacy:metadata'] = 'O plugin numberoftimes non almacena ningún dato persoal.';
+$string['subtype'] = 'numberoftimes';
+

@@ -35,14 +35,14 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string['pluginname'] = 'Baldintza asteko egun bakoitzari dagokionez';
 $string['conditiontext'] = 'Asteko egun guztietan. [LMXJVSD]';
-$string['subtype'] = 'weekdays';
-$string['modname'] = 'weekdays';
-$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
 $string['editrule_condition_activity'] = 'Jarduera {$a->typeelement}:';
-$string['weekdays_crontask'] = 'Weekdays cron task';
-$string['weekdaystext'] = 'Asteko eguna da ({$a->weekdays})';
-$string['weekdaystag'] = 'Asteguna';
-$string['weekdaysrequired'] = 'Hautatu gutxienez egun bat';
+$string['editrule_condition_element_time'] = 'Denbora {$a->typeelement}:';
+$string['modname'] = 'weekdays';
+$string['pluginname'] = 'Baldintza asteko egun bakoitzari dagokionez';
 $string['privacy:metadata'] = 'weekdays pluginak ez du datu pertsonalik gordetzen.';
+$string['subtype'] = 'weekdays';
+$string['weekdays_crontask'] = 'Weekdays cron task';
+$string['weekdaysrequired'] = 'Hautatu gutxienez egun bat';
+$string['weekdaystag'] = 'Asteguna';
+$string['weekdaystext'] = 'Asteko eguna da ({$a->weekdays})';
