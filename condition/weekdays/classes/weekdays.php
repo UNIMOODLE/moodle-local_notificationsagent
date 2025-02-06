@@ -245,6 +245,7 @@ class weekdays extends notificationconditionplugin {
      * @return void Processed content with markups handled.
      */
     public function process_markups(&$content, $courseid, $options = null) {
+        $contentdays =[];
         $jsonparams = json_decode($this->get_parameters());
         $calendar = \core_calendar\type_factory::get_calendar_instance();
         $calendar->get_weekdays();
