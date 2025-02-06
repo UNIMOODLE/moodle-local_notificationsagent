@@ -22,7 +22,7 @@
 
 import {get_string as getString} from 'core/str';
 import Url from 'core/url';
-
+import $ from 'jquery';
 /**
  * Selectors for the Assign Modal.
  *
