@@ -22,7 +22,7 @@
 
 import {get_string as getString} from 'core/str';
 import Url from 'core/url';
-
+import $ from 'jquery';
 /**
  * Selectors for the Assign Modal.
  *
@@ -232,8 +232,10 @@ export const init = () => {
                 getCountAll();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                /* eslint-disable no-console */
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
+                /* eslint-enable no-console */
             },
             dataType: 'json'
         });
@@ -336,8 +338,10 @@ export const init = () => {
                 window.location.reload();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                /* eslint-disable no-console */
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
+                /* eslint-enable no-console */
             },
             dataType: 'json'
         });

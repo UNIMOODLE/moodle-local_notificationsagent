@@ -35,7 +35,7 @@ import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {unshareAllRule} from 'local_notificationsagent/rule/repository';
-
+import $ from 'jquery';
 /**
  * Selectors for the Unshare All Button.
  *
