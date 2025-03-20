@@ -56,7 +56,7 @@ class notificationscondition_sessionstart_observer {
         $timeaccess = $event->timecreated;
         // Only triggered if is the first access to a course, otherwise return.
         $firstaccess = sessionstart::get_first_course_access($userid, $courseid);
-        if ($firstaccess) {
+        if (!$firstaccess) {
             return null;
         }
 
