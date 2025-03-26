@@ -66,6 +66,7 @@ body.path-local-notificationsagent .d-flex > .card[id^="card-"].card-required {
 
 body.path-local-notificationsagent .d-flex > .card[id^="card-"] .name {
     font-weight: 600;
+    color: black;
 }
 
 body.path-local-notificationsagent .d-flex > .card[id^="card-"] .createby {
@@ -97,6 +98,10 @@ body.path-local-notificationsagent .badge {
     background-color: #f3f3f3;
     border-radius: 1rem;
     text-transform: capitalize;
+    text-wrap: wrap;
+}
+body.path-local-notificationsagent .card-header .d-flex {
+    flex-wrap: wrap;
 }
 
 body.path-local-notificationsagent .badge.badge-template {
