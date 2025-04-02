@@ -88,9 +88,7 @@ class delete_rule extends external_api {
             try {
                 throw new \moodle_exception(
                     'nosuchinstance',
-                    '',
-                    '',
-                    get_capability_string('local/notificationsagent:nosuchinstance')
+                    'local_notificationsagent',
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
