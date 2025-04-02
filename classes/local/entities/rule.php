@@ -244,11 +244,11 @@ class rule extends base {
                         $userid
                     )
             ) {
-                $query
-                        = 'SELECT DISTINCT {notificationsagent_report}.ruleid
-                         FROM {notificationsagent_report}
-                      WHERE {notificationsagent_report}.courseid =' . $coursecontext->instanceid;
-                $rulenames = $DB->get_fieldset_sql($query);
+                $query = 'SELECT DISTINCT {notificationsagent_report}.ruleid
+                               FROM {notificationsagent_report}
+                               WHERE {notificationsagent_report}.courseid = :courseid';
+                $params = ['courseid' => $coursecontext->instanceid];
+                $rulenames = $DB->get_fieldset_sql($query, $params);
                 // User can see rules of its own.
             } else if (
                     has_capability(
@@ -258,14 +258,14 @@ class rule extends base {
                     )
             ) {
                 $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
-                $query
-                        = 'SELECT {notificationsagent_rule}.id
-                          FROM {notificationsagent_rule}
-                           JOIN {notificationsagent_report}
-                              ON {notificationsagent_report}.ruleid = {notificationsagent_rule}.id
-                            AND {notificationsagent_rule}.createdby = ' . $userid . '
-                        WHERE {notificationsagent_report}.courseid IN (' . $key . ' )';
-                $rulenames = $DB->get_fieldset_sql($query);
+                $query = 'SELECT {notificationsagent_rule}.id
+                                  FROM {notificationsagent_rule}
+                                    JOIN {notificationsagent_report}
+                                       ON {notificationsagent_report}.ruleid = {notificationsagent_rule}.id
+                                WHERE {notificationsagent_rule}.createdby = :userid
+                                     AND {notificationsagent_report}.courseid IN (:key)';
+                $params = ['userid' => $userid, 'key' => $key];
+                $rulenames = $DB->get_fieldset_sql($query, $params);
             }
 
             foreach ($rulenames as $rulename) {
@@ -322,8 +322,9 @@ class rule extends base {
                                 $coursecontext
                             )
                     ) {
-                        $query = "SELECT id FROM {course} where id!=" . SITEID;
-                        $courses = $DB->get_fieldset_sql($query);
+                        $query = "SELECT id FROM {course} WHERE id != :siteid";
+                        $params = ['siteid' => SITEID];
+                        $courses = $DB->get_fieldset_sql($query, $params);
 
                         foreach ($courses as $course) {
                             $options[$course] = get_course($course)->fullname;
@@ -334,8 +335,9 @@ class rule extends base {
                                 $coursecontext
                             )
                     ) {
-                        $query = "SELECT id FROM {course} WHERE id = ($coursecontext->instanceid)";
-                        $courses = $DB->get_fieldset_sql($query);
+                        $query = "SELECT id FROM {course} WHERE id = :courseid";
+                        $params = ['courseid' => $coursecontext->instanceid];
+                        $courses = $DB->get_fieldset_sql($query, $params);
                         foreach ($courses as $course) {
                             $options[$course] = get_course($course)->fullname;
                         }
@@ -393,16 +395,17 @@ class rule extends base {
                             )
                     ) {
                         $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
-                        $query
-                                = 'SELECT DISTINCT {user}.id, CONCAT({user}.firstname ," ", {user}.lastname) AS name
-                             FROM {notificationsagent_report}
-                              JOIN {user} ON {user}.id={notificationsagent_report}.userid
-                           WHERE {notificationsagent_report}.courseid IN (' . $key . ' )';
-                        ;
-                        $users = $DB->get_recordset_sql($query);
+                        $query = 'SELECT DISTINCT
+                                                    {user}.id, {user}.firstname, {user}.lastname, {user}.firstnamephonetic,
+                                                    {user}.lastnamephonetic, {user}.middlename, {user}.alternatename
+                                           FROM {notificationsagent_report}
+                                            JOIN {user} ON {user}.id = {notificationsagent_report}.userid
+                                         WHERE {notificationsagent_report}.courseid IN (:key)';
+                        $params = ['key' => $key];
+                        $users = $DB->get_recordset_sql($query, $params);
 
                         foreach ($users as $user) {
-                            $options[$user->id] = $user->name;
+                            $options[$user->id] = fullname($user);
                         }
                         $users->close();
                     } else if (
