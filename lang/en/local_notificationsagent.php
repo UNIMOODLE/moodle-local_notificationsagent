@@ -262,7 +262,7 @@ $string['notificationsagent:manageallrule'] = 'Cability to manage all rules';
 $string['notificationsagent:managesessions'] = 'Cability to save rule order';
 
 // Webservices.
-$string['notificationsagent:nosuchinstance'] = 'No such instance was found.';
+$string['nosuchinstance'] = 'No such instance was found.';
 $string['isnotrule'] = 'The given rule id is not a rule.';
 
 // Report.

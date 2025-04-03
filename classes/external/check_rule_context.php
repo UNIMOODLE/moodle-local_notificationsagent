@@ -84,9 +84,7 @@ class check_rule_context extends external_api {
             try {
                 throw new \moodle_exception(
                     'nosuchinstance',
-                    '',
-                    '',
-                    get_capability_string('local/notificationsagent:nosuchinstance')
+                    'local_notificationsagent',
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
