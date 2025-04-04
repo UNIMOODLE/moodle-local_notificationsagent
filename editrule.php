@@ -147,7 +147,6 @@ $PAGE->requires->js_call_amd(
     'initRemove',
     [editrule_form::FORM_REMOVE_ACTION_SPAN, editrule_form::FORM_REMOVE_ACTION_BUTTON]
 );
-$PAGE->requires->js_call_amd('local_notificationsagent/notification_statusrule', 'init');
 
 // LOAD RULE.
 $ruleid = optional_param('ruleid', null, PARAM_INT);
