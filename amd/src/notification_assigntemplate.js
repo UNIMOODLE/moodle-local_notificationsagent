@@ -27,7 +27,7 @@ import $ from 'jquery';
  * Selectors for the Assign Modal.
  *
  * @property {string} selectAllId The element ID of the Select All link.
-*/
+ */
 const selectors = {
     selectAllId: '[id^="select-all-"]',
 };
@@ -147,10 +147,10 @@ const registerEventListeners = async() => {
 export const init = () => {
 
     /**
- * Types of rule type
- *
- * @type {{RULE_TYPE: boolean}}
- */
+     * Types of rule type
+     *
+     * @type {{RULE_TYPE: boolean}}
+     */
     const RULE_TYPE = [
         'rule',
         'template'
@@ -232,8 +232,10 @@ export const init = () => {
                 getCountAll();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                /* eslint-disable no-console */
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
+                /* eslint-enable no-console */
             },
             dataType: 'json'
         });
@@ -336,8 +338,10 @@ export const init = () => {
                 window.location.reload();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                /* eslint-disable no-console */
                 console.log("Status: " + textStatus);
                 console.log(errorThrown);
+                /* eslint-enable no-console */
             },
             dataType: 'json'
         });

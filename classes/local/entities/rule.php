@@ -257,14 +257,15 @@ class rule extends base {
                         $userid
                     )
             ) {
-                $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
+                $key = array_keys(enrol_get_my_courses(['id', 'cacherev']));
+                [$insql, $inparams] = $DB->get_in_or_equal($key, SQL_PARAMS_NAMED, 'courseid');
                 $query = 'SELECT {notificationsagent_rule}.id
                                   FROM {notificationsagent_rule}
                                     JOIN {notificationsagent_report}
                                        ON {notificationsagent_report}.ruleid = {notificationsagent_rule}.id
                                 WHERE {notificationsagent_rule}.createdby = :userid
-                                     AND {notificationsagent_report}.courseid IN (:key)';
-                $params = ['userid' => $userid, 'key' => $key];
+                                     AND {notificationsagent_report}.courseid ' . $insql;
+                $params = ['userid' => $userid, ...$inparams];
                 $rulenames = $DB->get_fieldset_sql($query, $params);
             }
 
@@ -394,14 +395,15 @@ class rule extends base {
                                 $coursecontext
                             )
                     ) {
-                        $key = implode(',', array_keys(enrol_get_my_courses(['id', 'cacherev'])));
+                        $key = array_keys(enrol_get_my_courses(['id', 'cacherev']));
+                        [$insql, $params] = $DB->get_in_or_equal($key, SQL_PARAMS_NAMED, 'courseid');
                         $query = 'SELECT DISTINCT
-                                                    {user}.id, {user}.firstname, {user}.lastname, {user}.firstnamephonetic,
-                                                    {user}.lastnamephonetic, {user}.middlename, {user}.alternatename
+                                                     {user}.id, {user}.firstname, {user}.lastname, {user}.firstnamephonetic,
+                                                     {user}.lastnamephonetic, {user}.middlename, {user}.alternatename
                                            FROM {notificationsagent_report}
                                             JOIN {user} ON {user}.id = {notificationsagent_report}.userid
-                                         WHERE {notificationsagent_report}.courseid IN (:key)';
-                        $params = ['key' => $key];
+                                         WHERE {notificationsagent_report}.courseid ' . $insql;
+
                         $users = $DB->get_recordset_sql($query, $params);
 
                         foreach ($users as $user) {
