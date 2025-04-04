@@ -39,7 +39,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="idx_ruleidpluginname" UNIQUE="false" FIELDS="ruleid, pluginname"/>
@@ -55,7 +55,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notifications_rule" REFFIELDS="id"/>
+        <KEY NAME="fk_rule" TYPE="foreign" FIELDS="ruleid" REFTABLE="notificationsagent_rule" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="notificationsagent_triggers" COMMENT="Data for timetriggers">
