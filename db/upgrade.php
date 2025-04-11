@@ -325,5 +325,24 @@ function xmldb_local_notificationsagent_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024043009, 'local', 'notificationsagent');
     }
 
+    if ($oldversion < 2025032001) {
+        // There was a typo on the key reftable, so we need to remove the wrong foreign key and add the right one.
+        $wrongkey = new xmldb_key('fk_rule', XMLDB_KEY_FOREIGN, ['ruleid'], 'notifications_rule', ['id']);
+        $rightkey = new xmldb_key('fk_rule', XMLDB_KEY_FOREIGN, ['ruleid'], 'notificationsagent_rule', ['id']);
+
+        // Fix it in notificationsagent_action.
+        $table = new xmldb_table('notificationsagent_action');
+        $dbman->drop_key($table, $wrongkey);
+        $dbman->add_key($table, $rightkey);
+
+        // Fix it in notificationsagent_condition.
+        $table = new xmldb_table('notificationsagent_condition');
+        $dbman->drop_key($table, $wrongkey);
+        $dbman->add_key($table, $rightkey);
+
+        // Notificationsagent savepoint reached.
+        upgrade_plugin_savepoint(true, 2025032001, 'local', 'notificationsagent');
+    }
+
     return true;
 }
