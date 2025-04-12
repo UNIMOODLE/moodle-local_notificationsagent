@@ -50,6 +50,10 @@ class notificationscondition_usergroupadd_observer {
      */
     public static function group_member_added(\core\event\group_member_added $event) {
         $pluginname = usergroupadd::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $courseid = $event->courseid;
         $userid = $event->relateduserid;
         $groupid = $event->objectid;

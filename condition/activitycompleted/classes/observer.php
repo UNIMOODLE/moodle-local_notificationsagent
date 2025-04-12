@@ -49,7 +49,10 @@ class notificationscondition_activitycompleted_observer {
         $pluginname = activitycompleted::NAME;
         $courseid = $event->courseid;
         $userid = $event->relateduserid;
-
+        // Bypass the event hadler if the plugin is disabled.
+        if (! local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $event->contextinstanceid);
 
         if ($event->other['completionstate'] == COMPLETION_INCOMPLETE) {

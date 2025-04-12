@@ -48,6 +48,10 @@ class notificationscondition_activitynewcontent_observer {
      * @return void
      */
     public static function course_module_created(\core\event\course_module_created $event) {
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled(activitynewcontent::NAME)) {
+            return;
+        }
         $other = $event->other;
         $namemodule = $other["modulename"];
         if (in_array($namemodule, activitynewcontent::UNUSED_TYPES)) {

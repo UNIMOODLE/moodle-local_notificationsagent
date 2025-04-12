@@ -52,6 +52,10 @@ class notificationscondition_calendarstart_observer {
      */
     public static function calendar_updated(calendar_event_updated $event) {
         $pluginname = calendarstart::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $cmid = $event->objectid;
         $courseid = $event->courseid;
 

@@ -48,7 +48,10 @@ class notificationscondition_ac_observer {
      */
     public static function group_deleted(\core\event\group_deleted $event) {
         global $DB;
-
+        // Bypass the event hadler if the plugin is disabled.
+        if (! local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled(ac::NAME)) {
+            return;
+        }
         $sql = 'SELECT mnc.id, mnc.ruleid AS ruleid
                   FROM {notificationsagent_condition} mnc
                  WHERE mnc.pluginname = :name';
