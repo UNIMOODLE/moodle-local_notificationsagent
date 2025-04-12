@@ -51,7 +51,10 @@ class notificationscondition_activityend_observer {
         $cmid = $event->objectid;
 
         $pluginname = activityend::NAME;
-
+        // Bypass the event hadler if the plugin is disabled.
+        if (! local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
 
         foreach ($conditions as $condition) {

@@ -109,7 +109,16 @@ class notificationscondition extends notificationsbaseinfo {
 
         return $haschanged;
     }
-
+    /**
+     * Get the enablement status of the plugin.
+     * @param string $pluginname The name of the plugin to check.
+     * @return bool True if the plugin is enabled, false otherwise.
+     */
+    public static function is_plugin_enabled(string $pluginname): bool {
+        $plugin = 'notificationscondition_' . $pluginname;
+        $disabled = get_config($plugin, 'disabled');
+        return !$disabled;
+    }
     /**
      * Return URL used for management of plugins of this type.
      *

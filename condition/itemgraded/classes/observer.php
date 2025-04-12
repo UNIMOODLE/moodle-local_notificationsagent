@@ -47,6 +47,10 @@ class notificationscondition_itemgraded_observer {
      */
     public static function user_graded($event) {
         $pluginname = itemgraded::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $courseid = $event->courseid;
         $userid = $event->relateduserid;
 

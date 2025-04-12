@@ -47,6 +47,10 @@ class notificationscondition_activitysinceend_observer {
      */
     public static function course_module_completion_updated(\core\event\course_module_completion_updated $event) {
         $pluginname = activitysinceend::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $courseid = $event->courseid;
         $userid = $event->relateduserid;
 
