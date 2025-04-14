@@ -55,9 +55,11 @@ class notificationscondition_activitystudentend_observer {
 
         $pluginname = activitystudentend::NAME;
 
-        activitystudentend::set_activity_access($userid, $courseid, $cmid, $timecreated);
-
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
+        
+        if (!empty($conditions)) {
+            activitystudentend::set_activity_access($userid, $courseid, $cmid, $timecreated);
+        }
 
         foreach ($conditions as $condition) {
             $conditionid = $condition->id;

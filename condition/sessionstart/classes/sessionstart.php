@@ -235,11 +235,12 @@ class sessionstart extends notificationconditionplugin {
 
     /**
      * Get the first access time for a specific user and course.
-     *
+     * It checks the custom table first and if not found, it queries the logstore_standard_log table.
+     * It stores the first access time in the custom table for future fast access.
      * @param int $userid user id
      * @param int $courseid course id
      *
-     * @return mixed  return firstacces to a course
+     * @return mixed|null  return firstacces to a course or null if not found.
      */
     public static function get_first_course_access(int $userid, int $courseid) {
         global $DB;
@@ -247,9 +248,8 @@ class sessionstart extends notificationconditionplugin {
         $crsefirstaccess = coursefirstaccess::get_record(['courseid' => $courseid, 'userid' => $userid]);
         if (!empty($crsefirstaccess)) {
             $firstaccess = $crsefirstaccess->get('firstaccess');
-        }
-
-        if (empty($firstaccess)) {
+        } else {
+            // If the first access is not set, we check the logstore_standard_log table.
             $query = 'SELECT timecreated
                                FROM {logstore_standard_log}
                             WHERE courseid = :courseid
@@ -268,9 +268,11 @@ class sessionstart extends notificationconditionplugin {
             );
 
             if (!$result) {
-                return $firstaccess;
+                return null;
             }
             $firstaccess = $result->timecreated;
+            // We record this time in custom table to avoid querying the log_standard_log for a course firstaccess.
+            sessionstart::set_first_course_access($userid, $courseid, $firstaccess);
         }
 
         return $firstaccess;
