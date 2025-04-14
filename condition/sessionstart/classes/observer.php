@@ -56,12 +56,13 @@ class notificationscondition_sessionstart_observer {
         $timeaccess = $event->timecreated;
         // Only triggered if is the first access to a course, otherwise return.
         $firstaccess = sessionstart::get_first_course_access($userid, $courseid);
-        if (!$firstaccess) {
+        if (!empty($firstaccess)) {
+            // If the first access is not empty, it means that the user has already accessed the course.
+            // So we do not need to updatetrigger the conditions.
             return null;
         }
-
-        // We use this event to avoid querying the log_standard_log for a course firstaccess.
-        sessionstart::set_first_course_access($userid, $courseid, $timeaccess);
+        // If the first access is empty, it means that the user has not accessed the course yet.
+        // So we need to update the triggers of the conditions.
 
         $pluginname = sessionstart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
