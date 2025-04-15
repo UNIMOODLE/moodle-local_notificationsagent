@@ -35,6 +35,7 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\helper\helper;
+use stdClass;
 
 /**
  * Testing rule class
@@ -108,6 +109,46 @@ class notificationsagent_rule_test extends \advanced_testcase {
                 "timeopen" => self::CM_DATESTART,
                 "timeclose" => self::CM_DATEEND,
         ]);
+    }
+
+    /**
+     * Multiple evaluations.
+     */
+    public function test_evaluate_performance_v1() {
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_notificationsagent');
+        $futurerule = new stdClass();
+        $futurerule->courseid = self::$course->id;
+        $futurerule->timesfired = 2;
+
+        $ruleid = $generator->create_rule($futurerule);
+
+        // Conditions.
+        $newcondition = new stdClass();
+        $newcondition->ruleid = $ruleid;
+        $condition1 = $generator->create_condition($newcondition);
+
+        // Context.
+        $context = new evaluationcontext();
+        $context->set_userid(self::$user->id);
+        $context->set_courseid(self::$course->id);
+        $context->set_timeaccess(time() - YEARSECS);
+        $context->set_triggercondition($condition1);
+
+        $rule = new rule($ruleid);
+        $result = $rule->evaluate($context);
+        $this->assertTrue($result);
+
+        $conditions = $rule->get_conditions_to_evaluate();
+        $this->assertCount(1, $conditions);
+
+        foreach ($conditions as $condition) {
+            $context->set_params($condition->get_parameters());
+            $context->set_complementary(false);
+            $result = $condition->evaluate($context);
+            $this->assertTrue($result);
+        }
+
+        print_object($conditions);
     }
 
     /**
