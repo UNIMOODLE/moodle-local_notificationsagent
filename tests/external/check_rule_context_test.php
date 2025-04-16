@@ -172,19 +172,19 @@ final class check_rule_context_test extends \advanced_testcase {
 
         $instance = self::$rule::create_instance($ruleid);
 
-        try{
+        try {
             $result = \local_notificationsagent\external\check_rule_context::execute(
                 $useinstance == 0 ? $useinstance : $instance->get_id()
             );
             $result = external_api::clean_returnvalue(check_rule_context::execute_returns(), $result);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->assertEquals('requireloginerror', $e->errorcode);
             $this->assertEquals("Course or activity not accessible. (Not enrolled)", $e->getMessage());
         }
 
         if ($user == 2) {
             $this->assertEmpty($result['warnings']);
-        } elseif ((isset($result['warnings'][0]['warningcode']))) {
+        } else if ((isset($result['warnings'][0]['warningcode']))) {
             $this->assertEquals($expected, $result['warnings'][0]['warningcode']);
         }
     }

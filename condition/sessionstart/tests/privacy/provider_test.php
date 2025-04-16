@@ -58,6 +58,7 @@ final class provider_test extends \advanced_testcase {
     private static $course;
 
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         self::$user = self::getDataGenerator()->create_user();
         self::$course = self::getDataGenerator()->create_course();
