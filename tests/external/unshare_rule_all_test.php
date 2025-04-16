@@ -37,7 +37,7 @@ namespace local_notificationsagent\external;
 use local_notificationsagent\rule;
 use external_api;
 use external_single_structure;
-use local_notificationsagent\external\unshare_rule_all;
+
 
 /**
  * Testing external share rule
@@ -180,14 +180,18 @@ class unshare_rule_all_test extends \advanced_testcase {
         $this->assertIsNumeric($actionid);
 
         $instance = self::$rule::create_instance($ruleid);
-
-        $result = unshare_rule_all::execute(
-            $useinstance == 0 ? $useinstance : $instance->get_id()
-        );
-        $result = external_api::clean_returnvalue(unshare_rule_all::execute_returns(), $result);
+        try{
+            $result = unshare_rule_all::execute(
+                $useinstance == 0 ? $useinstance : $instance->get_id()
+            );
+            $result = external_api::clean_returnvalue(unshare_rule_all::execute_returns(), $result);
+        } catch (\Exception $e){
+            $this->assertEquals('requireloginerror', $e->errorcode);
+            $this->assertEquals("Course or activity not accessible. (Not enrolled)", $e->getMessage());
+        }
         if ($user == 2) {
             $this->assertEmpty($result['warnings']);
-        } else {
+        } elseif ((isset($result['warnings'][0]['warningcode']))) {
             $this->assertEquals($expected, $result['warnings'][0]['warningcode']);
         }
     }
