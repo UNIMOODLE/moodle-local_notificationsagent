@@ -180,18 +180,18 @@ class unshare_rule_all_test extends \advanced_testcase {
         $this->assertIsNumeric($actionid);
 
         $instance = self::$rule::create_instance($ruleid);
-        try{
+        try {
             $result = unshare_rule_all::execute(
                 $useinstance == 0 ? $useinstance : $instance->get_id()
             );
             $result = external_api::clean_returnvalue(unshare_rule_all::execute_returns(), $result);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->assertEquals('requireloginerror', $e->errorcode);
             $this->assertEquals("Course or activity not accessible. (Not enrolled)", $e->getMessage());
         }
         if ($user == 2) {
             $this->assertEmpty($result['warnings']);
-        } elseif ((isset($result['warnings'][0]['warningcode']))) {
+        } else if ((isset($result['warnings'][0]['warningcode']))) {
             $this->assertEquals($expected, $result['warnings'][0]['warningcode']);
         }
     }
