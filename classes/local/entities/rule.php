@@ -380,13 +380,15 @@ class rule extends base {
                             )
                     ) {
                         $query
-                                = "SELECT DISTINCT {user}.id, CONCAT({user}.firstname ,' ', {user}.lastname) AS name
-                                             FROM {notificationsagent_report}
-                                              JOIN {user} ON {user}.id={notificationsagent_report}.userid";
-
+                            = "SELECT  DISTINCT
+                                                 {user}.id, {user}.firstname, {user}.lastname, {user}.firstnamephonetic,
+                                                 {user}.lastnamephonetic, {user}.middlename, {user}.alternatename
+                                     FROM {notificationsagent_report}
+                                      JOIN {user} ON {user}.id={notificationsagent_report}.userid";
                         $users = $DB->get_recordset_sql($query);
+
                         foreach ($users as $user) {
-                            $options[$user->id] = $user->name;
+                            $options[$user->id] = fullname($user);
                         }
                         $users->close();
                     } else if (

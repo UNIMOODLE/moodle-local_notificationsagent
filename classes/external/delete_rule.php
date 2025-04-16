@@ -88,9 +88,7 @@ class delete_rule extends external_api {
             try {
                 throw new \moodle_exception(
                     'nosuchinstance',
-                    '',
-                    '',
-                    get_capability_string('local/notificationsagent:nosuchinstance')
+                    'local_notificationsagent',
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
@@ -103,7 +101,7 @@ class delete_rule extends external_api {
         }
 
         $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
-
+        self::validate_context($context);
         try {
             if ($context && has_capability('local/notificationsagent:deleterule', $context)) {
                 $instance->delete();

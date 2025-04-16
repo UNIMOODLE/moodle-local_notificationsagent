@@ -90,9 +90,7 @@ class update_rule_share extends external_api {
             try {
                 throw new \moodle_exception(
                     'nosuchinstance',
-                    '',
-                    '',
-                    get_capability_string('local/notificationsagent:nosuchinstance')
+                    'local_notificationsagent',
                 );
             } catch (\moodle_exception $e) {
                 $result['warnings'][] = [
@@ -104,7 +102,7 @@ class update_rule_share extends external_api {
             }
         }
         $context = \context_course::instance($instance->get_default_context(), IGNORE_MISSING);
-
+        self::validate_context($context);
         try {
             if ($context && has_capability('local/notificationsagent:updateruleshare', $context)) {
                 if ($instance->get_template()) {

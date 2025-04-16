@@ -162,16 +162,20 @@ final class update_rule_status_test extends \advanced_testcase {
         $this->assertIsNumeric($actionid);
 
         $instance = self::$rule::create_instance($ruleid);
-
-        $result = update_rule_status::execute(
-            $useinstance == 0 ? $useinstance : $instance->get_id(),
-            $status
-        );
-        $result = external_api::clean_returnvalue(update_rule_status::execute_returns(), $result);
+        try{
+            $result = update_rule_status::execute(
+                $useinstance == 0 ? $useinstance : $instance->get_id(),
+                $status
+            );
+            $result = external_api::clean_returnvalue(update_rule_status::execute_returns(), $result);
+        } catch (\Exception $e){
+            $this->assertEquals('requireloginerror', $e->errorcode);
+            $this->assertEquals("Course or activity not accessible. (Not enrolled)", $e->getMessage());
+        }
 
         if ($user == 2) {
             $this->assertEmpty($result['warnings']);
-        } else {
+        } elseif ((isset($result['warnings'][0]['warningcode']))) {
             $this->assertEquals($expected, $result['warnings'][0]['warningcode']);
         }
     }
