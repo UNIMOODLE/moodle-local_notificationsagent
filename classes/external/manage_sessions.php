@@ -88,7 +88,7 @@ class manage_sessions extends external_api {
         } else {
             $context = \context_system::instance();
         }
-
+        self::validate_context($context);
         if (has_capability('local/notificationsagent:managecourserule', $context)) {
             if ($orderid != -1) {
                 set_user_preference($sessionname, $orderid, $USER);
