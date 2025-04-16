@@ -1844,7 +1844,7 @@ class rule {
                                 JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = c.id AND e.status = 0
                                 JOIN {role_assignments} ra ON ra.userid = u.id
                                 JOIN {context} ct ON ct.id = ra.contextid AND ct.contextlevel = 50 AND ct.instanceid = c.id
-                                JOIN {role} r ON r.id = ra.roleid AND r.id != 5";
+                                JOIN {role} r ON r.id = ra.roleid AND r.archetype != 'student' ";
         }
 
         $ruleidwheresql1 = '';
