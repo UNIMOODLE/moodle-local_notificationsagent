@@ -47,6 +47,11 @@ class notificationscondition_sessionstart_observer {
      * @param course_viewed $event The course_viewed event object
      */
     public static function course_viewed(course_viewed $event) {
+        $pluginname = sessionstart::NAME;
+        // Bypass the event hadler if the plugin is disabled.
+        if (! local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         if ($event->courseid == SITEID || !isloggedin()) {
             return;
         }
@@ -63,7 +68,6 @@ class notificationscondition_sessionstart_observer {
         // We use this event to avoid querying the log_standard_log for a course firstaccess.
         sessionstart::set_first_course_access($userid, $courseid, $timeaccess);
 
-        $pluginname = sessionstart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         foreach ($conditions as $condition) {
             $subplugin = new sessionstart($condition->ruleid, $condition->id);

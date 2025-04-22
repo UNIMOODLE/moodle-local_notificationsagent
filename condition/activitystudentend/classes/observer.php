@@ -48,12 +48,15 @@ class notificationscondition_activitystudentend_observer {
      * @param course_module_viewed $event Course module viewed event
      */
     public static function course_module_viewed(course_module_viewed $event) {
+        $pluginname = activitystudentend::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $courseid = $event->courseid;
         $cmid = $event->contextinstanceid;
         $userid = $event->userid;
         $timecreated = $event->timecreated;
-
-        $pluginname = activitystudentend::NAME;
 
         activitystudentend::set_activity_access($userid, $courseid, $cmid, $timecreated);
 

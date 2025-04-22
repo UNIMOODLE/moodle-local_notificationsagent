@@ -48,11 +48,13 @@ class notificationscondition_activityopen_observer {
      * @param \core\event\course_module_updated $event The course module update event.
      */
     public static function course_module_updated(\core\event\course_module_updated $event) {
+        $pluginname = activityopen::NAME;
+        // Bypass the event hadler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $courseid = $event->courseid;
         $cmid = $event->objectid;
-
-        $pluginname = activityopen::NAME;
-
         $conditions = notificationsagent::get_conditions_by_cm($pluginname, $courseid, $cmid);
         foreach ($conditions as $condition) {
             $subplugin = new activityopen($condition->ruleid, $condition->id);

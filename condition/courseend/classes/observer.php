@@ -47,6 +47,11 @@ class notificationscondition_courseend_observer {
      * @param core\event\course_updated $event The course_updated event object
      */
     public static function course_updated(core\event\course_updated $event) {
+        $pluginname = courseend::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         if ($event->courseid == 1) {
             return null;
         }
@@ -62,7 +67,6 @@ class notificationscondition_courseend_observer {
         // Save cache.
         helper::set_cache_course($courseid);
 
-        $pluginname = courseend::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         foreach ($conditions as $condition) {
             $subplugin = new courseend($condition->ruleid, $condition->id);

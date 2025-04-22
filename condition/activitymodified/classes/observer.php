@@ -46,6 +46,10 @@ class notificationscondition_activitymodified_observer {
      * @param \core\event\course_module_updated $event The course module update event.
      */
     public static function course_module_updated(\core\event\course_module_updated $event) {
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled(activitymodified::NAME)) {
+            return;
+        }
         if (has_capability('moodle/course:managefiles', \context_course::instance($event->courseid), $event->userid)) {
             $pluginname = activitymodified::NAME;
             $conditions = notificationsagent::get_conditions_by_cm($pluginname, $event->courseid, $event->objectid);
