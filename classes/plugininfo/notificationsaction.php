@@ -34,6 +34,7 @@
 
 namespace local_notificationsagent\plugininfo;
 
+use local_notificationsagent\notificationplugin;
 use local_notificationsagent\plugininfo\notificationsbaseinfo, core_plugin_manager, moodle_url;
 
 /**
@@ -96,14 +97,14 @@ class notificationsaction extends notificationsbaseinfo {
         $haschanged = false;
 
         $plugin = 'notificationsaction_' . $pluginname;
-        $oldvalue = get_config($plugin, 'disabled');
+        $oldvalue = get_config($plugin, notificationplugin::CONFIG_DISABLED);
         $disabled = !$enabled;
         // Only set value if there is no config setting or if the value is different from the previous one.
         if ($oldvalue === false || ((bool) $oldvalue != $disabled)) {
-            set_config('disabled', $disabled, $plugin);
+            set_config(notificationplugin::CONFIG_DISABLED, $disabled, $plugin);
             $haschanged = true;
 
-            add_to_config_log('disabled', $oldvalue, $disabled, $plugin);
+            add_to_config_log(notificationplugin::CONFIG_DISABLED, $oldvalue, $disabled, $plugin);
             \core_plugin_manager::reset_caches();
         }
 
