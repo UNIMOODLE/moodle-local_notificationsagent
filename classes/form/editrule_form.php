@@ -636,7 +636,7 @@ class editrule_form extends \moodleform {
             $title .= get_string('conditiontext', 'notificationscondition_ac');
             $title .= \html_writer::end_tag('h5');
             $mform->addElement('textarea', self::FORM_JSON_AC, $title);
-            frontendCustom::include_all_javascript($COURSE, $cm);
+            frontend_custom::include_all_javascript($COURSE, $cm);
         }
     }
 }
