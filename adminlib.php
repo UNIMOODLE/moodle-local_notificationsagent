@@ -32,6 +32,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_notificationsagent\notificationplugin;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
@@ -214,7 +216,7 @@ class notificationsagent_plugin_manager {
             $row[] = get_string('pluginname', $this->subtype . '_' . $plugin);
             $row[] = get_config($this->subtype . '_' . $plugin, 'version');
 
-            $visible = !get_config($this->subtype . '_' . $plugin, 'disabled');
+            $visible = !get_config($this->subtype . '_' . $plugin, notificationplugin::CONFIG_DISABLED);
 
             if ($visible) {
                 $row[] = $this->format_icon_link('hide', $plugin, 't/hide', get_string('disable'));
