@@ -47,7 +47,7 @@ require_once("$CFG->dirroot/local/notificationsagent/lib.php");
 /**
  * Extends the core_availability\frontend class to handle custom frontend actions.
  */
-class frontendCustom extends \core_availability\frontend {
+class frontend_custom extends \core_availability\frontend {
     /**
      * Includes JavaScript for the main system and all plugins.
      *
