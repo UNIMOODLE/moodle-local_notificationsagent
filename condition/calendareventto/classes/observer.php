@@ -52,6 +52,11 @@ class notificationscondition_calendareventto_observer {
      * @return void
      */
     public static function calendar_updated(core\event\calendar_event_updated $event) {
+        $pluginname = calendareventto::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         $other = $event->other;
 
         // If startdate is not set in other array then the startdate setting has not been modified.
@@ -59,7 +64,6 @@ class notificationscondition_calendareventto_observer {
             return;
         }
 
-        $pluginname = calendareventto::NAME;
         $cmid = $event->objectid;
         $courseid = $event->courseid;
 

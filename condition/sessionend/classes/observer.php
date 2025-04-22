@@ -47,6 +47,11 @@ class notificationscondition_sessionend_observer {
      * @throws \dml_exception
      */
     public static function course_viewed(\core\event\course_viewed $event) {
+        $pluginname = sessionend::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         if ($event->courseid == SITEID || !isloggedin()) {
             return;
         }
@@ -55,7 +60,6 @@ class notificationscondition_sessionend_observer {
         $courseid = $event->courseid;
         $timeaccess = $event->timecreated;
 
-        $pluginname = sessionend::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         foreach ($conditions as $condition) {
             $subplugin = new sessionend($condition->ruleid, $condition->id);

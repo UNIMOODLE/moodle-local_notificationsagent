@@ -48,6 +48,11 @@ class notificationscondition_coursestart_observer {
      * @return null|void Returns null if the courseid is 1, otherwise does not return anything
      */
     public static function course_updated(\core\event\course_updated $event) {
+        $pluginname = coursestart::NAME;
+        // Bypass the event handler if the plugin is disabled.
+        if (!local_notificationsagent\plugininfo\notificationscondition::is_plugin_enabled($pluginname)) {
+            return;
+        }
         if ($event->courseid == 1) {
             return null;
         }
@@ -62,7 +67,6 @@ class notificationscondition_coursestart_observer {
         // Save cache.
         helper::set_cache_course($courseid);
 
-        $pluginname = coursestart::NAME;
         $conditions = notificationsagent::get_conditions_by_course($pluginname, $courseid);
         foreach ($conditions as $condition) {
             $subplugin = new coursestart($condition->ruleid, $condition->id);
