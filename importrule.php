@@ -102,4 +102,4 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
     }
 }
 
-header('Location: index.php?courseid=' . $courseid);
+redirect('index.php?courseid=' . $courseid);
