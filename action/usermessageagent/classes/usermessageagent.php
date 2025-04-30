@@ -97,26 +97,26 @@ class usermessageagent extends notificationactionplugin {
         $listusers = [];
         $enrolledusers = [];
 
-        if (has_capability('local/notificationsagent:managecourserule', $context)) {
-            $enrolledusers = get_enrolled_users($context);
+        // Only is template.
+        if ($this->rule->template == rule::TEMPLATE_TYPE ) {
+            $listusers['0'] = 'UUUU';
+        } else {
+            if (has_capability('local/notificationsagent:managecourserule', $context)) {
+                $enrolledusers = get_enrolled_users($context);
 
-            foreach ($enrolledusers as $uservalue) {
-                $listusers[$uservalue->id] = format_string(
-                    $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]",
+                foreach ($enrolledusers as $uservalue) {
+                    $listusers[$uservalue->id] = format_string(
+                        $uservalue->firstname . " " . $uservalue->lastname . " [" . $uservalue->email . "]",
+                        true
+                    );
+                }
+            } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
+                // User view - restricted to own user.
+                $listusers[$USER->id] = format_string(
+                    $USER->firstname . " " . $USER->lastname . " [" . $USER->email . "]",
                     true
                 );
             }
-        } else if (has_capability('local/notificationsagent:manageownrule', $context)) {
-            // User view - restricted to own user.
-            $listusers[$USER->id] = format_string(
-                $USER->firstname . " " . $USER->lastname . " [" . $USER->email . "]",
-                true
-            );
-        }
-
-        // Only is template.
-        if ($this->rule->template == rule::TEMPLATE_TYPE) {
-            $listusers['0'] = 'UUUU';
         }
 
         asort($listusers);
