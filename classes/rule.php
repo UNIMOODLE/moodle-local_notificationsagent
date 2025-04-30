@@ -209,7 +209,7 @@ class rule {
             $this->set_createdat($rule->createdat);
             $this->set_shared($rule->shared);
             $this->set_defaultrule($rule->defaultrule);
-            $this->set_template($rule->template);
+            $this->set_template($this->ruleaction == self::RULE_CLONE ? $type : $rule->template);;
             $this->set_forced($rule->forced);
             $this->set_timesfired($rule->timesfired);
             $this->set_runtime($rule->runtime);
