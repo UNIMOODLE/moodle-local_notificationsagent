@@ -35,7 +35,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/notificationsagent:messageagent' => [
+        'notificationsaction/messageagent:messageagent' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => [

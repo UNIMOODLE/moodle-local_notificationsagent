@@ -35,7 +35,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/notificationsagent:removeusergroup' => [
+        'notificationsaction/removeusergroup:removeusergroup' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => [

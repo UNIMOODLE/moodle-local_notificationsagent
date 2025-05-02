@@ -34,6 +34,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitystudentend:activitystudentend'] = 'Capability needed in order to use activity student end condition';
 $string['activitystudentend_crontask'] = 'Activity open cron task';
 $string['conditiontext'] = '[TTTT] has passed since the student last entry in the activity [AAAA].';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
@@ -47,4 +48,3 @@ $string['privacy:metadata:notificationsagent_cmview:firstaccess'] = 'The timesta
 $string['privacy:metadata:notificationsagent_cmview:idactivity'] = 'The ID of the activity visited by the user.';
 $string['privacy:metadata:notificationsagent_cmview:userid'] = 'The ID of the user related to the record.';
 $string['subtype'] = 'activitystudentend';
-

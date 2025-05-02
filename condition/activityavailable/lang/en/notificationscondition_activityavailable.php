@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activityavailable:activityavailable'] = 'Capability needed in order to use activity available condition';
 $string['activityavailable_crontask'] = 'Activity available cron task';
 $string['conditiontext'] = 'The [AAAA] activity is available. ';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';

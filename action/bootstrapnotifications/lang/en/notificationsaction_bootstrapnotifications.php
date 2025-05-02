@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['bootstrapnotifications:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
 $string['bootstrapnotifications_action'] = 'Bootstrap notification with text [TTTT]';
 $string['editrule_action_element_text'] = 'Text {$a->typeelement}';
 $string['messageprovider:bootstrap_notifications'] = 'Add user group Provider';

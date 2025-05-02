@@ -35,7 +35,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/notificationsagent:addusergroup' => [
+        'notificationsaction/addusergroup:addusergroup' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => [

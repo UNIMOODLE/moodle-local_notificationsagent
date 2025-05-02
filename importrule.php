@@ -43,7 +43,7 @@ $timer = 0;
 
 if (!$courseid) {
     require_login();
-    throw new \moodle_exception('needcourseid');
+    throw new \moodle_exception('needcourseid', 'local_notificationsagent');;
 }
 if (!has_capability($capability, $context)) {
     require_capability($capability, $context);

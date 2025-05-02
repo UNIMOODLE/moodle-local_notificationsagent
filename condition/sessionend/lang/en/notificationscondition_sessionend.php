@@ -38,6 +38,6 @@ $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['modname'] = 'sessionend';
 $string['pluginname'] = 'Condition relative date to last access to a course';
 $string['privacy:metadata'] = 'The sessionend plugin does not store any personal data.';
+$string['sessionend:sessionend'] = 'Capability needed in order to use session end condition';
 $string['sessionend_crontask'] = 'Session end cron task';
 $string['subtype'] = 'sessionend';
-

@@ -123,7 +123,7 @@ class removeusergroup extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:removeusergroup', $context);
+        return has_capability('notificationsaction/removeusergroup:removeusergroup', $context);
     }
 
     /**

@@ -43,7 +43,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/notificationsagent:weekend' => [
+        'notificationscondition/weekend:weekend' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => [

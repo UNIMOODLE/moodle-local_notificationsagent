@@ -43,6 +43,7 @@ $string['modname'] = 'weekdays';
 $string['pluginname'] = 'Condition relative to weekdays';
 $string['privacy:metadata'] = 'The weekdays plugin does not store any personal data.';
 $string['subtype'] = 'weekdays';
+$string['weekdays:weekdays'] = 'Capability needed in order to use weekdays condition';
 $string['weekdays_crontask'] = 'Weekdays cron task';
 $string['weekdaysrequired'] = 'Select at least one day';
 $string['weekdaystag'] = 'weekdays';

@@ -41,6 +41,6 @@ $string['modname'] = 'usergroupadd';
 $string['pluginname'] = 'Condition relative to add user to group';
 $string['privacy:metadata'] = 'The usergroupadd plugin does not store any personal data.';
 $string['subtype'] = 'usergroupadd';
+$string['usergroupadd:usergroupadd'] = 'Capability needed in order to use usergroupadd condition';
 $string['usergroupaddtag'] = 'The user has been added to a group';
 $string['usergroupaddtext'] = 'The user has been added to a group ({$a->usergroupadd})';
-

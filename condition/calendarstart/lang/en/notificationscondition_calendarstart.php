@@ -34,6 +34,7 @@
 
 $string['afterend'] = 'After the end of "event"';
 $string['afterstart'] = 'After the start of "event"';
+$string['calendarstart:calendarstart'] = 'Capability needed in order to use calendarstart condition';
 $string['calendarstart_crontask'] = 'Calendar start cron task';
 $string['conditiontext'] = 'It has been [TTTT] since the calendar event [CCCC]';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';

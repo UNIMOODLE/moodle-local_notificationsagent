@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitylastsend:activitylastsend'] = 'Capability needed in order to use activity lastsend condition';
 $string['activitylastsend_crontask'] = 'Activity lastsend cron task';
 $string['conditiontext'] = 'It has been more than [TTTT] since the last student content submission in the activity [AAAA].';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';

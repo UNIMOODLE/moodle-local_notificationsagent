@@ -42,4 +42,5 @@ $string['messageprovider:particular_message'] = 'Particular Message Provider';
 $string['pluginname'] = 'Particular user notification';
 $string['privacy:metadata'] = 'The usermessageagent plugin does not store any personal data.';
 $string['subtype'] = 'usermessageagent';
+$string['usermessageagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
 $string['usermessageagent_action'] = 'Send notification to user [UUUU] with title [TTTT] and message [BBBB]';

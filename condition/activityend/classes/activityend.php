@@ -227,7 +227,7 @@ class activityend extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activityend', $context);
+        return has_capability('notificationscondition/activityend:activityend', $context);
     }
 
     /**

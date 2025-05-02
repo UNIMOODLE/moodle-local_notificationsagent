@@ -149,7 +149,7 @@ class sessionstart extends notificationconditionplugin {
      * @return bool True if the user has the capability, false otherwise.
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:sessionstart', $context);
+        return has_capability('notificationscondition/sessionstart:sessionstart', $context);
     }
 
     /**

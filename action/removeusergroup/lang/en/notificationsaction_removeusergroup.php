@@ -40,5 +40,6 @@ $string['editrule_action_element_user'] = 'User {$a->typeelement}';
 $string['messageprovider:remove_user_group'] = 'Remove user group Provider';
 $string['pluginname'] = 'Remove user from group';
 $string['privacy:metadata'] = 'The removeusergroup plugin does not store any personal data.';
+$string['removeusergroup:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
 $string['removeusergroup_action'] = 'Remove user from group [GGGG]';
 $string['subtype'] = 'removeusergroup';

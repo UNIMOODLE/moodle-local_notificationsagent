@@ -35,9 +35,9 @@
 $string['conditiontext'] = 'An open thread by the user in the [FFFF] forum without any response for more than [TTTT] time.';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['editrule_condition_forum'] = 'Thread [FFFF]';
+$string['forumnoreply:forumnoreply'] = 'Capability needed in order to use forum no reply condition';
 $string['forumnoreply_crontask'] = 'Forumnoreply cron task';
 $string['modname'] = 'forumnoreply';
 $string['pluginname'] = 'Condition of a thread opened by the user without a response.';
 $string['privacy:metadata'] = 'The forumnoreply plugin does not store any personal data.';
 $string['subtype'] = 'forumnoreply';
-

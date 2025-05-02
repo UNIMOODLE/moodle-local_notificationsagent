@@ -39,6 +39,7 @@ $string['conditiontext'] = 'Estamos entre [FFFF] y [FFFF].';
 $string['editrule_condition_element_enddate'] = 'Fecha de fin';
 $string['editrule_condition_element_startdate'] = 'Fecha de inicio';
 $string['modname'] = 'ondates';
+$string['ondates:ondates'] = 'Capability needed in order to use ondates condition';
 $string['ondates_crontask'] = 'Ondates cron task';
 $string['ondatestag'] = 'Entre fechas';
 $string['ondatestext'] = 'Estamos entre fechas ({$a->ondates})';

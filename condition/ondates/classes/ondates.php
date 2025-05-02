@@ -170,7 +170,7 @@ class ondates extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:ondates', $context);
+        return has_capability('notificationscondition/ondates:ondates', $context);
     }
 
     /**

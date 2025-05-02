@@ -32,6 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['calendareventto:calendareventto'] = 'Capability needed in order to use calendar event to condition';
 $string['calendareventto_crontask'] = 'Calendar end cron task';
 $string['conditiontext'] = 'Less than [TTTT] remains for the calendar event [CCCC]';
 $string['editrule_condition_calendar'] = 'Event {$a->typeelement}:';

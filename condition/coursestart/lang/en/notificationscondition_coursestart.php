@@ -33,10 +33,10 @@
  */
 
 $string['conditiontext'] = '[TTTT] has passed since the beginning of the course.';
+$string['coursestart:coursestart'] = 'Capability needed in order to use coursestart condition';
 $string['coursestart_crontask'] = 'Course start cron task';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['modname'] = 'coursestart';
 $string['pluginname'] = 'Condition relative date to course start';
 $string['privacy:metadata'] = 'The coursestart plugin does not store any personal data.';
 $string['subtype'] = 'coursestart';
-

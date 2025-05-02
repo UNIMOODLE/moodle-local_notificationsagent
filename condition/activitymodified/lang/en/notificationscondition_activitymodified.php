@@ -34,6 +34,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitymodified:activitymodified'] = 'Capability needed in order to use activity modified condition';
 $string['activitymodified_crontask'] = 'Activitymodified cron task';
 $string['conditiontext'] = 'The content of activity [AAAA] has been modified. ';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';

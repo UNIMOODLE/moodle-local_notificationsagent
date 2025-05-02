@@ -40,5 +40,5 @@ $string['privacy:metadata:courseid'] = 'The ID of the course to which this data 
 $string['privacy:metadata:firstaccess'] = 'The first time the user accessed the course.';
 $string['privacy:metadata:notificationsagent_crseview'] = 'The plugin stores information related to user access to courses.';
 $string['privacy:metadata:userid'] = 'The ID of the user related to this data.';
+$string['sessionstart:sessionstart'] = 'Capability needed in order to use sessionstart condition';
 $string['subtype'] = 'sessionstart';
-

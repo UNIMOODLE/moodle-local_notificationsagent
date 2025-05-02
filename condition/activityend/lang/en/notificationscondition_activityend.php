@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activityend:activityend'] = 'Capability needed in order to use activity end condition';
 $string['activityend_crontask'] = 'Activity end cron task';
 $string['conditiontext'] = "Less than [TTTT] remains until the closing date of activity [AAAA].";
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';

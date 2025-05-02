@@ -255,7 +255,7 @@ class calendarstart extends notificationconditionplugin {
      * @param \context $context
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:calendarstart', $context);
+        return has_capability('notificationscondition/calendarstart:calendarstart', $context);
     }
 
     /**

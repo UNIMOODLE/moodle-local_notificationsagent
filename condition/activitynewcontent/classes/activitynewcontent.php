@@ -175,7 +175,7 @@ class activitynewcontent extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activitynewcontent', $context);
+        return has_capability('notificationscondition/activitynewcontent:activitynewcontent', $context);
     }
 
     /**

@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitycompleted:activitycompleted'] = 'Capability needed in order to use activitycompleted condition';
 $string['conditiontext'] = 'The user has completed the activity [AAAA].';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['modname'] = 'activitycompleted';

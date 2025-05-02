@@ -142,7 +142,7 @@ class coursestart extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:coursestart', $context);
+        return has_capability('notificationscondition/coursestart:coursestart', $context);
     }
 
     /**

@@ -35,6 +35,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['addusergroup:addusergroup'] = 'Capability needed in order to use addusergroup action';
 $string['addusergroup_action'] = 'Add user to group [GGGG]';
 $string['editrule_action_element_group'] = 'Group {$a->typeelement}';
 $string['editrule_action_element_user'] = 'User {$a->typeelement}';

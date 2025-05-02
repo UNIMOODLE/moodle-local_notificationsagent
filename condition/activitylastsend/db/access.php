@@ -34,7 +34,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/notificationsagent:activitylastsend' => [
+        'notificationscondition/activitylastsend:activitylastsend' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => [

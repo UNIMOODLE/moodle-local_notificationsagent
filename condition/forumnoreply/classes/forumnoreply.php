@@ -193,7 +193,7 @@ class forumnoreply extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:forumnoreply', $context);
+        return has_capability('notificationscondition/forumnoreply:forumnoreply', $context);
     }
 
     /**

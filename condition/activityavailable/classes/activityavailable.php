@@ -158,7 +158,7 @@ class activityavailable extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activityavailable', $context);
+        return has_capability('notificationscondition/activityavailable:activityavailable', $context);
     }
 
     /**

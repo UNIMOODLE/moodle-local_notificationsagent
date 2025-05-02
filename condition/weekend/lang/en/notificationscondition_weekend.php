@@ -42,7 +42,7 @@ $string['modname'] = 'weekend';
 $string['pluginname'] = 'Condition relative to weekend';
 $string['privacy:metadata'] = 'The weekend plugin does not store any personal data.';
 $string['subtype'] = 'weekend';
+$string['weekend:weekend'] = 'Capability needed in order to use weekend condition';
 $string['weekend_crontask'] = 'Weekend cron task';
 $string['weekendtag'] = 'Weekend';
 $string['weekendtext'] = 'It is weekend ({$a->weekend})';
-

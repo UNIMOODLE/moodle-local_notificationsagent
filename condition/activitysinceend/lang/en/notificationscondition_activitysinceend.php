@@ -34,6 +34,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activitysinceend:activitysinceend'] = 'Capability needed in order to use activity since end condition';
 $string['conditiontext'] = 'It has been [TTTT] since the completion milestone of the activity [AAAA].';
 $string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';

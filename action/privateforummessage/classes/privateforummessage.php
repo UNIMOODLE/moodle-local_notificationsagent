@@ -152,7 +152,7 @@ class privateforummessage extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:privateforummessage', $context)
+        return has_capability('notificationsaction/privateforummessage:privateforummessage', $context)
                 && has_capability('mod/forum:addnews', $context)
                 && has_capability('mod/forum:addquestion', $context)
                 && has_capability('mod/forum:startdiscussion', $context);

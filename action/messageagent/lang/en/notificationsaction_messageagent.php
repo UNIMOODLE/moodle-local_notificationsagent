@@ -37,6 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['editrule_action_message'] = 'Message {$a->typeelement}';
 $string['editrule_action_title'] = 'Title {$a->typeelement}:';
+$string['messageagent:messageagent'] = 'Capability needed in order to use messageagent action';
 $string['messageagent_action'] = 'Send individual notification with title [TTTT] and message [BBBB]';
 $string['messageagent_event'] = 'Message agent';
 $string['messageprovider:individual_message'] = 'Notification of my own activity.';

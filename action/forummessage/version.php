@@ -35,5 +35,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'notificationsaction_forummessage';
-$plugin->version = 2023101800;
+$plugin->version = 2025043000;
 $plugin->requires = 2020061500;

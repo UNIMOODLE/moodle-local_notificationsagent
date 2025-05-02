@@ -34,6 +34,7 @@
  */
 
 $string['conditiontext'] = 'Less than [TTTT] remains for the course end.';
+$string['courseend:courseend'] = 'Capability needed in order to use course end condition';
 $string['courseend_crontask'] = 'Course end cron task';
 $string['editrule_condition_element_time'] = 'Time {$a->typeelement}:';
 $string['modname'] = 'courseend';
