@@ -223,39 +223,6 @@ $string['notificationsagent:managesiterule'] = 'Gestionar las reglas a nivel de 
 $string['notificationsagent:managecourserule'] = 'Gestionar las reglas a nivel de curso';
 $string['notificationsagent:manageownrule'] = 'Gestionar tus propias reglas en el curso';
 $string['notificationsagent:viewassistantreport'] = 'Ver informe de reglas';
-
-$string['notificationsagent:activitycompleted'] = 'Capacidad para usar la condición activitycompleted';
-$string['notificationsagent:activityopen'] = 'Capacidad para usar la condición activityopen';
-$string['notificationsagent:coursestart'] = 'Capacidad para usar la condición coursestart';
-$string['notificationsagent:calendarstart'] = 'Capacidad para usar la condición calendarstart';
-$string['notificationsagent:sessionstart'] = 'Capacidad para usar la condición sessionstart';
-$string['notificationsagent:activityavailable'] = 'Capacidad necesaria para utilizar la condición de actividad disponible';
-$string['notificationsagent:activityend'] = 'Capacidad necesaria para utilizar la condición de fin de actividad';
-$string['notificationsagent:activitylastsend'] = 'Capacidad necesaria para utilizar la condición de último envío de la actividad';
-$string['notificationsagent:activitymodified'] = 'Capacidad necesaria para utilizar la condición de actividad modificada';
-$string['notificationsagent:activitynewcontent']
-    = 'Capacidad necesaria para utilizar la condición de contenido nuevo de la actividad';
-$string['notificationsagent:activitysinceend'] = 'Capacidad necesaria para utilizar la actividad desde la condición final';
-$string['notificationsagent:activitystudentend'] = 'Capacidad necesaria para utilizar la actividad condición final del estudiante';
-$string['notificationsagent:calendareventto'] = 'Capacidad necesaria para utilizar el evento del calendario para condicionar';
-$string['notificationsagent:courseend'] = 'Capacidad necesaria para utilizar la condición de fin del curso';
-$string['notificationsagent:forumnoreply'] = 'Capacidad necesaria para utilizar el foro sin condición de respuesta';
-$string['notificationsagent:numberoftimes'] = 'Capacidad necesaria para utilizar la condición de número de veces';
-$string['notificationsagent:sessionend'] = 'Capacidad necesaria para utilizar la condición de fin de sesión';
-$string['notificationsagent:weekend'] = 'Capacidad necesaria para utilizar la condición de fin de semana';
-$string['notificationsagent:itemgraded'] = 'Capacidad necesaria para utilizar la condición de elemento de calificación';
-$string['notificationsagent:weekdays'] = 'Capacidad necesaria para utilizar la condición de dias de la semana';
-$string['notificationsagent:ondates'] = 'Capacidad necesaria para utilizar la condición entre fechas';
-$string['notificationsagent:usergroupadd'] = 'Capacidad necesaria para utilizar la condición de añadir usuario a un grupo';
-
-$string['notificationsagent:addusergroup'] = 'Capacidad para usar la acción addusergroup';
-$string['notificationsagent:bootstrapnotifications'] = 'Capacidad para usar la acción bootstrapnotifications';
-$string['notificationsagent:forummessage'] = 'Capacidad para usar la acción forummessage';
-$string['notificationsagent:messageagent'] = 'Capacidad para usar la acción messageagent';
-$string['notificationsagent:removeusergroup'] = 'Capacidad para usar la acción removeusergroup';
-$string['notificationsagent:usermessageagent'] = 'Capacidad para usar la acción usermessageagent';
-$string['notificationsagent:privateforummessage'] = 'Capacidad para usar la acción privateforummessage';
-
 $string['notificationsagent:viewcourserule'] = 'Capacidad para ver las reglas de un curso';
 $string['notificationsagent:manageallrule'] = 'Capacidad para gestionar todas las reglas';
 $string['notificationsagent:managesessions'] = 'Capacidad para guardar el orden de las reglas';

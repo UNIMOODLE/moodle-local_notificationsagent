@@ -182,7 +182,7 @@ class activityopen extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activityopen', $context);
+        return has_capability('notificationscondition/activityopen:activityopen', $context);
     }
 
     /**

@@ -191,7 +191,7 @@ class usergroupadd extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:usergroupadd', $context);
+        return has_capability('notificationscondition/usergroupadd:usergroupadd', $context);
     }
 
     /**

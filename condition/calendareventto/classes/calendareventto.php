@@ -190,7 +190,7 @@ class calendareventto extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:calendareventto', $context);
+        return has_capability('notificationscondition/calendareventto:calendareventto', $context);
     }
 
     /**

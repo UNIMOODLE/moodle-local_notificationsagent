@@ -117,7 +117,7 @@ class messageagent extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:messageagent', $context)
+        return has_capability('notificationsaction/messageagent:messageagent', $context)
                 && has_capability('moodle/site:sendmessage', $context);
     }
 

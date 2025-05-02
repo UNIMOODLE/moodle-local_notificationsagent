@@ -211,7 +211,7 @@ class itemgraded extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:itemgraded', $context);
+        return has_capability('notificationscondition/itemgraded:itemgraded', $context);
     }
 
     /**

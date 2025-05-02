@@ -190,7 +190,7 @@ class activitysinceend extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activitysinceend', $context);
+        return has_capability('notificationscondition/activitysinceend:activitysinceend', $context);
     }
 
     /**

@@ -192,7 +192,7 @@ class weekdays extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:weekdays', $context);
+        return has_capability('notificationscondition/weekdays:weekdays', $context);
     }
 
     /**

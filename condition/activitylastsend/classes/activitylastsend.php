@@ -188,7 +188,7 @@ class activitylastsend extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:activitylastsend', $context);
+        return has_capability('notificationscondition/activitylastsend:activitylastsend', $context);
     }
 
     /**

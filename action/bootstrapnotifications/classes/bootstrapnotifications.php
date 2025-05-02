@@ -104,7 +104,7 @@ class bootstrapnotifications extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:bootstrapnotifications', $context);
+        return has_capability('notificationsaction/bootstrapnotifications:bootstrapnotifications', $context);
     }
 
     /**

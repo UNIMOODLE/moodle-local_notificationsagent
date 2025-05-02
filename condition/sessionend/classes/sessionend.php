@@ -155,7 +155,7 @@ class sessionend extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:sessionend', $context);
+        return has_capability('notificationscondition/sessionend:sessionend', $context);
     }
 
     /**

@@ -158,7 +158,7 @@ class forummessage extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:forummessage', $context)
+        return has_capability('notificationsaction/forummessage:forummessage', $context)
             && has_capability('mod/forum:addnews', $context)
             && has_capability('mod/forum:addquestion', $context)
             && has_capability('mod/forum:startdiscussion', $context);

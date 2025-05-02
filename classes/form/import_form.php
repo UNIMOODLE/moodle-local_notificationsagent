@@ -129,7 +129,7 @@ class import_form extends dynamic_form {
      */
     protected function check_access_for_dynamic_submission(): void {
         if (!has_capability('local/notificationsagent:importrule', $this->get_context_for_dynamic_submission())) {
-            throw new moodle_exception('importrulemissingcapability', 'data');
+            throw new moodle_exception('importrulemissingcapability', 'local_notificationsagent');
         }
     }
 

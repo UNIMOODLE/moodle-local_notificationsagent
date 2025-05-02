@@ -47,3 +47,4 @@ $string['ondates_crontask'] = 'Ondates cron task';
 $string['ondatestext'] = 'It is ondates ({$a->ondates})';
 $string['ondatestag'] = 'ondates';
 $string['privacy:metadata'] = 'The ondates plugin does not store any personal data.';
+$string['ondates:ondates'] = 'Capability needed in order to use ondates condition';

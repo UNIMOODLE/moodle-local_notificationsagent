@@ -105,10 +105,7 @@ class share_rule_all extends external_api {
                 } else {
                     throw new \moodle_exception(
                         'isnotrule',
-                        '',
-                        '',
-                        '',
-                        get_string('isnotrule', 'local_notificationsagent')
+                       'local_notificationsagent'
                     );
                 }
             } else {

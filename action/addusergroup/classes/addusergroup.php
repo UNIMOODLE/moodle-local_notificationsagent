@@ -123,7 +123,7 @@ class addusergroup extends notificationactionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:addusergroup', $context);
+        return has_capability('notificationsaction/addusergroup:addusergroup', $context);
     }
 
     /**

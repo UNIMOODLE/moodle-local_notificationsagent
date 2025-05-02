@@ -87,6 +87,8 @@ $string['no_file_selected'] = 'No file selected';
 $string['import_success'] = 'Rule imported successfuly';
 $string['import_error'] = 'Cannot import rule, check your JSON file';
 $string['no_json_file'] = 'File is not a JSON';
+$string['importrulemissingcapability'] = 'Capability to import rules';
+$string['needcourseid'] = 'Course id is required';;
 
 // Export Template.
 $string['export'] = 'Export';
@@ -225,38 +227,6 @@ $string['notificationsagent:managesiterule'] = 'Manage rules at site level';
 $string['notificationsagent:managecourserule'] = 'Manage rules at course level';
 $string['notificationsagent:manageownrule'] = 'Manage your own course rules';
 $string['notificationsagent:viewassistantreport'] = 'View rule report';
-
-$string['notificationsagent:activitycompleted'] = 'Capability needed in order to use activitycompleted condition';
-$string['notificationsagent:activityopen'] = 'Capability needed in order to use activityopen condition';
-$string['notificationsagent:calendarstart'] = 'Capability needed in order to use calendarstart condition';
-$string['notificationsagent:coursestart'] = 'Capability needed in order to use coursestart condition';
-$string['notificationsagent:sessionstart'] = 'Capability needed in order to use sessionstart condition';
-$string['notificationsagent:activityavailable'] = 'Capability needed in order to use activity available condition';
-$string['notificationsagent:activityend'] = 'Capability needed in order to use activity end condition';
-$string['notificationsagent:activitylastsend'] = 'Capability needed in order to use activity lastsend condition';
-$string['notificationsagent:activitymodified'] = 'Capability needed in order to use activity modified condition';
-$string['notificationsagent:activitynewcontent'] = 'Capability needed in order to use activity new content condition';
-$string['notificationsagent:activitysinceend'] = 'Capability needed in order to use activity since end condition';
-$string['notificationsagent:activitystudentend'] = 'Capability needed in order to use activity student end condition';
-$string['notificationsagent:calendareventto'] = 'Capability needed in order to use calendar event to condition';
-$string['notificationsagent:courseend'] = 'Capability needed in order to use course end condition';
-$string['notificationsagent:forumnoreply'] = 'Capability needed in order to use forum no reply condition';
-$string['notificationsagent:numberoftimes'] = 'Capability needed in order to use number of times condition';
-$string['notificationsagent:sessionend'] = 'Capability needed in order to use session end condition';
-$string['notificationsagent:weekend'] = 'Capability needed in order to use weekend condition';
-$string['notificationsagent:itemgraded'] = 'Capability needed in order to use grade item condition';
-$string['notificationsagent:weekdays'] = 'Capability needed in order to use weekdays condition';
-$string['notificationsagent:ondates'] = 'Capability needed in order to use ondates condition';
-$string['notificationsagent:usergroupadd'] = 'Capability needed in order to use usergroupadd condition';
-
-$string['notificationsagent:addusergroup'] = 'Capability needed in order to use addusergroup action';
-$string['notificationsagent:bootstrapnotifications'] = 'Capability needed in order to use bootstrapnotifications action';
-$string['notificationsagent:forummessage'] = 'Capability needed in order to use forummessage action';
-$string['notificationsagent:messageagent'] = 'Capability needed in order to use messageagent action';
-$string['notificationsagent:removeusergroup'] = 'Capability needed in order to use removeusergroup action';
-$string['notificationsagent:usermessageagent'] = 'Capability needed in order to use usermessageagent action';
-$string['notificationsagent:privateforummessage'] = 'Capability needed in order to use privateforummessage action';
-
 $string['notificationsagent:viewcourserule'] = 'Cability to view course rules';
 $string['notificationsagent:manageallrule'] = 'Cability to manage all rules';
 $string['notificationsagent:managesessions'] = 'Cability to save rule order';

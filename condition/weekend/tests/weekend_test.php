@@ -198,7 +198,7 @@ class weekend_test extends \advanced_testcase {
      */
     public function test_checkcapability() {
         $this->assertSame(
-            has_capability('local/notificationsagent:' . self::$subtype, self::$coursecontext),
+            has_capability('notificationscondition/' . self::$subtype.':'.self::$subtype, self::$coursecontext),
             self::$subplugin->check_capability(self::$coursecontext)
         );
     }

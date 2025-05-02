@@ -177,7 +177,7 @@ class courseend extends notificationconditionplugin {
      * @return bool
      */
     public function check_capability($context) {
-        return has_capability('local/notificationsagent:courseend', $context);
+        return has_capability('notificationscondition/courseend:courseend', $context);
     }
 
     /**
