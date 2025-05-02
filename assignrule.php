@@ -47,10 +47,10 @@ $data = [];
 
 if (!empty($idrule)) {
     if ($action == 'SHOW_CONTEXT') {
-        $data = get_list_assigned_context($idrule);
+        $data = local_notificationsagent_get_list_assigned_context($idrule);
     } else if ($action == 'SET_CONTEXT') {
-        add_list_courses_assigned($idrule, $arraycategories, $arraycourses);
-        set_forced_rule($idrule, $forced);
+        local_notificationsagent_add_list_courses_assigned($idrule, $arraycategories, $arraycourses);
+        local_notificationsagent_set_forced_rule($idrule, $forced);
     }
 }
 
@@ -62,7 +62,7 @@ if (!empty($idrule)) {
  * @return array|array[]
  * @package local_notificationsagent
  */
-function get_list_assigned_context($idrule) {
+function local_notificationsagent_get_list_assigned_context($idrule) {
     $rule = rule::create_instance($idrule);
     $listofcoursesassigned = $rule->get_assignedcontext();
     return $listofcoursesassigned;
@@ -78,7 +78,7 @@ function get_list_assigned_context($idrule) {
  * @return void
  * @package local_notificationsagent
  */
-function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
+function local_notificationsagent_add_list_courses_assigned($idrule, $categories = [], $courses = []) {
     global $DB;
 
     $instance = rule::create_instance($idrule);
@@ -119,7 +119,7 @@ function add_list_courses_assigned($idrule, $categories = [], $courses = []) {
  * @return void
  * @package local_notificationsagent
  */
-function set_forced_rule($idrule, $forced) {
+function local_notificationsagent_set_forced_rule($idrule, $forced) {
     global $DB;
 
     $instance = rule::create_instance($idrule);
