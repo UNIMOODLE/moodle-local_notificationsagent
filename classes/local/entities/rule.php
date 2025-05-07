@@ -158,7 +158,7 @@ class rule extends base {
                     foreach ($json as $key => $value) {
                         $result .= "  " . $key . " : " . mb_convert_encoding($value, 'UTF-8');
                     }
-                    return $result;
+                    return format_text($result);
                 });
 
         $columns[] = (new column(

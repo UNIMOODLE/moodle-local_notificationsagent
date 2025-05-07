@@ -218,9 +218,9 @@ class usermessageagent extends notificationactionplugin {
             $name = $user->firstname . " " . $user->lastname;
         }
 
-        $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
+        $message = format_text($jsonparams->{self::UI_MESSAGE}->text ?? '');
         $paramstoteplace = [
-                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', strip_tags(format_text($jsonparams->{self::UI_TITLE})))),
                 shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
                 shorten_text($name),
         ];
