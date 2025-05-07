@@ -292,24 +292,19 @@ class rule {
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
             $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
-        if (has_capability('moodle/category:viewhiddencategories', $context)) {
-            $forcedrules = self::get_course_rules_forced($courseid);
-            if (
-                has_capability('local/notificationsagent:viewcourserule', $context)
-                || has_capability(
-                    'local/notificationsagent:managecourserule',
-                    $context
-                )
-            ) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false),
-                    ...$forcedrules,
-                ];
-            }
-            if (has_capability('local/notificationsagent:manageallrule', $context)) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false),
-                    ...$forcedrules,
-                ];
-            }
+      
+        $forcedrules = self::get_course_rules_forced($courseid);
+        if (has_capability('local/notificationsagent:viewcourserule', $context)
+            || has_capability(
+                'local/notificationsagent:managecourserule',$context)) {
+            $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false),
+                ...$forcedrules,
+            ];
+        }
+        if (has_capability('local/notificationsagent:manageallrule', $context)) {
+            $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false),
+                ...$forcedrules,
+            ];
         }
         $rules = array_unique($rules, SORT_REGULAR);
 
@@ -1836,6 +1831,7 @@ class rule {
 
         $parents = helper::get_parents_categories_course($courseid);
         [$sqlparents, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+        
 
         $notstudentjoin = '';
         if ($notstudent) {
