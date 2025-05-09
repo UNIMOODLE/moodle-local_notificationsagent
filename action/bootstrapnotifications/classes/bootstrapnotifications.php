@@ -139,7 +139,8 @@ class bootstrapnotifications extends notificationactionplugin {
     public function process_markups(&$content, $courseid, $options = null) {
         $jsonparams = json_decode($this->get_parameters());
 
-        $paramstoteplace = [shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', strip_tags(format_text($jsonparams->{self::UI_MESSAGE}))))];
+        $paramstoteplace =
+            [shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', strip_tags(format_text($jsonparams->{self::UI_MESSAGE}))))];
 
         $humanvalue = str_replace($this->get_elements(), $paramstoteplace, $this->get_title());
 
