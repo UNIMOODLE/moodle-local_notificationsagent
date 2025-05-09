@@ -202,8 +202,12 @@ abstract class notificationconditionplugin extends notificationplugin {
 
             // Delete cache for this condition.
             notificationsagent::set_timer_cache(
-                ["(courseid= $courseid AND conditionid= {$dataplugin->id})"],
-                []
+                ["(courseid = :courseid AND conditionid = :conditionid)"],
+                [],
+                [
+                    'courseid'    => $courseid,
+                    'conditionid' => $dataplugin->id,
+                ]
             );
 
             $contextevaluation = new evaluationcontext();

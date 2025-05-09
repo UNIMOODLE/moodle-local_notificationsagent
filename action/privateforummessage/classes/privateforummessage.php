@@ -201,10 +201,10 @@ class privateforummessage extends notificationactionplugin {
         $fastmodinfo = get_fast_modinfo($courseid);
         $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
 
-        $message = $jsonparams->{self::UI_MESSAGE}->text ?? '';
+        $message = format_text($jsonparams->{self::UI_MESSAGE}->text ?? '');
         $paramstoteplace = [
                 $activityname,
-                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', $jsonparams->{self::UI_TITLE})),
+                shorten_text(str_replace('{' . rule::SEPARATOR . '}', ' ', strip_tags(format_text($jsonparams->{self::UI_TITLE})))),
                 shorten_text(format_string(str_replace('{' . rule::SEPARATOR . '}', ' ', $message))),
         ];
 

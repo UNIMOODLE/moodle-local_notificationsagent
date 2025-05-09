@@ -145,7 +145,6 @@ class notificationsagent_engine {
                         foreach ($actions as $action) {
                             $actionparams = json_decode($action->get_parameters(), true);
                             $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
-
                             // If the action has a specific user, send the action only to that user.
                             // otherwise, send the action for each user.
                             if (
@@ -180,9 +179,11 @@ class notificationsagent_engine {
                                     $parameters,
                                     $timeaccess
                                 );
+                                $rule->set_launched($context);
                             } else {
                                 $coursecontext = \context_course::instance($context->get_courseid());
                                 $users = notificationsagent::get_usersbycourse($coursecontext);
+                                $rule->set_launched($context);
                                 foreach ($users as $user) {
                                     $context->set_userid($user->id);
                                     $actionparams = json_decode($action->get_parameters(), true);
@@ -195,10 +196,7 @@ class notificationsagent_engine {
                                             &&
                                             !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
                                     ) {
-                                        if (
-                                                ($context->get_userid() == notificationsagent::GENERIC_USERID)
-                                                || ($context->get_userid() == $hasuser)
-                                        ) {
+                                        if ($context->get_userid() == $hasuser) {
                                             $context->set_userid($hasuser);
                                         } else {
                                             continue;
@@ -223,7 +221,6 @@ class notificationsagent_engine {
                                 }
                             }
                         }
-                        $rule->set_launched($context);
                         $transaction->allow_commit();
                     }
                 }
