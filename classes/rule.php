@@ -301,12 +301,12 @@ class rule {
                     $context
                 )
             ) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false),
+                $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false, true),
                     ...$forcedrules,
                 ];
             }
             if (has_capability('local/notificationsagent:manageallrule', $context)) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false),
+                $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false, true),
                     ...$forcedrules,
                 ];
             }
@@ -363,7 +363,10 @@ class rule {
         $instances = [];
 
         if ($courseid != SITEID && has_capability('local/notificationsagent:managecourserule', $context)) {
-            $rules = array_unique([...self::get_owner_rules(), ...self::get_course_rules($courseid, true)], SORT_REGULAR);
+            $rules = array_unique(
+                [...self::get_owner_rules(),
+                    ...self::get_course_rules($courseid, true, null, true, false)],
+                SORT_REGULAR);
         }
 
         if (!empty($rules)) {
@@ -1069,6 +1072,7 @@ class rule {
         $conditions = $this->get_conditions_to_evaluate();
         $insertdata = [];
         $deletedata = [];
+        $params = [];
 
         foreach ($conditions as $condition) {
             $context->set_params($condition->get_parameters());
@@ -1076,12 +1080,11 @@ class rule {
             $result = $condition->evaluate($context);
             if ($result === false) {
                 $timetrigger = $condition->estimate_next_time($context);
-
-                $deletedata[] = "
-                    (userid = {$context->get_userid()}
-                    AND courseid = {$context->get_courseid()}
-                    AND conditionid = {$condition->get_id()})";
-
+                $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+                $params[] = $context->get_userid();
+                $params[] = $context->get_courseid();
+                $params[] = $condition->get_id();
+                $deletedata[] = $conditionsql;
                 // Keep record in trigger.
                 // Event driven conditions return a null timetrigger.
                 if (!empty($timetrigger)) {
@@ -1097,7 +1100,8 @@ class rule {
 
                 notificationsagent::set_time_trigger(
                     $deletedata,
-                    $insertdata
+                    $insertdata,
+                    $params
                 );
 
                 return false;
@@ -1110,11 +1114,11 @@ class rule {
             $result = $exception->evaluate($context);
             if ($result === true) {
                 $timetrigger = $exception->estimate_next_time($context);
-
-                $deletedata[] = "
-                    (userid = {$context->get_userid()}
-                    AND courseid = {$context->get_courseid()}
-                    AND conditionid = {$exception->get_id()})";
+                $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+                $params[] = $context->get_userid();
+                $params[] = $context->get_courseid();
+                $params[] = $condition->get_id();
+                $deletedata[] = $conditionsql;
                 // Keep record in trigger.
                 // Event driven exceptions return a null timetrigger.
                 if (!empty($timetrigger)) {
@@ -1130,7 +1134,8 @@ class rule {
 
                 notificationsagent::set_time_trigger(
                     $deletedata,
-                    $insertdata
+                    $insertdata,
+                    $params
                 );
 
                 return false;
@@ -1138,10 +1143,11 @@ class rule {
         }
 
         // Set a time trigger for the rule to be executed.
-        $deletedata[] = "
-            (userid = {$context->get_userid()}
-            AND courseid = {$context->get_courseid()}
-            AND conditionid = {$context->get_triggercondition()})";
+        $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+        $params[] = $context->get_userid();
+        $params[] = $context->get_courseid();
+        $params[] = $context->get_triggercondition();
+        $deletedata[] = $conditionsql;
 
         $insertdata[] = [
             'userid' => $context->get_userid(),
@@ -1154,7 +1160,8 @@ class rule {
 
         notificationsagent::set_time_trigger(
             $deletedata,
-            $insertdata
+            $insertdata,
+            $params,
         );
 
         // All conditions are met, and no exceptions are triggered.
@@ -1822,17 +1829,27 @@ class rule {
     /**
      * Get all rules related to a given course
      *
-     * @param integer $courseid Course id
+     * @param int $courseid Course id
      * @param bool $notstudent Filter
      * @param int $ruleid Concrete ruleid
      * @param bool $notcatcontext Filter
      *
      * @return array $data rules
      */
-    private static function get_course_rules($courseid, $notstudent = false, $ruleid = null, $notcatcontext = true) {
+    private static function get_course_rules(
+        $courseid,
+        $notstudent = false,
+        $ruleid = null,
+        $notcatcontext = true,
+        $gettemplate = false
+    ) {
         global $DB;
-
+        $template = '';
         $data = [];
+
+        if ($courseid != SITEID && $gettemplate) {
+            $template = 'AND nr.template = 1';
+        }
 
         $parents = helper::get_parents_categories_course($courseid);
         [$sqlparents, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
@@ -1865,7 +1882,7 @@ class rule {
             SELECT nr.id
               FROM {notificationsagent_rule} nr
               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-               AND nctx.contextid = :categorycontextid AND nr.deleted = 0
+               AND nctx.contextid = :categorycontextid AND nr.deleted = 0  $template
               JOIN {course_categories} cc ON nctx.objectid = cc.id
               JOIN {course} c ON cc.id = c.category
               $notstudentjoin
@@ -1880,7 +1897,7 @@ class rule {
         $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-                   AND nctx.contextid = :coursecontextid  AND nr.deleted = 0
+                   AND nctx.contextid = :coursecontextid  AND nr.deleted = 0  $template
                   JOIN {course} c ON nctx.objectid = c.id
                   $notstudentjoin
                  WHERE c.id = :coursecontext
@@ -1952,17 +1969,20 @@ class rule {
      */
     private static function get_owner_rules_by_course($courseid) {
         global $DB, $USER;
-
+        $template = '';
+        if ($courseid != SITEID ) {
+            $template = 'AND nr.template = 1';
+        }
         $data = [];
 
-        $sql = 'SELECT nr.id
+        $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid AND nctx.objectid = :objectid
-                  AND nr.deleted = 0
+                  AND nr.deleted = 0 $template
                  WHERE nr.createdby = :createdby
               ORDER BY nr.status, nr.createdat ASC
-        ';
+       ";
         $data = $DB->get_records_sql($sql, [
             'coursecontextid' => CONTEXT_COURSE,
             'objectid' => $courseid,

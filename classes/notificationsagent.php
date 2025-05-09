@@ -397,11 +397,11 @@ class notificationsagent {
      *
      * @return void
      */
-    public static function set_timer_cache($deletedata, $insertdata) {
+    public static function set_timer_cache($deletedata, $insertdata , $params = []) {
         global $DB;
         if (!empty($deletedata)) {
             $todelete = implode(' OR ', $deletedata);
-            $DB->delete_records_select('notificationsagent_cache', $todelete);
+            $DB->delete_records_select('notificationsagent_cache', $todelete, $params);
         }
         if (!empty($insertdata)) {
             $DB->insert_records('notificationsagent_cache', $insertdata);
@@ -416,12 +416,12 @@ class notificationsagent {
      *
      * @return void
      */
-    public static function set_time_trigger($deletedata, $insertdata) {
+    public static function set_time_trigger($deletedata, $insertdata , $params = []) {
         global $DB;
 
         if (!empty($deletedata)) {
             $todelete = implode(' OR ', $deletedata);
-            $DB->delete_records_select('notificationsagent_triggers', $todelete);
+            $DB->delete_records_select('notificationsagent_triggers', $todelete, $params);
         }
         if (!empty($insertdata)) {
             $DB->insert_records('notificationsagent_triggers', $insertdata);
@@ -440,6 +440,7 @@ class notificationsagent {
         $transaction = $DB->start_delegated_transaction();
         $insertdata = [];
         $deletedata = [];
+        $params = [];
         $courseid = $context->get_courseid();
         $coursecontext = \context_course::instance($courseid);
         $contextuser = $context->get_userid();  // 0 or userid>0
@@ -471,8 +472,11 @@ class notificationsagent {
                 $context->set_userid($userid);
                 $cache = $subplugin->estimate_next_time($context);
 
-                $deletedata[]
-                    = "(userid =  $userid  AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
+                $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+                $params[] = $userid;
+                $params[] = $courseid;
+                $params[] = $subplugin->get_id();
+                $deletedata[] = $conditionsql;
 
                 if (!empty($cache)) {
                     $insertdata[] = [
@@ -485,8 +489,8 @@ class notificationsagent {
                     ];
                 }
             }
-            self::set_timer_cache($deletedata, $insertdata);
-            self::set_time_trigger($deletedata, $insertdata);
+            self::set_timer_cache($deletedata, $insertdata, $params);
+            self::set_time_trigger($deletedata, $insertdata, $params);
             return;
         }
         if (!$subplugin->is_generic()) {
@@ -517,8 +521,11 @@ class notificationsagent {
                     $context->set_userid($user->id);
                     $cache = $subplugin->estimate_next_time($context);
 
-                    $deletedata[]
-                        = "(userid = $user->id AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
+                    $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+                    $params[] = $user->id;
+                    $params[] = $courseid;
+                    $params[] = $subplugin->get_id();
+                    $deletedata[] = $conditionsql;
                     if (empty($cache)) {
                         continue;
                     }
@@ -562,9 +569,11 @@ class notificationsagent {
                 $context->set_userid($userid);
                 $cache = $subplugin->estimate_next_time($context);
 
-                $deletedata[]
-                    = "(userid =  $userid  AND courseid= $courseid AND conditionid= {$subplugin->get_id()})";
-
+                $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+                $params[] = $userid;
+                $params[] = $courseid;
+                $params[] = $subplugin->get_id();
+                $deletedata[] = $conditionsql;
                 if (!empty($cache)) {
                     $insertdata[] = [
                         'userid' => $userid,
@@ -577,8 +586,8 @@ class notificationsagent {
                 }
             }
         }
-        self::set_timer_cache($deletedata, $insertdata);
-        self::set_time_trigger($deletedata, $insertdata);
+        self::set_timer_cache($deletedata, $insertdata, $params);
+        self::set_time_trigger($deletedata, $insertdata, $params);
 
         $transaction->allow_commit();
     }
