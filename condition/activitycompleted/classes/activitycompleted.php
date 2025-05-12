@@ -89,7 +89,13 @@ class activitycompleted extends notificationconditionplugin {
         ]);
 
         if (!$cache) {
-            [$course, $cm] = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
+            try {
+                [$course, $cm] = get_course_and_cm_from_cmid($params->{self::UI_ACTIVITY}, '', $courseid);
+
+            } catch (\Exception $e) {
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
+                return false;
+            }
 
             $cinfo = new \completion_info($course);
             $cminfo = $cinfo->get_data($cm, false, $userid);

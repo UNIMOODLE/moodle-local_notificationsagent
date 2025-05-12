@@ -78,7 +78,12 @@ class activityavailable extends notificationconditionplugin {
         $cmid = $params->{self::UI_ACTIVITY};
         $available = false;
         if ($cmid) {
-            $cm = get_fast_modinfo($courseid, $userid)->get_cm($cmid);
+            try {
+                $cm = get_fast_modinfo($courseid, $userid)->get_cm($cmid);
+            } catch (\moodle_exception $e) {
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
+                return false;
+            }
             if ($cm->visible && $cm->available) {
                 $available = true;
             }

@@ -98,14 +98,20 @@ class forumnoreply extends notificationconditionplugin {
         );
 
         if (empty($time)) {
-            return !empty(
-                self::get_unanswered_threads(
+            try {
+                $threads = self::get_unanswered_threads(
                     $cmid,
                     $courseid,
                     $timeaccess,
                     $timenowandtime,
                     $userid
-                )
+                );
+            } catch (\moodle_exception $e) {
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
+                return false;
+            }
+            return !empty(
+               $threads
             );
         }
 
@@ -274,13 +280,19 @@ class forumnoreply extends notificationconditionplugin {
      * @param int $timenowandtime The subplugin time.
      * @param int|null $userid The user id.
      *
-     * @return object Unanswered threads.
+     * @return array Unanswered threads.
+     * @throws \moodle_exception
      */
     public static function get_unanswered_threads($cmid, $courseid, $timenow, $timenowandtime, $userid = null) {
         global $DB;
 
         $modinfo = get_fast_modinfo($courseid);
-        $forumid = $modinfo->get_cm($cmid)->instance;
+        try {
+            $forumid = $modinfo->get_cm($cmid)->instance;
+        } catch (\moodle_exception $e) {
+            debugging( $e->getMessage(), DEBUG_DEVELOPER);
+            return [];
+        }
 
         $whereuser = '';
         $params = [];
