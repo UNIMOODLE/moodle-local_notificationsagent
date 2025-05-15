@@ -274,7 +274,7 @@ class weekdays extends notificationconditionplugin {
      * @param int $today (0 => sunday, 1 => monday...)
      * @param array $days weekdays selected
      *
-     * @return boolean
+     * @return bool
      */
     public static function correct_weekday($today, $days): bool {
         return in_array($today, $days);
@@ -341,7 +341,7 @@ class weekdays extends notificationconditionplugin {
      * It is called near the completion of course restoration.
      *
      * @param string $restoreid Restore identifier
-     * @param integer $courseid Course identifier
+     * @param int $courseid Course identifier
      * @param \base_logger $logger Logger if any warnings
      *
      * @return bool False if restore is not required

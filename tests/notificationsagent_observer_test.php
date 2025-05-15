@@ -127,7 +127,11 @@ class notificationsagent_observer_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
         $USER->id = self::$user->id;
         $ruleid = $rule->create($dataform);
         $this->assertIsInt($ruleid);

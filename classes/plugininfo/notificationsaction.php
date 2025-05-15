@@ -44,7 +44,7 @@ class notificationsaction extends notificationsbaseinfo {
     /**
      * Checks if uninstall is allowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function is_uninstall_allowed() {
         return true;

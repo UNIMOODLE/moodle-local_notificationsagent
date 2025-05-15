@@ -305,7 +305,7 @@ class usermessageagent extends notificationactionplugin {
     /**
      * Check if the action will be sent once or not
      *
-     * @param integer $userid User id
+     * @param int $userid User id
      *
      * @return bool $sendonce Will the action be sent once?
      */
