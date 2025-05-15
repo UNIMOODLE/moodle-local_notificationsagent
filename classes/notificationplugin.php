@@ -401,7 +401,10 @@ abstract class notificationplugin {
      * @param array $array The array to be modified by reference
      */
     public function set_ui(&$array) {
-        $array[$this->get_id()] = ["pluginname" => $this->get_subtype(), "action" => editrule_form::FORM_JSON_ACTION_UPDATE];
+        $array[$this->get_id()] = [
+                "pluginname" => $this->get_subtype(),
+                "action" => editrule_form::FORM_JSON_ACTION_UPDATE,
+        ];
     }
 
     /**
@@ -601,7 +604,7 @@ abstract class notificationplugin {
     /**
      * Check if the object is new.
      *
-     * @return boolean
+     * @return bool
      */
     protected function is_new() {
         return is_null($this->id);

@@ -172,7 +172,7 @@ class evaluationcontext {
     /**
      * Get if it is complementary.
      *
-     * @return boolean
+     * @return bool
      */
     public function is_complementary() {
         return $this->iscomplementary;

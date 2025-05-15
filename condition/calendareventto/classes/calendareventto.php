@@ -291,7 +291,7 @@ class calendareventto extends notificationconditionplugin {
      * It is called near the completion of course restoration.
      *
      * @param string $restoreid Restore identifier
-     * @param integer $courseid Course identifier
+     * @param int $courseid Course identifier
      * @param \base_logger $logger Logger if any warnings
      *
      * @return bool|void False if restore is not required

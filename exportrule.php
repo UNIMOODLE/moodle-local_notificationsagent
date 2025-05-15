@@ -34,7 +34,7 @@
 
 use local_notificationsagent\rule;
 
-require_once("../../config.php");
+require(__DIR__ . '/../../config.php');
 
 global $DB;
 require_login();

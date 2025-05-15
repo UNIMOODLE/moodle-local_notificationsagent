@@ -135,7 +135,10 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0];
         $USER->id = self::$user->id;
         $ruleid = self::$rule->create($dataform);
         self::$rule->set_id($ruleid);
@@ -287,7 +290,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $ruleid = self::$rule->create($dataform);
         // Conditions.
@@ -364,7 +371,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $ruleid = self::$rule->create($dataform);
 
@@ -376,7 +387,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataupdate->type = 1;
         $dataupdate->courseid = self::$course->id;
         $dataupdate->timesfired = $timesfired;
-        $dataupdate->runtime_group = ['runtime_days' => 1, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataupdate->runtime_group = [
+            'runtime_days' => 1,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         // Test update.
         $instance->update($dataupdate);
@@ -422,7 +437,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $ruleid = self::$rule->create($dataform);
 
@@ -562,7 +581,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = $courseid;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $ruleid = self::$rule->create($dataform);
 
@@ -640,7 +663,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $ruleid = self::$rule->create($dataform);
 
@@ -707,7 +734,11 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $dataform->type = 1;
         $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
-        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->runtime_group = [
+            'runtime_days' => 5,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
 
         $categories = helper::build_category_array(\core_course_category::get(self::$course->category), self::$rule->get_id());
         $outputcategories = helper::build_output_categories([$categories]);

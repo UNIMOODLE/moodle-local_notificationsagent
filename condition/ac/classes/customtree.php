@@ -60,8 +60,8 @@ class customtree extends \core_availability\tree {
      *    coding_exception (if $lax is false).
      *
      * @param \stdClass $structure Structure (decoded from JSON)
-     * @param boolean $lax If true, throw exceptions only for invalid structure
-     * @param boolean $root If true, this is the root tree
+     * @param bool $lax If true, throw exceptions only for invalid structure
+     * @param bool $root If true, this is the root tree
      * @return \core_availability\tree Availability tree
      * @throws \coding_exception If data is not valid structure
      */
