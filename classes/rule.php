@@ -1602,7 +1602,11 @@ class rule {
         $record = $this->to_record();
         $record->name = $data->title;
         $record->createdat = time();
-        $record->createdby = $USER->id;
+
+        if (!isset($data->createdby)) {
+            $record->createdby = $USER->id;
+        }
+
         $record->template = $data->type;
 
         if (isset($data->timesfired) && !empty($data->timesfired)) {
