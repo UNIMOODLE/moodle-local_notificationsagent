@@ -175,7 +175,9 @@ class itemgraded extends notificationconditionplugin {
                 $item->iteminstance,
                 $courseid
             );
-            $listactivities[$cm->id] = format_string($item->get_name(true));
+            if ($cm) {
+                $listactivities[$cm->id] = format_string($item->get_name(true));
+            }
         }
 
         if ($this->rule->template == rule::TEMPLATE_TYPE) {

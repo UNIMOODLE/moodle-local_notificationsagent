@@ -1873,7 +1873,7 @@ class rule {
                 ] + $params;
         }
 
-        $sql = "SELECT nr.id
+        $sql = "SELECT UNIQUE nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
                    AND nctx.contextid = :coursecontextid  AND nr.deleted = 0
