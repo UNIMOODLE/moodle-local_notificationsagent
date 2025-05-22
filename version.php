@@ -37,5 +37,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_notificationsagent';
 $plugin->release = '0.6.4';
 $plugin->version = 2025051700;
-$plugin->requires = 2022041900;
+$plugin->requires = 2022041900;     // Min release Moodle4.3
+$plugin->incompatible = 404;        // This version is incompatible with Moodle 4.4 and up.
 $plugin->maturity = MATURITY_BETA;
