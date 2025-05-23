@@ -408,18 +408,23 @@ class helper {
     }
 
     /**
-     * Get parents categories id from course
+     * Get parent categories id from course
      *
      * @param int $courseid
      *
-     * @return array $parents categories id
+     * @return array $parents categories ids.
      */
     public static function get_parents_categories_course($courseid) {
         $course = get_course($courseid);
         $categoryid = $course->category;
-        $category = \core_course_category::get($categoryid);
-        $parents = $category->get_parents();
-        $parents[] = $course->category;
+        try {
+            $category = \core_course_category::get($categoryid);
+            $parents = $category->get_parents();
+            $parents[] = $course->category;
+        } catch (\moodle_exception $e) {
+            // If the category is hidden just return the course category.
+            $parents = [ $categoryid ];
+        }
 
         return $parents;
     }
