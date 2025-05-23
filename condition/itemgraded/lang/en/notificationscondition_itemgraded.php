@@ -35,8 +35,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['conditiontext'] = 'The user achieved a grade [OOOP] [GGGG] in the [AAAA] activity.';
-$string['editrule_condition_activity'] = 'Activity {$a->typeelement}:';
+$string['conditiontext'] = 'The user achieved a grade [OOOP] [GGGG] in the [AAAA] grade item.';
+$string['editrule_condition_activity'] = 'Grade item {$a->typeelement}:';
 $string['editrule_condition_grade'] = 'Grade {$a->typeelement}:';
 $string['itemgraded:itemgraded'] = 'Capability needed in order to use grade item condition';
 $string['modname'] = 'itemgraded';

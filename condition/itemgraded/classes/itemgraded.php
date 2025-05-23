@@ -46,7 +46,8 @@ require_once($CFG->libdir . '/gradelib.php');
 /**
  * itemgraded subplugin class
  */
-class itemgraded extends notificationconditionplugin {
+class itemgraded extends notificationconditionplugin
+{
     /**
      * @var string Subplugin name
      */
@@ -57,7 +58,8 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return \lang_string|string
      */
-    public function get_title() {
+    public function get_title()
+    {
         return get_string('conditiontext', 'notificationscondition_itemgraded');
     }
 
@@ -66,7 +68,8 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return string[]
      */
-    public function get_elements() {
+    public function get_elements()
+    {
         return ['[OOOP]', '[GGGG]', '[AAAA]'];
     }
 
@@ -77,28 +80,24 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return bool true if the condition is true, false otherwise.
      */
-    public function evaluate(evaluationcontext $context): bool {
+    public function evaluate(evaluationcontext $context): bool
+    {
         $meetcondition = false;
         $gradeisachieved = false;
         $courseid = $context->get_courseid();
         $userid = $context->get_userid();
         $params = json_decode($context->get_params());
 
-        try {
-            $cm = get_coursemodule_from_id(true, $params->{self::UI_ACTIVITY}, 0, false, MUST_EXIST);
-            $usergrade = grade_get_grades($courseid, 'mod', $cm->modname, $cm->instance, $userid);
-        } catch (\coding_exception $e) {
-            debugging($e->getMessage(), DEBUG_DEVELOPER);
+        $item = \grade_item::fetch(['id' => $params->{self::UI_ACTIVITY}]);
+        if ($item) {
             return false;
         }
 
-        if (isset($usergrade->items[0]->grades[$userid]->grade)) {
-            $gradeisachieved = notificationsagent::evaluate_expression(
-                $params->{self::UI_OP},
-                $usergrade->items[0]->grades[$userid]->grade,
-                $params->{self::UI_GRADE}
-            );
-        }
+        $gradeisachieved = notificationsagent::evaluate_expression(
+            $params->{self::UI_OP},
+            $item->get_grade($userid)->finalgrade,
+            $params->{self::UI_GRADE}
+        );
 
         if ($gradeisachieved) {
             $meetcondition = true;
@@ -114,7 +113,8 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return int|null
      */
-    public function estimate_next_time(evaluationcontext $context) {
+    public function estimate_next_time(evaluationcontext $context)
+    {
         $estimate = null;
 
         $isachieved = $this->evaluate($context);
@@ -137,7 +137,8 @@ class itemgraded extends notificationconditionplugin {
      * @param int $courseid The course identifier.
      * @param string $type The type of the notification plugin.
      */
-    public function get_ui($mform, $courseid, $type) {
+    public function get_ui($mform, $courseid, $type)
+    {
         $this->get_ui_title($mform, $type);
 
         $gradegroup[] = $mform->createElement(
@@ -151,9 +152,10 @@ class itemgraded extends notificationconditionplugin {
             $this->get_name_ui(self::UI_GRADE),
             '',
             [
-                        'class' => 'mr-2', 'size' => '7',
-                        'placeholder' => get_string('condition_grade', 'local_notificationsagent'),
-                ]
+                'class' => 'mr-2',
+                'size' => '7',
+                'placeholder' => get_string('condition_grade', 'local_notificationsagent'),
+            ]
         );
         $group = $mform->createElement(
             'group',
@@ -173,14 +175,10 @@ class itemgraded extends notificationconditionplugin {
 
         $listactivities = [];
         $items = \grade_item::fetch_all(['courseid' => $courseid, 'itemtype' => 'mod']);
-        $items = $items ? $items : [];
+
+        $items = $items ?: [];
         foreach ($items as $i => $item) {
-            $cm = get_coursemodule_from_instance(
-                $item->itemmodule,
-                $item->iteminstance,
-                $courseid
-            );
-            $listactivities[$cm->id] = format_string($item->get_name(true));
+            $listactivities[$item->id] = format_string($item->get_name(true));
         }
 
         if ($this->rule->template == rule::TEMPLATE_TYPE) {
@@ -215,7 +213,8 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return bool
      */
-    public function check_capability($context) {
+    public function check_capability($context)
+    {
         return has_capability('notificationscondition/itemgraded:itemgraded', $context);
     }
 
@@ -229,17 +228,18 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return mixed The converted parameters.
      */
-    public function convert_parameters($params) {
-        $params = (array) $params;
+    public function convert_parameters($params)
+    {
+        $params = (array)$params;
         $activity = $params[$this->get_name_ui(self::UI_ACTIVITY)] ?? 0;
         $op = self::OPERATORS[$params[$this->get_name_ui(self::UI_OP)]] ?? '';
         $grade = $params[$this->get_name_ui(self::UI_GRADE)] ?? 0;
         $this->set_parameters(json_encode([
-                self::UI_ACTIVITY => (int) $activity,
-                self::UI_OP => (string) $op,
-                self::UI_GRADE => (float) $grade,
+            self::UI_ACTIVITY => (int)$activity,
+            self::UI_OP => (string)$op,
+            self::UI_GRADE => (float)$grade,
         ]));
-        $this->set_cmid((int) $activity);
+        $this->set_cmid((int)$activity);
         return $this->get_parameters();
     }
 
@@ -255,18 +255,51 @@ class itemgraded extends notificationconditionplugin {
      *
      * @return void Processed content with markups handled.
      */
-    public function process_markups(&$content, $courseid, $options = null) {
+    public function process_markups(&$content, $courseid, $options = null)
+    {
         $jsonparams = json_decode($this->get_parameters());
 
         $activityname = '[AAAA]';
-        $cmid = $jsonparams->{self::UI_ACTIVITY};
-        $fastmodinfo = get_fast_modinfo($courseid);
-        $activityname = isset($fastmodinfo->cms[$cmid]) ? $fastmodinfo->cms[$cmid]->name : $activityname;
+        //$cmid = $jsonparams->{self::UI_ACTIVITY};
+        $item = \grade_item::fetch(['id' => $jsonparams->{self::UI_ACTIVITY}]);
 
-        $paramstoreplace = [$jsonparams->{self::UI_OP}, $jsonparams->{self::UI_GRADE}, $activityname];
+        $itemname = $item->itemname ?? $activityname;
+        $paramstoreplace = [$jsonparams->{self::UI_OP}, $jsonparams->{self::UI_GRADE}, $itemname];
         $humanvalue = str_replace($this->get_elements(), $paramstoreplace, $this->get_title());
 
         $content[] = $humanvalue;
+    }
+
+    /**
+     * Validation subplugin
+     *
+     * @param int $courseid Course id
+     * @param array $array The array to be modified by reference. If is null, validation is not being called from the form
+     *                                  and return directly
+     * @param bool $onlyverifysiteid Default true
+     *
+     * @return bool
+     */
+    public function validation($courseid, &$array = null, $onlyverifysiteid = true)
+    {
+        if (($validation = parent::validation($courseid, $array, $onlyverifysiteid)) === 'break') {
+            return true;
+        }
+
+        // If it is false from parent and $array is null, return.
+        if (is_null($array) && !$validation) {
+            return $validation;
+        }
+        // verifiy tha itemgraded exists
+        $data = json_decode($this->get_parameters(), true);
+
+
+        $item = \grade_item::fetch(['id' => $data[self::UI_ACTIVITY]]);
+        if (!$item) {
+            return  false;
+        }
+
+        return $validation;
     }
 
     /**
