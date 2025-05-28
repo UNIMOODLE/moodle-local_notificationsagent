@@ -49,7 +49,7 @@ $string['max_rules_cron_desc'] = 'Maximum number of rules per cron cycle';
 $string['tracelog'] = 'Trace log';
 $string['tracelog_desc'] = 'Trace log. Disable on a production site';
 $string['startdate'] = 'Activity dates config';
-$string['startdate_desc'] = 'Use a line for each activity with the pattern: pluginname|tablename|startdate|startend';
+$string['startdate_desc'] = 'Use a line for each activity with the pattern: pluginname|tablename|startdate|enddate';
 $string['pause_after_restore'] = 'Pause rules after restore';
 $string['pause_after_restore_desc'] = 'Pause rules after restoring a course';
 
@@ -297,6 +297,7 @@ $string['privacy:metadata:notificationsagent_triggers:ruleoff'] = 'The rule asso
 // Message provider.
 $string['messageprovider:notificationsagent_message'] = 'Broken rules notifications';
 $string['brokenrulebody'] = 'Rule:  {$a->rule} of the course :{$a->course} has been paused,';
+$string['validation_editrule_form_supported_cm'] = 'Activity type not supported. Contact the site administrator.';
 
 // Engine.
 $string['actionerror'] = 'Error while performing the action ';

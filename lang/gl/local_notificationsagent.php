@@ -49,7 +49,7 @@ $string['max_rules_cron_desc'] = 'Número máximo de regras por ciclo cron';
 $string['tracelog'] = 'Rexistro de rastrexo';
 $string['tracelog_desc'] = 'Rexistro de rastrexo. Desactivar nos sitios de produción';
 $string['startdate'] = 'Configuración da data da actividade';
-$string['startdate_desc'] = 'Utiliza unha liña para cada actividade co patrón: pluginname|tablename|startdate|startend';
+$string['startdate_desc'] = 'Utiliza unha liña para cada actividade co patrón: pluginname|tablename|startdate|enddate';
 $string['pause_after_restore'] = 'Pausa as regras despois da restauración';
 $string['pause_after_restore_desc'] = 'Pausa as regras despois de restaurar un curso';
 

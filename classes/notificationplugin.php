@@ -440,7 +440,7 @@ abstract class notificationplugin {
                 }
                 $array[$this->get_name_ui(self::UI_ACTIVITY)] = get_string(
                     'validation_editrule_form_supported_cm',
-                    'notificationscondition_activityend'
+                    'local_notificationsagent'
                 );
             }
         }
