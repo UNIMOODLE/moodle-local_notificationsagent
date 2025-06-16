@@ -248,8 +248,8 @@ class usermessageagent extends notificationactionplugin {
         $message->component = 'notificationsaction_usermessageagent'; // Your plugin's name.
         $message->name = 'particular_message'; // Your notification name from message.php.
         $message->userfrom = $userfrom == $userto ? \core_user::get_noreply_user() : $userfrom;
-        $message->subject = format_text($placeholdershuman->{self::UI_TITLE}); // Será nuestro TTTT.
-        $message->fullmessage = format_text($sendmessage); // Será nuestro BBBB.
+        $message->subject = format_string($placeholdershuman->{self::UI_TITLE});
+        $message->fullmessage = format_text($sendmessage);
         $message->fullmessageformat = FORMAT_MOODLE;
         $message->fullmessagehtml = format_text('<p>' . $sendmessage . '</p>');
         $message->smallmessage = shorten_text(format_text($sendmessage));
