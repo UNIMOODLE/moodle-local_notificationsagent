@@ -196,7 +196,14 @@ final class itemgraded_test extends \advanced_testcase {
                 'CONDITION = 50' => [1704445200, '{"op":"=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
                 'CONDITION > 10' => [1704445200, '{"op":">", "grade":10}', notificationplugin::COMPLEMENTARY_CONDITION, 6, true],
                 'CONDITION > 50 Incorrect' => [1704445200, '{"op":">", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 2,
-                        false],
+                false],
+                'GRADE = 0 with 0 correct' => [1704445200, '{"op":"=", "grade":0}', notificationplugin::COMPLEMENTARY_CONDITION, 0, true],
+                'GRADE = 100 with 10 correct' => [1704445200, '{"op":"=", "grade":100}', notificationplugin::COMPLEMENTARY_CONDITION, 10, true],
+                'GRADE < 50 with 4 correct' => [1704445200, '{"op":"<", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 4, true],
+                'GRADE < 50 with 6 correct (false)' => [1704445200, '{"op":"<", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 6, false],
+                'GRADE >= 50 with 5 correct' => [1704445200, '{"op":">=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
+                'GRADE <= 50 with 5 correct' => [1704445200, '{"op":"<=", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 5, true],
+                'INVALID OP' => [1704445200, '{"op":"X", "grade":50}', notificationplugin::COMPLEMENTARY_CONDITION, 10, false],
 
         ];
     }
