@@ -35,9 +35,7 @@
 namespace notificationscondition_activityavailable\task;
 
 use local_notificationsagent\rule;
-use local_notificationsagent\task\notificationsagent_trigger_cron;
 use notificationscondition_activityavailable\activityavailable;
-
 
 /**
  * Class for testing the activityavailable_crontask task.
@@ -46,17 +44,9 @@ use notificationscondition_activityavailable\activityavailable;
  */
 final class activityavailable_crontask_test extends \advanced_testcase {
     /**
-     * @var rule
-     */
-    private static $rule;
-    /**
      * @var \stdClass
      */
     private static $user;
-    /**
-     * @var \stdClass
-     */
-    private static $course;
     /**
      * Date start for the course
      */
@@ -73,86 +63,97 @@ final class activityavailable_crontask_test extends \advanced_testcase {
      * Activity date end
      */
     public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
-    /**
-     * User first access to a course
-     */
-    public const USER_FIRSTACCESS = 1704099600;
-    /**
-     * User last access to a course
-     */
-    public const USER_LASTACCESS = 1704099600;
 
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        $rule = new rule();
-        self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user();
-        self::$course = self::getDataGenerator()->create_course(
-            ([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-            ])
-        );
-        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
     }
 
     /**
-     *  Testing excute method from task.
+     * Task execute: visible courses get cache triggers; hidden courses are skipped.
+     *
+     * @param int $visible Course visible flag (0 = hidden, 1 = visible).
+     * @param bool $expecttrigger Whether a trigger row should exist after execute.
      *
      * @covers       \notificationscondition_activityavailable\task\activityavailable_crontask::execute
      * @covers       \local_notificationsagent\helper\helper::custom_mtrace
-     *
+     * @dataProvider data_provider_execute
      */
-    public function test_execute(): void {
-        global $DB, $USER;
+    public function test_execute(int $visible, bool $expecttrigger): void {
+        global $DB;
+
+        $course = self::getDataGenerator()->create_course([
+                'startdate' => self::COURSE_DATESTART,
+                'enddate' => self::COURSE_DATEEND,
+                'visible' => $visible,
+        ]);
+        self::getDataGenerator()->enrol_user(self::$user->id, $course->id);
+
         $pluginname = activityavailable::NAME;
+        $rule = new rule();
 
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
-            'course' => self::$course->id,
-            'timeopen' => self::CM_DATESTART,
-            'timeclose' => self::CM_DATEEND,
+                'course' => $course->id,
+                'timeopen' => self::CM_DATESTART,
+                'timeclose' => self::CM_DATEEND,
         ]);
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
-        $dataform->courseid = self::$course->id;
+        $dataform->courseid = $course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        $USER->id = self::$user->id;
-        $ruleid = self::$rule->create($dataform);
-        self::$rule->set_id($ruleid);
+        $this->setUser(self::$user);
+        $ruleid = $rule->create($dataform);
+        $rule->set_id($ruleid);
 
         $objdb = new \stdClass();
-        $objdb->ruleid = self::$rule->get_id();
-        $objdb->courseid = self::$course->id;
+        $objdb->ruleid = $rule->get_id();
+        $objdb->courseid = $course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
         $objdb->parameters = '{"cmid":' . $cmtestacct->cmid . '}';
         $objdb->cmid = $cmtestacct->id;
 
-        // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
-        self::$rule::create_instance($ruleid);
+        rule::create_instance($ruleid);
 
         $task = \core\task\manager::get_scheduled_task(activityavailable_crontask::class);
         $task->execute();
         $trigger = $DB->get_record(
             'notificationsagent_triggers',
             [
-                'conditionid' => $conditionid,
-                'userid' => self::$user->id,
-                'courseid' => self::$course->id,
-                'ruleid' => self::$rule->get_id(),
+                        'conditionid' => $conditionid,
+                        'userid' => self::$user->id,
+                        'courseid' => $course->id,
+                        'ruleid' => $rule->get_id(),
             ]
         );
 
-        $this->assertEquals(self::$course->id, $trigger->courseid);
-        $this->assertEquals(self::$user->id, $trigger->userid);
-        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
+        if ($expecttrigger) {
+            $this->assertNotFalse($trigger);
+            $this->assertEquals($course->id, $trigger->courseid);
+            $this->assertEquals(self::$user->id, $trigger->userid);
+            $this->assertEquals($rule->get_id(), $trigger->ruleid);
+        } else {
+            $this->assertFalse($trigger);
+        }
+    }
+
+    /**
+     * Visible vs hidden course expectations for test_execute.
+     *
+     * @return array<string, array{int, bool}>
+     */
+    public static function data_provider_execute(): array {
+        return [
+                'visible course generates trigger' => [1, true],
+                'hidden course skips trigger' => [0, false],
+        ];
     }
 
     /**
