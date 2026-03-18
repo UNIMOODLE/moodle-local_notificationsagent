@@ -56,6 +56,8 @@ class ac_crontask extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
+        global $DB;
+
         $conditions = notificationsagent::get_availability_conditions();
 
         foreach ($conditions as $condition) {
@@ -67,6 +69,11 @@ class ac_crontask extends scheduled_task {
             $context->set_timeaccess($this->get_timestarted());
             if (!empty($courses)) {
                 foreach ($courses as $courseid) {
+                    // Skip hidden or missing courses
+                    $coursevisible = $DB->get_field('course', 'visible', ['id' => $courseid], IGNORE_MISSING);
+                    if (empty($coursevisible)) {
+                        continue;
+                    }
                     $context->set_courseid($courseid);
                     notificationsagent::generate_cache_triggers($subplugin, $context);
                 }
