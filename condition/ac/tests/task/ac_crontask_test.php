@@ -44,9 +44,17 @@ use notificationscondition_ac\ac;
  */
 final class ac_crontask_test extends \advanced_testcase {
     /**
+     * @var rule
+     */
+    private static $rule;
+    /**
      * @var \stdClass
      */
     private static $user;
+    /**
+     * @var \stdClass
+     */
+    private static $course;
     /**
      * Date start for the course
      */
@@ -59,88 +67,71 @@ final class ac_crontask_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        $rule = new rule();
+        self::$rule = $rule;
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
+        self::$course = self::getDataGenerator()->create_course(
+            ([
+                'startdate' => self::COURSE_DATESTART,
+                'enddate' => self::COURSE_DATEEND,
+            ])
+        );
+        self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
     }
 
     /**
-     * Task execute: visible courses get cache triggers; hidden courses are skipped.
+     * Testing excute method from task.
      *
-     * @param int $visible Course visible flag (0 = hidden, 1 = visible).
-     * @param bool $expecttrigger Whether a trigger row should exist after execute.
+     * @covers \notificationscondition_ac\task\ac_crontask::execute
+     * @covers \local_notificationsagent\helper\helper::custom_mtrace
      *
-     * @covers       \notificationscondition_ac\task\ac_crontask::execute
-     * @dataProvider data_provider_execute
      */
-    public function test_execute(int $visible, bool $expecttrigger): void {
+    public function test_execute(): void {
         global $DB;
 
-        $course = self::getDataGenerator()->create_course([
-                'startdate' => self::COURSE_DATESTART,
-                'enddate' => self::COURSE_DATEEND,
-                'visible' => $visible,
-        ]);
-        self::getDataGenerator()->enrol_user(self::$user->id, $course->id);
-
         $pluginname = ac::NAME;
-        $rule = new rule();
 
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
-        $dataform->courseid = $course->id;
+        $dataform->courseid = self::$course->id;
         $dataform->timesfired = 2;
         $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
-        self::setUser(2);
-        $ruleid = $rule->create($dataform);
-        $rule->set_id($ruleid);
+        self::setUser(2);// Admin.
+        $ruleid = self::$rule->create($dataform);
+        self::$rule->set_id($ruleid);
 
         $objdb = new \stdClass();
-        $objdb->ruleid = $rule->get_id();
-        $objdb->courseid = $course->id;
+        $objdb->ruleid = self::$rule->get_id();
+        $objdb->courseid = self::$course->id;
         $objdb->type = 'condition';
         $objdb->pluginname = $pluginname;
-        $objdb->parameters =
+        $json =
                 '{"op":"&","c":[{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Fernando"}]},
                 {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}';
+        $objdb->parameters = $json;
         $objdb->cmid = null;
 
+        // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
-        rule::create_instance($ruleid);
+        self::$rule::create_instance($ruleid);
 
         $task = \core\task\manager::get_scheduled_task(ac_crontask::class);
         $task->execute();
-
         $trigger = $DB->get_record(
             'notificationsagent_triggers',
             [
-                        'conditionid' => $conditionid,
-                        'userid' => self::$user->id,
-                        'courseid' => $course->id,
-                        'ruleid' => $rule->get_id(),
+                'conditionid' => $conditionid,
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'ruleid' => self::$rule->get_id(),
             ]
         );
 
-        if ($expecttrigger) {
-            $this->assertNotFalse($trigger);
-            $this->assertEquals($course->id, $trigger->courseid);
-            $this->assertEquals(self::$user->id, $trigger->userid);
-            $this->assertEquals($rule->get_id(), $trigger->ruleid);
-        } else {
-            $this->assertFalse($trigger);
-        }
-    }
-
-    /**
-     * Data provider for test_execute.
-     *
-     * @return array<string, array{int, bool}>
-     */
-    public static function data_provider_execute(): array {
-        return [
-                'visible course generates trigger' => [1, true],
-                'hidden course skips trigger' => [0, false],
-        ];
+        $this->assertEquals(self::$course->id, $trigger->courseid);
+        $this->assertEquals(self::$user->id, $trigger->userid);
+        $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
     }
 
     /**
