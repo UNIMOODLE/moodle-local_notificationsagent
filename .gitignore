@@ -5,3 +5,10 @@ tests/phpunit
 phpdoc/
 .phpdoc/
 tests/phpunit/*
+# phpDocumentor output and cache
+/phpdoc/
+/.phpdoc/
+
+# PHPUnit local config (root and any nested path under tests/)
+*phpunit.xml
+/tests/**/phpunit.xml
