@@ -489,11 +489,16 @@ class notificationsagent {
      */
     public static function generate_cache_triggers($subplugin, $context) {
         global $DB;
+
+        $courseid = $context->get_courseid();
+        if ($courseid != SITEID && !self::is_course_visible_for_rules($courseid)) {
+            return;
+        }
+
         $transaction = $DB->start_delegated_transaction();
         $insertdata = [];
         $deletedata = [];
         $params = [];
-        $courseid = $context->get_courseid();
         $coursecontext = \context_course::instance($courseid);
         $contextuser = $context->get_userid();  // 0 or userid>0
         $rulecreatedby = $subplugin->rule->createdby;

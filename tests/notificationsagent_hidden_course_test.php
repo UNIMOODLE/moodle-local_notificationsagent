@@ -34,7 +34,10 @@
 
 namespace local_notificationsagent;
 
+use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\task\notificationsagent_trigger_cron;
+use notificationscondition_coursestart\coursestart;
 use notificationscondition_sessionend\sessionend;
 
 /**
@@ -74,6 +77,16 @@ final class notificationsagent_hidden_course_test extends \advanced_testcase {
         self::$rule = new rule();
         self::$user = self::getDataGenerator()->create_user();
         $this->reset_course_visible_for_rules_cache();
+    }
+
+    /**
+     * Clear visibility cache so other test classes do not inherit stale entries.
+     *
+     * @return void
+     */
+    public function tearDown(): void {
+        $this->reset_course_visible_for_rules_cache();
+        parent::tearDown();
     }
 
     /**
@@ -392,5 +405,98 @@ final class notificationsagent_hidden_course_test extends \advanced_testcase {
         $task->execute();
 
         $this->assertEmpty($DB->get_records('notificationsagent_report'));
+    }
+
+    /**
+     * generate_cache_triggers does not create triggers for a hidden course.
+     *
+     * @covers \local_notificationsagent\notificationsagent::generate_cache_triggers
+     */
+    public function test_generate_cache_triggers_hidden_course(): void {
+        global $DB, $USER;
+
+        $hiddencourse = $this->create_hidden_course();
+        self::getDataGenerator()->enrol_user(self::$user->id, $hiddencourse->id, 'student');
+        $USER->id = self::$user->id;
+
+        $dataform = new \StdClass();
+        $dataform->title = 'Rule Test';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = $hiddencourse->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $ruleid = self::$rule->create($dataform);
+
+        $conditionid = $DB->insert_record(
+            'notificationsagent_condition',
+            [
+                'ruleid' => $ruleid,
+                'courseid' => $hiddencourse->id,
+                'type' => 'condition',
+                'pluginname' => coursestart::NAME,
+                'parameters' => '{"time":172800}',
+                'cmid' => 0,
+            ]
+        );
+
+        $subplugin = new coursestart($ruleid, $conditionid);
+        $context = new evaluationcontext();
+        $context->set_params($subplugin->get_parameters());
+        $context->set_complementary(false);
+        $context->set_timeaccess(time());
+        $context->set_courseid($hiddencourse->id);
+        $context->set_userid(notificationsagent::GENERIC_USERID);
+
+        notificationsagent::generate_cache_triggers($subplugin, $context);
+
+        $this->assertEmpty($DB->get_records('notificationsagent_triggers', ['ruleid' => $ruleid]));
+    }
+
+    /**
+     * save_form does not create triggers when the course is hidden.
+     *
+     * @covers \local_notificationsagent\rule::save_form
+     */
+    public function test_save_form_hidden_course_does_not_create_triggers(): void {
+        global $DB;
+
+        $this->setAdminUser();
+        $hiddencourse = $this->create_hidden_course();
+        self::getDataGenerator()->enrol_user(self::$user->id, $hiddencourse->id, 'student');
+
+        $rule = new rule(null, rule::RULE_TYPE, rule::RULE_ADD);
+        $dataform = new \StdClass();
+        $dataform->title = 'Hidden course rule';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = $hiddencourse->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->{editrule_form::FORM_JSON_CONDITION} = json_encode([
+            '1' => [
+                'pluginname' => coursestart::NAME,
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_EXCEPTION} = '[]';
+        $dataform->{editrule_form::FORM_JSON_ACTION} = json_encode([
+            '1' => [
+                'pluginname' => 'messageagent',
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_AC} = '';
+        $dataform->{'1_coursestart_days'} = 2;
+        $dataform->{'1_coursestart_hours'} = 0;
+        $dataform->{'1_coursestart_minutes'} = 0;
+        $dataform->{'1_messageagent_title'} = 'Title';
+        $dataform->{'1_messageagent_message'} = ['text' => 'Message body', 'format' => FORMAT_HTML];
+
+        $rule->save_form($dataform);
+
+        $ruleid = $rule->get_id();
+        $this->assertNotEmpty($ruleid);
+        $this->assertEmpty(
+            $DB->get_records('notificationsagent_triggers', ['ruleid' => $ruleid, 'courseid' => $hiddencourse->id])
+        );
     }
 }

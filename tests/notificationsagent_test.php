@@ -92,6 +92,7 @@ final class notificationsagent_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        $this->reset_course_visible_for_rules_cache();
         $rule = new rule();
         $rule->set_name("Rule Test");
         $rule->set_id(246000);
@@ -118,6 +119,18 @@ final class notificationsagent_test extends \advanced_testcase {
 
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
         self::$rule = $rule;
+    }
+
+    /**
+     * Reset static visibility cache between tests.
+     *
+     * @return void
+     */
+    private function reset_course_visible_for_rules_cache(): void {
+        $reflection = new \ReflectionClass(notificationsagent::class);
+        $property = $reflection->getProperty('coursevisibleforrulescache');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
     }
 
     /**

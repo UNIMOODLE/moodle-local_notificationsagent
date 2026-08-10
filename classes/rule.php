@@ -1520,6 +1520,10 @@ class rule {
             return;
         }
 
+        if (!notificationsagent::is_course_visible_for_rules($courseid)) {
+            return;
+        }
+
         if (!empty($arraytimer)) {
             $generictimer = $arraytimer[notificationsagent::GENERIC_USERID]["timer"] ?? null;
             $genericconditionid = $arraytimer[notificationsagent::GENERIC_USERID]["conditionid"] ?? null;
