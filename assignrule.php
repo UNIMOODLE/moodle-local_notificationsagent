@@ -34,6 +34,7 @@
 
 require(__DIR__ . '/../../config.php');
 
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 defined('MOODLE_INTERNAL') || die();
@@ -108,6 +109,8 @@ function local_notificationsagent_add_list_courses_assigned($idrule, $categories
         }
         $DB->insert_records('notificationsagent_context', $paramscourse);
     }
+
+    notificationsagent::invalidate_conditions_cache();
 }
 
 /**

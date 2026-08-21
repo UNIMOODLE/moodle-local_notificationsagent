@@ -469,6 +469,114 @@ final class notificationsagent_test extends \advanced_testcase {
     }
 
     /**
+     * Testing that condition queries are cached until the cache is invalidated
+     *
+     * @return void
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_course
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_cm
+     * @covers \local_notificationsagent\notificationsagent::invalidate_conditions_cache
+     */
+    public function test_conditions_cache_lifecycle(): void {
+        global $DB, $USER;
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $pluginname = sessionend::NAME;
+
+        // No conditions yet: the empty result is cached as well.
+        $this->assertEmpty(notificationsagent::get_conditions_by_course($pluginname, self::$course->id));
+        $this->assertEmpty(notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID));
+
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"86400"}';
+        $objdb->cmid = self::CMID;
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+
+        // A direct insert does not purge, so the cached result is still served.
+        $this->assertEmpty(notificationsagent::get_conditions_by_course($pluginname, self::$course->id));
+        $this->assertEmpty(notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID));
+
+        notificationsagent::invalidate_conditions_cache();
+
+        $bycourse = notificationsagent::get_conditions_by_course($pluginname, self::$course->id);
+        $this->assertArrayHasKey($conditionid, $bycourse);
+        $this->assertEquals($ruleid, $bycourse[$conditionid]->ruleid);
+        $this->assertEquals(self::$course->id, $bycourse[$conditionid]->objectid);
+
+        $bycm = notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID);
+        $this->assertArrayHasKey($conditionid, $bycm);
+        $this->assertEquals($ruleid, $bycm[$conditionid]->ruleid);
+
+        // Deleting the rule through the API purges the cache on its own.
+        rule::create_instance($ruleid)->delete();
+
+        $this->assertEmpty(notificationsagent::get_conditions_by_course($pluginname, self::$course->id));
+        $this->assertEmpty(notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID));
+    }
+
+    /**
+     * Testing that conditions are cached until the cache is invalidated
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_course
+     * @covers \local_notificationsagent\notificationsagent::get_conditions_by_cm
+     * @covers \local_notificationsagent\notificationsagent::invalidate_conditions_cache
+     */
+    public function test_conditions_cache(): void {
+        global $DB, $USER;
+
+        $dataform = new \StdClass();
+        $dataform->title = "Rule Test";
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        // Condition.
+        $pluginname = sessionend::NAME;
+        $objdb = new \stdClass();
+        $objdb->ruleid = $ruleid;
+        $objdb->courseid = self::$course->id;
+        $objdb->type = 'condition';
+        $objdb->pluginname = $pluginname;
+        $objdb->parameters = '{"time":"86400"}';
+        $objdb->cmid = self::CMID;
+        // Insert.
+        $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
+
+        notificationsagent::invalidate_conditions_cache();
+
+        $bycourse = notificationsagent::get_conditions_by_course($pluginname, self::$course->id);
+        $bycm = notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID);
+        $this->assertArrayHasKey($conditionid, $bycourse);
+        $this->assertArrayHasKey($conditionid, $bycm);
+
+        // Without a purge, the cached rows are returned even though the condition is gone.
+        $DB->delete_records('notificationsagent_condition', ['id' => $conditionid]);
+        $this->assertEquals($bycourse, notificationsagent::get_conditions_by_course($pluginname, self::$course->id));
+        $this->assertEquals($bycm, notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID));
+
+        notificationsagent::invalidate_conditions_cache();
+
+        $this->assertEmpty(notificationsagent::get_conditions_by_course($pluginname, self::$course->id));
+        $this->assertEmpty(notificationsagent::get_conditions_by_cm($pluginname, self::$course->id, self::CMID));
+    }
+
+    /**
      * Testing get conditions by plugin
      *
      * @return void

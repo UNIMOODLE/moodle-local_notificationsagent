@@ -246,6 +246,10 @@ class provider implements
                         $DB->delete_records('notificationsagent_rule', ['id' => $ruletodelete->ruleid, 'createdby' => $userid]);
                     }
                 }
+
+                if (!empty($rulestodelete)) {
+                    \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
+                }
             }
         }
     }
@@ -272,6 +276,10 @@ class provider implements
             } else {
                 $DB->delete_records('notificationsagent_rule', ['id' => $ruletodelete->ruleid, 'createdby' => $userid]);
             }
+        }
+
+        if (!empty($rulestodelete)) {
+            \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
         }
     }
 

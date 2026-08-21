@@ -95,14 +95,9 @@ class notificationsagent {
      * @return array $data Plugin and course conditions
      */
     public static function get_conditions_by_course($pluginname, $courseid) {
-        global $DB;
-
         if (!self::is_course_visible_for_rules($courseid)) {
             return [];
         }
-
-        $coursesbycategory = [];
-        $data = [];
 
         $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname, nctx.contextid, nctx.objectid
                             FROM {notificationsagent_condition} nc
@@ -114,7 +109,8 @@ class notificationsagent {
                             JOIN {course} c ON nctx.objectid = c.id
                            WHERE nc.pluginname = :pluginname
         ';
-        $conditions = $DB->get_recordset_sql(
+        $conditions = self::get_cached_conditions(
+            'course_' . $pluginname . '_' . $courseid,
             $conditionssql,
             [
                 'pluginname' => $pluginname,
@@ -124,35 +120,90 @@ class notificationsagent {
             ]
         );
 
-        if ($conditions->valid()) {
-            foreach ($conditions as $condition) {
-                $conditionid = $condition->id;
+        return self::filter_conditions_by_context($conditions, $courseid);
+    }
 
-                if (isset($data[$conditionid])) {
-                    continue;
-                }
+    /**
+     * Purge the cached condition queries.
+     *
+     * Must be called wherever rules, conditions or rule contexts are modified.
+     *
+     * @return void
+     */
+    public static function invalidate_conditions_cache() {
+        \cache::make('local_notificationsagent', 'conditions')->purge();
+    }
 
-                $contextid = $condition->contextid;
-                $objectid = $condition->objectid;
-                if ($contextid == CONTEXT_COURSE) {
-                    $data[$conditionid] = $condition;
-                    continue;
-                }
+    /**
+     * Run a condition query through the application cache.
+     *
+     * Only the raw query result is cached. Course visibility and category membership
+     * are resolved by the callers so that course changes take effect without a purge.
+     *
+     * @param string $cachekey Cache key for this query
+     * @param string $sql Query to run on a cache miss
+     * @param array $params Query parameters
+     *
+     * @return array Condition records
+     */
+    private static function get_cached_conditions($cachekey, $sql, $params) {
+        global $DB;
 
-                // If is category, search the courses inside it.
-                if (!isset($coursesbycategory[$objectid])) {
-                    $coursecat = \core_course_category::get($objectid);
-                    $coursecategories = $coursecat->get_courses(['recursive' => 1]);
-                    $coursesbycategory[$objectid] = array_column($coursecategories, 'id');
-                }
+        $cache = \cache::make('local_notificationsagent', 'conditions');
 
-                if (in_array($courseid, $coursesbycategory[$objectid])) {
-                    $data[$conditionid] = $condition;
-                }
-            }
+        if (($cached = $cache->get($cachekey)) !== false) {
+            return $cached;
         }
 
+        $data = [];
+        $conditions = $DB->get_recordset_sql($sql, $params);
+        foreach ($conditions as $condition) {
+            $data[] = $condition;
+        }
         $conditions->close();
+
+        $cache->set($cachekey, $data);
+
+        return $data;
+    }
+
+    /**
+     * Keep the conditions whose context applies to the given course.
+     *
+     * @param array $conditions Condition records
+     * @param int $courseid Course id
+     *
+     * @return array $data Conditions indexed by condition id
+     */
+    private static function filter_conditions_by_context($conditions, $courseid) {
+        $coursesbycategory = [];
+        $data = [];
+
+        foreach ($conditions as $condition) {
+            $conditionid = $condition->id;
+
+            if (isset($data[$conditionid])) {
+                continue;
+            }
+
+            $contextid = $condition->contextid;
+            $objectid = $condition->objectid;
+            if ($contextid == CONTEXT_COURSE) {
+                $data[$conditionid] = $condition;
+                continue;
+            }
+
+            // If is category, search the courses inside it.
+            if (!isset($coursesbycategory[$objectid])) {
+                $coursecat = \core_course_category::get($objectid);
+                $coursecategories = $coursecat->get_courses(['recursive' => 1]);
+                $coursesbycategory[$objectid] = array_column($coursecategories, 'id');
+            }
+
+            if (in_array($courseid, $coursesbycategory[$objectid])) {
+                $data[$conditionid] = $condition;
+            }
+        }
 
         return $data;
     }
@@ -167,14 +218,9 @@ class notificationsagent {
      * @return array $data Plugin, course and cmid conditions
      */
     public static function get_conditions_by_cm($pluginname, $courseid, $cmid) {
-        global $DB;
-
         if (!self::is_course_visible_for_rules($courseid)) {
             return [];
         }
-
-        $coursesbycategory = [];
-        $data = [];
 
         $conditionssql = 'SELECT nc.id, nr.id AS ruleid, nc.parameters, nc.pluginname, nctx.contextid, nctx.objectid
                             FROM {notificationsagent_condition} nc
@@ -187,7 +233,8 @@ class notificationsagent {
                            WHERE nc.pluginname = :pluginname
                              AND nc.cmid = :cmid
         ';
-        $conditions = $DB->get_recordset_sql(
+        $conditions = self::get_cached_conditions(
+            'cm_' . $pluginname . '_' . $courseid . '_' . $cmid,
             $conditionssql,
             [
                 'pluginname' => $pluginname,
@@ -198,38 +245,7 @@ class notificationsagent {
             ]
         );
 
-        if ($conditions->valid()) {
-            foreach ($conditions as $condition) {
-                $conditionid = $condition->id;
-
-                if (isset($data[$conditionid])) {
-                    continue;
-                }
-
-                $contextid = $condition->contextid;
-                $objectid = $condition->objectid;
-
-                if ($contextid == CONTEXT_COURSE) {
-                    $data[$conditionid] = $condition;
-                    continue;
-                }
-
-                // If is category, search the courses inside it.
-                if (!isset($coursesbycategory[$objectid])) {
-                    $coursecat = \core_course_category::get($objectid);
-                    $coursecategories = $coursecat->get_courses(['recursive' => 1]);
-                    $coursesbycategory[$objectid] = array_column($coursecategories, 'id');
-                }
-
-                if (in_array($courseid, $coursesbycategory[$objectid])) {
-                    $data[$conditionid] = $condition;
-                }
-            }
-        }
-
-        $conditions->close();
-
-        return $data;
+        return self::filter_conditions_by_context($conditions, $courseid);
     }
 
     /**
@@ -929,6 +945,8 @@ class notificationsagent {
                 $DB->delete_records_select('notificationsagent_condition', "ruleid $insql", $inparams);
                 $DB->delete_records_select('notificationsagent_rule', "id $insql", $inparams);
             }
+
+            self::invalidate_conditions_cache();
         }
     }
 }

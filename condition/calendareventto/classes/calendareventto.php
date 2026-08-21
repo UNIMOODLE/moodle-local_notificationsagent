@@ -325,6 +325,7 @@ class calendareventto extends notificationconditionplugin {
             $record->cmid = $rec->newitemid;
 
             $DB->update_record('notificationsagent_condition', $record);
+            notificationsagent::invalidate_conditions_cache();
         }
     }
 }

@@ -142,6 +142,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         $record->complementary = $data['complementary'];
 
         $newconditionid = $DB->insert_record('notificationsagent_condition', $record);
+        \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
 
         $this->set_mapping('notificationsagent_condition', $data['id'], $newconditionid, false);
     }
@@ -316,5 +317,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
             || $this->task->get_target() == backup::TARGET_EXISTING_DELETING) {
             $this->delete_rules();
         }
+
+        \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
     }
 }

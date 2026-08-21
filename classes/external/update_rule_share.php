@@ -40,6 +40,7 @@ use external_function_parameters;
 use external_value;
 use external_warnings;
 use external_single_structure;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 defined('MOODLE_INTERNAL') || die();
@@ -114,6 +115,7 @@ class update_rule_share extends external_api {
                         $request->shared = rule::UNSHARED_RULE;
                     }
                     $DB->update_record('notificationsagent_rule', $request);
+                    notificationsagent::invalidate_conditions_cache();
                 } else {
                     throw new \moodle_exception(
                         'isnotrule',

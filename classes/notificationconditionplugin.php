@@ -322,6 +322,7 @@ abstract class notificationconditionplugin extends notificationplugin {
             $record->parameters = $newparameters;
 
             $DB->update_record('notificationsagent_condition', $record);
+            notificationsagent::invalidate_conditions_cache();
         }
     }
 }

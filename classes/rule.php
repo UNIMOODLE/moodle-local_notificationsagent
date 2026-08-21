@@ -1327,7 +1327,11 @@ class rule {
 
         $this->before_delete();
         $this->set_deleted(1);
-        return $DB->update_record('notificationsagent_rule', ['id' => $this->get_id(), 'deleted' => $this->get_deleted()]);
+        $result = $DB->update_record('notificationsagent_rule', ['id' => $this->get_id(), 'deleted' => $this->get_deleted()]);
+
+        notificationsagent::invalidate_conditions_cache();
+
+        return $result;
     }
 
     /**
@@ -1407,6 +1411,8 @@ class rule {
             $this->delete_cache();
         }
         $transaction->allow_commit();
+
+        notificationsagent::invalidate_conditions_cache();
     }
 
     /**
@@ -1734,6 +1740,8 @@ class rule {
 
         $torule->clone_conditions($fromrule->get_id());
         $torule->clone_actions($fromrule->get_id());
+
+        notificationsagent::invalidate_conditions_cache();
     }
 
     /**

@@ -99,6 +99,8 @@ if (!isset($_FILES['userfile']) || $_FILES['userfile']['error'] == UPLOAD_ERR_NO
                 $DB->insert_records('notificationsagent_condition', $sqlconditions);
         }
         $transaction->allow_commit();
+
+        \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
     }
 }
 

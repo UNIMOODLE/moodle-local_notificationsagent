@@ -41,6 +41,7 @@ require_once(__DIR__ . '/../../../../../calendar/lib.php');
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
@@ -392,6 +393,7 @@ class calendarstart extends notificationconditionplugin {
             $record->cmid = $rec->newitemid;
 
             $DB->update_record('notificationsagent_condition', $record);
+            notificationsagent::invalidate_conditions_cache();
         }
     }
 }

@@ -53,4 +53,7 @@ $definitions = [
                 'mode' => cache_store::MODE_APPLICATION,
                 'simpledata' => true,
         ],
+        'conditions' => [
+                'mode' => cache_store::MODE_APPLICATION,
+        ],
 ];
