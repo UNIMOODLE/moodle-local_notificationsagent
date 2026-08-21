@@ -501,4 +501,63 @@ final class activitystudentend_test extends \advanced_testcase {
         self::$subplugin->set_parameters(json_encode($objparameters));
         $this->assertTrue(self::$subplugin->validation(self::$coursetest->id));
     }
+
+    /**
+     * Persist last access from logstore into the plugin table so the log is queried once.
+     *
+     * @covers \notificationscondition_activitystudentend\activitystudentend::get_cmlastaccess
+     * @covers \notificationscondition_activitystudentend\activitystudentend::set_activity_access
+     */
+    public function test_get_cmlastaccess_persists_logstore_value(): void {
+        global $DB;
+
+        $userid = self::$user->id;
+        $courseid = self::$coursetest->id;
+        $cmid = self::$cmtestse->cmid;
+        $logtime = self::USER_ACTIVITY_LASTACCESS;
+        $modcontext = \context_module::instance($cmid);
+
+        $this->assertFalse(
+            $DB->record_exists(
+                'notificationsagent_cmview',
+                ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $cmid]
+            )
+        );
+
+        $DB->insert_record('logstore_standard_log', (object) [
+            'eventname' => '\\mod_quiz\\event\\course_module_viewed',
+            'component' => 'mod_quiz',
+            'action' => 'viewed',
+            'target' => 'course_module',
+            'objecttable' => 'course_modules',
+            'objectid' => $cmid,
+            'edulevel' => \core\event\base::LEVEL_PARTICIPATING,
+            'contextid' => $modcontext->id,
+            'contextlevel' => $modcontext->contextlevel,
+            'contextinstanceid' => $cmid,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'timecreated' => $logtime,
+        ]);
+
+        $lastaccess = activitystudentend::get_cmlastaccess($userid, $courseid, $cmid);
+        $this->assertEquals($logtime, $lastaccess);
+
+        $stored = $DB->get_record(
+            'notificationsagent_cmview',
+            ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $cmid],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertEquals($logtime, $stored->firstaccess);
+
+        // Remove the log row: a second call must still return the persisted value.
+        $DB->delete_records('logstore_standard_log', [
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'contextinstanceid' => $cmid,
+            'eventname' => '\\mod_quiz\\event\\course_module_viewed',
+        ]);
+        $this->assertEquals($logtime, activitystudentend::get_cmlastaccess($userid, $courseid, $cmid));
+    }
 }

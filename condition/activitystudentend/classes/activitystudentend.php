@@ -334,6 +334,8 @@ class activitystudentend extends notificationconditionplugin {
             }
 
             $lastaccess = $result->timecreated;
+            // Keep the log value in the plugin table so this query runs once per user and activity.
+            self::set_activity_access($userid, $courseid, $cmid, $lastaccess);
         }
 
         return $lastaccess;
