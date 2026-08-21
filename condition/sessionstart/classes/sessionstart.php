@@ -271,6 +271,8 @@ class sessionstart extends notificationconditionplugin {
                 return $firstaccess;
             }
             $firstaccess = $result->timecreated;
+            // Keep the log value in the plugin table so this query runs once per user and course.
+            self::set_first_course_access($userid, $courseid, $firstaccess);
         }
 
         return $firstaccess;

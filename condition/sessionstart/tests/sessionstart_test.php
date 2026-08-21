@@ -453,4 +453,56 @@ final class sessionstart_test extends \advanced_testcase {
         sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time());
         $this->assertIsNumeric(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
     }
+
+    /**
+     * Persist first access from logstore into the plugin table so the log is queried once.
+     *
+     * @covers \notificationscondition_sessionstart\sessionstart::get_first_course_access
+     * @covers \notificationscondition_sessionstart\sessionstart::set_first_course_access
+     */
+    public function test_get_first_course_access_persists_logstore_value(): void {
+        global $DB;
+
+        $userid = self::$user->id;
+        $courseid = self::$coursetest->id;
+        $logtime = self::USER_FIRSTACCESS;
+        $coursecontext = self::$coursecontext;
+
+        $this->assertFalse(
+            $DB->record_exists('notificationsagent_crseview', ['userid' => $userid, 'courseid' => $courseid])
+        );
+
+        $DB->insert_record('logstore_standard_log', (object) [
+            'eventname' => '\\core\\event\\course_viewed',
+            'component' => 'core',
+            'action' => 'viewed',
+            'target' => 'course',
+            'edulevel' => \core\event\base::LEVEL_PARTICIPATING,
+            'contextid' => $coursecontext->id,
+            'contextlevel' => $coursecontext->contextlevel,
+            'contextinstanceid' => $coursecontext->instanceid,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'timecreated' => $logtime,
+        ]);
+
+        $firstaccess = sessionstart::get_first_course_access($userid, $courseid);
+        $this->assertEquals($logtime, $firstaccess);
+
+        $stored = $DB->get_record(
+            'notificationsagent_crseview',
+            ['userid' => $userid, 'courseid' => $courseid],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertEquals($logtime, $stored->firstaccess);
+
+        // Remove the log row: a second call must still return the persisted value.
+        $DB->delete_records('logstore_standard_log', [
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'eventname' => '\\core\\event\\course_viewed',
+        ]);
+        $this->assertEquals($logtime, sessionstart::get_first_course_access($userid, $courseid));
+    }
 }
