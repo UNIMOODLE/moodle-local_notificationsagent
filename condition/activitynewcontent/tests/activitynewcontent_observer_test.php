@@ -137,6 +137,7 @@ final class activitynewcontent_observer_test extends \advanced_testcase {
         // Insert.
         $conditionid = $DB->insert_record('notificationsagent_condition', $objdb);
         $this->assertIsInt($conditionid);
+        notificationsagent::invalidate_conditions_cache();
 
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
