@@ -759,4 +759,97 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $cat = helper::count_category_courses($category);
         $this->assertEquals(1, $cat);
     }
+
+    /**
+     * Forced rules assigned by admin are listed for teachers with viewcourserule.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_index
+     */
+    public function test_forced_rule_visible_to_editingteacher(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Forced rule by admin';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 1;
+
+        $ruleid = (new rule())->create($dataform);
+        $DB->set_field('notificationsagent_rule', 'forced', rule::FORCED_RULE, ['id' => $ruleid]);
+
+        $context = \context_course::instance(self::$course->id);
+
+        $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $this->assertTrue(has_capability('local/notificationsagent:viewcourserule', $context));
+        $this->assertTrue(has_capability('local/notificationsagent:managecourserule', $context));
+        $this->assertFalse(has_capability('moodle/category:viewhiddencategories', $context));
+
+        $teacherrules = rule::get_rules_index($context, self::$course->id);
+        $teacherruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $teacherrules);
+        $this->assertContains($ruleid, $teacherruleids);
+
+        self::setAdminUser();
+        $adminrules = rule::get_rules_index($context, self::$course->id);
+        $adminruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $adminrules);
+        $this->assertContains($ruleid, $adminruleids);
+    }
+
+    /**
+     * Forced rules assigned to a category are listed for teachers of courses in that category.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_index
+     * @covers \local_notificationsagent\rule::get_course_rules_forced
+     */
+    public function test_forced_category_rule_visible_to_editingteacher(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Forced category rule by admin';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = SITEID;
+        $dataform->timesfired = 1;
+
+        $ruleid = (new rule())->create($dataform);
+        $DB->delete_records('notificationsagent_context', ['ruleid' => $ruleid]);
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $ruleid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+        $DB->set_field('notificationsagent_rule', 'forced', rule::FORCED_RULE, ['id' => $ruleid]);
+
+        $othercategory = self::getDataGenerator()->create_category();
+        $othercourse = self::getDataGenerator()->create_course(['category' => $othercategory->id]);
+
+        $context = \context_course::instance(self::$course->id);
+        $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        self::getDataGenerator()->enrol_user($teacher->id, $othercourse->id, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $this->assertTrue(has_capability('local/notificationsagent:viewcourserule', $context));
+        $this->assertFalse(has_capability('moodle/category:viewhiddencategories', $context));
+
+        $teacherrules = rule::get_rules_index($context, self::$course->id);
+        $teacherruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $teacherrules);
+        $this->assertContains($ruleid, $teacherruleids);
+
+        $othercontext = \context_course::instance($othercourse->id);
+        $otherrules = rule::get_rules_index($othercontext, $othercourse->id);
+        $otherruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $otherrules);
+        $this->assertNotContains($ruleid, $otherruleids);
+
+        self::setAdminUser();
+        $adminrules = rule::get_rules_index($context, self::$course->id);
+        $adminruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $adminrules);
+        $this->assertContains($ruleid, $adminruleids);
+    }
 }
