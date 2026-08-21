@@ -50,6 +50,42 @@ class notificationsagent {
     /** @var int Default USERID for grading course item */
     public const USERID_COURSEITEM = -1;
 
+    /** @var array Cache of is_course_visible_for_rules() results keyed by course id. */
+    private static $coursevisibleforrulescache = [];
+
+    /**
+     * Whether rules may run for a course (visible course in a visible category chain).
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    public static function is_course_visible_for_rules($courseid) {
+        global $DB;
+
+        if ($courseid <= 0 || $courseid == SITEID) {
+            return false;
+        }
+        if (array_key_exists($courseid, self::$coursevisibleforrulescache)) {
+            return self::$coursevisibleforrulescache[$courseid];
+        }
+        $course = $DB->get_record('course', ['id' => $courseid], 'id, visible, category', IGNORE_MISSING);
+        if (!$course || empty($course->visible)) {
+            self::$coursevisibleforrulescache[$courseid] = false;
+            return false;
+        }
+        $categoryid = $course->category;
+        while ($categoryid) {
+            $category = $DB->get_record('course_categories', ['id' => $categoryid], 'id, visible, parent', IGNORE_MISSING);
+            if (!$category || empty($category->visible)) {
+                self::$coursevisibleforrulescache[$courseid] = false;
+                return false;
+            }
+            $categoryid = $category->parent;
+        }
+        self::$coursevisibleforrulescache[$courseid] = true;
+        return true;
+    }
+
     /**
      * Get the current conditions by plugin and course id
      *
@@ -60,6 +96,10 @@ class notificationsagent {
      */
     public static function get_conditions_by_course($pluginname, $courseid) {
         global $DB;
+
+        if (!self::is_course_visible_for_rules($courseid)) {
+            return [];
+        }
 
         $coursesbycategory = [];
         $data = [];
@@ -128,6 +168,10 @@ class notificationsagent {
      */
     public static function get_conditions_by_cm($pluginname, $courseid, $cmid) {
         global $DB;
+
+        if (!self::is_course_visible_for_rules($courseid)) {
+            return [];
+        }
 
         $coursesbycategory = [];
         $data = [];
@@ -345,17 +389,25 @@ class notificationsagent {
                 $contextid = $context->contextid;
                 $objectid = $context->objectid;
                 if ($contextid == CONTEXT_COURSE) {
-                    $data[$objectid] = $objectid;
+                    if (self::is_course_visible_for_rules($objectid)) {
+                        $data[$objectid] = $objectid;
+                    }
                     continue;
                 }
 
                 if ($contextid == CONTEXT_COURSECAT) {
+                    $catvisible = $DB->get_field('course_categories', 'visible', ['id' => $objectid], IGNORE_MISSING);
+                    if (empty($catvisible)) {
+                        continue;
+                    }
                     $coursecat = \core_course_category::get($objectid);
                     $coursecategories = $coursecat->get_courses(['recursive' => 1]);
                     $coursesid = array_column($coursecategories, 'id');
                     if (!empty($coursesid)) {
                         foreach ($coursesid as $courseid) {
-                            $data[$courseid] = $courseid;
+                            if (self::is_course_visible_for_rules($courseid)) {
+                                $data[$courseid] = $courseid;
+                            }
                         }
                     }
                 }
@@ -437,11 +489,16 @@ class notificationsagent {
      */
     public static function generate_cache_triggers($subplugin, $context) {
         global $DB;
+
+        $courseid = $context->get_courseid();
+        if ($courseid != SITEID && !self::is_course_visible_for_rules($courseid)) {
+            return;
+        }
+
         $transaction = $DB->start_delegated_transaction();
         $insertdata = [];
         $deletedata = [];
         $params = [];
-        $courseid = $context->get_courseid();
         $coursecontext = \context_course::instance($courseid);
         $contextuser = $context->get_userid();  // 0 or userid>0
         $rulecreatedby = $subplugin->rule->createdby;
@@ -701,7 +758,8 @@ class notificationsagent {
                     SELECT nt.id, nt.ruleid, nt.conditionid, nt.courseid, nt.userid, nt.startdate
                       FROM {notificationsagent_triggers} nt
                       JOIN {notificationsagent_rule} nr ON nr.id = nt.ruleid AND nr.status = 0
-                     WHERE startdate
+                      JOIN {course} c ON c.id = nt.courseid AND c.visible = 1
+                     WHERE nt.startdate
                     BETWEEN :tasklastrunttime AND :timestarted
                        AND nt.courseid != :courseid
                     ORDER BY nt.startdate ASC

@@ -292,8 +292,13 @@ class rule {
         if (has_capability('local/notificationsagent:manageownrule', $context)) {
             $rules = [...$rules, ...self::get_owner_rules_by_course($courseid)];
         }
+        if (
+            has_capability('local/notificationsagent:viewcourserule', $context)
+            || has_capability('local/notificationsagent:managecourserule', $context)
+        ) {
+            $rules = [...$rules, ...self::get_course_rules_forced($courseid)];
+        }
         if (has_capability('moodle/category:viewhiddencategories', $context)) {
-            $forcedrules = self::get_course_rules_forced($courseid);
             if (
                 has_capability('local/notificationsagent:viewcourserule', $context)
                 || has_capability(
@@ -301,14 +306,10 @@ class rule {
                     $context
                 )
             ) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false, true),
-                    ...$forcedrules,
-                ];
+                $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false, true)];
             }
             if (has_capability('local/notificationsagent:manageallrule', $context)) {
-                $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false, true),
-                    ...$forcedrules,
-                ];
+                $rules = [...$rules, ...self::get_course_rules($courseid, false, null, false, true)];
             }
         }
         $rules = array_unique($rules, SORT_REGULAR);
@@ -1517,6 +1518,10 @@ class rule {
 
         $courseid = $data->courseid;
         if ($courseid == SITEID) {
+            return;
+        }
+
+        if (!notificationsagent::is_course_visible_for_rules($courseid)) {
             return;
         }
 

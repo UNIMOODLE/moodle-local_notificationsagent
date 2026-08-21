@@ -63,22 +63,6 @@ final class ac_crontask_test extends \advanced_testcase {
      * Date end for the course
      */
     public const COURSE_DATEEND = 1706605200; // 30/01/2024 10:00:00,
-    /**
-     * Activity date start
-     */
-    public const CM_DATESTART = 1704099600; // 01/01/2024 10:00:00,
-    /**
-     * Activity date end
-     */
-    public const CM_DATEEND = 1705741200; // 20/01/2024 10:00:00,
-    /**
-     * User first access to a course
-     */
-    public const USER_FIRSTACCESS = 1704099600;
-    /**
-     * User last access to a course
-     */
-    public const USER_LASTACCESS = 1704099600;
 
     public function setUp(): void {
         parent::setUp();
@@ -88,18 +72,18 @@ final class ac_crontask_test extends \advanced_testcase {
         self::$user = self::getDataGenerator()->create_user(['firstname' => 'Fernando']);
         self::$course = self::getDataGenerator()->create_course(
             ([
-                        'startdate' => self::COURSE_DATESTART,
-                        'enddate' => self::COURSE_DATEEND,
-                ])
+                'startdate' => self::COURSE_DATESTART,
+                'enddate' => self::COURSE_DATEEND,
+            ])
         );
         self::getDataGenerator()->enrol_user(self::$user->id, self::$course->id);
     }
 
     /**
-     *  Testing excute method from task.
+     * Testing excute method from task.
      *
-     * @covers       \notificationscondition_ac\task\ac_crontask::execute
-     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
+     * @covers \notificationscondition_ac\task\ac_crontask::execute
+     * @covers \local_notificationsagent\helper\helper::custom_mtrace
      *
      */
     public function test_execute(): void {
@@ -138,11 +122,11 @@ final class ac_crontask_test extends \advanced_testcase {
         $trigger = $DB->get_record(
             'notificationsagent_triggers',
             [
-                        'conditionid' => $conditionid,
-                        'userid' => self::$user->id,
-                        'courseid' => self::$course->id,
-                        'ruleid' => self::$rule->get_id(),
-                ]
+                'conditionid' => $conditionid,
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'ruleid' => self::$rule->get_id(),
+            ]
         );
 
         $this->assertEquals(self::$course->id, $trigger->courseid);

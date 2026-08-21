@@ -271,14 +271,17 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         $newrules = [];
         foreach ($records as $record) {
-            $newrules[] = $record->newitemid;
+            if (!empty($record->newitemid)) {
+                $newrules[] = $record->newitemid;
+            }
         }
         $records->close();
-        
+
+        $newrules = array_values(array_unique($newrules));
         if (empty($newrules)) {
             return; // Nothing to do.
         }
-        [$sqlnotin, $params] = $DB->get_in_or_equal(array_values($newrules), SQL_PARAMS_NAMED, 'param', false);
+        [$sqlnotin, $params] = $DB->get_in_or_equal($newrules, SQL_PARAMS_NAMED, 'param', false);
         $sql = "SELECT nr.id
                   FROM {notificationsagent_rule} nr
                   JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid

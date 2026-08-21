@@ -85,7 +85,8 @@ class itemgraded extends notificationconditionplugin {
         $params = json_decode($context->get_params());
 
         try {
-            $cm = get_coursemodule_from_id(true, $params->{self::UI_ACTIVITY}, 0, false, MUST_EXIST);
+            $cm = get_coursemodule_from_id('', $params->{self::UI_ACTIVITY}, 0, false, MUST_EXIST);
+
             $usergrade = grade_get_grades($courseid, 'mod', $cm->modname, $cm->instance, $userid);
         } catch (\coding_exception $e) {
             debugging($e->getMessage(), DEBUG_DEVELOPER);

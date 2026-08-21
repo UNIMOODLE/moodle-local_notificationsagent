@@ -35,9 +35,7 @@
 namespace notificationscondition_activityavailable\task;
 
 use local_notificationsagent\rule;
-use local_notificationsagent\task\notificationsagent_trigger_cron;
 use notificationscondition_activityavailable\activityavailable;
-
 
 /**
  * Class for testing the activityavailable_crontask task.
@@ -98,10 +96,10 @@ final class activityavailable_crontask_test extends \advanced_testcase {
     }
 
     /**
-     *  Testing excute method from task.
+     * Testing excute method from task.
      *
-     * @covers       \notificationscondition_activityavailable\task\activityavailable_crontask::execute
-     * @covers       \local_notificationsagent\helper\helper::custom_mtrace
+     * @covers \notificationscondition_activityavailable\task\activityavailable_crontask::execute
+     * @covers \local_notificationsagent\helper\helper::custom_mtrace
      *
      */
     public function test_execute(): void {

@@ -210,6 +210,10 @@ abstract class notificationconditionplugin extends notificationplugin {
                 ]
             );
 
+            if (!notificationsagent::is_course_visible_for_rules($courseid)) {
+                return;
+            }
+
             $contextevaluation = new evaluationcontext();
             $contextevaluation->set_courseid($courseid);
             $contextevaluation->set_params($this->get_parameters());
