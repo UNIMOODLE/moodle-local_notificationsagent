@@ -185,11 +185,25 @@ class ondates extends notificationconditionplugin {
      */
     public function convert_parameters($params) {
         $params = (array) $params;
-        $startdate = $params[$this->get_name_ui(self::STARTDATE)] ?? 0;
-        $enddate = $params[$this->get_name_ui(self::ENDDATE)] ?? 0;
+        $startdate = $this->date_to_timestamp($params[$this->get_name_ui(self::STARTDATE)] ?? 0);
+        $enddate = $this->date_to_timestamp($params[$this->get_name_ui(self::ENDDATE)] ?? 0);
         $enddate = strtotime('tomorrow', $enddate) - 1;
         $this->set_parameters(json_encode([self::STARTDATE => $startdate, self::ENDDATE => $enddate]));
         return $this->get_parameters();
+    }
+
+    /**
+     * Normalise a form or import date to a Unix timestamp.
+     *
+     * @param mixed $value Timestamp or date_selector array (day, month, year).
+     * @return int
+     */
+    private function date_to_timestamp($value): int {
+        if (is_array($value) && isset($value['year'], $value['month'], $value['day'])) {
+            return make_timestamp((int) $value['year'], (int) $value['month'], (int) $value['day']);
+        }
+
+        return (int) $value;
     }
 
     /**

@@ -332,6 +332,31 @@ final class ondates_test extends \advanced_testcase {
     }
 
     /**
+     * Test convert parameters from date selector arrays (export/import).
+     *
+     * @covers \notificationscondition_ondates\ondates::convert_parameters
+     * @covers \notificationscondition_ondates\ondates::date_to_timestamp
+     */
+    public function test_convertparameters_from_date_selector_array(): void {
+        $method = phpunitutil::get_method(self::$subplugin, 'get_name_ui');
+        $startdatename = $method->invoke(self::$subplugin, self::$subplugin::STARTDATE);
+        $enddatename = $method->invoke(self::$subplugin, self::$subplugin::ENDDATE);
+        $params = [
+            $startdatename => ['day' => '27', 'month' => '07', 'year' => '2026'],
+            $enddatename => ['day' => '28', 'month' => '08', 'year' => '2026'],
+        ];
+        $startdate = make_timestamp(2026, 7, 27);
+        $enddate = strtotime('tomorrow', make_timestamp(2026, 8, 28)) - 1;
+        $expected = json_encode([
+            self::$subplugin::STARTDATE => $startdate,
+            self::$subplugin::ENDDATE => $enddate,
+        ]);
+        $method = phpunitutil::get_method(self::$subplugin, 'convert_parameters');
+        $result = $method->invoke(self::$subplugin, $params);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Test process markups.
      *
      * @covers \notificationscondition_ondates\ondates::process_markups
