@@ -52,6 +52,7 @@ $string['assignunselectcourses'] = 'Desmarcar cursos';
 $string['brokenrulebody'] = 'La regla:  {$a->rule} del curso :{$a->course} se ha pausado.';
 $string['cachedef_action'] = 'Lista de acciones.';
 $string['cachedef_condition'] = 'Lista de condiciones.';
+$string['cachedef_conditions'] = 'Consultas de condiciones en caché.';
 $string['cachedef_course'] = 'Datos de curso.';
 $string['cachedef_launched'] = 'Lista de usuarios cuya periodicidad ha comenzado.';
 $string['card_day'] = 'día';

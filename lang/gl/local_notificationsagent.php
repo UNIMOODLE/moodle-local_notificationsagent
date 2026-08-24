@@ -50,6 +50,7 @@ $string['assignselectcourses'] = 'Marcar cursos';
 $string['assignselectedinfo'] = '{$a->courses} cursos seleccionados e categorías {$a->categorías}';
 $string['assignunselectcourses'] = 'Desmarcar cursos';
 $string['brokenrulebody'] = 'A regra: {$a->rule} do curso :{$a->course} foi detida.';
+$string['cachedef_conditions'] = 'Consultas de condicións na caché.';
 $string['cachedef_launched'] = 'Lista de usuarios cuxa recorrencia comezou.';
 $string['card_day'] = 'día';
 $string['card_day_plural'] = 'días';

@@ -53,6 +53,7 @@ $string['assignunselectcourses'] = 'Unselect courses';
 $string['brokenrulebody'] = 'Rule:  {$a->rule} of the course :{$a->course} has been paused,';
 $string['cachedef_action'] = 'List of actions.';
 $string['cachedef_condition'] = 'List of conditions.';
+$string['cachedef_conditions'] = 'Cached condition queries.';
 $string['cachedef_course'] = 'Course data.';
 $string['cachedef_launched'] = 'List of users which periodicity has started.';
 $string['card_day'] = 'day';

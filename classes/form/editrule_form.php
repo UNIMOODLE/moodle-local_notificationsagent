@@ -35,6 +35,7 @@
 namespace local_notificationsagent\form;
 
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
+use local_notificationsagent\plugininfo\notificationscondition;
 use local_notificationsagent\notificationplugin;
 use local_notificationsagent\rule;
 use notificationscondition_ac\custominfo;
@@ -537,7 +538,7 @@ class editrule_form extends \moodleform {
             }
         }
 
-        $ac = $data[self::FORM_JSON_AC];
+        $ac = $data[self::FORM_JSON_AC] ?? '';
         $jsoncondition = json_decode($data[self::FORM_JSON_CONDITION], true);
         $jsonexception = json_decode($data[self::FORM_JSON_EXCEPTION], true);
         $jsonaction = json_decode($data[self::FORM_JSON_ACTION], true);
@@ -547,7 +548,8 @@ class editrule_form extends \moodleform {
         $this->validationjsoncontent(notificationplugin::TYPE_EXCEPTION, $jsonexception, $data, $errors);
         $countaction = $this->validationjsoncontent(notificationplugin::TYPE_ACTION, $jsonaction, $data, $errors);
 
-        if (empty($countcondition) && custominfo::is_empty($ac)) {
+        $hasac = class_exists(custominfo::class) && !custominfo::is_empty($ac);
+        if (empty($countcondition) && !$hasac) {
             $errors["newcondition_group"] = get_string('editrule_condition_error', 'local_notificationsagent');
         }
 
@@ -630,7 +632,11 @@ class editrule_form extends \moodleform {
 
         $mform = $this->_form; // Don't forget the underscore!
 
-        if (!empty($CFG->enableavailability)) {
+        if (
+            !empty($CFG->enableavailability)
+            && class_exists(\notificationscondition_ac\ac::class)
+            && notificationscondition::is_plugin_enabled('ac')
+        ) {
             $cm = null;
             $title = \html_writer::start_tag('h5');
             $title .= get_string('conditiontext', 'notificationscondition_ac');

@@ -50,6 +50,7 @@ $string['assignselectcourses'] = 'Marqueu curs';
 $string['assignselectedinfo'] = '{$a->courses} cursos i {$a->categories} categories seleccionats';
 $string['assignunselectcourses'] = 'Desmarqueu curs';
 $string['brokenrulebody'] = 'La regla: {$a->rule} del curs :{$a->course} s\'ha pausat.';
+$string['cachedef_conditions'] = 'Consultes de condicions a la memòria cau.';
 $string['cachedef_launched'] = 'Llista d\'usuaris la periodicitat dels quals ha començat.';
 $string['card_day'] = 'dia';
 $string['card_day_plural'] = 'dies';

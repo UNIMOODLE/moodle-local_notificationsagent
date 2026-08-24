@@ -50,6 +50,7 @@ $string['assignselectcourses'] = 'Markatu ikastaroak';
 $string['assignselectedinfo'] = '{$a->courses} aukeratutako ikastaroak eta {$a->categories} kategoriak';
 $string['assignunselectcourses'] = 'Desmarkatu ikastaroak';
 $string['brokenrulebody'] = 'Araua: {$a->rule} ikastaroaren :{$a->course} pausatu egin da';
+$string['cachedef_conditions'] = 'Baldintza-kontsultak cachean.';
 $string['cachedef_launched'] = 'Errepikapena hasi den erabiltzaileen zerrenda.';
 $string['card_day'] = 'eguna';
 $string['card_day_plural'] = 'egunak';
