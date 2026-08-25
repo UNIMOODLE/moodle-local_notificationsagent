@@ -35,8 +35,11 @@
 namespace local_notificationsagent;
 
 use notificationscondition_ac\ac;
+use notificationscondition_enrolend\enrolend;
+use notificationscondition_ondates\ondates;
 use notificationscondition_sessionend\sessionend;
 use notificationscondition_sessionstart\sessionstart;
+use notificationscondition_usergroupadd\usergroupadd;
 
 /**
  * Testing notificationsagent class
@@ -131,6 +134,39 @@ final class notificationsagent_test extends \advanced_testcase {
         $property = $reflection->getProperty('coursevisibleforrulescache');
         $property->setAccessible(true);
         $property->setValue(null, []);
+    }
+
+    /**
+     * Reset static rule genericity cache between tests.
+     *
+     * @return void
+     */
+    private function reset_isgeneric_cache(): void {
+        $reflection = new \ReflectionClass(rule::class);
+        $property = $reflection->getProperty('isgenericcache');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
+    }
+
+    /**
+     * Create a rule record for trigger generation tests.
+     *
+     * @param int $courseid Course identifier
+     * @return int Rule identifier
+     */
+    private function create_rule_for_trigger_tests(int $courseid): int {
+        global $USER;
+
+        $this->setAdminUser();
+        $dataform = new \stdClass();
+        $dataform->title = 'Trigger test rule';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = $courseid;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = get_admin()->id;
+
+        return (new rule())->create($dataform);
     }
 
     /**
@@ -938,5 +974,231 @@ final class notificationsagent_test extends \advanced_testcase {
                 ['<=', 3, 3, true],
                 ['', 3, 3, false],
         ];
+    }
+
+    /**
+     * Mixed rules must schedule generic conditions per enrolled user.
+     *
+     * @covers \local_notificationsagent\notificationsagent::generate_cache_triggers
+     * @covers \local_notificationsagent\rule::is_rule_generic
+     */
+    public function test_generate_cache_triggers_mixed_rule_uses_per_user_triggers(): void {
+        global $DB;
+
+        $this->reset_isgeneric_cache();
+        $studentone = self::getDataGenerator()->create_user();
+        $studenttwo = self::getDataGenerator()->create_user();
+        self::getDataGenerator()->enrol_user($studentone->id, self::$course->id, 'student');
+        self::getDataGenerator()->enrol_user($studenttwo->id, self::$course->id, 'student');
+
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $now = time();
+        $ondatesparams = json_encode([
+            'startdate' => $now - DAYSECS,
+            'enddate' => $now + YEARSECS,
+        ]);
+
+        $ondatesconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => ondates::NAME,
+            'parameters' => $ondatesparams,
+            'cmid' => 0,
+        ]);
+        $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => sessionstart::NAME,
+            'parameters' => '{"time":86400}',
+            'cmid' => 0,
+        ]);
+
+        $subplugin = new ondates($ruleid, $ondatesconditionid);
+        $context = new evaluationcontext();
+        $context->set_params($subplugin->get_parameters());
+        $context->set_complementary(false);
+        $context->set_timeaccess($now);
+        $context->set_courseid(self::$course->id);
+
+        notificationsagent::generate_cache_triggers($subplugin, $context);
+
+        $this->assertFalse(rule::is_rule_generic($ruleid));
+        $this->assertEmpty($DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'userid' => notificationsagent::GENERIC_USERID,
+        ]));
+
+        [$usersql, $userparams] = $DB->get_in_or_equal([$studentone->id, $studenttwo->id], SQL_PARAMS_NAMED);
+        $triggers = $DB->get_records_select(
+            'notificationsagent_triggers',
+            'ruleid = :ruleid AND userid ' . $usersql,
+            ['ruleid' => $ruleid] + $userparams
+        );
+        $this->assertCount(2, $triggers);
+        $userids = array_map('intval', array_column($triggers, 'userid'));
+        $this->assertEqualsCanonicalizing([$studentone->id, $studenttwo->id], $userids);
+    }
+
+    /**
+     * Fully generic rules keep scheduling with GENERIC_USERID.
+     *
+     * @covers \local_notificationsagent\notificationsagent::generate_cache_triggers
+     */
+    public function test_generate_cache_triggers_fully_generic_rule_uses_generic_userid(): void {
+        global $DB;
+
+        $this->reset_isgeneric_cache();
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $now = time();
+        $ondatesparams = json_encode([
+            'startdate' => $now - DAYSECS,
+            'enddate' => $now + YEARSECS,
+        ]);
+
+        $ondatesconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => ondates::NAME,
+            'parameters' => $ondatesparams,
+            'cmid' => 0,
+        ]);
+
+        $subplugin = new ondates($ruleid, $ondatesconditionid);
+        $context = new evaluationcontext();
+        $context->set_params($subplugin->get_parameters());
+        $context->set_complementary(false);
+        $context->set_timeaccess($now);
+        $context->set_courseid(self::$course->id);
+
+        notificationsagent::generate_cache_triggers($subplugin, $context);
+
+        $this->assertTrue(rule::is_rule_generic($ruleid));
+        $triggers = $DB->get_records('notificationsagent_triggers', ['ruleid' => $ruleid]);
+        $this->assertCount(1, $triggers);
+        $trigger = reset($triggers);
+        $this->assertEquals(notificationsagent::GENERIC_USERID, (int) $trigger->userid);
+    }
+
+    /**
+     * Consolidation keeps a single trigger row per user with the latest startdate.
+     *
+     * @covers \local_notificationsagent\notificationsagent::consolidate_rule_triggers
+     */
+    public function test_consolidate_rule_triggers_single_row_per_user(): void {
+        global $DB;
+
+        $studentone = self::getDataGenerator()->create_user();
+        $studenttwo = self::getDataGenerator()->create_user();
+        self::getDataGenerator()->enrol_user($studentone->id, self::$course->id, 'student');
+        self::getDataGenerator()->enrol_user($studenttwo->id, self::$course->id, 'student');
+
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $enrolendconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => enrolend::NAME,
+            'parameters' => '{"time":86400}',
+            'cmid' => 0,
+        ]);
+        $usergroupconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => usergroupadd::NAME,
+            'parameters' => '{"cmid":0}',
+            'cmid' => 0,
+        ]);
+
+        $earlier = time() + DAYSECS;
+        $later = time() + (2 * DAYSECS);
+        foreach ([$studentone->id, $studenttwo->id] as $userid) {
+            $DB->insert_record('notificationsagent_cache', (object) [
+                'userid' => $userid,
+                'courseid' => self::$course->id,
+                'startdate' => $earlier,
+                'pluginname' => enrolend::NAME,
+                'conditionid' => $enrolendconditionid,
+            ]);
+            $DB->insert_record('notificationsagent_cache', (object) [
+                'userid' => $userid,
+                'courseid' => self::$course->id,
+                'startdate' => $later,
+                'pluginname' => usergroupadd::NAME,
+                'conditionid' => $usergroupconditionid,
+            ]);
+            foreach ([$enrolendconditionid, $usergroupconditionid] as $conditionid) {
+                $DB->insert_record('notificationsagent_triggers', (object) [
+                    'userid' => $userid,
+                    'courseid' => self::$course->id,
+                    'startdate' => $conditionid === $usergroupconditionid ? $later : $earlier,
+                    'conditionid' => $conditionid,
+                    'ruleid' => $ruleid,
+                ]);
+            }
+        }
+
+        notificationsagent::consolidate_rule_triggers($ruleid, self::$course->id);
+
+        foreach ([$studentone->id, $studenttwo->id] as $userid) {
+            $triggers = $DB->get_records('notificationsagent_triggers', [
+                'ruleid' => $ruleid,
+                'courseid' => self::$course->id,
+                'userid' => $userid,
+            ]);
+            $this->assertCount(1, $triggers);
+            $trigger = reset($triggers);
+            $this->assertEquals($later, (int) $trigger->startdate);
+            $this->assertEquals($usergroupconditionid, (int) $trigger->conditionid);
+        }
+    }
+
+    /**
+     * Consolidation must not overwrite triggers while ruleoff is active.
+     *
+     * @covers \local_notificationsagent\notificationsagent::consolidate_rule_triggers
+     */
+    public function test_consolidate_rule_triggers_respects_ruleoff(): void {
+        global $DB;
+
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $conditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => enrolend::NAME,
+            'parameters' => '{"time":86400}',
+            'cmid' => 0,
+        ]);
+        $ruleofftime = time() + WEEKSECS;
+        $DB->insert_record('notificationsagent_triggers', (object) [
+            'userid' => self::$user->id,
+            'courseid' => self::$course->id,
+            'startdate' => $ruleofftime,
+            'conditionid' => $conditionid,
+            'ruleid' => $ruleid,
+            'ruleoff' => time(),
+        ]);
+        $DB->insert_record('notificationsagent_cache', (object) [
+            'userid' => self::$user->id,
+            'courseid' => self::$course->id,
+            'startdate' => time() + DAYSECS,
+            'pluginname' => enrolend::NAME,
+            'conditionid' => $conditionid,
+        ]);
+
+        notificationsagent::consolidate_rule_triggers($ruleid, self::$course->id);
+
+        $trigger = $DB->get_record('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'userid' => self::$user->id,
+        ]);
+        $this->assertNotFalse($trigger);
+        $this->assertEquals($ruleofftime, (int) $trigger->startdate);
+        $this->assertNotNull($trigger->ruleoff);
     }
 }

@@ -518,6 +518,7 @@ class notificationsagent {
         $coursecontext = \context_course::instance($courseid);
         $contextuser = $context->get_userid();  // 0 or userid>0
         $rulecreatedby = $subplugin->rule->createdby;
+        $isgeneric = $subplugin->is_generic() && rule::is_rule_generic($subplugin->rule->id);
         // Avoid to set triggers for event or cron triggered by users who don't own the rule.
         if (
             $contextuser > 0 && $contextuser != $rulecreatedby
@@ -564,9 +565,11 @@ class notificationsagent {
             }
             self::set_timer_cache($deletedata, $insertdata, $params);
             self::set_time_trigger($deletedata, $insertdata, $params);
+            self::consolidate_rule_triggers($subplugin->rule->id, $courseid);
+            $transaction->allow_commit();
             return;
         }
-        if (!$subplugin->is_generic()) {
+        if (!$isgeneric) {
             // If $USER has student role, only generate triggers for its.
             if (
                 has_capability(
@@ -614,7 +617,7 @@ class notificationsagent {
             }
         }
 
-        if ($subplugin->is_generic()) {
+        if ($isgeneric) {
             // If $USER has student role, only generate triggers for the user.
             if (
                 has_capability(
@@ -661,8 +664,67 @@ class notificationsagent {
         }
         self::set_timer_cache($deletedata, $insertdata, $params);
         self::set_time_trigger($deletedata, $insertdata, $params);
+        self::consolidate_rule_triggers($subplugin->rule->id, $courseid);
 
         $transaction->allow_commit();
+    }
+
+    /**
+     * Consolidate triggers for a rule and course into one row per user.
+     *
+     * Uses the maximum startdate across all condition cache entries for the rule,
+     * matching the behaviour of save_form_triggers().
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return void
+     */
+    public static function consolidate_rule_triggers($ruleid, $courseid) {
+        global $DB;
+
+        $sql = 'SELECT nc.userid, nc.conditionid, nc.startdate
+                  FROM {notificationsagent_cache} nc
+                  JOIN {notificationsagent_condition} ncond ON ncond.id = nc.conditionid
+                 WHERE ncond.ruleid = :ruleid
+                   AND nc.courseid = :courseid
+                   AND nc.startdate IS NOT NULL
+              ORDER BY nc.userid, nc.startdate DESC, nc.conditionid DESC';
+
+        $cacherecords = $DB->get_recordset_sql($sql, [
+            'ruleid' => $ruleid,
+            'courseid' => $courseid,
+        ]);
+
+        $consolidated = [];
+        foreach ($cacherecords as $record) {
+            if (
+                !isset($consolidated[$record->userid])
+                || $record->startdate > $consolidated[$record->userid]->startdate
+            ) {
+                $consolidated[$record->userid] = $record;
+            }
+        }
+        $cacherecords->close();
+
+        foreach ($consolidated as $userid => $record) {
+            if (self::is_ruleoff($ruleid, $userid, $courseid)) {
+                continue;
+            }
+
+            $DB->delete_records('notificationsagent_triggers', [
+                'ruleid' => $ruleid,
+                'courseid' => $courseid,
+                'userid' => $userid,
+            ]);
+
+            $DB->insert_record('notificationsagent_triggers', (object) [
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'startdate' => $record->startdate,
+                'conditionid' => $record->conditionid,
+                'ruleid' => $ruleid,
+            ]);
+        }
     }
 
     /**

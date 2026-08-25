@@ -35,6 +35,9 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\helper\helper;
+use notificationscondition_coursestart\coursestart;
+use notificationscondition_ondates\ondates;
+use notificationscondition_sessionstart\sessionstart;
 
 /**
  * Testing rule class
@@ -851,5 +854,154 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $adminrules = rule::get_rules_index($context, self::$course->id);
         $adminruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $adminrules);
         $this->assertContains($ruleid, $adminruleids);
+    }
+
+    /**
+     * Reset static rule genericity cache between tests.
+     *
+     * @return void
+     */
+    private function reset_isgeneric_cache(): void {
+        $reflection = new \ReflectionClass(rule::class);
+        $property = $reflection->getProperty('isgenericcache');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
+    }
+
+    /**
+     * @covers \local_notificationsagent\rule::is_rule_generic
+     * @dataProvider is_rule_generic_provider
+     */
+    public function test_is_rule_generic(array $conditions, array $exceptions, bool $expected): void {
+        global $DB;
+
+        $this->reset_isgeneric_cache();
+        $this->setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Genericity test';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $ruleid = (new rule())->create($dataform);
+
+        foreach ($conditions as $condition) {
+            $DB->insert_record('notificationsagent_condition', (object) [
+                'ruleid' => $ruleid,
+                'courseid' => self::$course->id,
+                'type' => 'condition',
+                'pluginname' => $condition['pluginname'],
+                'parameters' => $condition['parameters'],
+                'cmid' => 0,
+                'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+            ]);
+        }
+
+        foreach ($exceptions as $exception) {
+            $DB->insert_record('notificationsagent_condition', (object) [
+                'ruleid' => $ruleid,
+                'courseid' => self::$course->id,
+                'type' => 'condition',
+                'pluginname' => $exception['pluginname'],
+                'parameters' => $exception['parameters'],
+                'cmid' => 0,
+                'complementary' => notificationplugin::COMPLEMENTARY_EXCEPTION,
+            ]);
+        }
+
+        $this->assertSame($expected, rule::is_rule_generic($ruleid));
+    }
+
+    /**
+     * @return array<string, array{0: array, 1: array, 2: bool}>
+     */
+    public static function is_rule_generic_provider(): array {
+        return [
+            'only generic conditions' => [
+                [
+                    ['pluginname' => ondates::NAME, 'parameters' => '{"startdate":1,"enddate":2}'],
+                    ['pluginname' => coursestart::NAME, 'parameters' => '{"time":86400}'],
+                ],
+                [],
+                true,
+            ],
+            'mixed conditions' => [
+                [
+                    ['pluginname' => ondates::NAME, 'parameters' => '{"startdate":1,"enddate":2}'],
+                    ['pluginname' => sessionstart::NAME, 'parameters' => '{"time":86400}'],
+                ],
+                [],
+                false,
+            ],
+            'generic conditions with non generic exception' => [
+                [
+                    ['pluginname' => ondates::NAME, 'parameters' => '{"startdate":1,"enddate":2}'],
+                ],
+                [
+                    ['pluginname' => sessionstart::NAME, 'parameters' => '{"time":86400}'],
+                ],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * Successful evaluation must remove all sibling triggers for the same user.
+     *
+     * @covers \local_notificationsagent\rule::evaluate
+     */
+    public function test_evaluate_success_removes_sibling_triggers(): void {
+        global $DB, $USER;
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Sibling trigger cleanup';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+
+        $primaryconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => 'coursestart',
+            'parameters' => '{"time":864000}',
+            'cmid' => self::CMID,
+        ]);
+        $siblingconditionid = $primaryconditionid + 1000;
+
+        $triggerdate = 1705050000;
+        foreach ([$primaryconditionid, $siblingconditionid] as $conditionid) {
+            $DB->insert_record('notificationsagent_triggers', (object) [
+                'userid' => self::$user->id,
+                'courseid' => self::$course->id,
+                'startdate' => $triggerdate,
+                'conditionid' => $conditionid,
+                'ruleid' => $ruleid,
+            ]);
+        }
+
+        $instance = rule::create_instance($ruleid);
+        $context = new evaluationcontext();
+        $context->set_userid(self::$user->id);
+        $context->set_courseid(self::$course->id);
+        $context->set_timeaccess($triggerdate);
+        $context->set_triggercondition($primaryconditionid);
+        $context->set_rule($instance);
+
+        $this->assertTrue($instance->evaluate($context));
+
+        $triggers = $DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'userid' => self::$user->id,
+        ]);
+        $this->assertCount(1, $triggers);
+        $trigger = reset($triggers);
+        $this->assertNotNull($trigger->ruleoff);
+        $this->assertGreaterThan(time(), (int) $trigger->startdate);
     }
 }

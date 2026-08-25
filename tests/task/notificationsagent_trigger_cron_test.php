@@ -393,4 +393,62 @@ final class notificationsagent_trigger_cron_test extends \advanced_testcase {
 
         $this->assertIsString($task->get_name());
     }
+
+    /**
+     * A consolidated rule trigger must only produce one report entry per cron run.
+     *
+     * @covers \local_notificationsagent\task\notificationsagent_trigger_cron::execute
+     * @covers \local_notificationsagent\notificationsagent::consolidate_rule_triggers
+     */
+    public function test_execute_consolidated_trigger_runs_once_per_user(): void {
+        global $DB, $USER;
+
+        $date = 1706173200;
+        $dataform = new \stdClass();
+        $dataform->title = 'Consolidated trigger rule';
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+        self::$rule->set_id($ruleid);
+
+        $conditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => 'sessionend',
+            'parameters' => '{"time":864001}',
+            'cmid' => self::$cmtesttc->id,
+        ]);
+        $DB->insert_record('notificationsagent_action', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'action',
+            'pluginname' => 'messageagent',
+            'parameters' => '{"title":"Title","message":{"text":"Message to {User_FirstName}"}}',
+        ]);
+
+        $DB->insert_record('notificationsagent_triggers', (object) [
+            'ruleid' => $ruleid,
+            'conditionid' => $conditionid,
+            'courseid' => self::$course->id,
+            'userid' => self::$user->id,
+            'startdate' => $date,
+        ]);
+
+        set_config('cronlastrun', $date - HOURSECS, 'local_notificationsagent');
+
+        $task = \core\task\manager::get_scheduled_task(notificationsagent_trigger_cron::class);
+        $task->set_timestarted($date);
+        $task->execute();
+
+        $reports = $DB->get_records('notificationsagent_report', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'userid' => self::$user->id,
+        ]);
+        $this->assertCount(1, $reports);
+    }
 }

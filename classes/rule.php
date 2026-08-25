@@ -108,6 +108,9 @@ class rule {
     /** @var bool $isgeneric Flag indicating if the rule is generic */
     private $isgeneric;
 
+    /** @var array<int, bool> Per-request cache of rule genericity. */
+    private static $isgenericcache = [];
+
     /** @var mixed $dataform Data form associated with the rule */
     private $dataform;
 
@@ -1057,6 +1060,20 @@ class rule {
     }
 
     /**
+     * Check whether a rule is fully generic (all conditions and exceptions are generic).
+     *
+     * @param int $ruleid Rule identifier
+     * @return bool
+     */
+    public static function is_rule_generic($ruleid): bool {
+        if (!isset(self::$isgenericcache[$ruleid])) {
+            $rule = self::create_instance($ruleid);
+            self::$isgenericcache[$ruleid] = $rule ? (bool) $rule->get_isgeneric() : true;
+        }
+        return self::$isgenericcache[$ruleid];
+    }
+
+    /**
      * Evaluates the rule based on the provided context by checking conditions and exceptions.
      *
      * This method iterates over all conditions of the rule and evaluates them.
@@ -1144,10 +1161,10 @@ class rule {
         }
 
         // Set a time trigger for the rule to be executed.
-        $conditionsql = "(userid = ? AND courseid = ? AND conditionid = ?)";
+        $conditionsql = "(userid = ? AND courseid = ? AND ruleid = ?)";
         $params[] = $context->get_userid();
         $params[] = $context->get_courseid();
-        $params[] = $context->get_triggercondition();
+        $params[] = $this->get_id();
         $deletedata[] = $conditionsql;
 
         $insertdata[] = [
