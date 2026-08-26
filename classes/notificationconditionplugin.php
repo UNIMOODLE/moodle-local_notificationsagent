@@ -222,7 +222,8 @@ abstract class notificationconditionplugin extends notificationplugin {
 
             // Array to save cache.
             $insertdata = [];
-            if (!$this->is_generic()) {
+            $isgeneric = $this->is_generic() && rule::is_rule_generic($this->rule->id);
+            if (!$isgeneric) {
                 foreach ($students as $student) {
                     $contextevaluation->set_userid($student->id);
                     $cache = $this->estimate_next_time($contextevaluation);

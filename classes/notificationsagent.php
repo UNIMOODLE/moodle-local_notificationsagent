@@ -707,6 +707,12 @@ class notificationsagent {
         $cacherecords->close();
 
         foreach ($consolidated as $userid => $record) {
+            if (
+                (int) $userid === self::GENERIC_USERID
+                && !rule::is_rule_generic($ruleid)
+            ) {
+                continue;
+            }
             if (self::is_ruleoff($ruleid, $userid, $courseid)) {
                 continue;
             }

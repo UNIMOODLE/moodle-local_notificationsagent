@@ -802,6 +802,33 @@ class rule {
     }
 
     /**
+     * Delete stale generic-user cache rows for a mixed rule in a course.
+     *
+     * @param int $courseid Course identifier
+     * @return void
+     */
+    private function delete_generic_user_cache(int $courseid): void {
+        global $DB;
+
+        $conditionids = $DB->get_fieldset_select(
+            'notificationsagent_condition',
+            'id',
+            'ruleid = ?',
+            [$this->get_id()]
+        );
+        if ($conditionids === []) {
+            return;
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED, 'cid');
+        $DB->delete_records_select(
+            'notificationsagent_cache',
+            "courseid = :courseid AND userid = :userid AND conditionid $insql",
+            ['courseid' => $courseid, 'userid' => notificationsagent::GENERIC_USERID] + $inparams
+        );
+    }
+
+    /**
      * Delete all cache records of the rule/conditions
      *
      * @return void
@@ -1501,6 +1528,9 @@ class rule {
 
         // Delete triggers from concrete courseid, only if not SITEID.
         if ($courseid != SITEID) {
+            if (!self::is_rule_generic($this->get_id())) {
+                $this->delete_generic_user_cache($courseid);
+            }
             $this->delete_triggers($courseid);
         }
 

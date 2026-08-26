@@ -34,6 +34,7 @@
 
 namespace local_notificationsagent;
 
+use local_notificationsagent\form\editrule_form;
 use notificationscondition_ac\ac;
 use notificationscondition_enrolend\enrolend;
 use notificationscondition_ondates\ondates;
@@ -1039,6 +1040,78 @@ final class notificationsagent_test extends \advanced_testcase {
         $this->assertCount(2, $triggers);
         $userids = array_map('intval', array_column($triggers, 'userid'));
         $this->assertEqualsCanonicalizing([$studentone->id, $studenttwo->id], $userids);
+    }
+
+    /**
+     * Mixed rules must not keep generic-user cache rows when saving a generic condition.
+     *
+     * @covers \local_notificationsagent\notificationconditionplugin::save
+     */
+    public function test_save_mixed_rule_generic_condition_uses_per_user_cache(): void {
+        global $DB;
+
+        $this->reset_isgeneric_cache();
+        $now = time();
+        $ondatesparams = json_encode([
+            'startdate' => $now - DAYSECS,
+            'enddate' => $now + YEARSECS,
+        ]);
+
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => sessionstart::NAME,
+            'parameters' => '{"time":0}',
+            'cmid' => 0,
+            'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+        ]);
+        $ondatesconditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => ondates::NAME,
+            'parameters' => $ondatesparams,
+            'cmid' => 0,
+            'complementary' => notificationplugin::COMPLEMENTARY_CONDITION,
+        ]);
+
+        $subplugin = new ondates($ruleid, $ondatesconditionid);
+        $start = usergetdate($now - DAYSECS);
+        $end = usergetdate($now + YEARSECS);
+        $data = new \stdClass();
+        $data->courseid = self::$course->id;
+        $data->{$ondatesconditionid . '_ondates_startdate'} = [
+            'day' => $start['mday'],
+            'month' => $start['mon'],
+            'year' => $start['year'],
+        ];
+        $data->{$ondatesconditionid . '_ondates_enddate'} = [
+            'day' => $end['mday'],
+            'month' => $end['mon'],
+            'year' => $end['year'],
+        ];
+
+        $arraytimer = [];
+        $students = [(object) ['id' => self::$user->id]];
+        $subplugin->save(
+            editrule_form::FORM_JSON_ACTION_UPDATE,
+            $data,
+            notificationplugin::COMPLEMENTARY_CONDITION,
+            $arraytimer,
+            $students
+        );
+
+        $this->assertFalse(rule::is_rule_generic($ruleid));
+        $this->assertEmpty($DB->get_records('notificationsagent_cache', [
+            'conditionid' => $ondatesconditionid,
+            'userid' => notificationsagent::GENERIC_USERID,
+        ]));
+        $this->assertNotEmpty($DB->get_records('notificationsagent_cache', [
+            'conditionid' => $ondatesconditionid,
+            'userid' => self::$user->id,
+        ]));
     }
 
     /**
