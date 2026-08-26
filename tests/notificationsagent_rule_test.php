@@ -35,6 +35,9 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\helper\helper;
+use notificationscondition_coursestart\coursestart;
+use notificationscondition_ondates\ondates;
+use notificationscondition_sessionstart\sessionstart;
 
 /**
  * Testing rule class
