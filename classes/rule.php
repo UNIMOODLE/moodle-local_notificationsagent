@@ -300,6 +300,7 @@ class rule {
             || has_capability('local/notificationsagent:managecourserule', $context)
         ) {
             $rules = [...$rules, ...self::get_course_rules_forced($courseid)];
+            $rules = [...$rules, ...self::get_course_rules($courseid, true, null, false, true)];
         }
         if (has_capability('moodle/category:viewhiddencategories', $context)) {
             if (

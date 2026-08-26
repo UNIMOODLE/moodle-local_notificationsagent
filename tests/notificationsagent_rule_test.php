@@ -35,9 +35,6 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\helper\helper;
-use notificationscondition_coursestart\coursestart;
-use notificationscondition_ondates\ondates;
-use notificationscondition_sessionstart\sessionstart;
 
 /**
  * Testing rule class
@@ -854,6 +851,35 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $adminrules = rule::get_rules_index($context, self::$course->id);
         $adminruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $adminrules);
         $this->assertContains($ruleid, $adminruleids);
+    }
+
+    /**
+     * Teachers can see non-forced rules created by other teachers in the same course.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_index
+     */
+    public function test_course_rules_visible_to_other_editingteacher(): void {
+        global $USER;
+
+        $teacherone = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        $teachertwo = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+
+        $USER->id = $teacherone->id;
+        $dataform = new \stdClass();
+        $dataform->title = 'Rule by teacher one';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 1;
+        $ruleid = (new rule())->create($dataform);
+
+        $context = \context_course::instance(self::$course->id);
+        $USER->id = $teachertwo->id;
+
+        $this->assertFalse(has_capability('moodle/category:viewhiddencategories', $context));
+        $teacherrules = rule::get_rules_index($context, self::$course->id);
+        $teacherruleids = array_map(static fn(rule $rule): int => (int) $rule->get_id(), $teacherrules);
+        $this->assertContains($ruleid, $teacherruleids);
+        $this->assertEquals($teacherone->id, rule::create_instance($ruleid)->get_createdby());
     }
 
     /**
