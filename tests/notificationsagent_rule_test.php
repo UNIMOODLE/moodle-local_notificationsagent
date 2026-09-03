@@ -857,6 +857,171 @@ final class notificationsagent_rule_test extends \advanced_testcase {
     }
 
     /**
+     * Site templates assigned to a course appear in assign view.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_assign
+     */
+    public function test_assigned_site_template_visible_in_rules_assign(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Site template for assign';
+        $dataform->type = rule::TEMPLATE_TYPE;
+        $dataform->courseid = SITEID;
+        $dataform->timesfired = 1;
+
+        $templateid = (new rule())->create($dataform);
+        $DB->delete_records('notificationsagent_context', ['ruleid' => $templateid]);
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $templateid,
+                'contextid' => CONTEXT_COURSE,
+                'objectid' => self::$course->id,
+            ]
+        );
+
+        $context = \context_course::instance(self::$course->id);
+        $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $this->assertTrue(has_capability('local/notificationsagent:managecourserule', $context));
+        $this->assertNotEquals($teacher->id, rule::create_instance($templateid)->get_createdby());
+
+        $assignrules = rule::get_rules_assign($context, self::$course->id);
+        $assignruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $assignrules);
+        $this->assertContains($templateid, $assignruleids);
+    }
+
+    /**
+     * Site templates assigned to a parent category appear in assign view for course teachers.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_assign
+     */
+    public function test_assigned_category_template_visible_in_rules_assign(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Category template for assign';
+        $dataform->type = rule::TEMPLATE_TYPE;
+        $dataform->courseid = SITEID;
+        $dataform->timesfired = 1;
+
+        $templateid = (new rule())->create($dataform);
+        $DB->delete_records('notificationsagent_context', ['ruleid' => $templateid]);
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $templateid,
+                'contextid' => CONTEXT_COURSECAT,
+                'objectid' => self::$course->category,
+            ]
+        );
+
+        $othercategory = self::getDataGenerator()->create_category();
+        $othercourse = self::getDataGenerator()->create_course(['category' => $othercategory->id]);
+
+        $context = \context_course::instance(self::$course->id);
+        $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        self::getDataGenerator()->enrol_user($teacher->id, $othercourse->id, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $assignrules = rule::get_rules_assign($context, self::$course->id);
+        $assignruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $assignrules);
+        $this->assertContains($templateid, $assignruleids);
+
+        $othercontext = \context_course::instance($othercourse->id);
+        $otherassignrules = rule::get_rules_assign($othercontext, $othercourse->id);
+        $otherassignruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $otherassignrules);
+        $this->assertNotContains($templateid, $otherassignruleids);
+    }
+
+    /**
+     * Site templates are not listed in assign view for courses without assignment context.
+     *
+     * @covers \local_notificationsagent\rule::get_rules_assign
+     */
+    public function test_assigned_site_template_not_visible_in_unassigned_course(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $assignedcourse = self::$course;
+        $unassignedcourse = self::getDataGenerator()->create_course();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Site template scoped to one course';
+        $dataform->type = rule::TEMPLATE_TYPE;
+        $dataform->courseid = SITEID;
+        $dataform->timesfired = 1;
+
+        $templateid = (new rule())->create($dataform);
+        $DB->delete_records('notificationsagent_context', ['ruleid' => $templateid]);
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $templateid,
+                'contextid' => CONTEXT_COURSE,
+                'objectid' => $assignedcourse->id,
+            ]
+        );
+
+        $teacher = self::getDataGenerator()->create_and_enrol($assignedcourse, 'editingteacher');
+        self::getDataGenerator()->enrol_user($teacher->id, $unassignedcourse->id, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $assignedcontext = \context_course::instance($assignedcourse->id);
+        $assignedrules = rule::get_rules_assign($assignedcontext, $assignedcourse->id);
+        $assignedruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $assignedrules);
+        $this->assertContains($templateid, $assignedruleids);
+
+        $unassignedcontext = \context_course::instance($unassignedcourse->id);
+        $unassignedrules = rule::get_rules_assign($unassignedcontext, $unassignedcourse->id);
+        $unassignedruleids = array_map(static fn(rule $rule): int => $rule->get_id(), $unassignedrules);
+        $this->assertNotContains($templateid, $unassignedruleids);
+    }
+
+    /**
+     * Teachers can clone site templates assigned to their course.
+     *
+     * @covers \local_notificationsagent\rule::check_permission
+     */
+    public function test_check_permission_allows_clone_assigned_site_template(): void {
+        global $DB, $USER;
+
+        self::setAdminUser();
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Site template clone permission';
+        $dataform->type = rule::TEMPLATE_TYPE;
+        $dataform->courseid = SITEID;
+        $dataform->timesfired = 1;
+
+        $templateid = (new rule())->create($dataform);
+        $DB->delete_records('notificationsagent_context', ['ruleid' => $templateid]);
+        $DB->insert_record(
+            'notificationsagent_context',
+            [
+                'ruleid' => $templateid,
+                'contextid' => CONTEXT_COURSE,
+                'objectid' => self::$course->id,
+            ]
+        );
+
+        $context = \context_course::instance(self::$course->id);
+        $teacher = self::getDataGenerator()->create_and_enrol(self::$course, 'editingteacher');
+        $USER->id = $teacher->id;
+
+        $clone = new rule($templateid, rule::RULE_TYPE, rule::RULE_CLONE);
+        $clone->check_permission($context, self::$course->id);
+        $this->assertTrue(true);
+    }
+
+    /**
      * Teachers can see non-forced rules created by other teachers in the same course.
      *
      * @covers \local_notificationsagent\rule::get_rules_index

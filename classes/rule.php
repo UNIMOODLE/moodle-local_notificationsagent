@@ -369,8 +369,11 @@ class rule {
 
         if ($courseid != SITEID && has_capability('local/notificationsagent:managecourserule', $context)) {
             $rules = array_unique(
-                [...self::get_owner_rules(),
-                    ...self::get_course_rules($courseid, true, null, true, false)],
+                [
+                    ...self::get_owner_rules(),
+                    ...self::get_course_rules($courseid, true, null, true, false),
+                    ...self::get_assigned_templates($courseid),
+                ],
                 SORT_REGULAR);
         }
 
@@ -1977,6 +1980,48 @@ class rule {
     }
 
     /**
+     * Get templates assigned to a course or parent categories.
+     *
+     *
+     * @param int $courseid Course id
+     *
+     * @return array<int, stdClass> Rule id records keyed by id
+     */
+    private static function get_assigned_templates(int $courseid): array {
+        global $DB;
+
+        if ($courseid == SITEID) {
+            return [];
+        }
+
+        $parents = helper::get_parents_categories_course($courseid);
+        [$sqlparents, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+
+        $sql = "SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nctx.contextid = :coursecontextid AND nr.deleted = 0 AND nr.template = :templatecourse
+                 WHERE nctx.objectid = :coursecontext
+                 UNION
+                SELECT nr.id
+                  FROM {notificationsagent_rule} nr
+                  JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                   AND nctx.contextid = :categorycontextid AND nr.deleted = 0 AND nr.template = :templatecat
+                  JOIN {course_categories} cc ON nctx.objectid = cc.id
+                 WHERE cc.id $sqlparents";
+
+        $params = [
+                'coursecontextid' => CONTEXT_COURSE,
+                'coursecontext' => $courseid,
+                'categorycontextid' => CONTEXT_COURSECAT,
+                'templatecourse' => self::TEMPLATE_TYPE,
+                'templatecat' => self::TEMPLATE_TYPE,
+            ] + $params;
+
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
      * Get the rules forced related to a given course.
      *
      * @param int $courseid The course ID.
@@ -2526,7 +2571,17 @@ class rule {
 
         if ($this->ruleaction == self::RULE_ADD || $isownrule || $hasmanageallrule) {
             return true;
-        } else if ($hasviewcourserules || $hasmanagecourserule) {
+        }
+
+        if (
+            $this->ruleaction === self::RULE_CLONE
+            && isset(self::get_assigned_templates($courseid)[$this->get_id()])
+            && ($hasviewcourserules || $hasmanagecourserule)
+        ) {
+            return true;
+        }
+
+        if ($hasviewcourserules || $hasmanagecourserule) {
             if (self::get_course_rules($courseid, true, $this->get_id())) {
                 return true;
             }
