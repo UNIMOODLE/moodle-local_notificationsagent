@@ -449,9 +449,45 @@ final class sessionstart_test extends \advanced_testcase {
      * @covers \notificationscondition_sessionstart\sessionstart::get_first_course_access
      */
     public function test_get_first_course_access(): void {
+        global $DB;
+
         $this->assertNull(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
+        $stored = $DB->get_record(
+            'notificationsagent_crseview',
+            ['userid' => self::$user->id, 'courseid' => self::$coursetest->id],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertEquals(0, $stored->firstaccess);
+        $this->assertNull(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
+
         sessionstart::set_first_course_access(self::$user->id, self::$coursetest->id, time());
         $this->assertIsNumeric(sessionstart::get_first_course_access(self::$user->id, self::$coursetest->id));
+    }
+
+    /**
+     * Negative cache: persist sentinel when logstore has no course_viewed row.
+     *
+     * @covers \notificationscondition_sessionstart\sessionstart::get_first_course_access
+     */
+    public function test_get_first_course_access_negative_cache_without_log(): void {
+        global $DB;
+
+        $userid = self::$user->id;
+        $courseid = self::$coursetest->id;
+
+        $this->assertNull(sessionstart::get_first_course_access($userid, $courseid));
+
+        $stored = $DB->get_record(
+            'notificationsagent_crseview',
+            ['userid' => $userid, 'courseid' => $courseid],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertEquals(0, $stored->firstaccess);
+
+        // Second call must reuse the sentinel without requiring a log row.
+        $this->assertNull(sessionstart::get_first_course_access($userid, $courseid));
     }
 
     /**

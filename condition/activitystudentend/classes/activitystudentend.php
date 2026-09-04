@@ -45,6 +45,8 @@ use notificationscondition_activitystudentend\persistent\cmlastaccess;
  * Class activitystudentend condition
  */
 class activitystudentend extends notificationconditionplugin {
+    /** Stored in the plugin table when logstore has no course_module_viewed row yet. */
+    private const FIRSTACCESS_NONE = 0;
     /**
      * Subplugin name
      */
@@ -298,18 +300,20 @@ class activitystudentend extends notificationconditionplugin {
      * @param int $courseid
      * @param int $cmid
      *
-     * @return false|mixed|null
+     * @return int|null Unix timestamp of first activity access, or null if the user has not accessed the activity yet
      */
     public static function get_cmlastaccess($userid, $courseid, $cmid) {
         global $DB;
-        $lastaccess = null;
         $cmlastaccess = cmlastaccess::get_record(['courseid' => $courseid, 'userid' => $userid, 'idactivity' => $cmid]);
-        if (!empty($cmlastaccess)) {
-            $lastaccess = $cmlastaccess->get('firstaccess');
+        if ($cmlastaccess !== false) {
+            $stored = (int) $cmlastaccess->get('firstaccess');
+            if ($stored === self::FIRSTACCESS_NONE) {
+                return null;
+            }
+            return $stored;
         }
 
-        if (empty($lastaccess)) {
-            $query = "SELECT timecreated
+        $query = "SELECT timecreated
                 FROM {logstore_standard_log} mlsl
                 JOIN {course_modules} mcm ON mcm.id = mlsl.contextinstanceid
                  AND mlsl.courseid = :courseid
@@ -320,23 +324,24 @@ class activitystudentend extends notificationconditionplugin {
             ORDER BY timecreated
                LIMIT 1";
 
-            $result = $DB->get_record_sql(
-                $query,
-                [
-                            'courseid' => $courseid,
-                            'userid' => $userid,
-                            'cmid' => $cmid,
-                    ]
-            );
+        $result = $DB->get_record_sql(
+            $query,
+            [
+                'courseid' => $courseid,
+                'userid' => $userid,
+                'cmid' => $cmid,
+            ]
+        );
 
-            if (!$result) {
-                return $lastaccess;
-            }
-
-            $lastaccess = $result->timecreated;
-            // Keep the log value in the plugin table so this query runs once per user and activity.
-            self::set_activity_access($userid, $courseid, $cmid, $lastaccess);
+        if (!$result) {
+            // Negative cache: avoid repeating logstore queries for users without access.
+            self::set_activity_access($userid, $courseid, $cmid, self::FIRSTACCESS_NONE);
+            return null;
         }
+
+        $lastaccess = (int) $result->timecreated;
+        // Keep the log value in the plugin table so this query runs once per user and activity.
+        self::set_activity_access($userid, $courseid, $cmid, $lastaccess);
 
         return $lastaccess;
     }

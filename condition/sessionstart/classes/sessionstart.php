@@ -43,6 +43,8 @@ use notificationscondition_sessionstart\persistent\coursefirstaccess;
  * This class handles the condition of session start.
  */
 class sessionstart extends notificationconditionplugin {
+    /** Stored in the plugin table when logstore has no course_viewed row yet. */
+    private const FIRSTACCESS_NONE = 0;
     /**
      * Subplugin name
      */
@@ -239,41 +241,45 @@ class sessionstart extends notificationconditionplugin {
      * @param int $userid user id
      * @param int $courseid course id
      *
-     * @return mixed  return firstacces to a course
+     * @return int|null Unix timestamp of first course access, or null if the user has not accessed the course yet
      */
     public static function get_first_course_access(int $userid, int $courseid) {
         global $DB;
-        $firstaccess = null;
         $crsefirstaccess = coursefirstaccess::get_record(['courseid' => $courseid, 'userid' => $userid]);
-        if (!empty($crsefirstaccess)) {
-            $firstaccess = $crsefirstaccess->get('firstaccess');
-        }
-
-        if (empty($firstaccess)) {
-            $query = 'SELECT timecreated
-                               FROM {logstore_standard_log}
-                            WHERE courseid = :courseid
-                                 AND userid = :userid
-                                AND eventname = :eventname
-                      ORDER BY timecreated
-                            LIMIT 1';
-
-            $result = $DB->get_record_sql(
-                $query,
-                [
-                    'courseid' => $courseid,
-                    'userid' => $userid,
-                    'eventname' => '\\core\\event\\course_viewed',
-                ]
-            );
-
-            if (!$result) {
-                return $firstaccess;
+        if ($crsefirstaccess !== false) {
+            $stored = (int) $crsefirstaccess->get('firstaccess');
+            if ($stored === self::FIRSTACCESS_NONE) {
+                return null;
             }
-            $firstaccess = $result->timecreated;
-            // Keep the log value in the plugin table so this query runs once per user and course.
-            self::set_first_course_access($userid, $courseid, $firstaccess);
+            return $stored;
         }
+
+        $query = 'SELECT timecreated
+                           FROM {logstore_standard_log}
+                        WHERE courseid = :courseid
+                             AND userid = :userid
+                            AND eventname = :eventname
+                  ORDER BY timecreated
+                        LIMIT 1';
+
+        $result = $DB->get_record_sql(
+            $query,
+            [
+                'courseid' => $courseid,
+                'userid' => $userid,
+                'eventname' => '\\core\\event\\course_viewed',
+            ]
+        );
+
+        if (!$result) {
+            // Negative cache: avoid repeating logstore queries for users without access.
+            self::set_first_course_access($userid, $courseid, self::FIRSTACCESS_NONE);
+            return null;
+        }
+
+        $firstaccess = (int) $result->timecreated;
+        // Keep the log value in the plugin table so this query runs once per user and course.
+        self::set_first_course_access($userid, $courseid, $firstaccess);
 
         return $firstaccess;
     }

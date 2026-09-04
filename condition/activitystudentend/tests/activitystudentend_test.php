@@ -503,6 +503,31 @@ final class activitystudentend_test extends \advanced_testcase {
     }
 
     /**
+     * Negative cache: persist sentinel when logstore has no course_module_viewed row.
+     *
+     * @covers \notificationscondition_activitystudentend\activitystudentend::get_cmlastaccess
+     */
+    public function test_get_cmlastaccess_negative_cache_without_log(): void {
+        global $DB;
+
+        $userid = self::$user->id;
+        $courseid = self::$coursetest->id;
+        $cmid = self::$cmtestse->cmid;
+
+        $this->assertNull(activitystudentend::get_cmlastaccess($userid, $courseid, $cmid));
+
+        $stored = $DB->get_record(
+            'notificationsagent_cmview',
+            ['userid' => $userid, 'courseid' => $courseid, 'idactivity' => $cmid],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertEquals(0, $stored->firstaccess);
+
+        $this->assertNull(activitystudentend::get_cmlastaccess($userid, $courseid, $cmid));
+    }
+
+    /**
      * Persist last access from logstore into the plugin table so the log is queried once.
      *
      * @covers \notificationscondition_activitystudentend\activitystudentend::get_cmlastaccess
