@@ -34,8 +34,13 @@
 
 namespace local_notificationsagent;
 
+use core\task\manager;
+use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationplugin;
+use local_notificationsagent\task\rebuild_rule_triggers_task;
 use notificationscondition_ac\ac;
+use notificationscondition_coursestart\coursestart;
 use notificationscondition_enrolend\enrolend;
 use notificationscondition_ondates\ondates;
 use notificationscondition_sessionend\sessionend;
@@ -143,10 +148,7 @@ final class notificationsagent_test extends \advanced_testcase {
      * @return void
      */
     private function reset_isgeneric_cache(): void {
-        $reflection = new \ReflectionClass(rule::class);
-        $property = $reflection->getProperty('isgenericcache');
-        $property->setAccessible(true);
-        $property->setValue(null, []);
+        rule::reset_isgeneric_cache();
     }
 
     /**
@@ -168,6 +170,97 @@ final class notificationsagent_test extends \advanced_testcase {
         $USER->id = get_admin()->id;
 
         return (new rule())->create($dataform);
+    }
+
+    /**
+     * Return queued rebuild adhoc tasks for a rule.
+     *
+     * @param int $ruleid Rule identifier
+     * @return rebuild_rule_triggers_task[]
+     */
+    private function get_rebuild_tasks_for_rule(int $ruleid): array {
+        $tasks = manager::get_adhoc_tasks(rebuild_rule_triggers_task::class);
+
+        return array_values(array_filter(
+            $tasks,
+            function (rebuild_rule_triggers_task $task) use ($ruleid): bool {
+                $data = $task->get_custom_data();
+
+                return (int) $data->ruleid === $ruleid;
+            }
+        ));
+    }
+
+    /**
+     * Build save_form data for a coursestart (generic) rule.
+     *
+     * @param int $courseid Course identifier
+     * @return \stdClass
+     */
+    private function build_coursestart_save_form_data(int $courseid): \stdClass {
+        $dataform = new \stdClass();
+        $dataform->title = 'Generic coursestart rule';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = $courseid;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->{editrule_form::FORM_JSON_CONDITION} = json_encode([
+            '1' => [
+                'pluginname' => coursestart::NAME,
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_EXCEPTION} = '[]';
+        $dataform->{editrule_form::FORM_JSON_ACTION} = json_encode([
+            '1' => [
+                'pluginname' => 'messageagent',
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_AC} = '';
+        $dataform->{'1_coursestart_days'} = 2;
+        $dataform->{'1_coursestart_hours'} = 0;
+        $dataform->{'1_coursestart_minutes'} = 0;
+        $dataform->{'1_messageagent_title'} = 'Title';
+        $dataform->{'1_messageagent_message'} = ['text' => 'Message body', 'format' => FORMAT_HTML];
+
+        return $dataform;
+    }
+
+    /**
+     * Build save_form data for an enrolend (non-generic) rule.
+     *
+     * @param int $courseid Course identifier
+     * @return \stdClass
+     */
+    private function build_enrolend_save_form_data(int $courseid): \stdClass {
+        $dataform = new \stdClass();
+        $dataform->title = 'Non-generic enrolend rule';
+        $dataform->type = rule::RULE_TYPE;
+        $dataform->courseid = $courseid;
+        $dataform->timesfired = 2;
+        $dataform->runtime_group = ['runtime_days' => 2, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $dataform->{editrule_form::FORM_JSON_CONDITION} = json_encode([
+            '1' => [
+                'pluginname' => enrolend::NAME,
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_EXCEPTION} = '[]';
+        $dataform->{editrule_form::FORM_JSON_ACTION} = json_encode([
+            '1' => [
+                'pluginname' => 'messageagent',
+                'action' => editrule_form::FORM_JSON_ACTION_INSERT,
+            ],
+        ]);
+        $dataform->{editrule_form::FORM_JSON_AC} = '';
+        $dataform->{'1_enrolend_days'} = 1;
+        $dataform->{'1_enrolend_hours'} = 0;
+        $dataform->{'1_enrolend_minutes'} = 0;
+        $dataform->{'1_messageagent_title'} = 'Title';
+        $dataform->{'1_messageagent_message'} = ['text' => 'Message body', 'format' => FORMAT_HTML];
+
+        return $dataform;
     }
 
     /**
@@ -1043,9 +1136,10 @@ final class notificationsagent_test extends \advanced_testcase {
     }
 
     /**
-     * Mixed rules must not keep generic-user cache rows when saving a generic condition.
+     * Mixed rules defer sync cache on save and rebuild per-user cache via generate_cache_triggers.
      *
      * @covers \local_notificationsagent\notificationconditionplugin::save
+     * @covers \local_notificationsagent\notificationsagent::generate_cache_triggers
      */
     public function test_save_mixed_rule_generic_condition_uses_per_user_cache(): void {
         global $DB;
@@ -1104,6 +1198,23 @@ final class notificationsagent_test extends \advanced_testcase {
         );
 
         $this->assertFalse(rule::is_rule_generic($ruleid));
+        $this->assertEmpty($DB->get_records('notificationsagent_cache', [
+            'conditionid' => $ondatesconditionid,
+            'userid' => notificationsagent::GENERIC_USERID,
+        ]));
+        $this->assertEmpty($DB->get_records('notificationsagent_cache', [
+            'conditionid' => $ondatesconditionid,
+            'userid' => self::$user->id,
+        ]));
+
+        $context = new evaluationcontext();
+        $context->set_params($subplugin->get_parameters());
+        $context->set_complementary(notificationplugin::COMPLEMENTARY_CONDITION);
+        $context->set_timeaccess($now);
+        $context->set_courseid(self::$course->id);
+
+        notificationsagent::generate_cache_triggers($subplugin, $context);
+
         $this->assertEmpty($DB->get_records('notificationsagent_cache', [
             'conditionid' => $ondatesconditionid,
             'userid' => notificationsagent::GENERIC_USERID,
@@ -1273,5 +1384,150 @@ final class notificationsagent_test extends \advanced_testcase {
         $this->assertNotFalse($trigger);
         $this->assertEquals($ruleofftime, (int) $trigger->startdate);
         $this->assertNotNull($trigger->ruleoff);
+    }
+
+    /**
+     * Non-generic rules defer trigger creation and queue an adhoc rebuild task.
+     *
+     * @covers \local_notificationsagent\rule::save_form
+     * @covers \local_notificationsagent\task\rebuild_rule_triggers_task::execute
+     */
+    public function test_save_form_non_generic_rule_defers_triggers_until_adhoc(): void {
+        global $DB;
+
+        $this->setAdminUser();
+        $timeend = time() + YEARSECS;
+        self::getDataGenerator()->enrol_user(
+            self::$user->id,
+            self::$course->id,
+            'student',
+            'manual',
+            time(),
+            $timeend
+        );
+
+        $rule = new rule(null, rule::RULE_TYPE, rule::RULE_ADD);
+        $rule->save_form($this->build_enrolend_save_form_data(self::$course->id));
+
+        $ruleid = $rule->get_id();
+        $this->assertTrue($rule->was_rebuild_queued());
+        $this->assertEmpty($DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+        ]));
+
+        $tasks = $this->get_rebuild_tasks_for_rule($ruleid);
+        $this->assertCount(1, $tasks);
+        $tasks[0]->execute();
+
+        $this->assertNotEmpty($DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+        ]));
+        $this->assertFalse(notificationsagent::is_rebuild_in_progress($ruleid, self::$course->id));
+    }
+
+    /**
+     * Fully generic rules still create triggers synchronously without adhoc tasks.
+     *
+     * @covers \local_notificationsagent\rule::save_form
+     */
+    public function test_save_form_generic_rule_creates_triggers_synchronously(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $rule = new rule(null, rule::RULE_TYPE, rule::RULE_ADD);
+        $rule->save_form($this->build_coursestart_save_form_data(self::$course->id));
+
+        $ruleid = $rule->get_id();
+        $this->assertFalse($rule->was_rebuild_queued());
+        $this->assertEmpty($this->get_rebuild_tasks_for_rule($ruleid));
+        $this->assertNotEmpty($DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+        ]));
+    }
+
+    /**
+     * Adhoc rebuild tasks with a stale token must not write triggers.
+     *
+     * @covers \local_notificationsagent\task\rebuild_rule_triggers_task::execute
+     */
+    public function test_rebuild_rule_triggers_task_stale_token_skips_rebuild(): void {
+        global $DB;
+
+        $this->setAdminUser();
+        $timeend = time() + YEARSECS;
+        self::getDataGenerator()->enrol_user(
+            self::$user->id,
+            self::$course->id,
+            'student',
+            'manual',
+            time(),
+            $timeend
+        );
+
+        $rule = new rule(null, rule::RULE_TYPE, rule::RULE_ADD);
+        $rule->save_form($this->build_enrolend_save_form_data(self::$course->id));
+        $ruleid = $rule->get_id();
+
+        notificationsagent::bump_rebuild_token($ruleid, self::$course->id);
+
+        $tasks = $this->get_rebuild_tasks_for_rule($ruleid);
+        $this->assertCount(1, $tasks);
+        $tasks[0]->execute();
+
+        $this->assertEmpty($DB->get_records('notificationsagent_triggers', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+        ]));
+    }
+
+    /**
+     * generate_cache_triggers must not write cache while a rebuild is in progress.
+     *
+     * @covers \local_notificationsagent\notificationsagent::generate_cache_triggers
+     */
+    public function test_generate_cache_triggers_skips_when_rebuild_in_progress(): void {
+        global $DB;
+
+        $ruleid = $this->create_rule_for_trigger_tests(self::$course->id);
+        $timeend = time() + YEARSECS;
+        self::getDataGenerator()->enrol_user(
+            self::$user->id,
+            self::$course->id,
+            'student',
+            'manual',
+            time(),
+            $timeend
+        );
+        $conditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => enrolend::NAME,
+            'parameters' => '{"time":86400}',
+            'cmid' => 0,
+        ]);
+
+        notificationsagent::set_rebuild_in_progress($ruleid, self::$course->id, true);
+
+        $subplugin = new enrolend($ruleid, $conditionid);
+        $context = new evaluationcontext();
+        $context->set_courseid(self::$course->id);
+        $context->set_userid(self::$user->id);
+        $context->set_params('{"time":86400}');
+        $context->set_timeaccess(time());
+        $context->set_complementary(notificationplugin::COMPLEMENTARY_CONDITION);
+
+        notificationsagent::generate_cache_triggers($subplugin, $context);
+
+        $this->assertEmpty($DB->get_records('notificationsagent_cache', [
+            'conditionid' => $conditionid,
+            'userid' => self::$user->id,
+        ]));
+
+        notificationsagent::set_rebuild_in_progress($ruleid, self::$course->id, false);
     }
 }

@@ -502,6 +502,8 @@ abstract class notificationplugin {
                 }
             }
 
+            rule::reset_isgeneric_cache((int) $this->rule->id);
+
             return false; // If delete, do not call to estimate_next_time method.
         } else {
             throw new moodle_exception('errorinsertupdatedelete', 'notificationplugin');

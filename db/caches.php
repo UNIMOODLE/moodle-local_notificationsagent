@@ -56,4 +56,8 @@ $definitions = [
         'conditions' => [
                 'mode' => cache_store::MODE_APPLICATION,
         ],
+        'rebuildstate' => [
+                'mode' => cache_store::MODE_APPLICATION,
+                'simpledata' => true,
+        ],
 ];

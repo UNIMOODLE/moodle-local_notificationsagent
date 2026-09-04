@@ -457,6 +457,109 @@ class notificationsagent {
     }
 
     /**
+     * Return the MUC store for rule trigger rebuild state.
+     *
+     * @return \cache
+     */
+    private static function get_rebuild_state_cache(): \cache {
+        return \cache::make('local_notificationsagent', 'rebuildstate');
+    }
+
+    /**
+     * Build the MUC key for a rule/course rebuild state entry.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return string
+     */
+    private static function get_rebuild_state_key(int $ruleid, int $courseid): string {
+        return $ruleid . '_' . $courseid;
+    }
+
+    /**
+     * Load rebuild state for a rule and course from MUC.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return array{token: int, inprogress: bool}
+     */
+    private static function get_rebuild_state(int $ruleid, int $courseid): array {
+        $cache = self::get_rebuild_state_cache();
+        $state = $cache->get(self::get_rebuild_state_key($ruleid, $courseid));
+
+        if (!is_array($state)) {
+            return ['token' => 0, 'inprogress' => false];
+        }
+
+        return [
+            'token' => (int) ($state['token'] ?? 0),
+            'inprogress' => (bool) ($state['inprogress'] ?? false),
+        ];
+    }
+
+    /**
+     * Persist rebuild state for a rule and course in MUC.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @param array{token: int, inprogress: bool} $state Rebuild state
+     */
+    private static function set_rebuild_state(int $ruleid, int $courseid, array $state): void {
+        $cache = self::get_rebuild_state_cache();
+        $cache->set(self::get_rebuild_state_key($ruleid, $courseid), $state);
+    }
+
+    /**
+     * Increment and return the rebuild token for a rule and course.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return int New token value
+     */
+    public static function bump_rebuild_token(int $ruleid, int $courseid): int {
+        $state = self::get_rebuild_state($ruleid, $courseid);
+        $state['token'] = $state['token'] + 1;
+        self::set_rebuild_state($ruleid, $courseid, $state);
+
+        return $state['token'];
+    }
+
+    /**
+     * Return the current rebuild token for a rule and course.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return int
+     */
+    public static function get_rebuild_token(int $ruleid, int $courseid): int {
+        return self::get_rebuild_state($ruleid, $courseid)['token'];
+    }
+
+    /**
+     * Set whether a trigger rebuild is in progress for a rule and course.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @param bool $inprogress Rebuild in progress flag
+     */
+    public static function set_rebuild_in_progress(int $ruleid, int $courseid, bool $inprogress): void {
+        $state = self::get_rebuild_state($ruleid, $courseid);
+        $state['inprogress'] = $inprogress;
+        self::set_rebuild_state($ruleid, $courseid, $state);
+    }
+
+    /**
+     * Whether a trigger rebuild is in progress for a rule and course.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @return bool
+     */
+    public static function is_rebuild_in_progress(int $ruleid, int $courseid): bool {
+        return self::get_rebuild_state($ruleid, $courseid)['inprogress'];
+    }
+
+    /**
      *
      * Set timer cache in the notifications agent cache table.
      *
@@ -501,13 +604,21 @@ class notificationsagent {
      *
      * @param object $subplugin
      * @param evaluationcontext $context
+     * @param bool $duringrebuild Skip rebuild-in-progress guard when called from adhoc rebuild
      * @return void
      */
-    public static function generate_cache_triggers($subplugin, $context) {
+    public static function generate_cache_triggers($subplugin, $context, bool $duringrebuild = false) {
         global $DB;
 
         $courseid = $context->get_courseid();
         if ($courseid != SITEID && !self::is_course_visible_for_rules($courseid)) {
+            return;
+        }
+
+        if (
+            !$duringrebuild
+            && self::is_rebuild_in_progress($subplugin->rule->id, $courseid)
+        ) {
             return;
         }
 

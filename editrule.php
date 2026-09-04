@@ -177,9 +177,13 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     $rule->save_form($fromform);
 
+    $message = $rule->was_rebuild_queued()
+        ? get_string('rulesaved_rebuildqueued', 'local_notificationsagent')
+        : get_string('rulesaved', 'local_notificationsagent');
+
     redirect(
         new moodle_url('/local/notificationsagent/index.php', ['courseid' => $courseid]),
-        get_string('rulesaved', 'local_notificationsagent')
+        $message
     );
 }
 

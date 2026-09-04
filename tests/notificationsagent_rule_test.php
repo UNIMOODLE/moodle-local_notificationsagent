@@ -1056,10 +1056,7 @@ final class notificationsagent_rule_test extends \advanced_testcase {
      * @return void
      */
     private function reset_isgeneric_cache(): void {
-        $reflection = new \ReflectionClass(rule::class);
-        $property = $reflection->getProperty('isgenericcache');
-        $property->setAccessible(true);
-        $property->setValue(null, []);
+        rule::reset_isgeneric_cache();
     }
 
     /**

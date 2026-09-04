@@ -39,6 +39,7 @@ global $CFG;
 require_once("$CFG->dirroot/local/notificationsagent/lib.php");
 
 use context;
+use core\task\manager;
 use moodle_url;
 use context_course;
 use local_notificationsagent\notificationsagent;
@@ -116,6 +117,9 @@ class rule {
 
     /** @var int $action Flag indicating the action add, edit, clone */
     private $ruleaction = self::RULE_ADD;
+
+    /** @var bool Whether trigger rebuild was queued after the last save_form call */
+    private $rebuildqueued = false;
 
     /** @var string Separator for placeholders */
     public const SEPARATOR = '______________________';
@@ -849,6 +853,108 @@ class rule {
     }
 
     /**
+     * Delete cache rows for this rule in a single course.
+     *
+     * @param int $courseid Course identifier
+     */
+    private function delete_cache_for_course(int $courseid): void {
+        global $DB;
+
+        $conditionids = [];
+        foreach ($this->get_conditions() as $condition) {
+            $conditionids[] = $condition->get_id();
+        }
+        foreach ($this->get_exceptions() as $exception) {
+            $conditionids[] = $exception->get_id();
+        }
+        if ($this->get_ac()) {
+            $conditionids[] = $this->get_ac()->get_id();
+        }
+
+        if ($conditionids === []) {
+            return;
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($conditionids, SQL_PARAMS_NAMED, 'cid');
+        $DB->delete_records_select(
+            'notificationsagent_cache',
+            "courseid = :courseid AND conditionid $insql",
+            ['courseid' => $courseid] + $inparams
+        );
+    }
+
+    /**
+     * Whether the last save_form call queued a background trigger rebuild.
+     *
+     * @return bool
+     */
+    public function was_rebuild_queued(): bool {
+        return $this->rebuildqueued;
+    }
+
+    /**
+     * Queue an adhoc task to rebuild triggers for a non-generic rule in a course.
+     *
+     * @param int $ruleid Rule identifier
+     * @param int $courseid Course identifier
+     * @param int $token Rebuild token
+     */
+    public static function queue_rebuild_triggers_task(int $ruleid, int $courseid, int $token): void {
+        $task = new \local_notificationsagent\task\rebuild_rule_triggers_task();
+        $task->set_custom_data((object) [
+            'ruleid' => $ruleid,
+            'courseid' => $courseid,
+            'token' => $token,
+        ]);
+        manager::queue_adhoc_task($task, true);
+    }
+
+    /**
+     * Rebuild cache and triggers for all conditions of this rule in a course.
+     *
+     * @param int $courseid Course identifier
+     * @param int $token Expected rebuild token
+     */
+    public function rebuild_triggers_for_course(int $courseid, int $token): void {
+        if ($courseid == SITEID || !notificationsagent::is_course_visible_for_rules($courseid)) {
+            return;
+        }
+
+        if (notificationsagent::get_rebuild_token($this->get_id(), $courseid) !== $token) {
+            return;
+        }
+
+        $this->delete_triggers($courseid);
+        $this->delete_cache_for_course($courseid);
+
+        $subplugintuples = [];
+        if ($this->get_ac()) {
+            $subplugintuples[] = [$this->get_ac(), notificationplugin::COMPLEMENTARY_CONDITION];
+        }
+        foreach ($this->get_conditions() as $condition) {
+            $subplugintuples[] = [$condition, notificationplugin::COMPLEMENTARY_CONDITION];
+        }
+        foreach ($this->get_exceptions() as $exception) {
+            $subplugintuples[] = [$exception, notificationplugin::COMPLEMENTARY_EXCEPTION];
+        }
+
+        foreach ($subplugintuples as [$subplugin, $complementary]) {
+            if (notificationsagent::get_rebuild_token($this->get_id(), $courseid) !== $token) {
+                return;
+            }
+
+            $context = new evaluationcontext();
+            $context->set_courseid($courseid);
+            $context->set_userid(0);
+            $context->set_params($subplugin->get_parameters());
+            $context->set_timeaccess(time());
+            $context->set_complementary($complementary);
+
+            notificationsagent::generate_cache_triggers($subplugin, $context, true);
+        }
+    }
+
+    /**
      * Set the conditions for the rule.
      *
      * This method assigns the provided conditions to the rule object. Conditions are
@@ -1088,6 +1194,20 @@ class rule {
      */
     public function set_isgeneric($isgeneric): void {
         $this->isgeneric = $isgeneric;
+    }
+
+    /**
+     * Clear cached is-generic state for one rule or for all rules.
+     *
+     * @param int|null $ruleid Rule identifier, or null to clear the entire cache
+     */
+    public static function reset_isgeneric_cache(?int $ruleid = null): void {
+        if ($ruleid === null) {
+            self::$isgenericcache = [];
+            return;
+        }
+
+        unset(self::$isgenericcache[$ruleid]);
     }
 
     /**
@@ -1443,6 +1563,7 @@ class rule {
      */
     public function save_form($data) {
         global $DB;
+        $this->rebuildqueued = false;
         $transaction = $DB->start_delegated_transaction();
 
         if ($this->is_new()) {
@@ -1473,6 +1594,7 @@ class rule {
 
         $courseid = $data->courseid;
         $context = context_course::instance($courseid);
+        self::reset_isgeneric_cache($this->get_id());
 
         // If $USER has student role, only generate triggers for the user.
         if (
@@ -1534,6 +1656,12 @@ class rule {
         if ($courseid != SITEID) {
             if (!self::is_rule_generic($this->get_id())) {
                 $this->delete_generic_user_cache($courseid);
+                $token = notificationsagent::bump_rebuild_token($this->get_id(), $courseid);
+                $this->delete_triggers($courseid);
+                $this->delete_cache_for_course($courseid);
+                self::queue_rebuild_triggers_task($this->get_id(), $courseid, $token);
+                $this->rebuildqueued = true;
+                return;
             }
             $this->delete_triggers($courseid);
         }

@@ -196,6 +196,8 @@ abstract class notificationconditionplugin extends notificationplugin {
         }
 
         if (parent::insert_update_delete($action, $dataplugin)) {
+            rule::reset_isgeneric_cache((int) $this->rule->id);
+
             if ($courseid == SITEID) {
                 return;
             }
@@ -211,6 +213,10 @@ abstract class notificationconditionplugin extends notificationplugin {
             );
 
             if (!notificationsagent::is_course_visible_for_rules($courseid)) {
+                return;
+            }
+
+            if (!rule::is_rule_generic($this->rule->id)) {
                 return;
             }
 
