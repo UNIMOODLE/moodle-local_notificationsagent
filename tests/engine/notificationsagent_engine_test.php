@@ -37,6 +37,7 @@ namespace local_notificationsagent\engine;
 use local_notificationsagent\engine\notificationsagent_engine;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
@@ -487,5 +488,81 @@ final class notificationsagent_engine_test extends \advanced_testcase {
                 true,
                 ],
         ];
+    }
+
+    /**
+     * Generic rules with usermessageagent must rotate message blocks per target user.
+     *
+     * @return void
+     * @covers ::notificationsagent_engine_evaluate_rule
+     */
+    public function test_generic_usermessageagent_rotates_message_blocks(): void {
+        global $DB, $USER;
+
+        set_config('calendar_weekend', 65);
+        $weekenddate = 1701511761;
+
+        $dataform = new \stdClass();
+        $dataform->title = 'Rule separator test';
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 3;
+        $dataform->runtime_group = ['runtime_days' => 5, 'runtime_hours' => 0, 'runtime_minutes' => 0];
+        $USER->id = self::$user->id;
+        $ruleid = self::$rule->create($dataform);
+        self::$rule->set_id($ruleid);
+
+        $conditionid = $DB->insert_record('notificationsagent_condition', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'condition',
+            'pluginname' => 'weekend',
+            'parameters' => '{}',
+            'cmid' => self::$cmteste->id,
+        ]);
+
+        $separator = '{' . rule::SEPARATOR . '}';
+        $message = 'Block one' . $separator . 'Block two' . $separator . 'Block three';
+        $actionparams = json_encode([
+            'title' => 'Title',
+            'message' => ['text' => $message],
+            notificationplugin::UI_USER => self::$user->id,
+        ]);
+        $DB->insert_record('notificationsagent_action', (object) [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'type' => 'action',
+            'pluginname' => 'usermessageagent',
+            'parameters' => $actionparams,
+        ]);
+
+        rule::create_instance($ruleid);
+        unset_config('noemailever');
+        $sink = $this->redirectMessages();
+        $expectedblocks = ['Block one', 'Block two', 'Block three'];
+
+        for ($execution = 0; $execution < 3; $execution++) {
+            notificationsagent_engine::notificationsagent_engine_evaluate_rule(
+                [$ruleid],
+                $weekenddate,
+                notificationsagent::GENERIC_USERID,
+                self::$course->id,
+                $conditionid,
+                $weekenddate
+            );
+
+            $messages = $sink->get_messages();
+            $this->assertCount($execution + 1, $messages);
+            $this->assertStringContainsString($expectedblocks[$execution], $messages[$execution]->fullmessage);
+        }
+        $sink->close();
+
+        $launched = $DB->get_record('notificationsagent_launched', [
+            'ruleid' => $ruleid,
+            'courseid' => self::$course->id,
+            'userid' => self::$user->id,
+        ]);
+        $this->assertNotFalse($launched);
+        $this->assertEquals(3, $launched->timesfired);
     }
 }

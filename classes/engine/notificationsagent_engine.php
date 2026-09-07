@@ -133,9 +133,22 @@ class notificationsagent_engine {
                     $transaction->allow_commit();
                 }
             } else {
+                $contextcourse = \context_course::instance($context->get_courseid());
+                if ($context->get_userid() == notificationsagent::GENERIC_USERID) {
+                    foreach ($rule->get_actions() as $action) {
+                        $actionparams = json_decode($action->get_parameters(), true);
+                        $hasuser = $actionparams[notificationplugin::UI_USER] ?? false;
+                        if (
+                            $hasuser
+                            && !has_capability('local/notificationsagent:managecourserule', $contextcourse, $hasuser)
+                        ) {
+                            $context->set_userid($hasuser);
+                            break;
+                        }
+                    }
+                }
                 if ($context->is_evaluate($rule)) {
                     $result = $rule->evaluate($context);
-                    $contextcourse = \context_course::instance($context->get_courseid());
                     if ($result) {
                         $transaction = $DB->start_delegated_transaction();
                         $launched = $rule->get_launched($context);
