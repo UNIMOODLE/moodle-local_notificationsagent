@@ -35,6 +35,7 @@
 namespace local_notificationsagent;
 
 use local_notificationsagent\helper\helper;
+use local_notificationsagent\notificationsagent;
 use notificationscondition_coursestart\coursestart;
 use notificationscondition_ondates\ondates;
 use notificationscondition_sessionstart\sessionstart;
@@ -1193,6 +1194,6 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertCount(1, $triggers);
         $trigger = reset($triggers);
         $this->assertNotNull($trigger->ruleoff);
-        $this->assertGreaterThan(time(), (int) $trigger->startdate);
+        $this->assertGreaterThan(notificationsagent::now(), (int) $trigger->startdate);
     }
 }

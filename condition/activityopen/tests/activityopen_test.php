@@ -240,6 +240,7 @@ final class activityopen_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary): void {
+        $this->mock_clock_with_frozen($timeaccess);
         self::$context->set_complementary($complementary);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
@@ -258,7 +259,7 @@ final class activityopen_test extends \advanced_testcase {
                     self::$subplugin->estimate_next_time(self::$context)
                 );
             } else {
-                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
             }
         }
         // Exception.
@@ -268,7 +269,7 @@ final class activityopen_test extends \advanced_testcase {
                     && $timeaccess <= self::CM_DATESTART +
                     $params->{notificationplugin::UI_TIME}
             ) {
-                $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                $this->assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
             } else {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }

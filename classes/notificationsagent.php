@@ -54,6 +54,24 @@ class notificationsagent {
     private static $coursevisibleforrulescache = [];
 
     /**
+     * Current Unix timestamp via the Moodle Clock API (testable; replaces time() in plugin code).
+     *
+     * @return int
+     */
+    public static function now(): int {
+        return self::get_clock()->time();
+    }
+
+    /**
+     * Resolve the Clock service from the DI container.
+     *
+     * @return \core\clock
+     */
+    public static function get_clock(): \core\clock {
+        return \core\di::get(\core\clock::class);
+    }
+
+    /**
      * Whether rules may run for a course (visible course in a visible category chain).
      *
      * @param int $courseid

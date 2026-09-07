@@ -235,7 +235,7 @@ final class ondates_test extends \advanced_testcase {
      * @return void
      */
     public function test_estimatenexttime($timeaccess, $expected, $params, $complementary): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         self::$context->set_params($params);
         // Saturday, Sunday configuration.
         self::$context->set_complementary($complementary);
@@ -245,7 +245,6 @@ final class ondates_test extends \advanced_testcase {
         // Test estimate next time.
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        \uopz_unset_return('time');
     }
 
     /**

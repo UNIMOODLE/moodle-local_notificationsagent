@@ -237,7 +237,7 @@ final class sessionstart_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $usecache, $complementary, $param): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         self::$context->set_complementary($complementary);
         self::$context->set_params($param);
         self::$context->set_timeaccess(self::COURSE_DATEEND);
@@ -256,7 +256,6 @@ final class sessionstart_test extends \advanced_testcase {
 
             $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
         }
-        \uopz_unset_return('time');
     }
 
     /**

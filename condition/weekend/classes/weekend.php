@@ -35,6 +35,7 @@
 namespace notificationscondition_weekend;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 
@@ -104,7 +105,7 @@ class weekend extends notificationconditionplugin {
         // Condición.
         if (!$context->is_complementary()) {
             if (self::is_weekend($context->get_timeaccess())) {
-                return time();
+                return notificationsagent::now();
             }
             $day += 1;
 
@@ -114,7 +115,7 @@ class weekend extends notificationconditionplugin {
             // Exception.
         } else {
             if (!self::is_weekend($context->get_timeaccess())) {
-                return time();
+                return notificationsagent::now();
             }
             $day += 1;
 

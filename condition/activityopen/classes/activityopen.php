@@ -117,7 +117,7 @@ class activityopen extends notificationconditionplugin {
             if ($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime) {
                 $timestart = $cmstarttime + $params->{self::UI_TIME};
             } else {
-                return time();
+                return notificationsagent::now();
             }
         }
         // Exception.
@@ -125,7 +125,7 @@ class activityopen extends notificationconditionplugin {
                 ($timeaccess <= $cmstarttime + $params->{self::UI_TIME} && $timeaccess >= $cmstarttime)
                 && $context->is_complementary()
         ) {
-            return time();
+            return notificationsagent::now();
         }
         return $timestart;
     }

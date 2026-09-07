@@ -36,6 +36,7 @@ namespace notificationscondition_activitysinceend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
@@ -122,7 +123,7 @@ class activitysinceend extends notificationconditionplugin {
             if ($timeaccess >= $timecompletion && $timeaccess <= $timecompletion + $params->{self::UI_TIME}) {
                 $timereturn = $timecompletion + $params->{self::UI_TIME};
             } else if ($timeaccess > $timecompletion + $params->{self::UI_TIME}) {
-                $timereturn = time();
+                $timereturn = notificationsagent::now();
             }
         }
 
@@ -132,7 +133,7 @@ class activitysinceend extends notificationconditionplugin {
                 && $timeaccess < $timecompletion + $params->{self::UI_TIME}
                 && $context->is_complementary()
         ) {
-            $timereturn = time();
+            $timereturn = notificationsagent::now();
         }
 
         return $timereturn;

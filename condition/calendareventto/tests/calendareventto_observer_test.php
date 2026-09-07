@@ -35,6 +35,7 @@
 namespace notificationscondition_calendareventto;
 
 use calendar_event;
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
@@ -128,7 +129,8 @@ final class calendareventto_observer_test extends \advanced_testcase {
 
     public function test_calendar_updated($time, $user): void {
         global $DB, $USER;
-        \uopz_set_return('time', self::COURSE_DATESTART);
+        $frozen = self::COURSE_DATESTART;
+        $this->mock_clock_with_frozen($frozen);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -163,6 +165,7 @@ final class calendareventto_observer_test extends \advanced_testcase {
                         'timeduration' => self::DURATION,
                 ],
         ]);
+        phpunitutil::set_event_timecreated($event, $frozen);
         $event->trigger();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -174,7 +177,6 @@ final class calendareventto_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
-        \uopz_unset_return('time');
     }
 
     /**
@@ -198,7 +200,7 @@ final class calendareventto_observer_test extends \advanced_testcase {
 
     public function test_calendar_event_deleted(): void {
         global $DB;
-        \uopz_set_return('time', self::COURSE_DATESTART);
+        $this->mock_clock_with_frozen(self::COURSE_DATESTART);
 
         self::setUser(2);// Admin.
 
@@ -241,10 +243,10 @@ final class calendareventto_observer_test extends \advanced_testcase {
                 ],
         ];
         $event = \core\event\calendar_event_deleted::create($eventargs);
+        phpunitutil::set_event_timecreated($event, self::COURSE_DATESTART);
         $event->trigger();
         $rule = self::$rule::create_instance($ruleid);
 
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
-        \uopz_unset_return('time');
     }
 }

@@ -258,7 +258,7 @@ final class calendarstart_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $usecache, $param, $complementary, $expected): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         $auxarray = json_decode($param, true);
         $auxarray['cmid'] = self::$caledarevent->id;
         $param = json_encode($auxarray);
@@ -280,7 +280,7 @@ final class calendarstart_test extends \advanced_testcase {
             if ($params->{calendarstart::UI_RADIO} == 1) {
                 if ($timeaccess >= $timeevent && $timeaccess <= $timeevent + $params->{notificationplugin::UI_TIME}) {
                     self::assertSame(
-                        time(),
+                        $timeaccess,
                         self::$subplugin->estimate_next_time(self::$context)
                     );
                 } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME}) {
@@ -294,7 +294,7 @@ final class calendarstart_test extends \advanced_testcase {
                         $params->{notificationplugin::UI_TIME} + $timeduration
                 ) {
                     self::assertSame(
-                        time(),
+                        $timeaccess,
                         self::$subplugin->estimate_next_time(self::$context)
                     );
                 } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME} + $timeduration) {
@@ -315,7 +315,7 @@ final class calendarstart_test extends \advanced_testcase {
                     );
                 } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME}) {
                     self::assertSame(
-                        time(),
+                        $timeaccess,
                         self::$subplugin->estimate_next_time(self::$context)
                     );
                 }
@@ -332,13 +332,12 @@ final class calendarstart_test extends \advanced_testcase {
                     );
                 } else if ($timeaccess >= $timeevent + $params->{notificationplugin::UI_TIME} + $timeduration) {
                     self::assertSame(
-                        time(),
+                        $timeaccess,
                         self::$subplugin->estimate_next_time(self::$context)
                     );
                 }
             }
         }
-        \uopz_unset_return('time');
     }
 
     /**

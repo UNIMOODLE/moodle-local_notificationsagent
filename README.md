@@ -97,16 +97,10 @@ Or one particular test:
 vendor/bin/phpunit local/notificationsagent/condition/weekend/tests/weekend_test.php
 ```
 
-Some test use some uopz funcionality. Install it with the following commad:
-```sh
-pecl install uopz
-```
-
 For further information, visit:
 
 - <https://moodledev.io/general/development/tools/phpunit>
 - <https://docs.phpunit.de/>
-- <https://pecl.php.net/package/uopz>
 
 ### PHPDOC
 Generate Phpdoc documentation. Run this command on plugin directory.

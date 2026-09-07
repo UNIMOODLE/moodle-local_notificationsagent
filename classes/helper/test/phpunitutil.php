@@ -34,6 +34,7 @@
 
 namespace local_notificationsagent\helper\test;
 
+use core\event\base;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -78,5 +79,19 @@ class phpunitutil {
         $property->setAccessible(true);
         $value = $property->getValue($obj);
         return $value;
+    }
+
+    /**
+     * Override event timecreated for tests (events use time(), not core\clock).
+     *
+     * @param base $event The event instance.
+     * @param int $time Unix timestamp to set.
+     */
+    public static function set_event_timecreated(base $event, int $time): void {
+        $property = new ReflectionProperty($event, 'data');
+        $property->setAccessible(true);
+        $data = $property->getValue($event);
+        $data['timecreated'] = $time;
+        $property->setValue($event, $data);
     }
 }

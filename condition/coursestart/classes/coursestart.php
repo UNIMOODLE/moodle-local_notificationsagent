@@ -37,6 +37,7 @@ namespace notificationscondition_coursestart;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\helper\helper;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 
 /**
@@ -105,9 +106,9 @@ class coursestart extends notificationconditionplugin {
             // Condition.
             if (!$context->is_complementary()) {
                 if ($timeaccess <= ($coursestart + $params->{self::UI_TIME})) {
-                    $timestart = max(time(), $coursestart + $params->{self::UI_TIME});
+                    $timestart = max(notificationsagent::now(), $coursestart + $params->{self::UI_TIME});
                 } else {
-                    return time();
+                    return notificationsagent::now();
                 }
             }
             // Exception.
@@ -115,7 +116,7 @@ class coursestart extends notificationconditionplugin {
                     ($timeaccess <= $coursestart + $params->{self::UI_TIME} && $timeaccess >= $coursestart)
                     && $context->is_complementary()
             ) {
-                return time();
+                return notificationsagent::now();
             }
         }
 

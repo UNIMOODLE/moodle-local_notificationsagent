@@ -231,7 +231,7 @@ final class courseend_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -244,22 +244,21 @@ final class courseend_test extends \advanced_testcase {
         // Test estimate next time.
         if (self::$context->is_complementary()) {
             if ($timeaccess < self::COURSE_DATEEND - $param) {
-                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess >= self::COURSE_DATEEND - $param && $timeaccess <= self::COURSE_DATEEND) {
                 self::assertEquals(self::COURSE_DATEEND, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATEEND) {
-                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
             }
         } else {
             if ($timeaccess < self::COURSE_DATEEND - $param) {
                 self::assertEquals(self::COURSE_DATEEND - $param, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess >= self::COURSE_DATEEND - $param && $timeaccess <= self::COURSE_DATEEND) {
-                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
             } else if ($timeaccess > self::COURSE_DATEEND) {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
-        \uopz_unset_return('time');
     }
 
     /**

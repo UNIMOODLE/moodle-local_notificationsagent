@@ -35,6 +35,7 @@
 namespace notificationscondition_activitycompleted;
 
 use local_notificationsagent\rule;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\evaluationcontext;
 
@@ -125,11 +126,11 @@ class activitycompleted extends notificationconditionplugin {
         $iscompleted = $this->evaluate($context);
 
         if ($iscompleted && !$context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         if (!$iscompleted && $context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         return $estimate;

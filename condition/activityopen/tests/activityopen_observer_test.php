@@ -34,6 +34,7 @@
 
 namespace notificationscondition_activityopen;
 
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_activityopen\activityopen;
@@ -107,7 +108,8 @@ final class activityopen_observer_test extends \advanced_testcase {
 
     public function test_course_module_updated($user): void {
         global $DB, $USER;
-        \uopz_set_return('time', self::COURSE_DATESTART);
+        $frozen = self::COURSE_DATESTART;
+        $this->mock_clock_with_frozen($frozen);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$course->id,
@@ -150,6 +152,7 @@ final class activityopen_observer_test extends \advanced_testcase {
                         'name' => $cmgen->name,
                 ],
         ]);
+        phpunitutil::set_event_timecreated($event, $frozen);
         $event->trigger();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -162,7 +165,6 @@ final class activityopen_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
-        \uopz_unset_return('time');
     }
 
     /**

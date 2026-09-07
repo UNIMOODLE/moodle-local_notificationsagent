@@ -108,7 +108,7 @@ final class ondates_crontask_test extends \advanced_testcase {
     public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = ondates::NAME;
-        \uopz_set_return('time', $date);
+        $this->mock_clock_with_frozen($date);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -149,7 +149,6 @@ final class ondates_crontask_test extends \advanced_testcase {
             }
         }
 
-        \uopz_unset_return('time');
     }
 
     /**

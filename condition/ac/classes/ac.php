@@ -35,6 +35,7 @@
 namespace notificationscondition_ac;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\form\editrule_form;
 
@@ -89,7 +90,7 @@ class ac extends notificationconditionplugin {
     public function estimate_next_time(evaluationcontext $context) {
         $result = $this->evaluate($context);
         if ($result) {
-            return time();
+            return notificationsagent::now();
         }
         return null;
     }

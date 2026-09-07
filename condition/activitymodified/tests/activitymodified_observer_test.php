@@ -34,6 +34,7 @@
 
 namespace notificationscondition_activitymodified;
 
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationsagent;
 
@@ -98,8 +99,10 @@ final class activitymodified_observer_test extends \advanced_testcase {
         global $DB, $USER;
 
         if (!is_null($fileuploadtime)) {
-            \uopz_set_return('time', $fileuploadtime);
+            $this->mock_clock_with_frozen($fileuploadtime);
         }
+
+        $eventtime = $fileuploadtime ?? time();
 
         $pluginname = activitymodified::NAME;
 
@@ -163,6 +166,9 @@ final class activitymodified_observer_test extends \advanced_testcase {
                         'name' => self::$activity->name,
                 ],
         ]);
+        if (!is_null($fileuploadtime)) {
+            phpunitutil::set_event_timecreated($event, $eventtime);
+        }
         $event->trigger();
 
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
@@ -183,7 +189,6 @@ final class activitymodified_observer_test extends \advanced_testcase {
         }
 
         if (!is_null($fileuploadtime)) {
-            \uopz_unset_return('time');
         }
     }
 

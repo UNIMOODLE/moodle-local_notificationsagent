@@ -37,6 +37,7 @@ namespace local_notificationsagent\form;
 use local_notificationsagent\plugininfo\notificationsbaseinfo;
 use local_notificationsagent\plugininfo\notificationscondition;
 use local_notificationsagent\notificationplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_ac\custominfo;
 
@@ -356,7 +357,7 @@ class editrule_form extends \moodleform {
         if (!empty($condition->getValue())) {
             $conditionvalue = json_decode($condition->getValue(), true);
         }
-        $key = "new" . time();
+        $key = "new" . notificationsagent::now();
         $conditionvalue[$key] = ["pluginname" => $pluginname, "action" => self::FORM_JSON_ACTION_INSERT];
         // Set default values for plugin.
         content::set_default_plugin($key, $this->rule, $this, $pluginname, $type);

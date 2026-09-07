@@ -229,7 +229,7 @@ final class usergroupadd_test extends \advanced_testcase {
      * @return void
      */
     public function test_estimatenexttime($timeaccess, $expected, $complementary, $addingroup): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         // Saturday, Sunday configuration.
         self::$context->set_complementary($complementary);
         set_config('calendar_usergroupadd', 65);
@@ -247,7 +247,6 @@ final class usergroupadd_test extends \advanced_testcase {
         self::$context->set_timeaccess($timeaccess);
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        \uopz_unset_return('time');
     }
 
     /**

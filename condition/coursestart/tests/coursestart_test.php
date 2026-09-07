@@ -229,7 +229,8 @@ final class coursestart_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
     public function test_estimatenexttime($timeaccess, $complementary, $param): void {
-        \uopz_set_return('time', time());
+        $frozen = self::COURSE_DATEEND;
+        $this->mock_clock_with_frozen($frozen);
 
         self::$context->set_params($param);
         self::$context->set_complementary($complementary);
@@ -243,11 +244,11 @@ final class coursestart_test extends \advanced_testcase {
                             $params->{notificationplugin::UI_TIME})
             ) {
                 self::assertEquals(
-                    max(time(), self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME}),
+                    max($frozen, self::COURSE_DATESTART + $params->{notificationplugin::UI_TIME}),
                     self::$subplugin->estimate_next_time(self::$context)
                 );
             } else {
-                self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                self::assertEquals($frozen, self::$subplugin->estimate_next_time(self::$context));
             }
         }
         // Exception.
@@ -257,13 +258,12 @@ final class coursestart_test extends \advanced_testcase {
                     && $timeaccess <= self::COURSE_DATESTART +
                     $params->{notificationplugin::UI_TIME}
             ) {
-                $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                $this->assertEquals($frozen, self::$subplugin->estimate_next_time(self::$context));
             } else {
                 self::assertNull(self::$subplugin->estimate_next_time(self::$context));
             }
         }
 
-        \uopz_unset_return('time');
     }
 
     /**

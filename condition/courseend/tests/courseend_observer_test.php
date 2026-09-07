@@ -34,6 +34,7 @@
 
 namespace notificationscondition_courseend;
 
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
@@ -106,7 +107,8 @@ final class courseend_observer_test extends \advanced_testcase {
 
     public function test_course_updated($time, $user): void {
         global $DB, $USER;
-        \uopz_set_return('time', self::COURSE_DATEEND);
+        $frozen = self::COURSE_DATEEND;
+        $this->mock_clock_with_frozen($frozen);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -130,7 +132,17 @@ final class courseend_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
         self::setUser(self::$user->id);
         self::$course->enddate = self::COURSE_DATEEND + 84600;
-        update_course(self::$course);
+        $DB->update_record('course', self::$course);
+
+        $event = \core\event\course_updated::create([
+                'objectid' => self::$course->id,
+                'context' => \context_course::instance(self::$course->id),
+                'courseid' => self::$course->id,
+                'userid' => self::$user->id,
+                'other' => ['updatedfields' => ['enddate' => self::$course->enddate]],
+        ]);
+        phpunitutil::set_event_timecreated($event, $frozen);
+        $event->trigger();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
@@ -142,7 +154,6 @@ final class courseend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
-        \uopz_unset_return('time');
     }
 
     /**

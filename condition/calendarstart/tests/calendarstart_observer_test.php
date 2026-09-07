@@ -34,6 +34,7 @@
 
 namespace notificationscondition_calendarstart;
 
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
@@ -211,7 +212,8 @@ final class calendarstart_observer_test extends \advanced_testcase {
 
     public function test_calendar_event_deleted(): void {
         global $DB;
-        \uopz_set_return('time', self::COURSE_DATESTART);
+        $frozen = self::COURSE_DATESTART;
+        $this->mock_clock_with_frozen($frozen);
 
         self::setUser(2);// Admin.
 
@@ -254,10 +256,10 @@ final class calendarstart_observer_test extends \advanced_testcase {
                 ],
         ];
         $event = \core\event\calendar_event_deleted::create($eventargs);
+        phpunitutil::set_event_timecreated($event, $frozen);
         $event->trigger();
         $rule = self::$rule::create_instance($ruleid);
 
         $this->assertEquals(rule::PAUSE_RULE, $rule->get_status());
-        \uopz_unset_return('time');
     }
 }

@@ -35,6 +35,7 @@
 namespace notificationscondition_activitynewcontent;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
@@ -111,12 +112,12 @@ class activitynewcontent extends notificationconditionplugin {
         $estimate = null;
         // Condition.
         if (!$context->is_complementary() && $context->get_observer()) {
-            $estimate = time();
+            $estimate = notificationsagent::now();
         }
 
         // Exception.
         if ($context->is_complementary() && !$context->get_observer()) {
-            $estimate = time();
+            $estimate = notificationsagent::now();
         }
 
         return $estimate;

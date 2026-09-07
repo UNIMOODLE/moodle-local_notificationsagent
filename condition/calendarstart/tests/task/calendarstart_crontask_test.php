@@ -131,7 +131,7 @@ final class calendarstart_crontask_test extends \advanced_testcase {
     public function test_execute($date, $radio, $user): void {
         global $DB, $USER;
         $pluginname = calendarstart::NAME;
-        \uopz_set_return('time', self::CM_DATESTART);
+        $this->mock_clock_with_frozen(self::CM_DATESTART);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestacct = $quizgen->create_instance([
             'course' => self::$course->id,
@@ -185,7 +185,6 @@ final class calendarstart_crontask_test extends \advanced_testcase {
             $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         }
 
-        \uopz_unset_return('time');
     }
 
     /**

@@ -35,6 +35,7 @@
 namespace notificationscondition_activityend;
 
 use Generator;
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_activityend\activityend;
@@ -117,7 +118,8 @@ final class activityend_observer_test extends \advanced_testcase {
     public function test_course_module_updated($role): void {
         global $DB, $USER;
 
-        \uopz_set_return('time', self::COURSE_DATEEND - 120);
+        $frozen = self::COURSE_DATEEND - 120;
+        $this->mock_clock_with_frozen($frozen);
         $quizgenerator = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmgen = $quizgenerator->create_instance([
                 'course' => self::$course->id,
@@ -161,6 +163,7 @@ final class activityend_observer_test extends \advanced_testcase {
                 ],
         ]);
 
+        phpunitutil::set_event_timecreated($event, $frozen);
         $event->trigger();
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
@@ -175,7 +178,6 @@ final class activityend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals($expected, $trigger->userid);
 
-        \uopz_unset_return('time');
     }
 
     /**

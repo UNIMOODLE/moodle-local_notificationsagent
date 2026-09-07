@@ -37,6 +37,7 @@ namespace notificationscondition_courseend;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\helper\helper;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 
 /**
@@ -105,7 +106,7 @@ class courseend extends notificationconditionplugin {
                 if ($timeaccess <= $courseend - $time) {
                     $timeend = $courseend - $time;
                 } else if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
-                    $timeend = time();
+                    $timeend = notificationsagent::now();
                 }
             }
             // Exception.
@@ -113,7 +114,7 @@ class courseend extends notificationconditionplugin {
                 if ($timeaccess >= $courseend - $time && $timeaccess < $courseend) {
                     $timeend = $courseend;
                 } else {
-                    $timeend = time();
+                    $timeend = notificationsagent::now();
                 }
             }
         }

@@ -37,6 +37,7 @@ namespace notificationscondition_sessionend;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\notificationsagent;
 
 /**
  * Class representing the sessionend condition plugin.
@@ -132,7 +133,7 @@ class sessionend extends notificationconditionplugin {
             return null;
         }
 
-        return max(time(), $lastaccess + $params->{self::UI_TIME});
+        return max(notificationsagent::now(), $lastaccess + $params->{self::UI_TIME});
     }
 
     /**

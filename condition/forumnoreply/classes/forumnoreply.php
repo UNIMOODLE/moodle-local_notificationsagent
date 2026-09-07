@@ -36,6 +36,7 @@ namespace notificationscondition_forumnoreply;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
@@ -133,12 +134,12 @@ class forumnoreply extends notificationconditionplugin {
 
         // Condition.
         if ($evaluate && !$this->get_iscomplementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         // Exception.
         if ($evaluate && $this->get_iscomplementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         return $estimate;

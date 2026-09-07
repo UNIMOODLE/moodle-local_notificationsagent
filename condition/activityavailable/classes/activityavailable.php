@@ -34,6 +34,7 @@
 
 namespace notificationscondition_activityavailable;
 
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\rule;
@@ -102,11 +103,11 @@ class activityavailable extends notificationconditionplugin {
         $available = $this->evaluate($context);
         // Condition.
         if ($available && !$context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
         // Exception.
         if (!$available && $context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         return null;

@@ -223,7 +223,7 @@ abstract class notificationconditionplugin extends notificationplugin {
             $contextevaluation = new evaluationcontext();
             $contextevaluation->set_courseid($courseid);
             $contextevaluation->set_params($this->get_parameters());
-            $contextevaluation->set_timeaccess(time());
+            $contextevaluation->set_timeaccess(notificationsagent::now());
             $contextevaluation->set_complementary($complementary);
 
             // Array to save cache.

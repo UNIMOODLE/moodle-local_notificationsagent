@@ -233,7 +233,7 @@ final class activitycompleted_test extends \advanced_testcase {
      */
     public function test_estimatenexttime($conditionjson, $complementary, $expected, $completed): void {
         global $DB;
-        \uopz_set_return('time', 1704099600);
+        $this->mock_clock_with_frozen(1704099600);
         $quizgen = self::getDataGenerator()->get_plugin_generator('mod_quiz');
         $cmtestent = $quizgen->create_instance([
                 'name' => 'Quiz unittest',
@@ -256,7 +256,6 @@ final class activitycompleted_test extends \advanced_testcase {
 
         $this->assertEquals($expected, $result);
 
-        \uopz_unset_return('time');
     }
 
     /**

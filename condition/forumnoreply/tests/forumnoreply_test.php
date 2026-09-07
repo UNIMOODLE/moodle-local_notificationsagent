@@ -125,7 +125,7 @@ final class forumnoreply_test extends \advanced_testcase {
      * @dataProvider dataprovider
      */
     public function test_evaluate($timeaccess, $param, $expected, $complementary): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         self::$context->set_params($param);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -155,7 +155,6 @@ final class forumnoreply_test extends \advanced_testcase {
         if (!$result) {
             $this->assertNull(self::$subplugin->estimate_next_time(self::$context));
         }
-        \uopz_unset_return('time');
     }
 
     /**

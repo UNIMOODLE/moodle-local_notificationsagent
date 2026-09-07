@@ -947,7 +947,7 @@ class rule {
             $context->set_courseid($courseid);
             $context->set_userid(0);
             $context->set_params($subplugin->get_parameters());
-            $context->set_timeaccess(time());
+            $context->set_timeaccess(notificationsagent::now());
             $context->set_complementary($complementary);
 
             notificationsagent::generate_cache_triggers($subplugin, $context, true);
@@ -1321,8 +1321,8 @@ class rule {
         $insertdata[] = [
             'userid' => $context->get_userid(),
             'courseid' => $context->get_courseid(),
-            'startdate' => time() + $this->get_runtime(),
-            'ruleoff' => time(),
+            'startdate' => notificationsagent::now() + $this->get_runtime(),
+            'ruleoff' => notificationsagent::now(),
             'conditionid' => $context->get_triggercondition(),
             'ruleid' => $this->get_id(),
         ];
@@ -1454,7 +1454,7 @@ class rule {
                             break;
 
                         case 'Current_time':
-                            $paramstoreplace[] = date('d-m-Y h:i:s', $context->get_startdate() ?? time());
+                            $paramstoreplace[] = date('d-m-Y h:i:s', $context->get_startdate() ?? notificationsagent::now());
                             $placeholderstoreplace[] = '{' . $placeholder . '}';
                             break;
 
@@ -1791,7 +1791,7 @@ class rule {
 
         $record = $this->to_record();
         $record->name = $data->title;
-        $record->createdat = time();
+        $record->createdat = notificationsagent::now();
         $record->createdby = $USER->id;
         $record->template = $data->type;
 
@@ -2454,8 +2454,8 @@ class rule {
         $launched->courseid = $context->get_courseid();
         $launched->userid = $context->get_userid();
         $launched->timesfired = self::MINIMUM_EXECUTION;
-        $launched->timecreated = time();
-        $launched->timemodified = time();
+        $launched->timecreated = notificationsagent::now();
+        $launched->timemodified = notificationsagent::now();
         $launched->id = $DB->insert_record('notificationsagent_launched', $launched);
 
         return $launched;
@@ -2474,7 +2474,7 @@ class rule {
         global $DB;
 
         $launched->timesfired = $context->get_usertimesfired();
-        $launched->timemodified = time();
+        $launched->timemodified = notificationsagent::now();
         $DB->update_record('notificationsagent_launched', $launched);
 
         return $launched;

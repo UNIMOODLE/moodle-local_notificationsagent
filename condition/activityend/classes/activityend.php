@@ -36,8 +36,8 @@ namespace notificationscondition_activityend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 
 /**
@@ -123,7 +123,7 @@ class activityend extends notificationconditionplugin {
             if ($timeaccess <= $cmidend - $time) {
                 $timeend = $cmidend - $time;
             } else if ($timeaccess >= $cmidend - $time && $timeaccess < $cmidend) {
-                $timeend = time();
+                $timeend = notificationsagent::now();
             }
         }
         // Exception.
@@ -131,7 +131,7 @@ class activityend extends notificationconditionplugin {
             if ($timeaccess >= $cmidend - $time && $timeaccess < $cmidend) {
                 $timeend = $cmidend;
             } else {
-                $timeend = time();
+                $timeend = notificationsagent::now();
             }
         }
         return $timeend;

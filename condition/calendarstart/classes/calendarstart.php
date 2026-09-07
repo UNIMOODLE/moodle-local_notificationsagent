@@ -145,7 +145,7 @@ class calendarstart extends notificationconditionplugin {
                 if ($timeaccess >= $timeevent && $timeaccess <= $timeevent + $params->{self::UI_TIME}) {
                     $timereturn = $timeevent + $params->{self::UI_TIME};
                 } else if ($timeaccess > $timeevent + $params->{self::UI_TIME}) {
-                    $timereturn = time();
+                    $timereturn = notificationsagent::now();
                 }
             } else {
                 if (
@@ -154,7 +154,7 @@ class calendarstart extends notificationconditionplugin {
                 ) {
                     $timereturn = $timeevent + $timeduration + $params->{self::UI_TIME};
                 } else if ($timeaccess > $timeevent + $timeduration + $params->{self::UI_TIME}) {
-                    $timereturn = time();
+                    $timereturn = notificationsagent::now();
                 }
             }
         }
@@ -163,14 +163,14 @@ class calendarstart extends notificationconditionplugin {
         if ($context->is_complementary()) {
             if ($params->{self::UI_RADIO} == 1) {
                 if ($timeaccess >= $timeevent && $timeaccess < $timeevent + $params->{self::UI_TIME}) {
-                    $timereturn = time();
+                    $timereturn = notificationsagent::now();
                 }
             } else {
                 if (
                         $timeaccess >= $timeevent + $timeduration
                         && $timeaccess < $timeevent + $timeduration + $params->{self::UI_TIME}
                 ) {
-                    $timereturn = time();
+                    $timereturn = notificationsagent::now();
                 }
             }
         }

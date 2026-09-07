@@ -223,7 +223,7 @@ final class activitylastsend_test extends \advanced_testcase {
      * @dataProvider dataestimate
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary, $completion): void {
-        \uopz_set_return('time', 1704099600);
+        $this->mock_clock_with_frozen(1704099600);
         // Test estimate next time.
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -258,7 +258,7 @@ final class activitylastsend_test extends \advanced_testcase {
         } else {
             if (self::$context->is_complementary()) {
                 if ($timeaccess >= self::USER_LASTSEND && $timeaccess <= self::USER_LASTSEND + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals(1704099600, self::$subplugin->estimate_next_time(self::$context));
                 } else if ($timeaccess > self::USER_LASTSEND + $param) {
                     self::assertNull(self::$subplugin->estimate_next_time(self::$context));
                 }
@@ -266,11 +266,10 @@ final class activitylastsend_test extends \advanced_testcase {
                 if ($timeaccess >= self::USER_LASTSEND && $timeaccess <= self::USER_LASTSEND + $param) {
                     self::assertEquals(self::USER_LASTSEND + $param, self::$subplugin->estimate_next_time(self::$context));
                 } else if ($timeaccess > self::USER_LASTSEND + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals(1704099600, self::$subplugin->estimate_next_time(self::$context));
                 }
             }
         }
-        \uopz_unset_return('time');
     }
 
     /**

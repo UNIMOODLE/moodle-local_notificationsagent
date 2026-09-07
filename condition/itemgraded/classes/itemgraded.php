@@ -121,11 +121,11 @@ class itemgraded extends notificationconditionplugin {
         $isachieved = $this->evaluate($context);
 
         if ($isachieved && !$context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         if (!$isachieved && $context->is_complementary()) {
-            return time();
+            return notificationsagent::now();
         }
 
         return $estimate;

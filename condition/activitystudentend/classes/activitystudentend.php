@@ -37,6 +37,7 @@ namespace notificationscondition_activitystudentend;
 use enrol_wallet\util\cm;
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 use notificationscondition_activitystudentend\persistent\cmlastaccess;
@@ -132,7 +133,7 @@ class activitystudentend extends notificationconditionplugin {
             if ($timeaccess >= $lastaccess && $timeaccess <= $lastaccess + $params->{self::UI_TIME}) {
                 $timereturn = $lastaccess + $params->{self::UI_TIME};
             } else if ($timeaccess > $lastaccess + $params->{self::UI_TIME}) {
-                $timereturn = time();
+                $timereturn = notificationsagent::now();
             }
         }
 
@@ -142,7 +143,7 @@ class activitystudentend extends notificationconditionplugin {
                 && $timeaccess <= $lastaccess + $params->{self::UI_TIME}
                 && $context->is_complementary()
         ) {
-            $timereturn = time();
+            $timereturn = notificationsagent::now();
         }
 
         return $timereturn;

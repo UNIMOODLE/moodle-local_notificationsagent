@@ -35,8 +35,9 @@
 namespace notificationsaction_privateforummessage;
 
 use local_notificationsagent\evaluationcontext;
-use local_notificationsagent\rule;
 use local_notificationsagent\notificationactionplugin;
+use local_notificationsagent\notificationsagent;
+use local_notificationsagent\rule;
 
 /**
  * Class representing privateforummessage action plugin.
@@ -235,7 +236,7 @@ class privateforummessage extends notificationactionplugin {
         $courseid = $context->get_courseid();
         // Set up the Moodle Web Services client.
 
-        $timenow = time();
+        $timenow = notificationsagent::now();
         $pluginname = self::NAME;
         $condition = $context->get_rule()->get_condition($pluginname);
         if ($condition) {
@@ -327,7 +328,7 @@ class privateforummessage extends notificationactionplugin {
     public static function forum_add_post($obj) {
         global $DB;
 
-        $timenow = $obj->timenow ?? time();
+        $timenow = $obj->timenow ?? notificationsagent::now();
 
         $forum = $DB->get_record('forum', ['id' => $obj->forum]);
 

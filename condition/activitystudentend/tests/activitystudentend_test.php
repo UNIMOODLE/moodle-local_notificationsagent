@@ -270,7 +270,7 @@ final class activitystudentend_test extends \advanced_testcase {
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary, $completion): void {
         global $DB;
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         // Test estimate next time.
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -292,7 +292,7 @@ final class activitystudentend_test extends \advanced_testcase {
         } else {
             if (self::$context->is_complementary()) {
                 if ($timeaccess >= self::USER_ACTIVITY_LASTACCESS && $timeaccess <= self::USER_ACTIVITY_LASTACCESS + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
                 } else if ($timeaccess > self::USER_ACTIVITY_LASTACCESS + $param) {
                     self::assertNull(self::$subplugin->estimate_next_time(self::$context));
                 }
@@ -303,11 +303,10 @@ final class activitystudentend_test extends \advanced_testcase {
                         self::$subplugin->estimate_next_time(self::$context)
                     );
                 } else if ($timeaccess > self::USER_ACTIVITY_LASTACCESS + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals($timeaccess, self::$subplugin->estimate_next_time(self::$context));
                 }
             }
         }
-        \uopz_unset_return('time');
     }
 
     /**

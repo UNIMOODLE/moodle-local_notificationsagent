@@ -146,7 +146,8 @@ final class activitymodified_test extends \advanced_testcase {
         self::$context->set_complementary($complementary);
         self::$subplugin->set_id(self::CONDITIONID);
 
-        \uopz_set_return('time', self::$context->get_timeaccess());
+        $frozen = self::$context->get_timeaccess();
+        $this->mock_clock_with_frozen($frozen);
         $activityctx = \context_module::instance(self::$activity->cmid);
 
         if ($usecache) {
@@ -181,14 +182,13 @@ final class activitymodified_test extends \advanced_testcase {
         $result = self::$subplugin->evaluate(self::$context);
         $this->assertSame($expected, $result);
         if ($result && !self::$context->is_complementary()) {
-            $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            $this->assertEquals($frozen, self::$subplugin->estimate_next_time(self::$context));
         }
 
         if (!$result && self::$context->is_complementary()) {
-            $this->assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+            $this->assertEquals($frozen, self::$subplugin->estimate_next_time(self::$context));
         }
 
-        \uopz_unset_return('time');
     }
 
     /**

@@ -36,6 +36,7 @@ namespace notificationscondition_sessionstart;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use notificationscondition_sessionstart\persistent\coursefirstaccess;
 
@@ -140,7 +141,7 @@ class sessionstart extends notificationconditionplugin {
             return null;
         }
 
-        return max(time(), $firstacces + $params->{self::UI_TIME});
+        return max(notificationsagent::now(), $firstacces + $params->{self::UI_TIME});
     }
 
     /**

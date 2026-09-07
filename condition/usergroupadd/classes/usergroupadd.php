@@ -35,6 +35,7 @@
 namespace notificationscondition_usergroupadd;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 use local_notificationsagent\rule;
@@ -125,7 +126,7 @@ class usergroupadd extends notificationconditionplugin {
         // Check if it's in group and condition/exception.
         if ($isingroup) {
             if (!$context->is_complementary()) {
-                return time();
+                return notificationsagent::now();
             } else {
                 return $estimate;
             }
@@ -133,7 +134,7 @@ class usergroupadd extends notificationconditionplugin {
             if (!$context->is_complementary()) {
                 return $estimate;
             } else {
-                return time();
+                return notificationsagent::now();
             }
         }
         return $estimate;

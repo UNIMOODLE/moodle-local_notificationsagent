@@ -205,7 +205,7 @@ final class ac_test extends \advanced_testcase {
      * @throws \coding_exception
      */
     public function test_estimatenexttime($conditionjson, $expected): void {
-        \uopz_set_return('time', 1704099600);
+        $this->mock_clock_with_frozen(1704099600);
 
         self::$context->set_params($conditionjson);
 
@@ -213,7 +213,6 @@ final class ac_test extends \advanced_testcase {
 
         $this->assertEquals($expected, $result);
 
-        \uopz_unset_return('time');
     }
 
     /**

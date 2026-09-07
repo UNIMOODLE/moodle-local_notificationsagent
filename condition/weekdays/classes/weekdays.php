@@ -35,6 +35,7 @@
 namespace notificationscondition_weekdays;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 
@@ -113,7 +114,7 @@ class weekdays extends notificationconditionplugin {
         // Condition.
         if (!$context->is_complementary()) {
             if (self::correct_weekday($dayofweek, $selecteddays)) {
-                return (time());
+                return (notificationsagent::now());
             }
 
             $weekdays = $calendar->get_weekdays();
@@ -131,7 +132,7 @@ class weekdays extends notificationconditionplugin {
             // Exception.
         } else {
             if (!self::correct_weekday($dayofweek, $selecteddays)) {
-                return (time());
+                return (notificationsagent::now());
             }
 
             $weekdays = $calendar->get_weekdays();

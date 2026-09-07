@@ -200,14 +200,13 @@ final class weekdays_test extends \advanced_testcase {
      * @return void
      */
     public function test_estimatenexttime($timeaccess, $expected, $param, $complementary): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         date_default_timezone_set('Europe/Madrid');
         self::$context->set_complementary($complementary);
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_params($param);
         // Test estimate next time.
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        \uopz_unset_return('time');
     }
 
     /**

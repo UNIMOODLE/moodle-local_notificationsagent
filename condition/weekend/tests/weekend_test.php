@@ -216,7 +216,7 @@ final class weekend_test extends \advanced_testcase {
      * @return void
      */
     public function test_estimatenexttime($timeaccess, $expected, $complementary): void {
-        \uopz_set_return('time', $timeaccess);
+        $this->mock_clock_with_frozen($timeaccess);
         // Saturday, Sunday configuration.
         self::$context->set_complementary($complementary);
         set_config('calendar_weekend', 65);
@@ -225,7 +225,6 @@ final class weekend_test extends \advanced_testcase {
         // Test estimate next time.
 
         $this->assertEquals($expected, self::$subplugin->estimate_next_time(self::$context));
-        \uopz_unset_return('time');
     }
 
     /**

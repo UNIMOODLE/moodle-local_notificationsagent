@@ -37,8 +37,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
-use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\notificationsagent;
+use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
 global $CFG;
@@ -123,7 +123,7 @@ class calendareventto extends notificationconditionplugin {
                 if ($timeaccess < $calendarstart - $params->{self::UI_TIME}) {
                     $timestart = $calendarstart - $params->{self::UI_TIME};
                 } else if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess <= $calendarstart) {
-                    $timestart = time();
+                    $timestart = notificationsagent::now();
                 }
             }
             // Exception.
@@ -131,7 +131,7 @@ class calendareventto extends notificationconditionplugin {
                 if ($timeaccess >= $calendarstart - $params->{self::UI_TIME} && $timeaccess < $calendarstart) {
                     $timestart = $calendarstart;
                 } else {
-                    $timestart = time();
+                    $timestart = notificationsagent::now();
                 }
             }
         }

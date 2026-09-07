@@ -36,6 +36,7 @@ namespace notificationscondition_activitylastsend;
 
 use local_notificationsagent\evaluationcontext;
 use local_notificationsagent\form\editrule_form;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
@@ -121,7 +122,7 @@ class activitylastsend extends notificationconditionplugin {
             ) {
                 $nexttime = $lastsendtime->timemodified + $params->{self::UI_TIME};
             } else if ($timeaccess > $lastsendtime->timemodified + $params->{self::UI_TIME}) {
-                $nexttime = time();
+                $nexttime = notificationsagent::now();
             }
         }
 
@@ -131,7 +132,7 @@ class activitylastsend extends notificationconditionplugin {
             && $timeaccess < $lastsendtime->timemodified + $params->{self::UI_TIME}
             && $context->is_complementary()
         ) {
-            $nexttime = time();
+            $nexttime = notificationsagent::now();
         }
 
         return $nexttime;

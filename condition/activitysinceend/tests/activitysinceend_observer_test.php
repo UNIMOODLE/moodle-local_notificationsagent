@@ -34,6 +34,7 @@
 
 namespace notificationscondition_activitysinceend;
 
+use local_notificationsagent\helper\test\phpunitutil;
 use local_notificationsagent\notificationsagent;
 use local_notificationsagent\rule;
 use notificationscondition_activitysinceend\activitysinceend;
@@ -111,7 +112,7 @@ final class activitysinceend_observer_test extends \advanced_testcase {
 
     public function test_course_module_completion_updated($time, $data): void {
         global $DB, $USER;
-        \uopz_set_return('time', $time);
+        $this->mock_clock_with_frozen($time);
         $pluginname = activitysinceend::NAME;
 
         $modinstance = self::getDataGenerator()->create_module('quiz', [
@@ -145,7 +146,16 @@ final class activitysinceend_observer_test extends \advanced_testcase {
         self::$rule::create_instance($ruleid);
 
         $completion = new \completion_info(self::$course);
+        $sink = $this->redirectEvents();
         $completion->update_state($cmtestasect, COMPLETION_COMPLETE, self::$user->id, false);
+        $sink->close();
+
+        $DB->set_field(
+            'course_modules_completion',
+            'timemodified',
+            $time,
+            ['coursemoduleid' => $cmtestasect->id, 'userid' => self::$user->id]
+        );
 
         $event = \core\event\course_module_completion_updated::create([
                 'context' => \context_module::instance($cmtestasect->id),
@@ -157,6 +167,8 @@ final class activitysinceend_observer_test extends \advanced_testcase {
                         'completionstate' => COMPLETION_COMPLETE,
                 ],
         ]);
+        phpunitutil::set_event_timecreated($event, $time);
+        \notificationscondition_activitysinceend_observer::course_module_completion_updated($event);
 
         $cache = $DB->get_record('notificationsagent_cache', ['conditionid' => $conditionid]);
         $trigger = $DB->get_record('notificationsagent_triggers', ['conditionid' => $conditionid]);
@@ -167,7 +179,6 @@ final class activitysinceend_observer_test extends \advanced_testcase {
         $this->assertEquals(self::$course->id, $trigger->courseid);
         $this->assertEquals(self::$rule->get_id(), $trigger->ruleid);
         $this->assertEquals(self::$user->id, $trigger->userid);
-        \uopz_unset_return('time');
     }
 
     /**

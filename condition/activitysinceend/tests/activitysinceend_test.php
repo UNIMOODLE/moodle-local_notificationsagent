@@ -261,7 +261,7 @@ final class activitysinceend_test extends \advanced_testcase {
      */
     public function test_estimatenexttime($timeaccess, $param, $complementary, $completion): void {
         global $DB;
-        \uopz_set_return('time', 1704099600);
+        $this->mock_clock_with_frozen(1704099600);
         // Test estimate next time.
         self::$context->set_timeaccess($timeaccess);
         self::$context->set_complementary($complementary);
@@ -282,7 +282,7 @@ final class activitysinceend_test extends \advanced_testcase {
         } else {
             if (self::$context->is_complementary()) {
                 if ($timeaccess >= self::USER_ACTIVITY_END && $timeaccess <= self::USER_ACTIVITY_END + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals(1704099600, self::$subplugin->estimate_next_time(self::$context));
                 } else if ($timeaccess > self::USER_ACTIVITY_END + $param) {
                     self::assertNull(self::$subplugin->estimate_next_time(self::$context));
                 }
@@ -290,11 +290,10 @@ final class activitysinceend_test extends \advanced_testcase {
                 if ($timeaccess >= self::USER_ACTIVITY_END && $timeaccess <= self::USER_ACTIVITY_END + $param) {
                     self::assertEquals(self::USER_ACTIVITY_END + $param, self::$subplugin->estimate_next_time(self::$context));
                 } else if ($timeaccess > self::USER_ACTIVITY_END + $param) {
-                    self::assertEquals(time(), self::$subplugin->estimate_next_time(self::$context));
+                    self::assertEquals(1704099600, self::$subplugin->estimate_next_time(self::$context));
                 }
             }
         }
-        \uopz_unset_return('time');
     }
 
     /**
@@ -473,7 +472,6 @@ final class activitysinceend_test extends \advanced_testcase {
      * @covers \notificationscondition_activitysinceend\activitysinceend::get_timecompletion
      */
     public function test_get_timecompletion(): void {
-        \uopz_set_return('time', time());
         $modinstance = self::getDataGenerator()->create_module('quiz', [
                 'course' => self::$coursetest,
                 'completion' => COMPLETION_TRACKING_AUTOMATIC,
@@ -485,9 +483,8 @@ final class activitysinceend_test extends \advanced_testcase {
 
         $completion = self::$subplugin::get_timecompletion(self::$cmtestase->id, self::$user->id);
 
-        $this->assertEquals(time(), $completion->timemodified);
+        $this->assertEqualsWithDelta(time(), $completion->timemodified, 2);
         $this->assertEquals(self::$user->id, $completion->userid);
-        \uopz_unset_return('time');
     }
 
     /**

@@ -35,6 +35,7 @@
 namespace notificationscondition_activitymodified;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use local_notificationsagent\rule;
 
@@ -109,11 +110,11 @@ class activitymodified extends notificationconditionplugin {
         $evaluate = $this->evaluate($context);
         // Condtion.
         if ($evaluate && !$context->is_complementary()) {
-            $estimatetime = time();
+            $estimatetime = notificationsagent::now();
         }
         // Exception.
         if (!$evaluate && $context->is_complementary()) {
-            $estimatetime = time();
+            $estimatetime = notificationsagent::now();
         }
 
         return $estimatetime;

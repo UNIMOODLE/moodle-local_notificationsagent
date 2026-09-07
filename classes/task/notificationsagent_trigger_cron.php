@@ -76,7 +76,7 @@ class notificationsagent_trigger_cron extends scheduled_task {
         }
         // Set cron task lastrun.
         set_config('cronlastrun', $cronlastrun, 'local_notificationsagent');
-        \local_notificationsagent\helper\helper::custom_mtrace("Task finished-> " . time());
+        \local_notificationsagent\helper\helper::custom_mtrace("Task finished-> " . \local_notificationsagent\notificationsagent::now());
         \local_notificationsagent\helper\helper::custom_mtrace("RUNTIME: " . $tasklastrunttime);
     }
 }

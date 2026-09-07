@@ -35,6 +35,7 @@
 namespace notificationscondition_ondates;
 
 use local_notificationsagent\evaluationcontext;
+use local_notificationsagent\notificationsagent;
 use local_notificationsagent\notificationconditionplugin;
 use core_calendar\type_factory;
 
@@ -109,13 +110,13 @@ class ondates extends notificationconditionplugin {
         // Condition.
         if (!$context->is_complementary()) {
             if ($isondates) {
-                return time();
+                return notificationsagent::now();
             } else {
                 if ($timeaccess > $enddate || $enddate < $startdate) {
                     return false;
                 } else if ($startdate < $enddate) {
                     if ($timeaccess >= $startdate) {
-                        return time();
+                        return notificationsagent::now();
                     } else {
                         return $startdate;
                     }
@@ -126,10 +127,10 @@ class ondates extends notificationconditionplugin {
                 return ($enddate + 1);
             } else {
                 if ($enddate < $startdate) {
-                    return time();
+                    return notificationsagent::now();
                 } else if ($startdate < $enddate) {
                     if ($timeaccess < $startdate || $timeaccess > $enddate) {
-                        return time();
+                        return notificationsagent::now();
                     }
                 }
             }

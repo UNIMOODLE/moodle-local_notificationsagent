@@ -109,7 +109,7 @@ final class weekend_crontask_test extends \advanced_testcase {
     public function test_execute($date, $user): void {
         global $DB, $USER;
         $pluginname = weekend::NAME;
-        \uopz_set_return('time', $date);
+        $this->mock_clock_with_frozen($date);
         $dataform = new \StdClass();
         $dataform->title = "Rule Test";
         $dataform->type = 1;
@@ -146,7 +146,6 @@ final class weekend_crontask_test extends \advanced_testcase {
             $this->assertEquals((empty($user) ? self::$user->id : notificationsagent::GENERIC_USERID), $trigger->userid);
         }
 
-        \uopz_unset_return('time');
     }
 
     /**
