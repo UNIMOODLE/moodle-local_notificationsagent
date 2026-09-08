@@ -129,10 +129,6 @@ class activitycompleted extends notificationconditionplugin {
             return notificationsagent::now();
         }
 
-        if (!$iscompleted && $context->is_complementary()) {
-            return notificationsagent::now();
-        }
-
         return $estimate;
     }
 

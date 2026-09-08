@@ -279,7 +279,7 @@ final class activitycompleted_test extends \advanced_testcase {
                 ],
                 'exception. not completed' => [
                         '{"op":"&","c":[{"type":"profile","sf":"firstname","op":"isequalto","v":"Miguel"}],"showc":[true]}',
-                        notificationplugin::COMPLEMENTARY_EXCEPTION, 1704099600, false,
+                        notificationplugin::COMPLEMENTARY_EXCEPTION, null, false,
                 ],
         ];
     }
