@@ -2493,6 +2493,10 @@ class rule {
     public static function get_limit_reached_by_users($courseid, $ruleid, $timesfired, $userids = []) {
         global $DB;
 
+        if (empty($userids)) {
+            return [];
+        }
+
         $cache = \cache::make('local_notificationsagent', 'launched');
         $rulecache = $cache->get($ruleid) ? $cache->get($ruleid) : [];
         $coursecache = $rulecache[$courseid] ?? [];

@@ -1196,4 +1196,17 @@ final class notificationsagent_rule_test extends \advanced_testcase {
         $this->assertNotNull($trigger->ruleoff);
         $this->assertGreaterThan(notificationsagent::now(), (int) $trigger->startdate);
     }
+
+    /**
+     * Empty user ids must not query the launched table.
+     *
+     * @covers \local_notificationsagent\rule::get_limit_reached_by_users
+     */
+    public function test_get_limit_reached_by_users_empty_userids(): void {
+        $result = rule::get_limit_reached_by_users(self::$course->id, 1, 2, []);
+        $this->assertSame([], $result);
+
+        $result = rule::get_limit_reached_by_users(self::$course->id, 1, 2);
+        $this->assertSame([], $result);
+    }
 }
