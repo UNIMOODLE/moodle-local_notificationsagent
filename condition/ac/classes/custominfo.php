@@ -160,9 +160,22 @@ class custominfo extends info {
         $modinfo = $this->get_modinfo();
         $courseid = $modinfo->get_course_id();
 
+        if ($this->availability === '' || $this->availability === null) {
+            return true;
+        }
+
+        $structure = json_decode($this->availability);
+        if (!is_object($structure)) {
+            return false;
+        }
+
+        if (self::is_empty($this->availability)) {
+            return true;
+        }
+
         // Conditions.
         customtree::$customchildren = []; // Empty.
-        $tree = new customtree(json_decode($this->availability));
+        $tree = new customtree($structure);
         $childrens = $tree::$customchildren;
         foreach ($childrens as $child) {
             $type = $child->type; // Completion//grade//group//grouping.
@@ -225,7 +238,12 @@ class custominfo extends info {
     public static function is_empty($availability) {
         $result = true;
         if (!empty($availability)) {
-            $tree = new \core_availability\tree(json_decode($availability));
+            $structure = json_decode($availability);
+            if (!is_object($structure)) {
+                return false;
+            }
+
+            $tree = new \core_availability\tree($structure);
             $children = $tree->get_all_children('core_availability\tree');
             if (!empty($children)) {
                 foreach ($children as $child) {

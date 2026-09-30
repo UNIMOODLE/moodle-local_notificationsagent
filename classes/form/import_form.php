@@ -53,10 +53,7 @@ class import_form extends dynamic_form {
         $filepath = $this->save_temp_file('importfile');
         $file = file_get_contents($filepath);
         $data = json_decode($file, true);
-
-        array_walk_recursive($data, function(&$value) {
-            $value = html_entity_decode(format_text($value, FORMAT_HTML), ENT_QUOTES);
-        });
+        $this->sanitise_import_data($data);
 
         $data = $this->array_to_object($data, 0);
 
@@ -72,6 +69,33 @@ class import_form extends dynamic_form {
             'result' => true,
             'url' => $returnurl->out(false),
         ];
+    }
+
+    /**
+     * Sanitise imported scalar values for display while preserving serialised JSON fields.
+     *
+     * @param array $data Imported rule data
+     */
+    private function sanitise_import_data(array &$data): void {
+        $skipkeys = [
+            editrule_form::FORM_JSON_AC,
+            editrule_form::FORM_JSON_CONDITION,
+            editrule_form::FORM_JSON_EXCEPTION,
+            editrule_form::FORM_JSON_ACTION,
+        ];
+
+        foreach ($data as $key => &$value) {
+            if (is_array($value)) {
+                $this->sanitise_import_data($value);
+                continue;
+            }
+
+            if (!is_string($value) || in_array($key, $skipkeys, true)) {
+                continue;
+            }
+
+            $value = html_entity_decode(format_text($value, FORMAT_HTML), ENT_QUOTES);
+        }
     }
 
     /**

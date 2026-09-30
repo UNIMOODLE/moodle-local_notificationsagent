@@ -364,6 +364,8 @@ final class ac_test extends \advanced_testcase {
                 'Activity completion2' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":100,"e":1}]},
                 {"op":"!|","c":[]}],"showc":[true,true],"errors":["availability:error_list_nochildren"]}',
                         false],
+                'Empty availability' => ['', true],
+                'Invalid availability JSON' => ['{"op":"&","c":[{"op":"&","c":[{"type":"completion","cm":76,"e":1}]},', false],
         ];
     }
 

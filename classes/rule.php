@@ -652,11 +652,13 @@ class rule {
      * @return array
      */
     public function get_conditions_to_evaluate() {
-        if ($this->get_ac() && $this->get_conditions()) {
-            return array_merge($this->get_conditions(), [$this->get_ac()]);
+        $conditions = $this->get_conditions() ?: [];
+
+        if ($this->get_ac()) {
+            $conditions[] = $this->get_ac();
         }
 
-        return !empty($this->get_conditions()) ? $this->get_conditions() : [$this->get_ac()];
+        return $conditions;
     }
 
     /**

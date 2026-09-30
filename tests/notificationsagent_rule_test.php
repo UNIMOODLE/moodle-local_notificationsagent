@@ -354,6 +354,44 @@ final class notificationsagent_rule_test extends \advanced_testcase {
     }
 
     /**
+     * Rules without conditions or access restrictions must not expose a null evaluator.
+     *
+     * @covers \local_notificationsagent\rule::get_conditions_to_evaluate
+     * @covers \local_notificationsagent\rule::validation
+     */
+    public function test_get_conditions_to_evaluate_without_conditions_or_ac(): void {
+        global $DB, $USER;
+
+        $USER->id = self::$user->id;
+        $dataform = new \stdClass();
+        $dataform->title = 'Action only rule';
+        $dataform->type = 1;
+        $dataform->courseid = self::$course->id;
+        $dataform->timesfired = 1;
+        $dataform->runtime_group = [
+            'runtime_days' => 1,
+            'runtime_hours' => 0,
+            'runtime_minutes' => 0,
+        ];
+
+        $ruleid = self::$rule->create($dataform);
+        $DB->insert_record(
+            'notificationsagent_action',
+            [
+                'ruleid' => $ruleid,
+                'type' => 'action',
+                'pluginname' => 'messageagent',
+                'parameters' => '{"title":"Test","message":"Hello"}',
+            ],
+        );
+
+        $instance = rule::create_instance($ruleid);
+
+        $this->assertSame([], $instance->get_conditions_to_evaluate());
+        $this->assertTrue($instance->validation(self::$course->id));
+    }
+
+    /**
      * Testing rule update
      *
      * @param int $timesfired
