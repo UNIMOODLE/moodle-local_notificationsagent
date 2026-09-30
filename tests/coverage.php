@@ -46,7 +46,6 @@ return new class extends phpunit_coverage_info {
     protected $includelistfiles
             = [
                     'editrule.php',
-                    'assignrule.php',
                     'exportrule.php',
                     'importrule.php',
             ];

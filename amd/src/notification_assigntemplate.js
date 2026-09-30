@@ -21,8 +21,9 @@
  */
 
 import {get_string as getString} from 'core/str';
-import Url from 'core/url';
+import Notification from 'core/notification';
 import $ from 'jquery';
+import Repository from 'local_notificationsagent/rule/repository';
 /**
  * Selectors for the Assign Modal.
  *
@@ -156,11 +157,6 @@ export const init = () => {
         'template'
     ];
 
-    const ACTION = [
-        'SHOW_CONTEXT',
-        'SET_CONTEXT',
-    ];
-
     const RULE_FORCED_TYPE = {
         FORCED: 0,
         NONFORCED: 1,
@@ -203,42 +199,31 @@ export const init = () => {
         modal.find('.modal-body .name').text($('#card-' + idtemplate + ' .name').text());
 
         /* Rellenar cursos asignados */
-        $.ajax({
-            type: "POST",
-            url: Url.relativeUrl('/local/notificationsagent/assignrule.php'),
-            data: {
-                ruleid: idtemplate,
-                action: ACTION[0]
-            },
-            success: function(data) {
-                data['category'].forEach((categoryid) => {
-                    let category = $('#assignTemplateModal .category-listing input#checkboxcategory-' + categoryid);
-                    if (category.length) {
-                        category.prop('checked', true);
-                        $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
-                        $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("disabled", true);
-                        $('#listitem-category-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
-                    }
-                });
+        Repository.getAssignedContexts(parseInt(idtemplate)).then((data) => {
+            if (showWarnings(data.warnings)) {
+                return;
+            }
+            data['category'].forEach((categoryid) => {
+                let category = $('#assignTemplateModal .category-listing input#checkboxcategory-' + categoryid);
+                if (category.length) {
+                    category.prop('checked', true);
+                    $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
+                    $('#category-listing-content-' + categoryid + ' input[type="checkbox"]').prop("disabled", true);
+                    $('#listitem-category-' + categoryid + ' input[type="checkbox"]').prop("checked", true);
+                }
+            });
 
-                data['course'].forEach((courseid) => {
-                    let course = $('#assignTemplateModal .category-listing input#checkboxcourse-' + courseid);
-                    if (course.length) {
-                        course.prop('checked', true);
-                    }
-                });
+            data['course'].forEach((courseid) => {
+                let course = $('#assignTemplateModal .category-listing input#checkboxcourse-' + courseid);
+                if (course.length) {
+                    course.prop('checked', true);
+                }
+            });
 
-                // After displaying the selected info, display the count of selected items.
-                getCountAll();
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                /* eslint-disable no-console */
-                console.log("Status: " + textStatus);
-                console.log(errorThrown);
-                /* eslint-enable no-console */
-            },
-            dataType: 'json'
-        });
+            // After displaying the selected info, display the count of selected items.
+            getCountAll();
+            return;
+        }).catch(Notification.exception);
     });
     $('#assignTemplateModal').on('hide.bs.modal', function() {
         $('#assignTemplateModal .custom-control-input').prop('checked', false);
@@ -324,29 +309,35 @@ export const init = () => {
             });
         }
 
-        $.ajax({
-            type: "POST",
-            url: Url.relativeUrl('/local/notificationsagent/assignrule.php'),
-            data: {
-                ruleid: idtemplate,
-                category: data['category'],
-                course: data['course'],
-                forced: forced,
-                action: ACTION[1]
-            },
-            success: function() {
+        Repository.setAssignedContexts(
+            parseInt(idtemplate),
+            data['category'].map((id) => parseInt(id)),
+            data['course'].map((id) => parseInt(id)),
+            forced
+        ).then((response) => {
+            if (!showWarnings(response.warnings)) {
                 window.location.reload();
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                /* eslint-disable no-console */
-                console.log("Status: " + textStatus);
-                console.log(errorThrown);
-                /* eslint-enable no-console */
-            },
-            dataType: 'json'
-        });
+            }
+            return;
+        }).catch(Notification.exception);
 
     });
+
+    /**
+     * Show the warnings returned by a web service.
+     *
+     * @param {Array} warnings
+     * @returns {boolean} Whether there were warnings
+     */
+    const showWarnings = (warnings) => {
+        if (!warnings || !warnings.length) {
+            return false;
+        }
+        warnings.forEach((warning) => {
+            Notification.addNotification({message: warning.message, type: 'error'});
+        });
+        return true;
+    };
 
     /**
      * Reset default checkboxes.

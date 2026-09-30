@@ -143,8 +143,47 @@ const saveOrderSession = (sessionname, orderid, courseid) => {
     return Ajax.call([request])[0];
 };
 
+/**
+ * Get the categories and courses a rule is assigned to
+ *
+ * @param {Number} ruleid The rule ID.
+ * @returns {object} jQuery promise
+ */
+const getAssignedContexts = (ruleid) => {
+    const request = {
+        methodname: 'local_notificationsagent_get_rule_assigned_contexts',
+        args: {
+            ruleid,
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
+/**
+ * Assign a rule to categories and courses
+ *
+ * @param {Number} ruleid The rule ID.
+ * @param {Number[]} categories The category IDs.
+ * @param {Number[]} courses The course IDs.
+ * @param {Number} forced The forced value.
+ * @returns {object} jQuery promise
+ */
+const setAssignedContexts = (ruleid, categories, courses, forced) => {
+    const request = {
+        methodname: 'local_notificationsagent_set_rule_assigned_contexts',
+        args: {
+            ruleid,
+            categories,
+            courses,
+            forced,
+        }
+    };
+    return Ajax.call([request])[0];
+};
+
 export default {
     updateRuleStatus, deleteRule, updateRuleShare,
     shareAllRule, unshareAllRule,
-    checkRuleContext, saveOrderSession
+    checkRuleContext, saveOrderSession,
+    getAssignedContexts, setAssignedContexts
 };

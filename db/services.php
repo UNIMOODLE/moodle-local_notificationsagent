@@ -91,5 +91,21 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/notificationsagent:managesessions',
     ],
+    'local_notificationsagent_get_rule_assigned_contexts' => [
+        'classname' => \local_notificationsagent\external\get_rule_assigned_contexts::class,
+        'method' => 'execute',
+        'description' => 'Get the categories and courses a rule is assigned to',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/notificationsagent:assignrule',
+    ],
+    'local_notificationsagent_set_rule_assigned_contexts' => [
+        'classname' => \local_notificationsagent\external\set_rule_assigned_contexts::class,
+        'method' => 'execute',
+        'description' => 'Assign a rule to categories and courses',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/notificationsagent:assignrule',
+    ],
 
 ];
