@@ -108,44 +108,29 @@ abstract class notificationactionplugin extends notificationplugin {
      * @param bool $showuserplaceholders
      */
     public function placeholders($mform, $type, $showuserplaceholders) {
+        global $OUTPUT;
+
         $id = $this->get_id();
-        $placeholders = \html_writer::start_tag(
-            'div',
-            ["id" => "fgroup_id_" . $id . "_" . $this->get_subtype() . "_placeholders", "class" => "form-group row fitem"]
-        );
-        $placeholders .= \html_writer::start_tag('div', ["class" => "col-md-12"]);
-        $placeholders .= \html_writer::start_tag(
-            'div',
-            ["class" => "notificationvars", "id" => "notificationvars_" . $id . "_" . $type]
-        );
+        $placeholders = [];
         foreach (rule::get_placeholders($showuserplaceholders) as $option) {
-            $clipboardtargetid = "notificationvars_" . $id . "_" . $type . "_" . $option;
-            $placeholdercodeelement = \html_writer::tag('span',
-            '{' . $option . '}',
-                 [
-                    'id' => $clipboardtargetid,
-                    'style' => 'display: none;',
-                ]);
-            $placeholdername = get_string(
-                $option == rule::SEPARATOR ? 'placeholder_Separator' : 'placeholder_' . $option,
-                'local_notificationsagent');
-            $placeholders .= \html_writer::tag(
-                'button',
-                $placeholdername . $placeholdercodeelement,
-                [
-                            "id" => $clipboardtargetid . 'button',
-                            "class" => "badge  badge-placeholder",
-                            "data-action" => "copytoclipboard",
-                            "data-clipboard-target" => '#' . $clipboardtargetid,
-                    ]
-            );
-
+            $placeholders[] = [
+                'targetid' => "notificationvars_" . $id . "_" . $type . "_" . $option,
+                'name' => get_string(
+                    $option == rule::SEPARATOR ? 'placeholder_Separator' : 'placeholder_' . $option,
+                    'local_notificationsagent'
+                ),
+                'code' => '{' . $option . '}',
+            ];
         }
-        $placeholders .= \html_writer::end_tag('div');
-        $placeholders .= \html_writer::end_tag('div');
-        $placeholders .= \html_writer::end_tag('div');
 
-        $group = $mform->createElement('html', $placeholders);
+        $html = $OUTPUT->render_from_template('local_notificationsagent/editrule/placeholders', [
+            'id' => $id,
+            'subtype' => $this->get_subtype(),
+            'type' => $type,
+            'placeholders' => $placeholders,
+        ]);
+
+        $group = $mform->createElement('html', $html);
 
         $mform->insertElementBefore($group, 'new' . $type . '_group');
     }

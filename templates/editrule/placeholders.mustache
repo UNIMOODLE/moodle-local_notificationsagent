@@ -1,0 +1,72 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+    Project implemented by the \"Recovery, Transformation and Resilience Plan.
+    Funded by the European Union - Next GenerationEU\".
+
+    Produced by the UNIMOODLE University Group: Universities of
+    Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+    Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+    @package    local_notificationsagent
+    @copyright  2023 Proyecto UNIMOODLE
+    @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+    @author     ISYC <soporte@isyc.com>
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{!
+    @template local_notificationsagent/editrule/placeholders
+
+    Placeholders that can be copied into the fields of an action.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-action="copytoclipboard" and data-clipboard-target are used by core/copy_to_clipboard.
+
+    Context variables required for this template:
+    * id - Subplugin id
+    * subtype - Subplugin name
+    * type - Subplugin type
+    * placeholders - List of placeholders
+        * targetid - Id of the element with the placeholder code
+        * name - Placeholder name
+        * code - Placeholder code
+
+    Example context (json):
+    {
+        "id": 5,
+        "subtype": "messageagent",
+        "type": "action",
+        "placeholders": [
+            {
+                "targetid": "notificationvars_5_action_Course_FullName",
+                "name": "Course full name",
+                "code": "{Course_FullName}"
+            }
+        ]
+    }
+}}
+<div id="fgroup_id_{{id}}_{{subtype}}_placeholders" class="form-group row fitem">
+    <div class="col-md-12">
+        <div class="notificationvars" id="notificationvars_{{id}}_{{type}}">
+            {{#placeholders}}
+                <button id="{{targetid}}button" class="badge  badge-placeholder" data-action="copytoclipboard" data-clipboard-target="#{{targetid}}">{{{name}}}<span id="{{targetid}}" style="display: none;">{{code}}</span></button>
+            {{/placeholders}}
+        </div>
+    </div>
+</div>

@@ -33,7 +33,6 @@
  */
 
 require(__DIR__ . '/../../config.php');
-require_once(__DIR__ . '/renderer.php');
 require_once(__DIR__ ."/../../lib/modinfolib.php");
 require_once(__DIR__ ."/lib.php");
 
@@ -122,6 +121,7 @@ $PAGE->navbar->add(
     new moodle_url('/local/notificationsagent/editrule.php', ['courseid' => $courseid])
 );
 $PAGE->requires->js_call_amd('core/copy_to_clipboard');
+$PAGE->requires->js_call_amd('local_notificationsagent/notification_tabs', 'initTabTarget');
 $PAGE->requires->js_call_amd(
     'local_notificationsagent/notification_tabs',
     'init',

@@ -34,7 +34,6 @@
 
 namespace local_notificationsagent\helper;
 
-use html_writer;
 use moodle_url;
 use local_notificationsagent\rule;
 
@@ -236,99 +235,9 @@ class helper {
      * @return string
      */
     public static function build_output_categories($arraycategories, $categoryid = 0) {
-        $output = "";
-        foreach ($arraycategories as $key => $category) {
-            $output .= html_writer::start_tag("li", [
-                    "id" => "listitem-category-" . $category["id"],
-                    "class" => "listitem listitem-category list-group-item list-group-item-action collapsed",
-            ]);
-            $output .= html_writer::start_div("", ["class" => "category-listing-header d-flex"]);
-            $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-            $output .= html_writer::tag("input", "", [
-                    "id" => "checkboxcategory-" . $category["id"],
-                    "type" => "checkbox", "class" => "custom-control-input",
-                    "data-parent" => "#category-listing-content-" . $categoryid,
-                    "data-category" => $category["id"],
-            ]);
-            $output .= html_writer::tag(
-                "label",
-                "",
-                ["class" => "custom-control-label", "for" => "checkboxcategory-" . $category["id"]]
-            );
-            $output .= html_writer::end_div(); // ... .custom-checkbox
-            $output .= html_writer::start_div("", [
-                    "class" => "d-flex px-0", "data-toggle" => "collapse",
-                    "data-target" => "#category-listing-content-" . $category["id"],
-                    "aria-controls" => "category-listing-content-" . $category["id"],
-            ]);
-            $output .= html_writer::start_div("", ["class" => "categoryname d-flex align-items-center"]);
-            $output .= $category["name"];
-            $output .= html_writer::tag("i", "", ["class" => "fa fa-angle-down ml-2"]);
-            $output .= html_writer::end_div(); // ....categoryname
-            $output .= html_writer::end_div(); // ... .data-toggle
-            $output .= html_writer::span(
-                "",
-                "",
-                ["id" => "selected-info-" . $category["id"], "class" => "bg-primary"]
-            );
-            $output .= html_writer::start_div("", ["class" => "ml-auto px-0"]);
-            $output .= html_writer::start_tag("span", ["class" => "course-count text-muted"]);
-            $output .= $category["countsubcategoriescourses"];
-            $output .= html_writer::tag("i", "", ["class" => "fa fa-graduation-cap fa-fw ml-2"]);
-            $output .= html_writer::end_tag("span"); // ... .course-count
-            $output .= html_writer::end_div(); // ... .col-auto
-            $output .= html_writer::end_div(); // ... .d-flex
-            $output .= html_writer::start_tag("ul", [
-                    "id" => "category-listing-content-" . $category["id"],
-                    "class" => "collapse", "data-parent" => "#category-listing-content-" . $categoryid,
-            ]);
-            if (!empty($category['courses'])) {
-                $output .= html_writer::link(
-                    "#",
-                    get_string("assignselectcourses", "local_notificationsagent"),
-                    ["id" => "select-all-" . $category["id"],
-                    "data-category" => $category["id"], "data-forceselected" => "false"]
-                );
-            }
-            if (!empty($category["categories"])) {
-                $output .= self::build_output_categories($category["categories"], $category["id"]);
-            }
-            if (!empty($category["courses"])) {
-                foreach ($category["courses"] as $key => $course) {
-                    $output .= html_writer::start_tag("li", [
-                            "id" => "listitem-course-" . $course["id"],
-                            "class" => "listitem listitem-course list-group-item list-group-item-action",
-                    ]);
-                    $output .= html_writer::start_div("", ["class" => "d-flex"]);
-                    $output .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-                    $output .= html_writer::tag(
-                        "input",
-                        "",
-                        [
-                                    "id" => "checkboxcourse-" . $course["id"],
-                                    "type" => "checkbox", "class" => "custom-control-input",
-                                    "data-parent" => "#category-listing-content-" . $category["id"],
-                                    "data-category" => $category["id"],
-                            ]
-                    );
-                    $output .= html_writer::tag(
-                        "label",
-                        "",
-                        ["class" => "custom-control-label", "for" => "checkboxcourse-" . $course["id"]]
-                    );
-                    $output .= html_writer::end_div(); // ... .custom-checkbox
-                    $output .= html_writer::start_div("", ["class" => "coursename"]);
-                    $output .= $course["name"];
-                    $output .= html_writer::end_div(); // ... .coursename
-                    $output .= html_writer::end_div(); // ... .d-flex
-                    $output .= html_writer::end_tag("li");
-                    // ... .listitem.listitem-course.list-group-item.list-group-item-action
-                }
-            }
-            $output .= html_writer::end_tag("ul"); // ... #category-listing-content-x
-            $output .= html_writer::end_tag("li"); // ... .listitem.listitem-category.list-group-item
-        }
-        return $output;
+        global $PAGE;
+
+        return $PAGE->get_renderer('local_notificationsagent')->category_items($arraycategories, (int) $categoryid);
     }
 
     /**

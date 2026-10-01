@@ -22,6 +22,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
+import Templates from 'core/templates';
 import $ from 'jquery';
 import Repository from 'local_notificationsagent/rule/repository';
 /**
@@ -172,23 +173,16 @@ export const init = () => {
 
         var button = $(event.relatedTarget);
         idtemplate = button.data('idtemplate');
-        var isRuleForced;
-        var htmlRuleForced;
-
         let ruleCard = $('div[id="card-' + idtemplate + '"]');
         $('#assignTemplateModal #forced-content').empty();
         if (ruleCard.data('type') === RULE_TYPE[0]) {
-            isRuleForced = ruleCard.data('forced');
-            getString('assignforced', 'local_notificationsagent').then(forcedRule => {
-                htmlRuleForced = '<div class="custom-control custom-checkbox mr-1">';
-                htmlRuleForced += '<input id="forced" type="checkbox" class="custom-control-input">';
-                htmlRuleForced += '<label class="custom-control-label" for="forced">' + forcedRule + '</label>';
-                htmlRuleForced += '</div>';
-                $('#assignTemplateModal #forced-content').append(htmlRuleForced);
-                if (!isRuleForced) {
-                    $('#assignTemplateModal #forced-content #forced').prop('checked', true);
-                }
-            });
+            const isRuleForced = ruleCard.data('forced');
+            Templates.renderForPromise('local_notificationsagent/assign/forced_checkbox', {checked: !isRuleForced})
+                .then(({html, js}) => {
+                    Templates.appendNodeContents('#assignTemplateModal #forced-content', html, js);
+                    return;
+                })
+                .catch(Notification.exception);
         }
 
         var modal = $(this);

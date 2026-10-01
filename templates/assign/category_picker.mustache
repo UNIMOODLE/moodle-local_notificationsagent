@@ -1,0 +1,83 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+    Project implemented by the \"Recovery, Transformation and Resilience Plan.
+    Funded by the European Union - Next GenerationEU\".
+
+    Produced by the UNIMOODLE University Group: Universities of
+    Valladolid, Complutense de Madrid, UPV/EHU, León, Salamanca,
+    Illes Balears, Valencia, Rey Juan Carlos, La Laguna, Zaragoza, Málaga,
+    Córdoba, Extremadura, Vigo, Las Palmas de Gran Canaria y Burgos.
+
+    @package    local_notificationsagent
+    @copyright  2023 Proyecto UNIMOODLE
+    @author     UNIMOODLE Group (Coordinator) <direccion.area.estrategia.digital@uva.es>
+    @author     ISYC <soporte@isyc.com>
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{!
+    @template local_notificationsagent/assign/category_picker
+
+    Category and course picker of the assignment modal.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-parent, data-category and data-forceselected are used by notification_assigntemplate.
+
+    Context variables required for this template:
+    * categories - Top level categories, see local_notificationsagent/assign/category_item
+
+    Example context (json):
+    {
+        "categories": [
+            {
+                "id": 1,
+                "name": "Category",
+                "parentid": 0,
+                "countsubcategoriescourses": 1,
+                "hascourses": true,
+                "courses": [
+                    {"id": 2, "name": "Course", "categoryid": 1}
+                ],
+                "categories": []
+            }
+        ]
+    }
+}}
+<div class="course-category-listing">
+    <div class="header-listing">
+        <div class="d-flex">
+            <div class="custom-control custom-checkbox mr-1">
+                <input id="course-category-select-all" type="checkbox" class="custom-control-input">
+                <label class="custom-control-label" for="course-category-select-all"></label>
+            </div>
+            <div class="col px-0 d-flex">
+                <div class="header-categoryname">{{#str}}name, core{{/str}}</div>
+            </div>
+            <div class="col-auto px-0 d-flex">
+                <div class="header-countcourses">{{#str}}courses, core{{/str}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="category-listing">
+        <ul id="category-listing-content-0" class="m-0 pl-0">
+            {{#categories}}
+                {{> local_notificationsagent/assign/category_item }}
+            {{/categories}}
+        </ul>
+    </div>
+</div>

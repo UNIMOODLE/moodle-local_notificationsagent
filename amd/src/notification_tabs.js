@@ -43,6 +43,23 @@ export const init = (idButton, idSelect) => {
 };
 
 /**
+ * Keep the selected tab in the tab-target field so it is restored when the form is reloaded.
+ */
+export const initTabTarget = () => {
+    const nav = document.getElementById('nav-tab');
+    const tabtarget = document.querySelector('input[name="tab-target"]');
+    if (!nav || !tabtarget) {
+        return;
+    }
+    nav.addEventListener('click', (e) => {
+        const tab = e.target.closest('[role="tab"]');
+        if (tab && tab.id) {
+            tabtarget.value = tab.id;
+        }
+    });
+};
+
+/**
  * Remove initialisation.
  * @param {String} removeSpan The span selector.
  * @param {String} submitRemove The button name.

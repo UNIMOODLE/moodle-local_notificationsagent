@@ -429,77 +429,38 @@ class editrule_form extends \moodleform {
         $render = $PAGE->get_renderer('local_notificationsagent');
         $mform->addElement('html', $render->tabnav($tabtarget));
 
-        $mform->addElement(
-            'html',
-            '
-            <div class="tab-content" id="nav-tabContent">
-        '
-        );
-        $mform->addElement(
-            'html',
-            '
-            <div>
-        '
-        );
+        // The wrappers open and close around form elements, so they cannot be a single template.
+        $mform->addElement('html', \html_writer::start_div('tab-content', ['id' => 'nav-tabContent']));
+        $mform->addElement('html', \html_writer::start_div());
         $this->settabcontentavailability();
-        $mform->addElement(
-            'html',
-            '
-            </div>
-        '
-        );
+        $mform->addElement('html', \html_writer::end_div());
 
-        $classnabdefault = "tab-pane fade";
-        $classnavconditions = ($tabtarget == 'nav-conditions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
-        $classnavexceptions = ($tabtarget == 'nav-exceptions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
-        $classnavactions = ($tabtarget == 'nav-actions-tab') ? $classnabdefault . ' show active' : $classnabdefault;
-        $mform->addElement(
-            'html',
-            '
-            <div class="' . $classnavconditions . '" id="nav-conditions" role="tabpanel" aria-labelledby="nav-conditions-tab">
-        '
-        );
-
+        $mform->addElement('html', $this->start_tabpane('nav-conditions', $tabtarget));
         $this->settabcontent(notificationplugin::TYPE_CONDITION);
-
-        $mform->addElement(
-            'html',
-            '
-            </div>
-            <div class="' . $classnavexceptions . '" id="nav-exceptions" role="tabpanel" aria-labelledby="nav-exceptions-tab">
-        '
-        );
-
+        $mform->addElement('html', \html_writer::end_div() . $this->start_tabpane('nav-exceptions', $tabtarget));
         $this->settabcontent(notificationplugin::TYPE_EXCEPTION);
-
-        $mform->addElement(
-            'html',
-            '
-            </div>
-            <div class="' . $classnavactions . '" id="nav-actions" role="tabpanel" aria-labelledby="nav-actions-tab">
-        '
-        );
-
+        $mform->addElement('html', \html_writer::end_div() . $this->start_tabpane('nav-actions', $tabtarget));
         $this->settabcontent(notificationplugin::TYPE_ACTION);
 
         // Core_availability conditions.
-        $mform->addElement(
-            'html',
-            '
-            </div>
-            <div id="nav-ac">
-            '
-        );
-
-        $mform->addElement(
-            'html',
-            '
-            </div>
-        </div>
-        '
-        );
+        $mform->addElement('html', \html_writer::end_div() . \html_writer::start_div('', ['id' => 'nav-ac']));
+        $mform->addElement('html', \html_writer::end_div() . \html_writer::end_div());
 
         $mform->addGroup($this->actionbuttons, 'buttonar', '', [' '], false);
+        $mform->addElement('html', $render->evaluation_help());
+    }
+
+    /**
+     * Opening tag of a tab pane.
+     *
+     * @param string $id Tab pane id
+     * @param string $tabtarget Id of the active tab
+     *
+     * @return string
+     */
+    private function start_tabpane(string $id, $tabtarget): string {
+        $class = 'tab-pane fade' . ($tabtarget == $id . '-tab' ? ' show active' : '');
+        return \html_writer::start_div($class, ['id' => $id, 'role' => 'tabpanel', 'aria-labelledby' => $id . '-tab']);
     }
 
     /**

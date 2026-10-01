@@ -33,11 +33,11 @@
  */
 
 require(__DIR__ . '/../../config.php');
-require_once(__DIR__ . '/renderer.php');
 require_once(__DIR__ ."/../../lib/modinfolib.php");
 require_once(__DIR__ ."/lib.php");
 
 use local_notificationsagent\helper\helper;
+use local_notificationsagent\output\category_picker;
 use local_notificationsagent\rule;
 use local_notificationsagent\notificationplugin;
 
@@ -121,7 +121,6 @@ if ($statusmsg !== '') {
     \core\notification::success(get_string($statusmsg, 'local_notificationsagent'));
 }
 
-$renderer = $PAGE->get_renderer('core');
 $templatecontext = [
         "courseid" => $courseid,
 ];
@@ -287,38 +286,8 @@ foreach ($categoriesall as $cat) {
 }
 
 if (!empty($categoryarray)) {
-    $outputcategories = html_writer::start_div("", ["class" => "course-category-listing"]);
-    $outputcategories .= html_writer::start_div("", ["class" => "header-listing"]);
-    $outputcategories .= html_writer::start_div("", ["class" => "d-flex"]);
-    $outputcategories .= html_writer::start_div("", ["class" => "custom-control custom-checkbox mr-1"]);
-    $outputcategories .= html_writer::tag(
-        "input",
-        "",
-        ["id" => "course-category-select-all", "type" => "checkbox", "class" => "custom-control-input"]
-    );
-    $outputcategories .= html_writer::tag("label", "", ["class" => "custom-control-label", "for" => "course-category-select-all"]);
-    $outputcategories .= html_writer::end_div(); // ... .custom-checkbox
-    $outputcategories .= html_writer::start_div("", ["class" => "col px-0 d-flex"]);
-    $outputcategories .= html_writer::start_div("", ["class" => "header-categoryname"]);
-    $outputcategories .= get_string('name', 'core');
-    $outputcategories .= html_writer::end_div(); // ...... .header-categoryname
-    $outputcategories .= html_writer::end_div(); // ... .col
-    $outputcategories .= html_writer::start_div("", ["class" => "col-auto px-0 d-flex"]);
-    $outputcategories .= html_writer::start_div("", ["class" => "header-countcourses"]);
-    $outputcategories .= get_string('courses', 'core');
-    $outputcategories .= html_writer::end_div(); // ... .header-countcourses
-    $outputcategories .= html_writer::end_div(); // ... .col-auto
-    $outputcategories .= html_writer::end_div(); // ... .d-flex
-    $outputcategories .= html_writer::end_div(); // ... .header-listing
-    $outputcategories .= html_writer::start_div("", ["class" => "category-listing"]);
-    $outputcategories .= html_writer::start_tag("ul", ["id" => "category-listing-content-0", "class" => "m-0 pl-0"]);
-    $outputcategories .= helper::build_output_categories($categoryarray);
-    $outputcategories .= html_writer::end_tag("ul"); // ... #category-listing-content-0
-    $outputcategories .= html_writer::end_div(); // ... .category-listing
-    $outputcategories .= html_writer::end_div(); // ... .course-category-listing
-
-    $templatecontext['output_categoriescourses'] = $outputcategories;
+    $templatecontext['output_categoriescourses'] = $output->render(new category_picker($categoryarray));
 }
-echo $renderer->render_from_template('local_notificationsagent/index', $templatecontext);
+echo $output->render_from_template('local_notificationsagent/index', $templatecontext);
 
 echo $output->footer();

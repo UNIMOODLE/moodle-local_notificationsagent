@@ -33,7 +33,6 @@
  */
 
 require(__DIR__ . '/../../config.php');
-require_once(__DIR__ . '/renderer.php');
 require_once(__DIR__ ."/../../lib/modinfolib.php");
 require_once(__DIR__ ."/lib.php");
 
@@ -89,7 +88,6 @@ $output = $PAGE->get_renderer('local_notificationsagent');
 
 echo $output->header();
 
-$renderer = $PAGE->get_renderer('core');
 $templatecontext = [
     "courseid" => $courseid,
 ];
@@ -192,6 +190,6 @@ foreach ($rules as $rule) {
 $templatecontext['rulecontent'] = $rulecontent;
 $templatecontext['capabilities']['create'] = has_capability('local/notificationsagent:createrule', $context);
 
-echo $renderer->render_from_template('local_notificationsagent/assign', $templatecontext);
+echo $output->render_from_template('local_notificationsagent/assign', $templatecontext);
 
 echo $output->footer();

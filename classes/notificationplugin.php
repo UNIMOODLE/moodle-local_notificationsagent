@@ -276,11 +276,13 @@ abstract class notificationplugin {
      * @param string $type The type of the notification plugin, used to build the class attribute.
      */
     protected function get_ui_title($mform, $type) {
-        $title = \html_writer::start_tag('h5');
-        $title .= $this->get_title();
-        $class = 'remove-' . $type . '-span';
-        $title .= \html_writer::span('', 'btn icon fa fa-trash align-top ' . $class, ['id' => $this->get_id()]);
-        $title .= \html_writer::end_tag('h5');
+        global $OUTPUT;
+
+        $title = $OUTPUT->render_from_template('local_notificationsagent/editrule/subplugin_title', [
+            'id' => $this->get_id(),
+            'type' => $type,
+            'title' => $this->get_title(),
+        ]);
         $titleelement = $mform->createElement('html', $title);
         $mform->insertElementBefore($titleelement, 'new' . $type . '_group');
     }
