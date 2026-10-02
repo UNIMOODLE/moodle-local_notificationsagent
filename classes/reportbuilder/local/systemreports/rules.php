@@ -50,6 +50,7 @@ class rules extends system_report {
 
         $narralias = $ruleentity->get_table_alias('notificationsagent_report');
         $this->set_main_table('notificationsagent_report', $narralias);
+        $this->add_security_conditions($narralias);
         $this->add_entity($ruleentity);
 
         $coursentity = new course();
@@ -60,6 +61,43 @@ class rules extends system_report {
         $this->add_columns();
         $this->add_filters();
         $this->set_downloadable(true);
+    }
+
+    /**
+     * Restrict the report rows to the context course and, without full view capability, to the current user
+     *
+     * Filters can be changed or reset by the user, so access restrictions must be applied as base conditions.
+     *
+     * @param string $narralias Alias of the notificationsagent_report table
+     */
+    private function add_security_conditions(string $narralias): void {
+        global $USER;
+
+        $context = $this->get_context();
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            $this->add_base_condition_simple("{$narralias}.courseid", $context->instanceid);
+        }
+
+        if (!$this->can_view_all()) {
+            $this->add_base_condition_simple("{$narralias}.userid", $USER->id);
+        }
+    }
+
+    /**
+     * Whether the current user can see the rows of every user in the report context
+     *
+     * @return bool
+     */
+    private function can_view_all(): bool {
+        $context = $this->get_context();
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            return has_any_capability(
+                ['local/notificationsagent:viewcourserule', 'local/notificationsagent:manageallrule'],
+                $context
+            );
+        }
+
+        return has_capability('local/notificationsagent:manageallrule', $context);
     }
 
     /**
@@ -101,13 +139,16 @@ class rules extends system_report {
      *
      */
     protected function add_filters(): void {
-        $filters = [
-                'rule:rulename',
-                'course:courseselector',
-                'rule:userfullname',
-                'rule:actiondetail',
-                'rule:timestamp',
-        ];
+        $filters = ['rule:rulename'];
+        if ($this->get_context()->contextlevel != CONTEXT_COURSE) {
+            $filters[] = 'course:courseselector';
+        }
+        if ($this->can_view_all()) {
+            $filters[] = 'rule:userfullname';
+        }
+        $filters[] = 'rule:actiondetail';
+        $filters[] = 'rule:timestamp';
+
         $this->add_filters_from_entities($filters);
     }
 }
