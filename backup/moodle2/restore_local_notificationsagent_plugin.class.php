@@ -81,6 +81,12 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule($data) {
         global $DB;
 
+        // Backups made with users keep the flag. Restoring without users drops student rules.
+        // Older backups have no flag and are restored as they were.
+        if (!empty($data['isstudentrule']) && empty($this->get_setting_value('users'))) {
+            return;
+        }
+
         $ispauseafterrestore = get_config('local_notificationsagent', 'pauseafterrestore');
 
         $record = new \stdClass();
@@ -111,8 +117,13 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_context($data) {
         global $DB;
 
+        $ruleid = $this->get_restored_ruleid($data['ruleid']);
+        if (empty($ruleid)) {
+            return;
+        }
+
         $record = new \stdClass();
-        $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+        $record->ruleid = $ruleid;
         $record->contextid = $data['contextid'];
         if ($this->task->get_courseid() == SITEID) {
             $record->objectid = $data['objectid'];
@@ -133,8 +144,13 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_condition($data) {
         global $DB;
 
+        $ruleid = $this->get_restored_ruleid($data['ruleid']);
+        if (empty($ruleid)) {
+            return;
+        }
+
         $record = new \stdClass();
-        $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+        $record->ruleid = $ruleid;
         $record->pluginname = $data['pluginname'];
         $record->type = $data['type'];
         $record->parameters = $data['parameters'];
@@ -157,8 +173,13 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
     public function process_local_notificationsagent_rule_action($data) {
         global $DB;
 
+        $ruleid = $this->get_restored_ruleid($data['ruleid']);
+        if (empty($ruleid)) {
+            return;
+        }
+
         $record = new \stdClass();
-        $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+        $record->ruleid = $ruleid;
         $record->pluginname = $data['pluginname'];
         $record->type = $data['type'];
         $record->parameters = $data['parameters'];
@@ -180,8 +201,13 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         // Only import the history of rules launched if the source and target course is the same.
         if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
+            $ruleid = $this->get_restored_ruleid($data['ruleid']);
+            if (empty($ruleid)) {
+                return;
+            }
+
             $record = new \stdClass();
-            $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+            $record->ruleid = $ruleid;
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
             $record->userid = $data['userid'];
             $record->timesfired = $data['timesfired'];
@@ -204,8 +230,13 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
         // Only import the history of report records if the source and target course is the same.
         if ($this->task->get_old_courseid() == $this->task->get_courseid()) {
+            $ruleid = $this->get_restored_ruleid($data['ruleid']);
+            if (empty($ruleid)) {
+                return;
+            }
+
             $record = new \stdClass();
-            $record->ruleid = $this->get_mappingid('notificationsagent_rule', $data['ruleid']);
+            $record->ruleid = $ruleid;
             $record->userid = $data['userid'];
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
             $record->actionid = $this->get_mappingid('notificationsagent_action', $data['actionid']);
@@ -319,5 +350,15 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         }
 
         \local_notificationsagent\notificationsagent::invalidate_conditions_cache();
+    }
+
+    /**
+     * New rule id, or 0 when that rule was not restored.
+     *
+     * @param int $oldruleid Rule id in the backup
+     * @return int
+     */
+    private function get_restored_ruleid($oldruleid): int {
+        return (int) $this->get_mappingid('notificationsagent_rule', $oldruleid);
     }
 }

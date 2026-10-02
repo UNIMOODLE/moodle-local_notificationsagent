@@ -53,7 +53,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
 
         $rule = new backup_nested_element('rule', ['id'], [
                 'name', 'description', 'status', 'createdby', 'createdat', 'shared',
-                'defaultrule', 'template', 'forced', 'timesfired', 'runtime',
+                'defaultrule', 'template', 'forced', 'timesfired', 'runtime', 'isstudentrule',
         ]);
         $rules->add_child($rule);
 
@@ -92,19 +92,8 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
         ]);
         $reports->add_child($report);
 
-        // Rule source.
-        $rule->set_source_sql(
-            '
-            SELECT nr.*
-              FROM {notificationsagent_rule} nr
-              JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
-               AND nctx.contextid = ?
-             WHERE nctx.objectid = ?
-        ',
-            [
-                        backup_helper::is_sqlparam(CONTEXT_COURSE), backup::VAR_COURSEID,
-                ]
-        );
+        // Calculated here, once settings such as "users" are already applied.
+        $rule->set_source_array($this->get_rules_to_backup());
 
         // If it's the site context, we need to back up rules with course and category context.
         if ($this->task->get_courseid() == SITEID) {
@@ -206,5 +195,47 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
         );
 
         return $plugin;
+    }
+
+    /**
+     * Rules of the course, flagged when the creator cannot manage course rules.
+     *
+     * Those rules belong to students. Course copy does not include participants,
+     * so they are left out unless the backup includes users.
+     *
+     * @return \stdClass[]
+     */
+    private function get_rules_to_backup(): array {
+        global $DB;
+
+        $courseid = $this->task->get_courseid();
+        $rules = $DB->get_records_sql(
+            "SELECT nr.*
+               FROM {notificationsagent_rule} nr
+               JOIN {notificationsagent_context} nctx ON nr.id = nctx.ruleid
+                AND nctx.contextid = :contextid
+              WHERE nctx.objectid = :courseid",
+            [
+                'contextid' => CONTEXT_COURSE,
+                'courseid' => $courseid,
+            ]
+        );
+
+        $includeusers = !empty($this->get_setting_value('users'));
+        $context = \context_course::instance($courseid);
+        $result = [];
+        foreach ($rules as $rule) {
+            $rule->isstudentrule = (int) !has_capability(
+                'local/notificationsagent:managecourserule',
+                $context,
+                $rule->createdby
+            );
+            if (!$includeusers && $rule->isstudentrule) {
+                continue;
+            }
+            $result[] = $rule;
+        }
+
+        return $result;
     }
 }
