@@ -93,7 +93,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
         $record->name = $data['name'];
         $record->description = $data['description'];
         $record->status = $ispauseafterrestore ? \local_notificationsagent\rule::PAUSE_RULE : $data['status'];
-        $record->createdby = $data['createdby'];
+        $record->createdby = $this->map_userid((int) $data['createdby']);
         $record->createdat = $data['createdat'];
         $record->shared = $data['shared'];
         $record->defaultrule = $data['defaultrule'];
@@ -209,7 +209,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
             $record = new \stdClass();
             $record->ruleid = $ruleid;
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
-            $record->userid = $data['userid'];
+            $record->userid = $this->map_userid((int) $data['userid']);
             $record->timesfired = $data['timesfired'];
             $record->timecreated = $data['timecreated'];
             $record->timemodified = $data['timemodified'];
@@ -237,7 +237,7 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
 
             $record = new \stdClass();
             $record->ruleid = $ruleid;
-            $record->userid = $data['userid'];
+            $record->userid = $this->map_userid((int) $data['userid']);
             $record->courseid = $this->get_mappingid('course', $data['courseid']);
             $record->actionid = $this->get_mappingid('notificationsagent_action', $data['actionid']);
             $record->actiondetail = $data['actiondetail'];
@@ -360,5 +360,23 @@ class restore_local_notificationsagent_plugin extends restore_local_plugin {
      */
     private function get_restored_ruleid($oldruleid): int {
         return (int) $this->get_mappingid('notificationsagent_rule', $oldruleid);
+    }
+
+    /**
+     * Map a user id from the backup to the id in the target site.
+     *
+     * @param int $olduserid User id in the backup
+     * @return int User id to store after restore
+     */
+    private function map_userid(int $olduserid): int {
+        $mapped = (int) $this->get_mappingid('user', $olduserid);
+        if ($mapped) {
+            return $mapped;
+        }
+        if ($this->task->is_samesite()) {
+            return $olduserid;
+        }
+
+        return (int) $this->task->get_userid();
     }
 }

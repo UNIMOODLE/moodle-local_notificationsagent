@@ -56,6 +56,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                 'defaultrule', 'template', 'forced', 'timesfired', 'runtime', 'isstudentrule',
         ]);
         $rules->add_child($rule);
+        $rule->annotate_ids('user', 'createdby');
 
         $contexts = new backup_nested_element('contexts');
         $rule->add_child($contexts);
@@ -84,6 +85,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                 'ruleid', 'courseid', 'userid', 'timesfired', 'timecreated', 'timemodified',
         ]);
         $launcheds->add_child($launched);
+        $launched->annotate_ids('user', 'userid');
 
         $reports = new backup_nested_element('reports');
         $rule->add_child($reports);
@@ -91,6 +93,7 @@ class backup_local_notificationsagent_plugin extends backup_local_plugin {
                 'ruleid', 'userid', 'courseid', 'actionid', 'actiondetail', 'timestamp',
         ]);
         $reports->add_child($report);
+        $report->annotate_ids('user', 'userid');
 
         // Calculated here, once settings such as "users" are already applied.
         $rule->set_source_array($this->get_rules_to_backup());

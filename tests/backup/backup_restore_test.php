@@ -44,6 +44,12 @@ use local_notificationsagent\rule;
  * @covers \restore_local_notificationsagent_plugin
  */
 final class backup_restore_test extends \advanced_testcase {
+    /** @var \stdClass Teacher who creates the teacher rule */
+    private \stdClass $teacher;
+
+    /** @var \stdClass Student who creates the student rule */
+    private \stdClass $student;
+
     /** @var string Name of the teacher rule */
     private const TEACHER_RULE = 'Teacher rule';
 
@@ -100,6 +106,36 @@ final class backup_restore_test extends \advanced_testcase {
     }
 
     /**
+     * With user data, restored rules keep the mapped creator ids.
+     */
+    public function test_restored_createdby_with_users(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->create_course_with_rules();
+        $newcourseid = $this->backup_and_restore($course, true, true, false);
+
+        $this->assert_rule_createdby($newcourseid, self::TEACHER_RULE, (int) $this->teacher->id);
+        $this->assert_rule_createdby($newcourseid, self::STUDENT_RULE, (int) $this->student->id);
+    }
+
+    /**
+     * On another site without user data, the teacher rule is owned by the user who runs the restore.
+     */
+    public function test_restored_createdby_foreign_site_without_users(): void {
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $admin = $generator->create_user();
+        $generator->role_assign('manager', $admin->id, \context_system::instance());
+
+        $course = $this->create_course_with_rules();
+        $this->setAdminUser();
+        $newcourseid = $this->backup_and_restore($course, false, false, false, true, (int) $admin->id);
+
+        $this->assert_rule_createdby($newcourseid, self::TEACHER_RULE, (int) $admin->id);
+    }
+
+    /**
      * Course copy without user data does not copy the student rule.
      */
     public function test_course_copy_without_userdata(): void {
@@ -150,14 +186,14 @@ final class backup_restore_test extends \advanced_testcase {
 
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $teacher = $generator->create_user();
-        $student = $generator->create_user();
-        $generator->enrol_user($teacher->id, $course->id, 'editingteacher');
-        $generator->enrol_user($student->id, $course->id, 'student');
+        $this->teacher = $generator->create_user();
+        $this->student = $generator->create_user();
+        $generator->enrol_user($this->teacher->id, $course->id, 'editingteacher');
+        $generator->enrol_user($this->student->id, $course->id, 'student');
 
-        $this->setUser($teacher);
+        $this->setUser($this->teacher);
         $teacheruleid = $this->create_rule($course->id, self::TEACHER_RULE);
-        $this->setUser($student);
+        $this->setUser($this->student);
         $studentruleid = $this->create_rule($course->id, self::STUDENT_RULE);
         $this->setAdminUser();
 
@@ -205,13 +241,17 @@ final class backup_restore_test extends \advanced_testcase {
      * @param bool $backupusers
      * @param bool $restoreusers
      * @param bool $stripstudentflag
+     * @param bool $foreignsite Simulate a backup from another Moodle site
+     * @param int|null $restoreuserid User id for restore_controller (defaults to current user)
      * @return int New course id
      */
     private function backup_and_restore(
         \stdClass $course,
         bool $backupusers,
         bool $restoreusers,
-        bool $stripstudentflag
+        bool $stripstudentflag,
+        bool $foreignsite = false,
+        ?int $restoreuserid = null
     ): int {
         global $CFG, $USER;
 
@@ -242,18 +282,22 @@ final class backup_restore_test extends \advanced_testcase {
             $this->assertNotSame($xml, $stripped);
             file_put_contents($file, $stripped);
         }
+        if ($foreignsite) {
+            $this->mark_backup_as_foreign_site($backupid);
+        }
 
         $newcourseid = \restore_dbops::create_new_course(
             $course->fullname,
             $course->shortname . '_r',
             $course->category
         );
+        $restoreuser = $restoreuserid ?? (int) $USER->id;
         $rc = new \restore_controller(
             $backupid,
             $newcourseid,
             \backup::INTERACTIVE_NO,
             \backup::MODE_GENERAL,
-            $USER->id,
+            $restoreuser,
             \backup::TARGET_NEW_COURSE
         );
         $rc->get_plan()->get_setting('users')->set_status(\backup_setting::NOT_LOCKED);
@@ -263,6 +307,33 @@ final class backup_restore_test extends \advanced_testcase {
         $rc->destroy();
 
         return $newcourseid;
+    }
+
+    /**
+     * Change the backup metadata so the restore treats it as coming from another site.
+     *
+     * @param string $backupid
+     */
+    private function mark_backup_as_foreign_site(string $backupid): void {
+        global $CFG;
+
+        $file = make_backup_temp_directory($backupid) . '/moodle_backup.xml';
+        $xml = file_get_contents($file);
+        $this->assertStringContainsString($CFG->wwwroot, $xml);
+        $xml = str_replace($CFG->wwwroot, 'https://foreign.example.invalid', $xml);
+
+        // Backups from Moodle 2.0+ compare original_site_identifier_hash, not only wwwroot.
+        $foreignhash = md5('local_notificationsagent_foreign_site_test');
+        $xml = preg_replace(
+            '/<original_site_identifier_hash>[^<]*<\/original_site_identifier_hash>/',
+            '<original_site_identifier_hash>' . $foreignhash . '</original_site_identifier_hash>',
+            $xml,
+            1,
+            $count
+        );
+        $this->assertGreaterThan(0, $count, 'Backup metadata must include original_site_identifier_hash');
+
+        file_put_contents($file, $xml);
     }
 
     /**
@@ -316,6 +387,34 @@ final class backup_restore_test extends \advanced_testcase {
         $this->assertNotFalse($ruleid);
         $this->assertTrue($DB->record_exists('notificationsagent_condition', ['ruleid' => $ruleid]));
         $this->assertTrue($DB->record_exists('notificationsagent_action', ['ruleid' => $ruleid]));
+    }
+
+    /**
+     * Assert the createdby value of a restored rule in the course.
+     *
+     * @param int $courseid
+     * @param string $name
+     * @param int $expecteduserid
+     */
+    private function assert_rule_createdby(int $courseid, string $name, int $expecteduserid): void {
+        global $DB;
+
+        $createdby = $DB->get_field_sql(
+            "SELECT nr.createdby
+               FROM {notificationsagent_rule} nr
+               JOIN {notificationsagent_context} nctx ON nctx.ruleid = nr.id
+              WHERE nctx.contextid = :contextid
+                AND nctx.objectid = :courseid
+                AND nr.name = :name
+                AND nr.deleted = 0",
+            [
+                'contextid' => CONTEXT_COURSE,
+                'courseid' => $courseid,
+                'name' => $name,
+            ]
+        );
+
+        $this->assertEquals($expecteduserid, (int) $createdby);
     }
 
     /**
