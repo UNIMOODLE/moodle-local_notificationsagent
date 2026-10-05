@@ -21,7 +21,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {checkRuleContext, deleteRule} from 'local_notificationsagent/rule/repository';
@@ -58,40 +58,34 @@ export const init = async() => {
  * @returns {Promise<void>}
  */
 const showModal = async(deleteItem) => {
-    let ruleObj = {};
+    try {
+        let ruleObj = {};
 
-    ruleObj.id = deleteItem.dataset.ruleid;
-    ruleObj.type = deleteItem.dataset.type;
-    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+        ruleObj.id = deleteItem.dataset.ruleid;
+        ruleObj.type = deleteItem.dataset.type;
+        ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+        ruleObj.hascontext = await hasRuleContext(deleteItem);
 
-    hasRuleContext(deleteItem).then(hasContext => {
-        ruleObj.hascontext = hasContext;
-
-        ModalFactory.create({
-            type: ModalFactory.types.SAVE_CANCEL,
-            title: getString('deletetitle', 'local_notificationsagent', ruleObj),
-            body: Templates.render('local_notificationsagent/modal/delete', {
+        const modal = await SaveCancelModal.create({
+            title: await getString('deletetitle', 'local_notificationsagent', ruleObj),
+            body: await Templates.render('local_notificationsagent/modal/delete', {
                 rule: ruleObj,
             }),
-        }).then(function(modal) {
-            modal.setSaveButtonText(getString('delete'));
+        });
+        await modal.setSaveButtonText(await getString('delete'));
 
-            // Handle save event.
-            modal.getRoot().on(ModalEvents.save, function() {
-                setDeleteRule(ruleObj.id);
-            });
+        modal.getRoot().on(ModalEvents.save, function() {
+            setDeleteRule(ruleObj.id);
+        });
 
-            // Handle hidden event.
-            modal.getRoot().on(ModalEvents.hidden, function() {
-                // Destroy when hidden.
-                modal.destroy();
-            });
+        modal.getRoot().on(ModalEvents.hidden, function() {
+            modal.destroy();
+        });
 
-            modal.show();
-
-            return true;
-        }).catch(Notification.exception);
-    });
+        modal.show();
+    } catch (exception) {
+        Notification.exception(exception);
+    }
 };
 
 /**

@@ -31,7 +31,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {updateRuleShare} from 'local_notificationsagent/rule/repository';
@@ -79,47 +79,44 @@ export const init = async() => {
  * @returns {Promise<void>}
  */
 const showModal = async(shareItem) => {
-    let ruleObj = {};
+    try {
+        let ruleObj = {};
 
-    ruleObj.id = shareItem.dataset.ruleid;
-    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
-    ruleObj.shared = shareItem.dataset.shared == SHARING_TYPE.SHARED ? SHARING_TYPE.SHARED : SHARING_TYPE.UNSHARED;
+        ruleObj.id = shareItem.dataset.ruleid;
+        ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+        ruleObj.shared = shareItem.dataset.shared == SHARING_TYPE.SHARED ? SHARING_TYPE.SHARED : SHARING_TYPE.UNSHARED;
 
-    if (!ruleObj.shared) {
-        ruleObj.name = await getString('unsharetitle', 'local_notificationsagent', ruleObj);
-    } else {
-        ruleObj.name = await getString('sharetitle', 'local_notificationsagent', ruleObj);
-    }
+        if (!ruleObj.shared) {
+            ruleObj.name = await getString('unsharetitle', 'local_notificationsagent', ruleObj);
+        } else {
+            ruleObj.name = await getString('sharetitle', 'local_notificationsagent', ruleObj);
+        }
 
-    ModalFactory.create({
-        type: ModalFactory.types.SAVE_CANCEL,
-        title: ruleObj.name,
-        body: Templates.render('local_notificationsagent/modal/share', {
-            rule: ruleObj,
-        }),
-    }).then(function(modal) {
-        let isShared = !ruleObj.shared ? SHARING_TYPE.UNSHARED : SHARING_TYPE.SHARED;
-        let shareBtnText = isShared ?
-            getString('editrule_unsharerule', 'local_notificationsagent') :
-            getString('editrule_sharerule', 'local_notificationsagent');
+        const isShared = !ruleObj.shared ? SHARING_TYPE.UNSHARED : SHARING_TYPE.SHARED;
+        const shareBtnText = isShared ?
+            await getString('editrule_unsharerule', 'local_notificationsagent') :
+            await getString('editrule_sharerule', 'local_notificationsagent');
 
-        modal.setSaveButtonText(shareBtnText);
+        const modal = await SaveCancelModal.create({
+            title: ruleObj.name,
+            body: await Templates.render('local_notificationsagent/modal/share', {
+                rule: ruleObj,
+            }),
+        });
+        await modal.setSaveButtonText(shareBtnText);
 
-        // Handle save event.
         modal.getRoot().on(ModalEvents.save, function() {
             setRuleShare(ruleObj.id, isShared);
         });
 
-        // Handle hidden event.
         modal.getRoot().on(ModalEvents.hidden, function() {
-            // Destroy when hidden.
             modal.destroy();
         });
 
         modal.show();
-
-        return true;
-    });
+    } catch (exception) {
+        Notification.exception(exception);
+    }
 };
 
 /**

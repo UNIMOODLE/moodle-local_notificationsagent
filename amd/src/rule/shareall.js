@@ -31,7 +31,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {shareAllRule} from 'local_notificationsagent/rule/repository';
@@ -68,36 +68,33 @@ export const init = async() => {
  * @returns {Promise<void>}
  */
 const showModal = async(shareAllItem) => {
-    let ruleObj = {};
+    try {
+        let ruleObj = {};
 
-    ruleObj.id = shareAllItem.dataset.ruleid;
-    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
-    ruleObj.name = await getString('sharealltitle', 'local_notificationsagent', ruleObj);
+        ruleObj.id = shareAllItem.dataset.ruleid;
+        ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+        ruleObj.name = await getString('sharealltitle', 'local_notificationsagent', ruleObj);
 
-    ModalFactory.create({
-        type: ModalFactory.types.SAVE_CANCEL,
-        title: ruleObj.name,
-        body: Templates.render('local_notificationsagent/modal/shareall', {
-            rule: ruleObj,
-        }),
-    }).then(function(modal) {
-        modal.setSaveButtonText(getString('editrule_shareallrule', 'local_notificationsagent'));
+        const modal = await SaveCancelModal.create({
+            title: ruleObj.name,
+            body: await Templates.render('local_notificationsagent/modal/shareall', {
+                rule: ruleObj,
+            }),
+        });
+        await modal.setSaveButtonText(await getString('editrule_shareallrule', 'local_notificationsagent'));
 
-        // Handle save event.
         modal.getRoot().on(ModalEvents.save, function() {
             setShareAllRule(ruleObj.id);
         });
 
-        // Handle hidden event.
         modal.getRoot().on(ModalEvents.hidden, function() {
-            // Destroy when hidden.
             modal.destroy();
         });
 
         modal.show();
-
-        return true;
-    });
+    } catch (exception) {
+        Notification.exception(exception);
+    }
 };
 
 /**

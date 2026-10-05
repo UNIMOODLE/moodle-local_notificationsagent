@@ -31,7 +31,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {updateRuleStatus} from 'local_notificationsagent/rule/repository';
@@ -79,46 +79,44 @@ export const init = async() => {
  * @returns {Promise<void>}
  */
 const showModal = async(updateStatusItem) => {
-    let ruleObj = {};
+    try {
+        let ruleObj = {};
 
-    ruleObj.id = updateStatusItem.dataset.ruleid;
-    ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
-    ruleObj.status = updateStatusItem.dataset.status == STATUS_TYPE.RESUMED ? STATUS_TYPE.RESUMED : STATUS_TYPE.PAUSED;
+        ruleObj.id = updateStatusItem.dataset.ruleid;
+        ruleObj.title = document.querySelector('#card-' + ruleObj.id + ' .name').textContent;
+        ruleObj.status = updateStatusItem.dataset.status == STATUS_TYPE.RESUMED ? STATUS_TYPE.RESUMED : STATUS_TYPE.PAUSED;
 
-    if (!ruleObj.status) {
-        ruleObj.name = await getString('status_pausetitle', 'local_notificationsagent', ruleObj);
-    } else {
-        ruleObj.name = await getString('status_activatetitle', 'local_notificationsagent', ruleObj);
-    }
+        if (!ruleObj.status) {
+            ruleObj.name = await getString('status_pausetitle', 'local_notificationsagent', ruleObj);
+        } else {
+            ruleObj.name = await getString('status_activatetitle', 'local_notificationsagent', ruleObj);
+        }
 
-    ModalFactory.create({
-        type: ModalFactory.types.SAVE_CANCEL,
-        title: ruleObj.name,
-        body: Templates.render('local_notificationsagent/modal/update_status', {
-            rule: ruleObj,
-        }),
-    }).then(function(modal) {
-        let isPaused = !ruleObj.status ? STATUS_TYPE.PAUSED : STATUS_TYPE.RESUMED;
-        let updateStatusBtnText = isPaused ?
-            getString('statuspause', 'local_notificationsagent') : getString('statusactivate', 'local_notificationsagent');
+        const isPaused = !ruleObj.status ? STATUS_TYPE.PAUSED : STATUS_TYPE.RESUMED;
+        const updateStatusBtnText = isPaused ?
+            await getString('statuspause', 'local_notificationsagent') :
+            await getString('statusactivate', 'local_notificationsagent');
 
-        modal.setSaveButtonText(updateStatusBtnText);
+        const modal = await SaveCancelModal.create({
+            title: ruleObj.name,
+            body: await Templates.render('local_notificationsagent/modal/update_status', {
+                rule: ruleObj,
+            }),
+        });
+        await modal.setSaveButtonText(updateStatusBtnText);
 
-        // Handle save event.
         modal.getRoot().on(ModalEvents.save, function() {
             setRuleStatus(ruleObj.id, isPaused);
         });
 
-        // Handle hidden event.
         modal.getRoot().on(ModalEvents.hidden, function() {
-            // Destroy when hidden.
             modal.destroy();
         });
 
         modal.show();
-
-        return true;
-    });
+    } catch (exception) {
+        Notification.exception(exception);
+    }
 };
 
 /**
